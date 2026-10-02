@@ -55,6 +55,7 @@
         <button class="active" data-tab="tab-upload" data-i18n="tabUpload">آپلود / متن</button>
         <button data-tab="tab-live" data-i18n="tabLive">پخش زنده</button>
         <button data-tab="tab-manage" data-i18n="tabManage">مدیریت پست‌ها</button>
+        <button data-tab="tab-playlists" data-i18n="tabPlaylists">پلی‌لیست‌ها</button>
         <button data-tab="tab-backup" data-i18n="tabBackup">پشتیبان</button>
       </div>
 
@@ -159,6 +160,25 @@
         <h3 style="margin-bottom:1rem" data-i18n="existingPosts">پست‌های موجود</h3>
         <p style="font-size:0.9rem;color:#666;margin-bottom:1rem" data-i18n="manageNote">برای حذف هر پست روی دکمه حذف کلیک کنید.</p>
         <div id="posts-list"></div>
+      </div>
+
+      <div id="tab-playlists" class="admin-tab-content hidden">
+        <h3 style="margin-bottom:1rem" data-i18n="playlistsTitle">پلی‌لیست‌ها</h3>
+        <p style="font-size:0.9rem;color:#666;margin-bottom:1rem" data-i18n="playlistsNote">پلی‌لیست با نام دلخواه بسازید و پست‌ها را به آن اضافه کنید.</p>
+        <form id="playlist-form" style="background:#f8f6f1;padding:1.2rem;border-radius:12px;margin-bottom:1.5rem;">
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="plNameFa">نام پلی‌لیست (فارسی)</label>
+              <input type="text" id="pl-name-fa" data-i18n-placeholder="plNameFaPh" placeholder="مثلاً: موعظه‌های مکاشفه">
+            </div>
+            <div class="form-group">
+              <label data-i18n="plNameEn">Playlist name (English)</label>
+              <input type="text" id="pl-name-en" data-i18n-placeholder="plNameEnPh" placeholder="e.g. Revelation sermons">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" data-i18n="plCreate">ساخت پلی‌لیست</button>
+        </form>
+        <div id="playlists-admin-list"></div>
       </div>
 
       <div id="tab-backup" class="admin-tab-content hidden">
