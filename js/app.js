@@ -6,13 +6,13 @@ const LANG_KEY = 'cog_lang';
 const PROGRESS_KEY = 'cog_progress';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBmeWRzeLOa5qVQc2CDSRvFCG2nVlF1z_0",
-  authDomain: "ruzekhodavand.firebaseapp.com",
-  projectId: "ruzekhodavand",
-  storageBucket: "ruzekhodavand.firebasestorage.app",
-  messagingSenderId: "993182198836",
-  appId: "1:993182198836:web:dcbe10a9f565b75d026e61",
-  measurementId: "G-0ZVP3ERTY9"
+  apiKey: "AIzaSyACmzOLWCtIBboDBTu8IbnjeS9NG-5Z87E",
+  authDomain: "lalala-9a4b6.firebaseapp.com",
+  projectId: "lalala-9a4b6",
+  storageBucket: "lalala-9a4b6.firebasestorage.app",
+  messagingSenderId: "304381949568",
+  appId: "1:304381949568:web:2178a803c6950d448bd865",
+  measurementId: "G-TPECJKXV61"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -397,7 +397,7 @@ function addComment(e, postId) {
 
 function escapeHtml(str) {
   if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
 }
 
 function setupEventListeners() {
