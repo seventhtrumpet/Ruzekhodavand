@@ -36,6 +36,7 @@
         <a href="#playlists" data-i18n="playlistsNav">پلی‌لیست‌ها</a>
         <a href="#live" data-i18n="live">پخش زنده</a>
         <a href="#questions" data-i18n="questionsNav">سوالات</a>
+        <a href="#feedback" data-i18n="feedbackNav">بازخورد</a>
         <a href="#contact" data-i18n="contact">تماس</a>
         <a href="admin.html" data-i18n="admin">مدیریت</a>
         <button id="theme-toggle" class="theme-toggle" title="Theme" aria-label="Toggle dark mode">🌙</button>
@@ -179,6 +180,44 @@
             <textarea name="message" required rows="4" placeholder="Your question..."></textarea>
           </div>
           <button type="submit" class="btn btn-primary" style="width:100%;" data-i18n="qSend">ارسال سوال</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="feedback" style="margin-top:3rem">
+      <h2 class="section-title" data-i18n="feedbackTitle">بازخورد</h2>
+      <div class="contact-card" style="max-width:560px;text-align:start;">
+        <p style="margin-bottom:1rem;color:var(--text-muted);font-size:0.95rem;" data-i18n="feedbackIntro">نظر یا پیشنهاد خود را بنویسید. بازخورد شما به ما کمک می‌کند سایت را بهتر کنیم.</p>
+        <form id="feedback-form" action="https://formsubmit.co/info.seventhtrumpet@gmail.com" method="POST">
+          <input type="hidden" name="_subject" value="Feedback from Seventh Trumpet website">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_next" value="https://ruzekhodavand.vercel.app/#feedback">
+          <input type="hidden" name="form_type" value="feedback">
+          <div class="form-group">
+            <label data-i18n="fbName">نام شما (اختیاری)</label>
+            <input type="text" name="name" data-i18n-placeholder="fbNamePh" placeholder="Name (optional)">
+          </div>
+          <div class="form-group">
+            <label data-i18n="fbEmail">ایمیل شما (اختیاری)</label>
+            <input type="email" name="email" data-i18n-placeholder="fbEmailPh" placeholder="you@email.com (optional)">
+          </div>
+          <div class="form-group">
+            <label data-i18n="fbRating">امتیاز (اختیاری)</label>
+            <select name="rating" id="fb-rating">
+              <option value="" data-i18n="fbRatingNone">— انتخاب کنید —</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="fbMessage">پیام بازخورد</label>
+            <textarea name="message" required rows="4" data-i18n-placeholder="fbMessagePh" placeholder="Your feedback..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;" data-i18n="fbSend">ارسال بازخورد</button>
         </form>
       </div>
     </section>
