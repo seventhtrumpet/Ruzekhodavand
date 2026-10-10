@@ -111,10 +111,14 @@ body.lang-en {
 }
 
 .lang-toggle {
-  background: var(--accent) !important;
-  color: var(--primary) !important;
+  background: rgba(255,255,255,0.95) !important;
+  color: #0a2540 !important;
   font-weight: 600;
   padding: 0.4rem 0.9rem !important;
+  border: 1px solid rgba(255,255,255,0.5) !important;
+}
+.lang-toggle:hover {
+  background: #fff !important;
 }
 
 .live-badge {
@@ -351,9 +355,10 @@ body.lang-en {
 .btn-primary { background: var(--primary); color: white; }
 body.dark .btn-primary { color: #0a1520; }
 .btn-primary:hover { filter: brightness(1.1); }
-.btn-accent { background: var(--accent); color: var(--primary); font-weight: 600; }
+.btn-accent { background: var(--primary); color: #fff; font-weight: 600; }
+body.dark .btn-accent { background: #4a90c8; color: #0a1520; }
 .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-.btn-outline:hover { border-color: var(--accent); color: var(--primary); }
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
 .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.85rem; }
 .btn-danger { background: var(--danger); color: white; }
 
@@ -600,7 +605,7 @@ body.dark .footer { background: #0a1520; }
 .daily-verse-label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--primary);
   text-transform: uppercase;
   margin-bottom: 0.6rem;
 }
