@@ -38,6 +38,10 @@
     textEl.textContent = fa ? v.fa : v.en;
     refEl.textContent = '— ' + (fa ? v.ref_fa : v.ref_en);
     window._verseIdx = idx % DAILY_VERSES.length;
+    const label = document.querySelector('[data-i18n="verseOfDay"]');
+    const btn = document.getElementById('verse-refresh');
+    if (label) label.textContent = fa ? 'آیه امروز' : 'Verse of the Day';
+    if (btn) btn.textContent = fa ? 'آیه دیگر' : 'Another verse';
   }
 
   function applyTheme(theme) {
@@ -139,12 +143,27 @@
     obs.observe(grid, { childList: true, subtree: true });
   }
 
+  // Ensure playlists nav/title translate even if app.js keys missing
+  function forcePlaylistLabels() {
+    const fa = lang() === 'fa';
+    document.querySelectorAll('[data-i18n="playlistsNav"]').forEach(el => {
+      el.textContent = fa ? 'پلی‌لیست‌ها' : 'Playlists';
+    });
+    document.querySelectorAll('[data-i18n="playlistsTitle"]').forEach(el => {
+      el.textContent = fa ? 'پلی‌لیست‌ها' : 'Playlists';
+    });
+  }
+
   function boot() {
     initTheme();
     initVerse();
     initScrollTop();
     patchOpenPost();
     improveEmptyState();
+    forcePlaylistLabels();
+    document.getElementById('lang-toggle')?.addEventListener('click', () => {
+      setTimeout(forcePlaylistLabels, 60);
+    });
   }
 
   if (document.readyState === 'loading') {
