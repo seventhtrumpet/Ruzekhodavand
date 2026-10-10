@@ -53,18 +53,6 @@
   line-height: 1.45;
   margin-top: 0.8rem;
 }
-.bible-nkjv-link {
-  display: inline-block;
-  margin-top: 0.6rem;
-  width: 100%;
-  text-align: center;
-  background: #0a2540 !important;
-  color: #fff !important;
-}
-body.dark .bible-nkjv-link {
-  background: #4a90c8 !important;
-  color: #0a1520 !important;
-}
 .bible-reader {
   background: var(--bg-card);
   border: 1px solid var(--border);
