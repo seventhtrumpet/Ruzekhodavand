@@ -155,8 +155,8 @@
 
   const EXTRA_I18N = {
     fa: {
-      playlistsNav: 'پلی‌لیست‌ها', playlistsTitle: 'پلی‌لیست‌ها',
-      verseOfDay: 'آیه امروز', newVerse: 'آیه دیگر',
+      bibleNav: 'کتاب مقدس', playlistsNav: 'پلی‌لیست‌ها', playlistsTitle: 'پلی‌لیست‌ها',
+      verseOfDay: 'آیه امروز', newVerse: 'آیه دیگر', subscribeNav: 'آیه روزانه',
       feedbackNav: 'بازخورد', feedbackTitle: 'بازخورد',
       feedbackIntro: 'نظر یا پیشنهاد خود را بنویسید. بازخورد شما به ما کمک می‌کند سایت را بهتر کنیم.',
       fbName: 'نام شما (اختیاری)', fbEmail: 'ایمیل شما (اختیاری)',
@@ -165,8 +165,8 @@
       fbNamePh: 'نام (اختیاری)', fbEmailPh: 'ایمیل (اختیاری)', fbMessagePh: 'بازخورد شما...'
     },
     en: {
-      playlistsNav: 'Playlists', playlistsTitle: 'Playlists',
-      verseOfDay: 'Verse of the Day', newVerse: 'Another verse',
+      bibleNav: 'Bible', playlistsNav: 'Playlists', playlistsTitle: 'Playlists',
+      verseOfDay: 'Verse of the Day', newVerse: 'Another verse', subscribeNav: 'Daily verse',
       feedbackNav: 'Feedback', feedbackTitle: 'Feedback',
       feedbackIntro: 'Share your thoughts or suggestions. Your feedback helps us improve the site.',
       fbName: 'Your name (optional)', fbEmail: 'Your email (optional)',
