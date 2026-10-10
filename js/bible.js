@@ -21,7 +21,6 @@
       footer: 'شیپور هفتم — پیام سه فرشته مکاشفه 14',
       version: 'هزارۀ نو (FANMV)',
       note: 'ترجمۀ فارسی «هزارۀ نو» © Elam Ministries.',
-      nkjv: '',
       errLoad: 'این کتاب هنوز بارگذاری نشده است. کتاب دیگری را امتحان کنید (مثلاً روت یا یونس).',
       errNet: 'خطا در بارگذاری. اتصال اینترنت را بررسی کنید.'
     },
@@ -30,8 +29,7 @@
       bibleBook: 'Book', bibleChapter: 'Chapter', bibleLoading: 'Loading...',
       footer: 'Seventh Trumpet — Three Angels Message, Revelation 14',
       version: 'King James Version (public domain)',
-      note: 'Full NKJV is copyrighted. Use the button for NKJV on Bible Gateway. On-page text is public-domain KJV.',
-      nkjv: 'Open this chapter in NKJV (Bible Gateway)',
+      note: 'English text: King James Version (public domain).',
       errLoad: 'Could not load this chapter.',
       errNet: 'Network error. Check your connection.'
     }
@@ -57,15 +55,6 @@
     if (ver) ver.textContent = t('version');
     const note = document.getElementById('bible-note');
     if (note) note.textContent = t('note');
-    const nkjv = document.getElementById('nkjv-link');
-    if (nkjv) {
-      if (currentLang === 'en') {
-        nkjv.classList.remove('hidden');
-        nkjv.textContent = t('nkjv');
-      } else {
-        nkjv.classList.add('hidden');
-      }
-    }
   }
 
   function saveState() {
@@ -147,16 +136,8 @@
     return null;
   }
 
-  function updateNkjvLink() {
-    const b = meta.find(x => x.id === bookId);
-    const nkjv = document.getElementById('nkjv-link');
-    if (!b || !nkjv) return;
-    nkjv.href = 'https://www.biblegateway.com/passage/?search=' +
-      encodeURIComponent(b.en + ' ' + chapter) + '&version=NKJV';
-  }
-
   function escapeHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>');
   }
 
   async function render() {
@@ -166,7 +147,6 @@
     if (!b || !box) return;
     box.innerHTML = '<p class="bible-loading">' + t('bibleLoading') + '</p>';
     heading.textContent = (currentLang === 'fa' ? b.fa : b.en) + ' ' + chapter;
-    updateNkjvLink();
     saveState();
 
     try {
