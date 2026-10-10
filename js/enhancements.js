@@ -143,14 +143,38 @@
     obs.observe(grid, { childList: true, subtree: true });
   }
 
-  // Ensure playlists nav/title translate even if app.js keys missing
-  function forcePlaylistLabels() {
-    const fa = lang() === 'fa';
-    document.querySelectorAll('[data-i18n="playlistsNav"]').forEach(el => {
-      el.textContent = fa ? 'پلی‌لیست‌ها' : 'Playlists';
-    });
-    document.querySelectorAll('[data-i18n="playlistsTitle"]').forEach(el => {
-      el.textContent = fa ? 'پلی‌لیست‌ها' : 'Playlists';
+  const EXTRA_I18N = {
+    fa: {
+      playlistsNav: 'پلی‌لیست‌ها', playlistsTitle: 'پلی‌لیست‌ها',
+      verseOfDay: 'آیه امروز', newVerse: 'آیه دیگر',
+      feedbackNav: 'بازخورد', feedbackTitle: 'بازخورد',
+      feedbackIntro: 'نظر یا پیشنهاد خود را بنویسید. بازخورد شما به ما کمک می‌کند سایت را بهتر کنیم.',
+      fbName: 'نام شما (اختیاری)', fbEmail: 'ایمیل شما (اختیاری)',
+      fbRating: 'امتیاز (اختیاری)', fbRatingNone: '— انتخاب کنید —',
+      fbMessage: 'پیام بازخورد', fbSend: 'ارسال بازخورد',
+      fbNamePh: 'نام (اختیاری)', fbEmailPh: 'ایمیل (اختیاری)', fbMessagePh: 'بازخورد شما...'
+    },
+    en: {
+      playlistsNav: 'Playlists', playlistsTitle: 'Playlists',
+      verseOfDay: 'Verse of the Day', newVerse: 'Another verse',
+      feedbackNav: 'Feedback', feedbackTitle: 'Feedback',
+      feedbackIntro: 'Share your thoughts or suggestions. Your feedback helps us improve the site.',
+      fbName: 'Your name (optional)', fbEmail: 'Your email (optional)',
+      fbRating: 'Rating (optional)', fbRatingNone: '— Choose —',
+      fbMessage: 'Your feedback', fbSend: 'Send feedback',
+      fbNamePh: 'Name (optional)', fbEmailPh: 'Email (optional)', fbMessagePh: 'Your feedback...'
+    }
+  };
+
+  function forceExtraLabels() {
+    const t = EXTRA_I18N[lang() === 'fa' ? 'fa' : 'en'];
+    Object.keys(t).forEach(key => {
+      document.querySelectorAll('[data-i18n="' + key + '"]').forEach(el => {
+        el.textContent = t[key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder="' + key + '"]').forEach(el => {
+        el.placeholder = t[key];
+      });
     });
   }
 
@@ -160,9 +184,9 @@
     initScrollTop();
     patchOpenPost();
     improveEmptyState();
-    forcePlaylistLabels();
+    forceExtraLabels();
     document.getElementById('lang-toggle')?.addEventListener('click', () => {
-      setTimeout(forcePlaylistLabels, 60);
+      setTimeout(forceExtraLabels, 60);
     });
   }
 
