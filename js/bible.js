@@ -83,10 +83,7 @@
   async function loadMeta() {
     try {
       const res = await fetch('data/bible-fa/meta.json');
-      if (res.ok) {
-        meta = await res.json();
-        return;
-      }
+      if (res.ok) { meta = await res.json(); return; }
     } catch (e) {}
     meta = [
       {id:10,fa:'پیدایش',en:'Genesis'},{id:80,fa:'روت',en:'Ruth'},{id:390,fa:'یونس',en:'Jonah'},
@@ -101,9 +98,7 @@
       const label = currentLang === 'fa' ? b.fa : b.en;
       return '<option value="' + b.id + '">' + label + '</option>';
     }).join('');
-    if (bookId == null || !meta.find(b => b.id === bookId)) {
-      bookId = meta[0].id;
-    }
+    if (bookId == null || !meta.find(b => b.id === bookId)) bookId = meta[0].id;
     sel.value = String(bookId);
   }
 
@@ -118,13 +113,38 @@
     sel.value = String(chapter);
   }
 
+  let packPromise = null;
+  async function loadPack() {
+    if (packPromise) return packPromise;
+    packPromise = (async () => {
+      const out = {};
+      for (const name of ['pack-a.json', 'pack-b.json', 'pack.json']) {
+        try {
+          const res = await fetch('data/bible-fa/' + name);
+          if (res.ok) Object.assign(out, await res.json());
+        } catch (e) {}
+      }
+      return out;
+    })();
+    return packPromise;
+  }
+
   async function loadFaBook(id) {
     if (faCache[id]) return faCache[id];
-    const res = await fetch('data/bible-fa/' + id + '.json');
-    if (!res.ok) return null;
-    const data = await res.json();
-    faCache[id] = data;
-    return data;
+    try {
+      const res = await fetch('data/bible-fa/' + id + '.json');
+      if (res.ok) {
+        const data = await res.json();
+        faCache[id] = data;
+        return data;
+      }
+    } catch (e) {}
+    const pack = await loadPack();
+    if (pack && pack[String(id)]) {
+      faCache[id] = pack[String(id)];
+      return faCache[id];
+    }
+    return null;
   }
 
   function updateNkjvLink() {
