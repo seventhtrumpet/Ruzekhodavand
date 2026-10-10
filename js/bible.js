@@ -1,9 +1,8 @@
-/* Seventh Trumpet — Bible reader (FA: FANMV via SQL.js / EN: KJV API) */
+/* Seventh Trumpet — Bible reader (FA: FANMV JSON packs / EN: KJV API) */
 (function () {
   const LANG_KEY = 'cog_lang';
   const THEME_KEY = 'cog_theme';
   const STATE_KEY = 'cog_bible_state';
-  const SQLITE_URL = 'data/bible-fa/FANMV.SQLite3';
 
   const CHAPTER_COUNTS = {
     10:50,20:40,30:27,40:36,50:34,60:24,70:21,80:4,90:31,100:24,
@@ -23,8 +22,7 @@
       version: 'هزارۀ نو (FANMV)',
       note: 'ترجمۀ فارسی «هزارۀ نو» © Elam Ministries.',
       errLoad: 'این کتاب در دسترس نیست.',
-      errNet: 'خطا در بارگذاری. اتصال اینترنت را بررسی کنید.',
-      errDb: 'پایگاه داده فارسی هنوز بارگذاری نشده. لطفاً فایل FANMV.SQLite3 را در مسیر data/bible-fa/ قرار دهید.'
+      errNet: 'خطا در بارگذاری. اتصال اینترنت را بررسی کنید.'
     },
     en: {
       siteName: 'Seventh Trumpet', home: 'Home', bibleNav: 'Bible', langBtn: 'Persian',
@@ -33,8 +31,7 @@
       version: 'King James Version (public domain)',
       note: 'English text: King James Version (public domain).',
       errLoad: 'Could not load this chapter.',
-      errNet: 'Network error. Check your connection.',
-      errDb: 'Persian database not found.'
+      errNet: 'Network error. Check your connection.'
     }
   };
 
@@ -42,9 +39,8 @@
   let currentLang = localStorage.getItem(LANG_KEY) || 'fa';
   let bookId = null;
   let chapter = 1;
-  let sqlDb = null;
-  let dbLoading = null;
   let faCache = {};
+  let manifest = null;
 
   function t(k) { return (I18N[currentLang] || I18N.fa)[k] || k; }
 
@@ -80,11 +76,23 @@
       if (res.ok) { meta = await res.json(); return; }
     } catch (e) {}
     meta = [
-      {id:10,fa:'پیدایش',en:'Genesis'},{id:20,fa:'خروج',en:'Exodus'},
-      {id:80,fa:'روت',en:'Ruth'},{id:390,fa:'یونس',en:'Jonah'},
+      {id:10,fa:'پیدایش',en:'Genesis'},{id:80,fa:'روت',en:'Ruth'},
       {id:470,fa:'متی',en:'Matthew'},{id:500,fa:'یوحنا',en:'John'},
       {id:730,fa:'مکاشفه',en:'Revelation'}
     ];
+  }
+
+  async function loadManifest() {
+    if (manifest) return manifest;
+    try {
+      const res = await fetch('data/bible-fa/manifest.json');
+      if (res.ok) {
+        manifest = await res.json();
+        return manifest;
+      }
+    } catch (e) {}
+    manifest = {};
+    return manifest;
   }
 
   function fillBooks() {
@@ -109,93 +117,27 @@
     sel.value = String(chapter);
   }
 
-  function cleanText(t) {
-    if (!t) return '';
-    return String(t).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-  }
-
-  async function ensureDb() {
-    if (sqlDb) return sqlDb;
-    if (dbLoading) return dbLoading;
-    dbLoading = (async () => {
-      try {
-        if (typeof initSqlJs === 'undefined') {
-          await new Promise((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js';
-            s.onload = resolve;
-            s.onerror = reject;
-            document.head.appendChild(s);
-          });
-        }
-        const SQL = await initSqlJs({
-          locateFile: file => 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/' + file
-        });
-        const res = await fetch(SQLITE_URL);
-        if (!res.ok) throw new Error('db missing');
-        const buf = await res.arrayBuffer();
-        sqlDb = new SQL.Database(new Uint8Array(buf));
-        return sqlDb;
-      } catch (e) {
-        console.error('FANMV load failed', e);
-        sqlDb = null;
-        return null;
-      }
-    })();
-    return dbLoading;
-  }
-
   async function loadFaBook(id) {
     if (faCache[id]) return faCache[id];
-    try {
-      const res = await fetch('data/bible-fa/' + id + '.json');
-      if (res.ok) {
-        const data = await res.json();
-        faCache[id] = data;
-        return data;
-      }
-    } catch (e) {}
-    try {
-      const manRes = await fetch('data/bible-fa/manifest.json');
-      if (manRes.ok) {
-        const man = await manRes.json();
-        const packName = man[String(id)];
-        if (packName) {
-          const pr = await fetch('data/bible-fa/' + packName);
-          if (pr.ok) {
-            const pack = await pr.json();
-            Object.keys(pack).forEach(k => { faCache[k] = pack[k]; });
-            if (faCache[id]) return faCache[id];
-          }
-        }
-      }
-    } catch (e) {}
-    const db = await ensureDb();
-    if (!db) return null;
-    try {
-      const stmt = db.prepare(
-        'SELECT chapter, verse, text FROM verses WHERE book_number=? ORDER BY chapter, verse'
-      );
-      stmt.bind([id]);
-      const chapters = {};
-      while (stmt.step()) {
-        const row = stmt.getAsObject();
-        const ch = String(row.chapter);
-        const v = String(row.verse);
-        if (!chapters[ch]) chapters[ch] = {};
-        chapters[ch][v] = cleanText(row.text);
-      }
-      stmt.free();
-      if (!Object.keys(chapters).length) return null;
-      const nameRow = db.exec('SELECT long_name FROM books WHERE book_number=' + id);
-      const name = nameRow[0] && nameRow[0].values[0] ? nameRow[0].values[0][0] : '';
-      const data = { id: id, name: name, chapters: chapters };
-      faCache[id] = data;
-      return data;
-    } catch (e) {
-      console.error(e);
-      return null;
+    const man = await loadManifest();
+    const files = man[String(id)] || ['b' + id + '.json'];
+    const merged = { id: id, name: '', chapters: {} };
+    let any = false;
+    for (const fname of files) {
+      try {
+        const res = await fetch('data/bible-fa/' + fname);
+        if (!res.ok) continue;
+        const pack = await res.json();
+        const data = pack[String(id)] || pack[id];
+        if (!data) continue;
+        any = true;
+        if (data.name) merged.name = data.name;
+        Object.assign(merged.chapters, data.chapters || {});
+      } catch (e) {}
     }
+    if (!any) return null;
+    faCache[id] = merged;
+    return merged;
   }
 
   function escapeHtml(s) {
@@ -215,7 +157,7 @@
       if (currentLang === 'fa') {
         const data = await loadFaBook(bookId);
         if (!data) {
-          box.innerHTML = '<p class="bible-loading">' + t('errDb') + '</p>';
+          box.innerHTML = '<p class="bible-loading">' + t('errLoad') + '</p>';
           return;
         }
         const verses = (data.chapters && data.chapters[String(chapter)]) || {};
@@ -313,7 +255,6 @@
     await loadMeta();
     fillBooks();
     fillChapters();
-    if (currentLang === 'fa') ensureDb();
     await render();
 
     document.getElementById('bible-book')?.addEventListener('change', onBookChange);
@@ -326,7 +267,6 @@
       applyChrome();
       fillBooks();
       fillChapters();
-      if (currentLang === 'fa') ensureDb();
       await render();
     });
   }
