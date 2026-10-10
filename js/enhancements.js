@@ -1,6 +1,16 @@
 /* Seventh Trumpet - UX enhancements */
 (function () {
   const THEME_KEY = 'cog_theme';
+
+  // Keep Latin digits even when locale is Persian
+  (function () {
+    const orig = Date.prototype.toLocaleString;
+    Date.prototype.toLocaleString = function (locale, options) {
+      if (locale === 'fa-IR') locale = 'fa-IR-u-nu-latn';
+      return orig.call(this, locale, options);
+    };
+  })();
+
   const DAILY_VERSES = [
     { fa: 'زیرا خدا جهان را این‌قدر محبت نمود که پسر یگانه خود را داد تا هر که بر او ایمان آورد هلاک نگردد بلکه حیات جاودانی یابد.', en: 'For God so loved the world that He gave His only begotten Son, that whoever believes in Him should not perish but have everlasting life.', ref_fa: 'یوحنا ۳:۱۶', ref_en: 'John 3:16' },
     { fa: 'و این انجیل ملکوت در تمام عالم موعظه خواهد شد تا شهادتی برای جمیع امت‌ها باشد؛ آنگاه انتها خواهد رسید.', en: 'And this gospel of the kingdom will be preached in all the world as a witness to all the nations, and then the end will come.', ref_fa: 'متی ۲۴:۱۴', ref_en: 'Matthew 24:14' },
