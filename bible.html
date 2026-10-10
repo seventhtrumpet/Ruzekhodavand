@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bible — کتاب مقدس | Seventh Trumpet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/bible.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span data-i18n="siteName">شیپور هفتم</span></a>
+      <nav class="nav">
+        <a href="index.html" data-i18n="home">خانه</a>
+        <a href="bible.html" class="active" data-i18n="bibleNav">کتاب مقدس</a>
+        <button id="theme-toggle" class="theme-toggle" title="Theme">🌙</button>
+        <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="bible-app">
+    <aside class="bible-sidebar">
+      <div class="bible-version" id="bible-version-label">هزارۀ نو</div>
+      <label class="bible-label" data-i18n="bibleBook">کتاب</label>
+      <select id="bible-book"></select>
+      <label class="bible-label" data-i18n="bibleChapter">باب</label>
+      <select id="bible-chapter"></select>
+      <div class="bible-nav-btns">
+        <button type="button" id="bible-prev" class="btn btn-outline btn-sm">◀</button>
+        <button type="button" id="bible-next" class="btn btn-outline btn-sm">▶</button>
+      </div>
+      <p class="bible-note" id="bible-note"></p>
+      <a id="nkjv-link" class="btn btn-accent btn-sm bible-nkjv-link hidden" href="#" target="_blank" rel="noopener">Open NKJV on Bible Gateway</a>
+    </aside>
+    <section class="bible-reader">
+      <h1 id="bible-heading" class="bible-heading"></h1>
+      <div id="bible-verses" class="bible-verses">
+        <p class="bible-loading" data-i18n="bibleLoading">در حال بارگذاری...</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه 14</p>
+  </footer>
+
+  <script src="js/bible.js"></script>
+</body>
+</html>

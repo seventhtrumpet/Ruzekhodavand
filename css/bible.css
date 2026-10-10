@@ -1,0 +1,86 @@
+.bible-app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.2rem 1rem 3rem;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+  min-height: 70vh;
+}
+@media (max-width: 720px) {
+  .bible-app { grid-template-columns: 1fr; }
+}
+.bible-sidebar {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  height: fit-content;
+  position: sticky;
+  top: 4.5rem;
+}
+.bible-version {
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+}
+.bible-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0.5rem 0 0.25rem;
+}
+.bible-sidebar select {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.bible-nav-btns {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.8rem 0;
+}
+.bible-nav-btns .btn { flex: 1; }
+.bible-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-top: 0.8rem;
+}
+.bible-nkjv-link { display: inline-block; margin-top: 0.6rem; width: 100%; text-align: center; }
+.bible-reader {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.4rem 1.5rem 2rem;
+  box-shadow: var(--shadow);
+}
+.bible-heading {
+  color: var(--primary);
+  font-size: 1.4rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--accent);
+}
+.bible-verses { line-height: 2; font-size: 1.08rem; }
+.bible-verse { margin-bottom: 0.55rem; }
+.bible-verse-num {
+  display: inline-block;
+  min-width: 1.6em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  vertical-align: top;
+  margin-inline-end: 0.35rem;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.bible-loading { color: var(--text-muted); text-align: center; padding: 2rem; }
+body.lang-en .bible-app { direction: ltr; }
+body.lang-en .bible-verses { font-family: var(--font-en); }
