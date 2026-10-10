@@ -928,6 +928,34 @@ body.dark .modal {
   50% { opacity: 0.7; transform: scale(1.4); }
 }
 
+/* Numbers always LTR (do not flip in Persian RTL) */
+.num-ltr,
+.angel-num,
+.media-meta,
+.comment-date,
+.daily-verse-ref,
+.contact-item a[href^="tel:"],
+.contact-item a[href^="https://wa.me"],
+a[href^="tel:"],
+a[href^="https://wa.me"],
+input[type="date"],
+input[type="time"],
+input[type="number"],
+#fb-rating {
+  direction: ltr !important;
+  unicode-bidi: isolate;
+  text-align: start;
+}
+
+.contact-item > div {
+  min-width: 0;
+}
+.contact-item a {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
 @media (max-width: 600px) {
   .form-row { grid-template-columns: 1fr; }
   .header-inner { flex-direction: column; align-items: flex-start; }
