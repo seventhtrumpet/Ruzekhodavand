@@ -1,6 +1,24 @@
-/* Seventh Trumpet — side menu (hamburger) — secondary links only */
+/* Seventh Trumpet — side menu (secondary links + theme) */
 (function () {
   const THEME_KEY = 'cog_theme';
+
+  function getLang() {
+    return (typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'fa';
+  }
+
+  function labels() {
+    const fa = getLang() === 'fa';
+    return {
+      title: fa ? 'شیپور هفتم' : 'Seventh Trumpet',
+      questions: fa ? 'سوالات' : 'Questions',
+      feedback: fa ? 'بازخورد' : 'Feedback',
+      admin: fa ? 'مدیریت' : 'Admin',
+      theme: fa ? 'حالت شب / روز' : 'Dark / Light mode',
+      playlists: fa ? 'پلی‌لیست‌ها' : 'Playlists',
+      subscribe: fa ? 'آیه روزانه' : 'Daily verse',
+      contact: fa ? 'تماس' : 'Contact'
+    };
+  }
 
   function applyThemeIcon(theme) {
     const icon = document.getElementById('theme-icon');
@@ -14,16 +32,39 @@
     try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
   }
 
+  function refreshMenuLabels() {
+    const L = labels();
+    const head = document.querySelector('.side-menu-head span');
+    if (head) head.textContent = L.title;
+    const map = {
+      'menu-link-questions': L.questions,
+      'menu-link-feedback': L.feedback,
+      'menu-link-admin': L.admin,
+      'menu-link-playlists': L.playlists,
+      'menu-link-subscribe': L.subscribe,
+      'menu-link-contact': L.contact
+    };
+    Object.keys(map).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = map[id];
+    });
+    const themeLabel = document.getElementById('theme-label');
+    if (themeLabel) themeLabel.textContent = L.theme;
+  }
+  window.updateSideMenuLang = refreshMenuLabels;
+
   function initSideMenu() {
     if (document.getElementById('menu-toggle')) return;
 
     const headerInner = document.querySelector('.header-inner');
     if (!headerInner) return;
 
-    // Keep main nav visible — only add hamburger next to it
+    // Remove theme from main nav — it lives in secondary menu
+    const themeInNav = document.querySelector('.nav #theme-toggle, .nav-main #theme-toggle');
+    if (themeInNav) themeInNav.remove();
+
     const langBtn = document.getElementById('lang-toggle');
     const liveBadge = document.getElementById('live-badge');
-    const themeBtn = document.getElementById('theme-toggle');
 
     let actions = headerInner.querySelector('.header-actions');
     if (!actions) {
@@ -31,8 +72,6 @@
       actions.className = 'header-actions';
       headerInner.appendChild(actions);
     }
-
-    // Move lang + live badge into actions if still in nav (keeps them on the right)
     if (langBtn && langBtn.parentNode && langBtn.parentNode.classList.contains('nav')) {
       actions.appendChild(langBtn);
     }
@@ -62,22 +101,24 @@
     overlay.hidden = true;
     document.body.appendChild(overlay);
 
+    const L = labels();
     const panel = document.createElement('aside');
     panel.id = 'side-menu';
     panel.className = 'side-menu';
     panel.setAttribute('aria-hidden', 'true');
-    // Secondary only — important links stay in the top bar
     panel.innerHTML =
-      '<div class="side-menu-head"><span>شیپور هفتم</span>' +
+      '<div class="side-menu-head"><span>' + L.title + '</span>' +
       '<button type="button" id="menu-close" class="menu-close" aria-label="Close">×</button></div>' +
       '<nav class="side-menu-nav">' +
-      '<a href="#questions" data-menu-link>سوالات / Questions</a>' +
-      '<a href="#feedback" data-menu-link>بازخورد / Feedback</a>' +
-      '<a href="admin.html">مدیریت / Admin</a>' +
+      '<a href="#questions" id="menu-link-questions" data-menu-link>' + L.questions + '</a>' +
+      '<a href="#feedback" id="menu-link-feedback" data-menu-link>' + L.feedback + '</a>' +
+      '<a href="admin.html" id="menu-link-admin">' + L.admin + '</a>' +
+      '<button type="button" id="theme-toggle" class="side-menu-btn">' +
+      '<span id="theme-icon">🌙</span> <span id="theme-label">' + L.theme + '</span></button>' +
       '<hr class="side-menu-hr">' +
-      '<a href="#playlists" data-menu-link>پلی‌لیست‌ها / Playlists</a>' +
-      '<a href="#subscribe" data-menu-link>آیه روزانه / Daily verse</a>' +
-      '<a href="#contact" data-menu-link>تماس / Contact</a>' +
+      '<a href="#playlists" id="menu-link-playlists" data-menu-link>' + L.playlists + '</a>' +
+      '<a href="#subscribe" id="menu-link-subscribe" data-menu-link>' + L.subscribe + '</a>' +
+      '<a href="#contact" id="menu-link-contact" data-menu-link>' + L.contact + '</a>' +
       '</nav>';
     document.body.appendChild(panel);
 
@@ -101,17 +142,18 @@
     panel.querySelectorAll('[data-menu-link]').forEach(a => a.addEventListener('click', closeMenu));
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
 
-    // Theme button in main nav
-    if (themeBtn && !themeBtn.dataset.bound) {
-      themeBtn.dataset.bound = '1';
-      themeBtn.addEventListener('click', () => {
-        const next = document.body.classList.contains('dark') ? 'light' : 'dark';
-        applyThemeIcon(next);
-      });
-    }
+    const themeBtn = document.getElementById('theme-toggle');
+    themeBtn.addEventListener('click', () => {
+      const next = document.body.classList.contains('dark') ? 'light' : 'dark';
+      applyThemeIcon(next);
+    });
     const saved = localStorage.getItem(THEME_KEY);
     if (saved === 'dark' || document.body.classList.contains('dark')) applyThemeIcon('dark');
     else applyThemeIcon(saved || 'light');
+
+    document.getElementById('lang-toggle')?.addEventListener('click', () => {
+      setTimeout(refreshMenuLabels, 30);
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSideMenu);
