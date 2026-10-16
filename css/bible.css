@@ -107,3 +107,33 @@
 .bible-loading { color: var(--text-muted); text-align: center; padding: 2rem; }
 body.lang-en .bible-app { direction: ltr; }
 body.lang-en .bible-verses { font-family: var(--font-en); }
+
+.bible-pill {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  background: var(--primary, #0a2540);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 1.15rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  box-shadow: 0 4px 18px rgba(10, 37, 64, 0.28);
+  cursor: pointer;
+  max-width: 90vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.bible-pill:hover { filter: brightness(1.08); }
+.bible-pill.hidden { display: none; }
+body.dark .bible-pill {
+  background: #1a3a5c;
+  color: #e8eef5;
+}
