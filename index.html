@@ -3,41 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Seventh Trumpet — شیپور هفتم | پیام سه فرشته</title>
-  <meta name="description" content="Seventh Trumpet — شیپور هفتم. پیام سه فرشته مکاشفه 14. The everlasting gospel and Three Angels Message.">
-  <meta name="keywords" content="Seventh Trumpet, شیپور هفتم, Three Angels Message, پیام سه فرشته, Church of God, Revelation 14, everlasting gospel">
-  <meta name="author" content="Seventh Trumpet">
   <meta name="robots" content="index, follow">
-  <meta property="og:title" content="Seventh Trumpet — شیپور هفتم">
-  <meta property="og:description" content="پیام سه فرشته مکاشفه 14 — The everlasting gospel to every nation">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://ruzekhodavand.vercel.app/">
-  <meta property="og:site_name" content="Seventh Trumpet">
-  <link rel="canonical" href="https://ruzekhodavand.vercel.app/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/menu.css">
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+  <title>خانه | شیپور هفتم</title>
+  <meta name="description" content="Home — Seventh Trumpet">
 </head>
-<body>
+<body data-page="home">
   <header class="header">
     <div class="header-inner">
-      <a href="index.html" class="logo">
-        <span data-i18n="siteName">شیپور هفتم</span>
-      </a>
+      <a href="index.html" class="logo"><span data-i18n="siteName">شیپور هفتم</span></a>
       <nav class="nav nav-main">
-        <a href="#home" data-i18n="home">خانه</a>
-        <a href="#media" data-i18n="media">رسانه‌ها</a>
-        <a href="bible.html" data-i18n="bibleNav">کتاب مقدس</a>
-        <a href="#live" data-i18n="live">پخش زنده</a>
+        <a href="index.html" data-i18n="home" data-nav="home">خانه</a>
+        <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
+        <a href="bible.html" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
+        <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
         <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
         <span id="live-badge" class="live-badge hidden" data-i18n="liveBadge">زنده</span>
       </nav>
     </div>
   </header>
-
   <div id="user-bar" style="background:#f0f4f8;padding:0.6rem 1rem;border-bottom:1px solid #dde3ea;font-size:0.9rem;">
     <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.7rem;max-width:1200px;margin:0 auto;">
       <div id="auth-logged-out" style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">
@@ -54,27 +44,19 @@
       </div>
     </div>
   </div>
-
   <div id="email-modal" class="modal-overlay">
     <div class="modal" style="max-width:400px;">
       <button class="modal-close" onclick="closeEmailModal()">&times;</button>
       <h2 style="margin-bottom:1rem;color:var(--primary)" data-i18n="emailLoginTitle">ورود با ایمیل</h2>
       <div id="email-form">
-        <div class="form-group">
-          <label data-i18n="emailLabel">ایمیل</label>
-          <input type="email" id="email-input" placeholder="you@gmail.com" required>
-        </div>
-        <div class="form-group">
-          <label data-i18n="passwordLabel">رمز عبور</label>
-          <input type="password" id="email-password" placeholder="••••••••" required>
-        </div>
+        <div class="form-group"><label data-i18n="emailLabel">ایمیل</label><input type="email" id="email-input" placeholder="you@gmail.com" required></div>
+        <div class="form-group"><label data-i18n="passwordLabel">رمز عبور</label><input type="password" id="email-password" placeholder="••••••••" required></div>
         <div id="email-error" style="color:#c62828;font-size:0.9rem;margin-bottom:0.8rem;display:none;"></div>
         <button id="btn-email-login" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;" data-i18n="loginBtn">ورود</button>
         <button id="btn-email-register" class="btn btn-outline" style="width:100%;" data-i18n="registerBtn">ثبت‌نام</button>
       </div>
     </div>
   </div>
-
   <section class="hero" id="home">
     <div class="hero-stars" aria-hidden="true">
       <span style="top:12%;left:8%;animation-delay:0s"></span>
@@ -88,27 +70,14 @@
     <div class="hero-content">
       <h1 data-i18n="heroTitle">شیپور هفتم</h1>
       <p data-i18n="heroSub">پیام جاودانی انجیل برای تمام قوم‌ها، زبان‌ها و ملت‌ها</p>
-      <p style="font-size:0.95rem;opacity:0.8;margin-top:-0.5rem" data-i18n="tagline">پیام سه فرشته — مکاشفه 14</p>
+      <p style="font-size:0.95rem;opacity:0.8;margin-top:-0.5rem" data-i18n="tagline">پیام سه فرشته — مکاشفه ۱۴</p>
       <div class="angels-row">
-        <div class="angel-card">
-          <div class="angel-num">1</div>
-          <div class="angel-title" data-i18n="angel1">فرشته اول</div>
-          <div class="angel-text" data-i18n="angel1Text">از خدا بترسید و او را جلال دهید، زیرا ساعت داوری او رسیده است</div>
-        </div>
-        <div class="angel-card">
-          <div class="angel-num">2</div>
-          <div class="angel-title" data-i18n="angel2">فرشته دوم</div>
-          <div class="angel-text" data-i18n="angel2Text">بابل سقوط کرده است! سقوط کرده است!</div>
-        </div>
-        <div class="angel-card">
-          <div class="angel-num">3</div>
-          <div class="angel-title" data-i18n="angel3">فرشته سوم</div>
-          <div class="angel-text" data-i18n="angel3Text">اگر کسی وحش و تصویرش را بپرستد...</div>
-        </div>
+        <div class="angel-card"><div class="angel-num">1</div><div class="angel-title" data-i18n="angel1">فرشته اول</div><div class="angel-text" data-i18n="angel1Text">از خدا بترسید و او را جلال دهید، زیرا ساعت داوری او رسیده است</div></div>
+        <div class="angel-card"><div class="angel-num">2</div><div class="angel-title" data-i18n="angel2">فرشته دوم</div><div class="angel-text" data-i18n="angel2Text">بابل سقوط کرده است! سقوط کرده است!</div></div>
+        <div class="angel-card"><div class="angel-num">3</div><div class="angel-title" data-i18n="angel3">فرشته سوم</div><div class="angel-text" data-i18n="angel3Text">اگر کسی وحش و تصویرش را بپرستد...</div></div>
       </div>
     </div>
   </section>
-
   <section class="daily-verse" id="daily-verse">
     <div class="daily-verse-inner">
       <div class="daily-verse-label" data-i18n="verseOfDay">آیه امروز</div>
@@ -117,150 +86,27 @@
       <button type="button" id="verse-refresh" class="verse-refresh" data-i18n="newVerse">آیه دیگر</button>
     </div>
   </section>
-
-  <div id="subscribe-mount"></div>
-
-  <main class="container">
-    <section id="live-section" class="live-section hidden">
-      <div class="live-indicator">
-        <span class="live-dot"></span>
-        <span data-i18n="liveNow">در حال پخش زنده</span>
-      </div>
-      <h2 id="live-title" style="margin-bottom:0.5rem"></h2>
-      <iframe id="live-iframe" class="live-iframe" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-    </section>
-
-    <section id="media">
-      <h2 class="section-title" data-i18n="media">رسانه‌ها</h2>
-      <div class="filters">
-        <select id="filter-book"><option value="" data-i18n="all">همه</option></select>
-        <select id="filter-type">
-          <option value="" data-i18n="all">همه</option>
-          <option value="text" data-i18n="text">متن</option>
-          <option value="photo" data-i18n="photo">عکس</option>
-          <option value="video" data-i18n="video">ویدیو</option>
-          <option value="audio" data-i18n="audio">صوت</option>
-          <option value="file" data-i18n="file">فایل</option>
-        </select>
-        <input type="search" id="filter-search" data-i18n-placeholder="search" placeholder="جستجو...">
-      </div>
-      <div id="media-grid" class="media-grid"></div>
-    </section>
-
-    <section id="playlists" style="margin-top:3rem">
-      <h2 class="section-title" data-i18n="playlistsTitle">پلی‌لیست‌ها</h2>
-      <div id="playlists-grid" class="media-grid"></div>
-    </section>
-
-    <section id="questions" style="margin-top:3rem">
-      <h2 class="section-title" data-i18n="questionsTitle">پرسش و پاسخ</h2>
-      <div class="contact-card" style="max-width:560px;text-align:start;">
-        <p style="margin-bottom:1rem;color:var(--text-muted);font-size:0.95rem;" data-i18n="questionsIntro">سوال خود را بنویسید. پاسخ از طریق ایمیل برای شما ارسال می‌شود.</p>
-        <form id="question-form" action="https://formsubmit.co/info.seventhtrumpet@gmail.com" method="POST">
-          <input type="hidden" name="_subject" value="New question from Seventh Trumpet website">
-          <input type="hidden" name="_captcha" value="false">
-          <input type="hidden" name="_template" value="table">
-          <input type="hidden" name="_next" value="https://ruzekhodavand.vercel.app/#questions">
-          <div class="form-group">
-            <label data-i18n="qName">نام شما</label>
-            <input type="text" name="name" required placeholder="Name">
-          </div>
-          <div class="form-group">
-            <label data-i18n="qEmail">ایمیل شما (برای پاسخ)</label>
-            <input type="email" name="email" required placeholder="you@email.com">
-          </div>
-          <div class="form-group">
-            <label data-i18n="qQuestion">سوال شما</label>
-            <textarea name="message" required rows="4" placeholder="Your question..."></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary" style="width:100%;" data-i18n="qSend">ارسال سوال</button>
-        </form>
-      </div>
-    </section>
-
-    <section id="feedback" style="margin-top:3rem">
-      <h2 class="section-title" data-i18n="feedbackTitle">بازخورد</h2>
-      <div class="contact-card" style="max-width:560px;text-align:start;">
-        <p style="margin-bottom:1rem;color:var(--text-muted);font-size:0.95rem;" data-i18n="feedbackIntro">نظر یا پیشنهاد خود را بنویسید. بازخورد شما به ما کمک می‌کند سایت را بهتر کنیم.</p>
-        <form id="feedback-form" action="https://formsubmit.co/info.seventhtrumpet@gmail.com" method="POST">
-          <input type="hidden" name="_subject" value="Feedback from Seventh Trumpet website">
-          <input type="hidden" name="_captcha" value="false">
-          <input type="hidden" name="_template" value="table">
-          <input type="hidden" name="_next" value="https://ruzekhodavand.vercel.app/#feedback">
-          <input type="hidden" name="form_type" value="feedback">
-          <div class="form-group">
-            <label data-i18n="fbName">نام شما (اختیاری)</label>
-            <input type="text" name="name" data-i18n-placeholder="fbNamePh" placeholder="Name (optional)">
-          </div>
-          <div class="form-group">
-            <label data-i18n="fbEmail">ایمیل شما (اختیاری)</label>
-            <input type="email" name="email" data-i18n-placeholder="fbEmailPh" placeholder="you@email.com (optional)">
-          </div>
-          <div class="form-group">
-            <label data-i18n="fbRating">امتیاز (اختیاری)</label>
-            <select name="rating" id="fb-rating">
-              <option value="" data-i18n="fbRatingNone">— انتخاب کنید —</option>
-              <option value="5">⭐⭐⭐⭐⭐</option>
-              <option value="4">⭐⭐⭐⭐</option>
-              <option value="3">⭐⭐⭐</option>
-              <option value="2">⭐⭐</option>
-              <option value="1">⭐</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label data-i18n="fbMessage">پیام بازخورد</label>
-            <textarea name="message" required rows="4" data-i18n-placeholder="fbMessagePh" placeholder="Your feedback..."></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary" style="width:100%;" data-i18n="fbSend">ارسال بازخورد</button>
-        </form>
-      </div>
-    </section>
-
-    <section id="contact" style="margin-top:3rem">
-      <h2 class="section-title" data-i18n="contactTitle">تماس با ما</h2>
-      <div class="contact-card">
-        <div class="contact-item">
-          <span>📱</span>
-          <div>
-            <div data-i18n="whatsapp">واتساپ</div>
-            <a href="https://wa.me/442081333076" target="_blank" rel="noopener" dir="ltr" class="num-ltr">+44 208 133 3076</a>
-          </div>
-        </div>
-        <div class="contact-item">
-          <span>📞</span>
-          <div>
-            <div data-i18n="phone">تلفن</div>
-            <a href="tel:+37433222450" dir="ltr" class="num-ltr">+374 33 222 450</a>
-          </div>
-        </div>
-        <div class="contact-item">
-          <span>✉️</span>
-          <div>
-            <div data-i18n="email">ایمیل</div>
-            <a href="mailto:info.seventhtrumpet@gmail.com">info.seventhtrumpet@gmail.com</a><br>
-            <a href="mailto:seventh.trumpet@yahoo.com">seventh.trumpet@yahoo.com</a>
-          </div>
-        </div>
-      </div>
-    </section>
+  <main class="container" style="padding-bottom:3rem;">
+    <div class="home-links" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-top:2rem;">
+      <a class="btn btn-primary" href="media.html" data-i18n="media">رسانه‌ها</a>
+      <a class="btn btn-primary" href="bible.html" data-i18n="bibleNav">کتاب مقدس</a>
+      <a class="btn btn-primary" href="live.html" data-i18n="live">پخش زنده</a>
+      <a class="btn btn-outline" href="questions.html" data-i18n="questionsNav">سوالات</a>
+      <a class="btn btn-outline" href="feedback.html" data-i18n="feedbackNav">بازخورد</a>
+      <a class="btn btn-outline" href="contact.html" data-i18n="contact">تماس</a>
+    </div>
   </main>
-
   <footer class="footer">
-    <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه 14</p>
+    <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه ۱۴</p>
     <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7">Seventh Trumpet · Revelation 14:6-12</p>
   </footer>
-
-  <div id="post-modal" class="modal-overlay">
-    <div class="modal"><div id="modal-content"></div></div>
-  </div>
-
+  <div id="post-modal" class="modal-overlay"><div class="modal"><div id="modal-content"></div></div></div>
   <div id="subscribe-popup-mount"></div>
   <button type="button" id="scroll-top" class="scroll-top" aria-label="Scroll to top" title="Top">↑</button>
-
   <script src="js/app.js"></script>
   <script src="js/app_core.js"></script>
   <script src="js/i18n_extra.js"></script>
-  <script src="js/playlists.js"></script>
+  <script src="js/menu.js"></script>
   <script src="js/enhancements.js"></script>
   <script src="js/subscribe.js"></script>
 </body>
