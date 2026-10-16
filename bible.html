@@ -26,22 +26,24 @@
     </div>
   </header>
 
-  <button type="button" id="bible-pill" class="bible-pill hidden" title="Jump to current verse"></button>
-
-  <main class="bible-app">
-    <aside class="bible-sidebar">
-      <div class="bible-version" id="bible-version-label">هزارۀ نو</div>
-      <label class="bible-label" data-i18n="bibleBook">کتاب</label>
-      <select id="bible-book"></select>
-      <label class="bible-label" data-i18n="bibleChapter">باب</label>
-      <select id="bible-chapter"></select>
-      <label class="bible-label" data-i18n="bibleVerse">آیه</label>
-      <select id="bible-verse"></select>
-      <div class="bible-nav-btns">
-        <button type="button" id="bible-prev" class="btn btn-outline btn-sm">◀</button>
-        <button type="button" id="bible-next" class="btn btn-outline btn-sm">▶</button>
+  <main class="bible-app" id="bible-app">
+    <aside class="bible-sidebar" id="bible-sidebar">
+      <button type="button" id="bible-ref-btn" class="bible-ref-btn" aria-expanded="true"></button>
+      <div class="bible-panel" id="bible-panel">
+        <div class="bible-version" id="bible-version-label">هزارۀ نو</div>
+        <label class="bible-label" data-i18n="bibleBook">کتاب</label>
+        <select id="bible-book"></select>
+        <label class="bible-label" data-i18n="bibleChapter">باب</label>
+        <select id="bible-chapter"></select>
+        <label class="bible-label" data-i18n="bibleVerse">آیه</label>
+        <select id="bible-verse"></select>
+        <div class="bible-nav-btns">
+          <button type="button" id="bible-prev" class="btn btn-outline btn-sm">◀</button>
+          <button type="button" id="bible-next" class="btn btn-outline btn-sm">▶</button>
+        </div>
+        <button type="button" id="bible-done" class="btn btn-primary btn-sm bible-done" data-i18n="bibleDone">خواندن</button>
+        <p class="bible-note" id="bible-note"></p>
       </div>
-      <p class="bible-note" id="bible-note"></p>
     </aside>
     <section class="bible-reader">
       <h1 id="bible-heading" class="bible-heading"></h1>
