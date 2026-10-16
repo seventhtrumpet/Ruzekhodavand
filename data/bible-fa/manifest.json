@@ -20,7 +20,7 @@
   "560": ["b560c1.json", "b560c2.json", "b560c3a.json", "b560c3b.json", "b560c4a.json", "b560c4b.json", "b560c5.json", "b560c6.json"],
   "570": ["b570c1a.json", "b570c1b.json", "b570c1c.json", "b570c2a.json", "b570c2b.json", "b570c3a.json", "b570c3b.json", "b570c4a.json", "b570c4b.json"],
   "580": ["b580c1a.json", "b580c1b.json", "b580c1c.json", "b580c2a.json", "b580c2b.json", "b580c3a.json", "b580c3b.json", "b580c4a.json", "b580c4b.json"],
-  "590": ["b590.json"],
+  "590": ["b590c1.json", "b590c2a.json", "b590c2b.json", "b590c3.json", "b590c4a.json", "b590c4b.json", "b590c5a.json", "b590c5b.json"],
   "600": ["b600.json"],
   "610": ["b610.json"],
   "620": ["b620.json"],
