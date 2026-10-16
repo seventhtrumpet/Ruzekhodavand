@@ -4,26 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>کتاب مقدس — شیپور هفتم</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/bible.css">
   <link rel="stylesheet" href="css/menu.css">
 </head>
-<body>
-  <header class="site-header">
+<body data-page="bible">
+  <header class="header">
     <div class="header-inner">
-      <a href="index.html" class="logo" data-i18n="siteName">شیپور هفتم</a>
-      <nav class="main-nav">
-        <a href="index.html" data-i18n="home">خانه</a>
-        <a href="media.html" data-i18n="media">رسانه‌ها</a>
-        <a href="bible.html" class="active" data-i18n="bibleNav">کتاب مقدس</a>
-        <a href="live.html" data-i18n="live">پخش زنده</a>
+      <a href="index.html" class="logo"><span data-i18n="siteName">شیپور هفتم</span></a>
+      <nav class="nav nav-main">
+        <a href="index.html" data-i18n="home" data-nav="home">خانه</a>
+        <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
+        <a href="bible.html" class="active" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
+        <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
+        <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
       </nav>
-      <div class="header-actions">
-        <button type="button" id="lang-toggle" class="btn btn-outline btn-sm">English</button>
-        <button type="button" id="menu-toggle" class="menu-toggle" aria-label="Menu">☰</button>
-      </div>
     </div>
   </header>
+
   <main class="bible-app">
     <aside class="bible-sidebar">
       <div class="bible-version" id="bible-version-label">هزارۀ نو</div>
@@ -44,9 +45,11 @@
       </div>
     </section>
   </main>
-  <footer class="site-footer">
+
+  <footer class="footer">
     <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه ۱۴</p>
   </footer>
+
   <script src="js/bible_patch.js"></script>
   <script src="js/bible.js"></script>
   <script src="js/menu.js"></script>
