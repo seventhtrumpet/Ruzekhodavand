@@ -29,7 +29,7 @@
   "660": ["b660.json"],
   "670": ["b670.json"],
   "680": ["b680.json"],
-  "690": ["b690.json"],
+  "690": ["b690c1.json", "b690c2a.json", "b690c2b.json", "b690c3a.json", "b690c3b.json", "b690c4.json", "b690c5.json"],
   "700": ["b700.json"],
   "710": ["b710.json"],
   "720": ["b720.json"]
