@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>کتاب مقدس — شیپور هفتم</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,36 +21,47 @@
         <a href="bible.html" class="active" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
         <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
         <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
-        <span id="live-badge" class="live-badge hidden" data-i18n="liveBadge">زنده</span>
       </nav>
     </div>
   </header>
 
-  <main class="bible-app" id="bible-app">
-    <aside class="bible-sidebar" id="bible-sidebar">
-      <button type="button" id="bible-ref-btn" class="bible-ref-btn" aria-expanded="true"></button>
-      <div class="bible-panel" id="bible-panel">
-        <div class="bible-version" id="bible-version-label">هزارۀ نو</div>
-        <label class="bible-label" data-i18n="bibleBook">کتاب</label>
-        <select id="bible-book"></select>
-        <label class="bible-label" data-i18n="bibleChapter">باب</label>
-        <select id="bible-chapter"></select>
-        <label class="bible-label" data-i18n="bibleVerse">آیه</label>
-        <select id="bible-verse"></select>
-        <div class="bible-nav-btns">
-          <button type="button" id="bible-prev" class="btn btn-outline btn-sm">◀</button>
-          <button type="button" id="bible-next" class="btn btn-outline btn-sm">▶</button>
-        </div>
-        <button type="button" id="bible-done" class="btn btn-primary btn-sm bible-done" data-i18n="bibleDone">خواندن</button>
-        <p class="bible-note" id="bible-note"></p>
+  <div class="mb-bar">
+    <button type="button" id="mb-prev" class="mb-nav" title="Prev chapter">‹</button>
+    <button type="button" id="mb-ref" class="mb-ref">—</button>
+    <button type="button" id="mb-next" class="mb-nav" title="Next chapter">›</button>
+  </div>
+
+  <div id="mb-sel" class="mb-sel hidden" aria-hidden="true">
+    <div class="mb-sel-bg" id="mb-sel-bg"></div>
+    <div class="mb-sel-panel">
+      <div class="mb-sel-tabs">
+        <button type="button" class="mb-tab active" data-tab="books" id="mb-tab-books" data-i18n="bibleBook">کتاب</button>
+        <button type="button" class="mb-tab" data-tab="chapters" id="mb-tab-chapters" data-i18n="bibleChapter">باب</button>
+        <button type="button" class="mb-tab" data-tab="verses" id="mb-tab-verses" data-i18n="bibleVerse">آیه</button>
       </div>
-    </aside>
-    <section class="bible-reader">
-      <h1 id="bible-heading" class="bible-heading"></h1>
-      <div id="bible-verses" class="bible-verses">
-        <p class="bible-loading" data-i18n="bibleLoading">در حال بارگذاری...</p>
+      <div class="mb-sel-body">
+        <div id="mb-books" class="mb-grid mb-books"></div>
+        <div id="mb-chapters" class="mb-grid mb-nums hidden"></div>
+        <div id="mb-verses" class="mb-grid mb-nums hidden"></div>
       </div>
-    </section>
+      <div class="mb-sel-foot">
+        <span id="mb-version" class="mb-version">هزارۀ نو</span>
+        <button type="button" id="mb-close" class="mb-close" data-i18n="bibleDone">خواندن</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mb-actions" class="mb-actions hidden">
+    <span id="mb-sel-label" class="mb-sel-label"></span>
+    <button type="button" id="mb-copy" data-i18n="copy">کپی</button>
+    <button type="button" id="mb-clear" data-i18n="clear">پاک</button>
+  </div>
+
+  <main class="mb-reader" id="mb-reader">
+    <h1 id="bible-heading" class="mb-heading"></h1>
+    <div id="bible-verses" class="mb-text">
+      <p class="bible-loading" data-i18n="bibleLoading">در حال بارگذاری...</p>
+    </div>
   </main>
 
   <footer class="footer">
