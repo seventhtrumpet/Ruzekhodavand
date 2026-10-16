@@ -67,8 +67,32 @@
   padding-bottom: 0.6rem;
   border-bottom: 2px solid var(--primary);
 }
+.bible-chapter-block {
+  margin-bottom: 2.2rem;
+  scroll-margin-top: 5rem;
+}
+.bible-chapter-title {
+  color: var(--primary);
+  font-size: 1.15rem;
+  margin: 0 0 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 3.6rem;
+  background: var(--bg-card);
+  z-index: 2;
+}
 .bible-verses { line-height: 2; font-size: 1.08rem; }
-.bible-verse { margin-bottom: 0.55rem; }
+.bible-verse {
+  margin-bottom: 0.55rem;
+  scroll-margin-top: 6rem;
+  border-radius: 6px;
+  padding: 0.1rem 0.25rem;
+  transition: background 0.3s;
+}
+.bible-verse.highlight {
+  background: rgba(201, 162, 39, 0.25);
+}
 .bible-verse-num {
   display: inline-block;
   min-width: 1.6em;
