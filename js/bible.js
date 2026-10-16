@@ -1,4 +1,4 @@
-/* Seventh Trumpet — Bible reader (FA: FANMV JSON packs / EN: KJV API) */
+/* Seventh Trumpet — continuous Bible reader */
 (function () {
   const LANG_KEY = 'cog_lang';
   const THEME_KEY = 'cog_theme';
@@ -16,22 +16,24 @@
 
   const I18N = {
     fa: {
-      siteName: '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645', home: '\u062e\u0627\u0646\u0647', bibleNav: '\u06a9\u062a\u0627\u0628 \u0645\u0642\u062f\u0633', langBtn: 'English',
-      bibleBook: '\u06a9\u062a\u0627\u0628', bibleChapter: '\u0628\u0627\u0628', bibleLoading: '\u062f\u0631 \u062d\u0627\u0644 \u0628\u0627\u0631\u06af\u0630\u0627\u0631\u06cc...',
-      footer: '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645 \u2014 \u067e\u06cc\u0627\u0645 \u0633\u0647 \u0641\u0631\u0634\u062a\u0647 \u0645\u06a9\u0627\u0634\u0641\u0647 14',
-      version: '\u0647\u0632\u0627\u0631\u06c0 \u0646\u0648 (FANMV)',
-      note: '\u062a\u0631\u062c\u0645\u06c0 \u0641\u0627\u0631\u0633\u06cc \u00ab\u0647\u0632\u0627\u0631\u06c0 \u0646\u0648\u00bb \u00a9 Elam Ministries. \u0641\u0642\u0637 \u06a9\u062a\u0627\u0628\u200c\u0647\u0627\u06cc \u0645\u0648\u062c\u0648\u062f \u0646\u0645\u0627\u06cc\u0634 \u062f\u0627\u062f\u0647 \u0645\u06cc\u200c\u0634\u0648\u0646\u062f.',
-      errLoad: '\u0627\u06cc\u0646 \u06a9\u062a\u0627\u0628 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.',
-      errNet: '\u062e\u0637\u0627 \u062f\u0631 \u0628\u0627\u0631\u06af\u0630\u0627\u0631\u06cc. \u0627\u062a\u0635\u0627\u0644 \u0627\u06cc\u0646\u062a\u0631\u0646\u062a \u0631\u0627 \u0628\u0631\u0631\u0633\u06cc \u06a9\u0646\u06cc\u062f.'
+      siteName: 'شیپور هفتم', home: 'خانه', bibleNav: 'کتاب مقدس', langBtn: 'English',
+      bibleBook: 'کتاب', bibleChapter: 'باب', bibleVerse: 'آیه', bibleLoading: 'در حال بارگذاری...',
+      footer: 'شیپور هفتم — پیام سه فرشته مکاشفه ۱۴',
+      version: 'هزارۀ نو (FANMV)',
+      note: 'ترجمه فارسی «هزارۀ نو» © Elam Ministries. فقط کتاب‌های موجود نمایش داده می‌شوند. می‌توانید تا پایان کتاب اسکرول کنید.',
+      errLoad: 'این کتاب در دسترس نیست.',
+      errNet: 'خطا در بارگذاری. اتصال اینترنت را بررسی کنید.',
+      chapterLabel: 'باب', jump: 'برو'
     },
     en: {
       siteName: 'Seventh Trumpet', home: 'Home', bibleNav: 'Bible', langBtn: 'Persian',
-      bibleBook: 'Book', bibleChapter: 'Chapter', bibleLoading: 'Loading...',
-      footer: 'Seventh Trumpet \u2014 Three Angels Message, Revelation 14',
+      bibleBook: 'Book', bibleChapter: 'Chapter', bibleVerse: 'Verse', bibleLoading: 'Loading...',
+      footer: 'Seventh Trumpet — Three Angels Message, Revelation 14',
       version: 'King James Version (public domain)',
-      note: 'English text: King James Version (public domain). All 66 books available.',
-      errLoad: 'Could not load this chapter.',
-      errNet: 'Network error. Check your connection.'
+      note: 'English: King James Version (public domain). Scroll through the whole book.',
+      errLoad: 'Could not load this book.',
+      errNet: 'Network error. Check your connection.',
+      chapterLabel: 'Chapter', jump: 'Go'
     }
   };
 
@@ -39,8 +41,11 @@
   let currentLang = localStorage.getItem(LANG_KEY) || 'fa';
   let bookId = null;
   let chapter = 1;
+  let verse = 1;
   let faCache = {};
+  let enCache = {};
   let manifest = null;
+  let scrollSync = true;
 
   function t(k) { return (I18N[currentLang] || I18N.fa)[k] || k; }
 
@@ -59,7 +64,7 @@
   }
 
   function saveState() {
-    try { localStorage.setItem(STATE_KEY, JSON.stringify({ bookId, chapter })); } catch (e) {}
+    try { localStorage.setItem(STATE_KEY, JSON.stringify({ bookId, chapter, verse })); } catch (e) {}
   }
 
   function loadState() {
@@ -67,6 +72,7 @@
       const s = JSON.parse(localStorage.getItem(STATE_KEY) || '{}');
       if (s.bookId) bookId = Number(s.bookId);
       if (s.chapter) chapter = Number(s.chapter);
+      if (s.verse) verse = Number(s.verse);
     } catch (e) {}
   }
 
@@ -76,9 +82,8 @@
       if (res.ok) { meta = await res.json(); return; }
     } catch (e) {}
     meta = [
-      {id:10,fa:'\u067e\u06cc\u062f\u0627\u06cc\u0634',en:'Genesis'},{id:80,fa:'\u0631\u0648\u062a',en:'Ruth'},
-      {id:470,fa:'\u0645\u062a\u06cc',en:'Matthew'},{id:500,fa:'\u06cc\u0648\u062d\u0646\u0627',en:'John'},
-      {id:730,fa:'\u0645\u06a9\u0627\u0634\u0641\u0647',en:'Revelation'}
+      {id:480,fa:'انجیل مَرقُس',en:'Mark'},{id:500,fa:'انجیل یوحنا',en:'John'},
+      {id:690,fa:'نامۀ یوحنا اوّل',en:'1 John'},{id:730,fa:'مکاشفۀ یوحنا',en:'Revelation'}
     ];
   }
 
@@ -86,10 +91,7 @@
     if (manifest) return manifest;
     try {
       const res = await fetch('/data/bible-fa/manifest.json');
-      if (res.ok) {
-        manifest = await res.json();
-        return manifest;
-      }
+      if (res.ok) { manifest = await res.json(); return manifest; }
     } catch (e) {}
     manifest = {};
     return manifest;
@@ -120,6 +122,17 @@
     sel.innerHTML = opts;
     if (chapter < 1 || chapter > max) chapter = 1;
     sel.value = String(chapter);
+  }
+
+  function fillVerses(maxV) {
+    const sel = document.getElementById('bible-verse');
+    if (!sel) return;
+    const max = maxV || 1;
+    let opts = '';
+    for (let i = 1; i <= max; i++) opts += '<option value="' + i + '">' + i + '</option>';
+    sel.innerHTML = opts;
+    if (verse < 1 || verse > max) verse = 1;
+    sel.value = String(verse);
   }
 
   function deepMergeChapters(target, source) {
@@ -157,51 +170,116 @@
     return merged;
   }
 
+  async function loadEnBook(id) {
+    if (enCache[id]) return enCache[id];
+    const b = meta.find(x => x.id === id);
+    if (!b) return null;
+    const max = CHAPTER_COUNTS[id] || 1;
+    const chapters = {};
+    for (let ch = 1; ch <= max; ch++) {
+      try {
+        const ref = encodeURIComponent(b.en + ' ' + ch);
+        const res = await fetch('https://bible-api.com/' + ref + '?translation=kjv');
+        if (!res.ok) continue;
+        const data = await res.json();
+        const verses = {};
+        (data.verses || []).forEach(v => { verses[String(v.verse)] = (v.text || '').trim(); });
+        if (Object.keys(verses).length) chapters[String(ch)] = verses;
+      } catch (e) {}
+    }
+    if (!Object.keys(chapters).length) return null;
+    const book = { id, name: b.en, chapters };
+    enCache[id] = book;
+    return book;
+  }
+
   function escapeHtml(s) {
     return String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>');
   }
 
-  async function render() {
+  function scrollToRef(ch, vs, smooth) {
+    const id = 'v-' + ch + '-' + vs;
+    const el = document.getElementById(id) || document.getElementById('ch-' + ch);
+    if (!el) return;
+    scrollSync = false;
+    el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+    document.querySelectorAll('.bible-verse.highlight').forEach(n => n.classList.remove('highlight'));
+    const verseEl = document.getElementById(id);
+    if (verseEl) {
+      verseEl.classList.add('highlight');
+      setTimeout(() => verseEl.classList.remove('highlight'), 2500);
+    }
+    setTimeout(() => { scrollSync = true; }, 600);
+  }
+
+  function updateSelectorsFromScroll() {
+    if (!scrollSync) return;
+    const nodes = document.querySelectorAll('.bible-chapter-block');
+    let current = null;
+    const mid = window.scrollY + 120;
+    nodes.forEach(n => {
+      if (n.offsetTop <= mid) current = n;
+    });
+    if (!current) return;
+    const ch = Number(current.getAttribute('data-chapter'));
+    if (ch && ch !== chapter) {
+      chapter = ch;
+      const csel = document.getElementById('bible-chapter');
+      if (csel) csel.value = String(ch);
+      const maxV = Number(current.getAttribute('data-max-verse') || 1);
+      fillVerses(maxV);
+      saveState();
+    }
+  }
+
+  async function renderBook() {
     const box = document.getElementById('bible-verses');
     const heading = document.getElementById('bible-heading');
     const b = meta.find(x => x.id === bookId);
     if (!b || !box) return;
     box.innerHTML = '<p class="bible-loading">' + t('bibleLoading') + '</p>';
-    heading.textContent = (currentLang === 'fa' ? b.fa : b.en) + ' ' + chapter;
+    heading.textContent = currentLang === 'fa' ? b.fa : b.en;
     saveState();
 
     try {
-      if (currentLang === 'fa') {
-        const data = await loadFaBook(bookId);
-        if (!data) {
-          box.innerHTML = '<p class="bible-loading">' + t('errLoad') + '</p>';
-          return;
-        }
-        const verses = (data.chapters && data.chapters[String(chapter)]) || {};
-        const nums = Object.keys(verses).map(Number).sort((a, c) => a - c);
-        if (!nums.length) {
-          box.innerHTML = '<p class="bible-loading">' + t('errLoad') + '</p>';
-          return;
-        }
-        box.innerHTML = nums.map(n =>
-          '<p class="bible-verse"><span class="bible-verse-num">' + n + '</span>' +
-          escapeHtml(verses[String(n)]) + '</p>'
-        ).join('');
-      } else {
-        const ref = encodeURIComponent(b.en + ' ' + chapter);
-        const res = await fetch('https://bible-api.com/' + ref + '?translation=kjv');
-        if (!res.ok) throw new Error('api');
-        const data = await res.json();
-        const verses = data.verses || [];
-        if (!verses.length) {
-          box.innerHTML = '<p class="bible-loading">' + t('errLoad') + '</p>';
-          return;
-        }
-        box.innerHTML = verses.map(v =>
-          '<p class="bible-verse"><span class="bible-verse-num">' + v.verse + '</span>' +
-          escapeHtml(v.text) + '</p>'
-        ).join('');
+      let data;
+      if (currentLang === 'fa') data = await loadFaBook(bookId);
+      else data = await loadEnBook(bookId);
+
+      if (!data || !data.chapters) {
+        box.innerHTML = '<p class="bible-loading">' + t('errLoad') + '</p>';
+        return;
       }
+
+      const chNums = Object.keys(data.chapters).map(Number).sort((a, c) => a - c);
+      if (!chNums.length) {
+        box.innerHTML = '<p class="bible-loading">' + t('errLoad') + '</p>';
+        return;
+      }
+
+      let html = '';
+      chNums.forEach(ch => {
+        const verses = data.chapters[String(ch)] || {};
+        const vNums = Object.keys(verses).map(Number).sort((a, c) => a - c);
+        const maxV = vNums.length ? vNums[vNums.length - 1] : 1;
+        html += '<div class="bible-chapter-block" id="ch-' + ch + '" data-chapter="' + ch + '" data-max-verse="' + maxV + '">';
+        html += '<h2 class="bible-chapter-title">' + t('chapterLabel') + ' ' + ch + '</h2>';
+        vNums.forEach(n => {
+          html += '<p class="bible-verse" id="v-' + ch + '-' + n + '" data-chapter="' + ch + '" data-verse="' + n + '">' +
+            '<span class="bible-verse-num">' + n + '</span>' + escapeHtml(verses[String(n)]) + '</p>';
+        });
+        html += '</div>';
+      });
+      box.innerHTML = html;
+
+      const firstCh = chNums[0];
+      if (!chNums.includes(chapter)) chapter = firstCh;
+      const verses0 = data.chapters[String(chapter)] || {};
+      const vMax = Object.keys(verses0).map(Number).sort((a,c)=>a-c);
+      fillVerses(vMax.length ? vMax[vMax.length - 1] : 1);
+      const csel = document.getElementById('bible-chapter');
+      if (csel) csel.value = String(chapter);
+      scrollToRef(chapter, verse, false);
     } catch (e) {
       box.innerHTML = '<p class="bible-loading">' + t('errNet') + '</p>';
     }
@@ -210,13 +288,26 @@
   function onBookChange(e) {
     bookId = Number(e.target.value);
     chapter = 1;
+    verse = 1;
     fillChapters();
-    render();
+    fillVerses(1);
+    renderBook();
   }
 
   function onChapterChange(e) {
     chapter = Number(e.target.value);
-    render();
+    verse = 1;
+    const block = document.getElementById('ch-' + chapter);
+    const maxV = block ? Number(block.getAttribute('data-max-verse') || 1) : 1;
+    fillVerses(maxV);
+    scrollToRef(chapter, 1, true);
+    saveState();
+  }
+
+  function onVerseChange(e) {
+    verse = Number(e.target.value);
+    scrollToRef(chapter, verse, true);
+    saveState();
   }
 
   function shiftChapter(dir) {
@@ -224,24 +315,19 @@
     const next = chapter + dir;
     if (next < 1 || next > max) return;
     chapter = next;
-    fillChapters();
-    render();
+    verse = 1;
+    const csel = document.getElementById('bible-chapter');
+    if (csel) csel.value = String(chapter);
+    const block = document.getElementById('ch-' + chapter);
+    const maxV = block ? Number(block.getAttribute('data-max-verse') || 1) : 1;
+    fillVerses(maxV);
+    scrollToRef(chapter, 1, true);
+    saveState();
   }
 
   function initTheme() {
     const saved = localStorage.getItem(THEME_KEY);
-    const dark = saved === 'dark';
-    document.body.classList.toggle('dark', dark);
-    const btn = document.getElementById('theme-toggle');
-    if (btn) {
-      btn.textContent = dark ? '\u2600\uFE0F' : '\u1F319';
-      btn.addEventListener('click', () => {
-        const next = !document.body.classList.contains('dark');
-        document.body.classList.toggle('dark', next);
-        localStorage.setItem(THEME_KEY, next ? 'dark' : 'light');
-        btn.textContent = next ? '\u2600\uFE0F' : '\u1F319';
-      });
-    }
+    document.body.classList.toggle('dark', saved === 'dark');
   }
 
   async function boot() {
@@ -252,21 +338,25 @@
     await loadManifest();
     fillBooks();
     fillChapters();
-    await render();
+    fillVerses(1);
+    await renderBook();
 
     document.getElementById('bible-book')?.addEventListener('change', onBookChange);
     document.getElementById('bible-chapter')?.addEventListener('change', onChapterChange);
+    document.getElementById('bible-verse')?.addEventListener('change', onVerseChange);
     document.getElementById('bible-prev')?.addEventListener('click', () => shiftChapter(-1));
     document.getElementById('bible-next')?.addEventListener('click', () => shiftChapter(1));
     document.getElementById('lang-toggle')?.addEventListener('click', async () => {
       currentLang = currentLang === 'fa' ? 'en' : 'fa';
       localStorage.setItem(LANG_KEY, currentLang);
-      faCache = {};
       applyChrome();
       fillBooks();
       fillChapters();
-      await render();
+      await renderBook();
     });
+    window.addEventListener('scroll', () => {
+      window.requestAnimationFrame(updateSelectorsFromScroll);
+    }, { passive: true });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
