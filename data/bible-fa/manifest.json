@@ -1,1 +1,25 @@
-PLACEHOLDER
+{
+  "260": ["b260.json"],
+  "360": ["b360.json"],
+  "380": ["b380.json"],
+  "390": ["b390c1.json", "b390c2.json", "b390c3.json", "b390c4.json"],
+  "480": ["b480c1a.json", "b480c1b.json", "b480c1c.json", "b480c2a.json", "b480c2b.json", "b480c2c.json", "b480c3a.json", "b480c3b.json", "b480c3c.json", "b480c4a.json", "b480c4b.json", "b480c4c.json", "b480c5a.json", "b480c5b.json", "b480c5c.json", "b480c6a.json", "b480c6b.json", "b480c6c.json", "b480c6d.json", "b480c7a.json", "b480c7b.json", "b480c7c.json", "b480c8a.json", "b480c8b.json", "b480c8c.json", "b480c9a.json", "b480c9b.json", "b480c9c.json", "b480c9d.json", "b480c10a.json", "b480c10b.json", "b480c10c.json", "b480c10d.json", "b480c11a.json", "b480c11b.json", "b480c11c.json", "b480c12a.json", "b480c12b.json", "b480c12c.json", "b480c12d.json", "b480c13a.json", "b480c13b.json", "b480c13c.json", "b480c14a.json", "b480c14b.json", "b480c14c.json", "b480c14d.json", "b480c14e.json", "b480c15a.json", "b480c15b.json", "b480c15c.json", "b480c16a.json", "b480c16b.json"],
+  "500": ["b500c1a.json", "b500c1b.json", "b500c1c.json", "b500c1d.json", "b500c2a.json", "b500c2b.json", "b500c3a.json", "b500c3b.json", "b500c3c.json", "b500c4a.json", "b500c4b.json", "b500c4c.json", "b500c4d.json", "b500c5a.json", "b500c5b.json", "b500c5c.json", "b500c5d.json", "b500c6a.json", "b500c6b.json", "b500c6c.json", "b500c6d.json", "b500c6e.json", "b500c7a.json", "b500c7b.json", "b500c7c.json", "b500c7d.json", "b500c8a.json", "b500c8b.json", "b500c8c.json", "b500c8d.json"],
+  "550": ["b550c1.json", "b550c2a.json", "b550c2b.json", "b550c3a.json", "b550c3b.json", "b550c4a.json", "b550c4b.json", "b550c5.json", "b550c6.json"],
+  "560": ["b560c1.json", "b560c2.json", "b560c3a.json", "b560c3b.json", "b560c4a.json", "b560c4b.json", "b560c5.json", "b560c6.json"],
+  "570": ["b570c1a.json", "b570c1b.json", "b570c1c.json", "b570c2a.json", "b570c2b.json", "b570c3a.json", "b570c3b.json", "b570c4a.json", "b570c4b.json"],
+  "580": ["b580c1a.json", "b580c1b.json", "b580c1c.json", "b580c2a.json", "b580c2b.json", "b580c3a.json", "b580c3b.json", "b580c4a.json", "b580c4b.json"],
+  "590": ["b590c1.json", "b590c2a.json", "b590c2b.json", "b590c3.json", "b590c4a.json", "b590c4b.json", "b590c5a.json", "b590c5b.json"],
+  "600": ["b600.json"],
+  "610": ["b610c1a.json", "b610c1b.json", "b610c2.json", "b610c3a.json", "b610c3b.json", "b610c4a.json", "b610c4b.json", "b610c5a.json", "b610c5b.json", "b610c6a.json", "b610c6b.json"],
+  "620": ["b620c1a.json", "b620c1b.json", "b620c2a.json", "b620c2b.json", "b620c3a.json", "b620c3b.json", "b620c4a.json", "b620c4b.json"],
+  "630": ["b630.json"],
+  "640": ["b640.json"],
+  "660": ["b660c1a.json", "b660c1b.json", "b660c2a.json", "b660c2b.json", "b660c3a.json", "b660c3b.json", "b660c4a.json", "b660c4b.json", "b660c5a.json", "b660c5b.json"],
+  "670": ["b670c1a.json", "b670c1b.json", "b670c1c.json", "b670c2a.json", "b670c2b.json", "b670c3a.json", "b670c3b.json", "b670c4a.json", "b670c4b.json", "b670c5.json"],
+  "680": ["b680c1a.json", "b680c1b.json", "b680c2a.json", "b680c2b.json", "b680c3a.json", "b680c3b.json"],
+  "690": ["b690c1.json", "b690c2.json", "b690c3.json", "b690c4.json", "b690c5.json"],
+  "700": ["b700.json"],
+  "710": ["b710.json"],
+  "720": ["b720.json"]
+}
