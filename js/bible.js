@@ -16,20 +16,20 @@
 
   const I18N = {
     fa: {
-      siteName: 'شیپور هفتم', home: 'خانه', bibleNav: 'کتاب مقدس', langBtn: 'English',
-      bibleBook: 'کتاب', bibleChapter: 'باب', bibleLoading: 'در حال بارگذاری...',
-      footer: 'شیپور هفتم — پیام سه فرشته مکاشفه 14',
-      version: 'هزارۀ نو (FANMV)',
-      note: 'ترجمۀ فارسی «هزارۀ نو» © Elam Ministries.',
-      errLoad: 'این کتاب در دسترس نیست.',
-      errNet: 'خطا در بارگذاری. اتصال اینترنت را بررسی کنید.'
+      siteName: '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645', home: '\u062e\u0627\u0646\u0647', bibleNav: '\u06a9\u062a\u0627\u0628 \u0645\u0642\u062f\u0633', langBtn: 'English',
+      bibleBook: '\u06a9\u062a\u0627\u0628', bibleChapter: '\u0628\u0627\u0628', bibleLoading: '\u062f\u0631 \u062d\u0627\u0644 \u0628\u0627\u0631\u06af\u0630\u0627\u0631\u06cc...',
+      footer: '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645 \u2014 \u067e\u06cc\u0627\u0645 \u0633\u0647 \u0641\u0631\u0634\u062a\u0647 \u0645\u06a9\u0627\u0634\u0641\u0647 14',
+      version: '\u0647\u0632\u0627\u0631\u06c0 \u0646\u0648 (FANMV)',
+      note: '\u062a\u0631\u062c\u0645\u06c0 \u0641\u0627\u0631\u0633\u06cc \u00ab\u0647\u0632\u0627\u0631\u06c0 \u0646\u0648\u00bb \u00a9 Elam Ministries. \u0641\u0642\u0637 \u06a9\u062a\u0627\u0628\u200c\u0647\u0627\u06cc \u0645\u0648\u062c\u0648\u062f \u0646\u0645\u0627\u06cc\u0634 \u062f\u0627\u062f\u0647 \u0645\u06cc\u200c\u0634\u0648\u0646\u062f.',
+      errLoad: '\u0627\u06cc\u0646 \u06a9\u062a\u0627\u0628 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.',
+      errNet: '\u062e\u0637\u0627 \u062f\u0631 \u0628\u0627\u0631\u06af\u0630\u0627\u0631\u06cc. \u0627\u062a\u0635\u0627\u0644 \u0627\u06cc\u0646\u062a\u0631\u0646\u062a \u0631\u0627 \u0628\u0631\u0631\u0633\u06cc \u06a9\u0646\u06cc\u062f.'
     },
     en: {
       siteName: 'Seventh Trumpet', home: 'Home', bibleNav: 'Bible', langBtn: 'Persian',
       bibleBook: 'Book', bibleChapter: 'Chapter', bibleLoading: 'Loading...',
-      footer: 'Seventh Trumpet — Three Angels Message, Revelation 14',
+      footer: 'Seventh Trumpet \u2014 Three Angels Message, Revelation 14',
       version: 'King James Version (public domain)',
-      note: 'English text: King James Version (public domain).',
+      note: 'English text: King James Version (public domain). All 66 books available.',
       errLoad: 'Could not load this chapter.',
       errNet: 'Network error. Check your connection.'
     }
@@ -72,20 +72,20 @@
 
   async function loadMeta() {
     try {
-      const res = await fetch('data/bible-fa/meta.json');
+      const res = await fetch('/data/bible-fa/meta.json');
       if (res.ok) { meta = await res.json(); return; }
     } catch (e) {}
     meta = [
-      {id:10,fa:'پیدایش',en:'Genesis'},{id:80,fa:'روت',en:'Ruth'},
-      {id:470,fa:'متی',en:'Matthew'},{id:500,fa:'یوحنا',en:'John'},
-      {id:730,fa:'مکاشفه',en:'Revelation'}
+      {id:10,fa:'\u067e\u06cc\u062f\u0627\u06cc\u0634',en:'Genesis'},{id:80,fa:'\u0631\u0648\u062a',en:'Ruth'},
+      {id:470,fa:'\u0645\u062a\u06cc',en:'Matthew'},{id:500,fa:'\u06cc\u0648\u062d\u0646\u0627',en:'John'},
+      {id:730,fa:'\u0645\u06a9\u0627\u0634\u0641\u0647',en:'Revelation'}
     ];
   }
 
   async function loadManifest() {
     if (manifest) return manifest;
     try {
-      const res = await fetch('data/bible-fa/manifest.json');
+      const res = await fetch('/data/bible-fa/manifest.json');
       if (res.ok) {
         manifest = await res.json();
         return manifest;
@@ -98,11 +98,16 @@
   function fillBooks() {
     const sel = document.getElementById('bible-book');
     if (!sel || !meta.length) return;
-    sel.innerHTML = meta.map(b => {
+    let list = meta;
+    if (currentLang === 'fa' && manifest && Object.keys(manifest).length) {
+      list = meta.filter(b => manifest[String(b.id)]);
+      if (!list.length) list = meta;
+    }
+    sel.innerHTML = list.map(b => {
       const label = currentLang === 'fa' ? b.fa : b.en;
       return '<option value="' + b.id + '">' + label + '</option>';
     }).join('');
-    if (bookId == null || !meta.find(b => b.id === bookId)) bookId = meta[0].id;
+    if (bookId == null || !list.find(b => b.id === bookId)) bookId = list[0].id;
     sel.value = String(bookId);
   }
 
@@ -125,7 +130,7 @@
     let any = false;
     for (const fname of files) {
       try {
-        const res = await fetch('data/bible-fa/' + fname);
+        const res = await fetch('/data/bible-fa/' + fname);
         if (!res.ok) continue;
         const pack = await res.json();
         const data = pack[String(id)] || pack[id];
@@ -206,9 +211,10 @@
     const max = CHAPTER_COUNTS[bookId] || 1;
     let next = chapter + delta;
     if (next < 1) {
-      const bi = meta.findIndex(x => x.id === bookId);
+      const list = (currentLang === 'fa' && manifest) ? meta.filter(b => manifest[String(b.id)]) : meta;
+      const bi = list.findIndex(x => x.id === bookId);
       if (bi > 0) {
-        bookId = meta[bi - 1].id;
+        bookId = list[bi - 1].id;
         chapter = CHAPTER_COUNTS[bookId] || 1;
         document.getElementById('bible-book').value = String(bookId);
         fillChapters();
@@ -217,9 +223,10 @@
       return;
     }
     if (next > max) {
-      const bi = meta.findIndex(x => x.id === bookId);
-      if (bi < meta.length - 1) {
-        bookId = meta[bi + 1].id;
+      const list = (currentLang === 'fa' && manifest) ? meta.filter(b => manifest[String(b.id)]) : meta;
+      const bi = list.findIndex(x => x.id === bookId);
+      if (bi >= 0 && bi < list.length - 1) {
+        bookId = list[bi + 1].id;
         chapter = 1;
         document.getElementById('bible-book').value = String(bookId);
         fillChapters();
@@ -238,12 +245,12 @@
     document.body.classList.toggle('dark', dark);
     const btn = document.getElementById('theme-toggle');
     if (btn) {
-      btn.textContent = dark ? '☀️' : '🌙';
+      btn.textContent = dark ? '\u2600\uFE0F' : '\u1F319';
       btn.addEventListener('click', () => {
         const next = !document.body.classList.contains('dark');
         document.body.classList.toggle('dark', next);
         localStorage.setItem(THEME_KEY, next ? 'dark' : 'light');
-        btn.textContent = next ? '☀️' : '🌙';
+        btn.textContent = next ? '\u2600\uFE0F' : '\u1F319';
       });
     }
   }
@@ -253,6 +260,7 @@
     loadState();
     applyChrome();
     await loadMeta();
+    await loadManifest();
     fillBooks();
     fillChapters();
     await render();
@@ -264,6 +272,7 @@
     document.getElementById('lang-toggle')?.addEventListener('click', async () => {
       currentLang = currentLang === 'fa' ? 'en' : 'fa';
       localStorage.setItem(LANG_KEY, currentLang);
+      faCache = {};
       applyChrome();
       fillBooks();
       fillChapters();
