@@ -1,4 +1,4 @@
-/* Enhancements: load media module + auth UI + daily verse */
+/* Load media + auth + core fix */
 (function () {
   function loadScript(src, cb) {
     if (document.querySelector('script[src="' + src + '"]')) { if (cb) cb(); return; }
@@ -8,16 +8,21 @@
     document.body.appendChild(s);
   }
   function boot() {
-    loadScript('js/app_media.js', function () {
-      loadScript('js/auth_ui.js', function () {
-        if (typeof renderAll === 'function') try { renderAll(); } catch (e) {}
+    loadScript('js/app_core_fix.js', function () {
+      loadScript('js/app_media.js', function () {
+        loadScript('js/auth_ui.js', function () {
+          try {
+            if (typeof applyLanguage === 'function') applyLanguage();
+            if (typeof renderAll === 'function') renderAll();
+            if (typeof setupEventListeners === 'function') setupEventListeners();
+          } catch (e) { console.log(e); }
+        });
       });
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  // daily verse
   function showVerse() {
     var el = document.getElementById('verse-text');
     var ref = document.getElementById('verse-ref');
@@ -32,15 +37,12 @@
   document.addEventListener('DOMContentLoaded', function () {
     showVerse();
     document.getElementById('verse-refresh')?.addEventListener('click', showVerse);
-  });
-
-  // scroll top
-  document.addEventListener('DOMContentLoaded', function () {
     var btn = document.getElementById('scroll-top');
-    if (!btn) return;
-    window.addEventListener('scroll', function () {
-      btn.classList.toggle('show', window.scrollY > 400);
-    });
-    btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    if (btn) {
+      window.addEventListener('scroll', function () {
+        btn.classList.toggle('show', window.scrollY > 400);
+      });
+      btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    }
   });
 })();
