@@ -1,4 +1,4 @@
-/* Seventh Trumpet — continuous Bible reader (fast, no flash) */
+/* Seventh Trumpet — MyBible-style reader */
 (function () {
   const LANG_KEY = 'cog_lang';
   const THEME_KEY = 'cog_theme';
@@ -17,27 +17,29 @@
   const I18N = {
     fa: {
       siteName: 'شیپور هفتم', home: 'خانه', bibleNav: 'کتاب مقدس', langBtn: 'English',
-      media: 'رسانه‌ها', live: 'پخش زنده', liveBadge: 'زنده',
+      media: 'رسانه‌ها', live: 'پخش زنده',
       bibleBook: 'کتاب', bibleChapter: 'باب', bibleVerse: 'آیه',
-      bibleLoading: 'در حال بارگذاری...',
+      bibleLoading: 'در حال بارگذاری...', bibleDone: 'خواندن',
       footer: 'شیپور هفتم — پیام سه فرشته مکاشفه ۱۴',
       version: 'هزارۀ نو (FANMV)',
-      note: 'ترجمهٔ فارسی «هزارۀ نو» © Elam Ministries. فقط کتاب‌های موجود نشان داده می‌شوند. می‌توانید تا پایان کتاب اسکرول کنید.',
       errLoad: 'این کتاب در دسترس نیست.',
-      errNet: 'خطا در بارگذاری. اتصال اینترنت را بررسی کنید.',
-      chapterLabel: 'باب', bibleDone: 'خواندن'
+      errNet: 'خطا در بارگذاری.',
+      chapterLabel: 'باب', copy: 'کپی', clear: 'پاک',
+      ot: 'عهد عتیق', nt: 'عهد جدید',
+      copied: 'کپی شد'
     },
     en: {
       siteName: 'Seventh Trumpet', home: 'Home', bibleNav: 'Bible', langBtn: 'Persian',
-      media: 'Media', live: 'Live', liveBadge: 'LIVE',
+      media: 'Media', live: 'Live',
       bibleBook: 'Book', bibleChapter: 'Chapter', bibleVerse: 'Verse',
-      bibleLoading: 'Loading...',
+      bibleLoading: 'Loading...', bibleDone: 'Read',
       footer: 'Seventh Trumpet — Three Angels Message, Revelation 14',
-      version: 'King James Version (public domain)',
-      note: 'English: King James Version (public domain). Scroll through the whole book.',
+      version: 'King James Version',
       errLoad: 'Could not load this book.',
-      errNet: 'Network error. Check your connection.',
-      chapterLabel: 'Chapter', bibleDone: 'Read'
+      errNet: 'Network error.',
+      chapterLabel: 'Chapter', copy: 'Copy', clear: 'Clear',
+      ot: 'Old Testament', nt: 'New Testament',
+      copied: 'Copied'
     }
   };
 
@@ -51,6 +53,7 @@
   let manifest = null;
   let scrollSync = true;
   let loadingBook = false;
+  let selected = new Set();
 
   function t(k) { return (I18N[currentLang] || I18N.fa)[k] || k; }
 
@@ -60,37 +63,11 @@
     return currentLang === 'fa' ? b.fa : b.en;
   }
 
-  function updatePill() {
+  function updateRef() {
+    const btn = document.getElementById('mb-ref');
+    if (!btn) return;
     const name = bookLabel();
-    const text = name ? (name + '  ·  ' + chapter + ':' + verse) : '';
-    const refBtn = document.getElementById('bible-ref-btn');
-    if (refBtn) refBtn.textContent = text || (currentLang === 'fa' ? 'کتاب / باب / آیه' : 'Book / Chapter / Verse');
-    const pill = document.getElementById('bible-pill');
-    if (pill) {
-      if (text) { pill.textContent = text; pill.classList.remove('hidden'); }
-      else pill.classList.add('hidden');
-    }
-  }
-
-  function collapsePanel() {
-    const app = document.getElementById('bible-app');
-    const btn = document.getElementById('bible-ref-btn');
-    if (app) app.classList.add('panel-collapsed');
-    if (btn) btn.setAttribute('aria-expanded', 'false');
-    updatePill();
-  }
-
-  function expandPanel() {
-    const app = document.getElementById('bible-app');
-    const btn = document.getElementById('bible-ref-btn');
-    if (app) app.classList.remove('panel-collapsed');
-    if (btn) btn.setAttribute('aria-expanded', 'true');
-  }
-
-  function togglePanel() {
-    const app = document.getElementById('bible-app');
-    if (app && app.classList.contains('panel-collapsed')) expandPanel();
-    else collapsePanel();
+    btn.textContent = name ? (name + ' ' + chapter + ':' + verse) : '—';
   }
 
   function applyChrome() {
@@ -99,21 +76,18 @@
     document.body.classList.toggle('lang-en', currentLang === 'en');
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const k = el.getAttribute('data-i18n');
-      if ((I18N.en || {})[k] !== undefined) el.textContent = t(k);
+      if (I18N.en[k] !== undefined) el.textContent = t(k);
     });
-    const ver = document.getElementById('bible-version-label');
+    const ver = document.getElementById('mb-version');
     if (ver) ver.textContent = t('version');
-    const note = document.getElementById('bible-note');
-    if (note) note.textContent = t('note');
     const heading = document.getElementById('bible-heading');
     if (heading && bookId) heading.textContent = bookLabel();
-    updatePill();
+    updateRef();
   }
 
   function saveState() {
     try { localStorage.setItem(STATE_KEY, JSON.stringify({ bookId, chapter, verse })); } catch (e) {}
   }
-
   function loadState() {
     try {
       const s = JSON.parse(localStorage.getItem(STATE_KEY) || '{}');
@@ -133,7 +107,6 @@
       {id:500,fa:'انجیل یوحنا',en:'John'},{id:690,fa:'نامۀ یوحنا اوّل',en:'1 John'}
     ];
   }
-
   async function loadManifest() {
     if (manifest) return manifest;
     try {
@@ -144,42 +117,12 @@
     return manifest;
   }
 
-  function fillBooks() {
-    const sel = document.getElementById('bible-book');
-    if (!sel || !meta.length) return;
-    let list = meta;
+  function availableBooks() {
     if (currentLang === 'fa' && manifest && Object.keys(manifest).length) {
-      list = meta.filter(b => manifest[String(b.id)]);
-      if (!list.length) list = meta;
+      const list = meta.filter(b => manifest[String(b.id)]);
+      return list.length ? list : meta;
     }
-    sel.innerHTML = list.map(b => {
-      const label = currentLang === 'fa' ? b.fa : b.en;
-      return '<option value="' + b.id + '">' + label + '</option>';
-    }).join('');
-    if (bookId == null || !list.find(b => b.id === bookId)) bookId = list[0].id;
-    sel.value = String(bookId);
-  }
-
-  function fillChapters() {
-    const sel = document.getElementById('bible-chapter');
-    if (!sel) return;
-    const max = CHAPTER_COUNTS[bookId] || 1;
-    let opts = '';
-    for (let i = 1; i <= max; i++) opts += '<option value="' + i + '">' + i + '</option>';
-    sel.innerHTML = opts;
-    if (chapter < 1 || chapter > max) chapter = 1;
-    sel.value = String(chapter);
-  }
-
-  function fillVerses(maxV) {
-    const sel = document.getElementById('bible-verse');
-    if (!sel) return;
-    const max = maxV || 1;
-    let opts = '';
-    for (let i = 1; i <= max; i++) opts += '<option value="' + i + '">' + i + '</option>';
-    sel.innerHTML = opts;
-    if (verse < 1 || verse > max) verse = 1;
-    sel.value = String(verse);
+    return meta;
   }
 
   function deepMergeChapters(target, source) {
@@ -198,7 +141,7 @@
     if (faCache[id]) return faCache[id];
     const man = await loadManifest();
     const files = man[String(id)] || ['b' + id + '.json'];
-    const merged = { id: id, name: '', chapters: {} };
+    const merged = { id, name: '', chapters: {} };
     let any = false;
     await Promise.all(files.map(async (fname) => {
       try {
@@ -241,57 +184,49 @@
   function buildChapterHtml(ch, versesObj) {
     const verses = versesObj || {};
     const vNums = Object.keys(verses).map(Number).sort((a, c) => a - c);
-    const maxV = vNums.length ? vNums[vNums.length - 1] : 1;
-    let html = '<div class="bible-chapter-block" id="ch-' + ch + '" data-chapter="' + ch + '" data-max-verse="' + maxV + '">';
-    html += '<h2 class="bible-chapter-title">' + t('chapterLabel') + ' ' + ch + '</h2>';
+    let html = '<div class="mb-chapter" id="ch-' + ch + '" data-chapter="' + ch + '" data-max-verse="' + (vNums[vNums.length-1]||1) + '">';
+    html += '<h2 class="mb-ch-title">' + t('chapterLabel') + ' ' + ch + '</h2>';
     vNums.forEach(n => {
-      html += '<p class="bible-verse" id="v-' + ch + '-' + n + '" data-chapter="' + ch + '" data-verse="' + n + '">' +
-        '<span class="bible-verse-num">' + n + '</span>' + escapeHtml(verses[String(n)]) + '</p>';
+      const key = ch + ':' + n;
+      const sel = selected.has(key) ? ' selected' : '';
+      html += '<p class="mb-verse' + sel + '" id="v-' + ch + '-' + n + '" data-chapter="' + ch + '" data-verse="' + n + '">' +
+        '<span class="mb-vnum">' + n + '</span>' + escapeHtml(verses[String(n)]) + '</p>';
     });
     html += '</div>';
     return html;
   }
 
   function scrollToRef(ch, vs, smooth) {
-    const id = 'v-' + ch + '-' + vs;
-    const el = document.getElementById(id) || document.getElementById('ch-' + ch);
+    const el = document.getElementById('v-' + ch + '-' + vs) || document.getElementById('ch-' + ch);
     if (!el) return;
     scrollSync = false;
     el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
-    document.querySelectorAll('.bible-verse.highlight').forEach(n => n.classList.remove('highlight'));
-    const verseEl = document.getElementById(id);
+    document.querySelectorAll('.mb-verse.highlight').forEach(n => n.classList.remove('highlight'));
+    const verseEl = document.getElementById('v-' + ch + '-' + vs);
     if (verseEl) {
       verseEl.classList.add('highlight');
-      setTimeout(() => verseEl.classList.remove('highlight'), 2000);
+      setTimeout(() => verseEl.classList.remove('highlight'), 1800);
     }
-    setTimeout(() => { scrollSync = true; }, 500);
+    setTimeout(() => { scrollSync = true; }, 450);
   }
 
   function updateSelectorsFromScroll() {
     if (!scrollSync || loadingBook) return;
-    const nodes = document.querySelectorAll('.bible-chapter-block');
+    const nodes = document.querySelectorAll('.mb-chapter');
     let current = null;
-    const mid = window.scrollY + 140;
-    nodes.forEach(n => {
-      if (n.offsetTop <= mid) current = n;
-    });
+    const mid = window.scrollY + 130;
+    nodes.forEach(n => { if (n.offsetTop <= mid) current = n; });
     if (!current) return;
     const ch = Number(current.getAttribute('data-chapter'));
     if (!ch) return;
-    let nearestVerse = 1;
-    current.querySelectorAll('.bible-verse').forEach(v => {
-      if (v.offsetTop <= mid + 40) nearestVerse = Number(v.getAttribute('data-verse')) || nearestVerse;
+    let nearest = 1;
+    current.querySelectorAll('.mb-verse').forEach(v => {
+      if (v.offsetTop <= mid + 30) nearest = Number(v.getAttribute('data-verse')) || nearest;
     });
-    if (ch !== chapter || nearestVerse !== verse) {
+    if (ch !== chapter || nearest !== verse) {
       chapter = ch;
-      verse = nearestVerse;
-      const csel = document.getElementById('bible-chapter');
-      if (csel && csel.value !== String(ch)) csel.value = String(ch);
-      const maxV = Number(current.getAttribute('data-max-verse') || 1);
-      const vsel = document.getElementById('bible-verse');
-      if (vsel && vsel.options.length !== maxV) fillVerses(maxV);
-      else if (vsel) vsel.value = String(verse);
-      updatePill();
+      verse = nearest;
+      updateRef();
       saveState();
     }
   }
@@ -301,14 +236,13 @@
     const heading = document.getElementById('bible-heading');
     const b = meta.find(x => x.id === bookId);
     if (!b || !box) return;
-
     loadingBook = true;
     heading.textContent = bookLabel();
-    updatePill();
+    updateRef();
     saveState();
+    clearSelection();
 
-    const showLoader = forceReload || !box.querySelector('.bible-chapter-block');
-    if (showLoader) {
+    if (forceReload || !box.querySelector('.mb-chapter')) {
       box.innerHTML = '<p class="bible-loading">' + t('bibleLoading') + '</p>';
     }
 
@@ -320,18 +254,11 @@
           loadingBook = false;
           return;
         }
-        const chNums = Object.keys(data.chapters).map(Number).sort((a, c) => a - c);
-        let html = '';
-        chNums.forEach(ch => { html += buildChapterHtml(ch, data.chapters[String(ch)]); });
-        box.innerHTML = html;
+        const chNums = Object.keys(data.chapters).map(Number).sort((a,c)=>a-c);
+        box.innerHTML = chNums.map(ch => buildChapterHtml(ch, data.chapters[String(ch)])).join('');
         if (!chNums.includes(chapter)) chapter = chNums[0] || 1;
-        const verses0 = data.chapters[String(chapter)] || {};
-        const vMax = Object.keys(verses0).map(Number).sort((a,c)=>a-c);
-        fillVerses(vMax.length ? vMax[vMax.length - 1] : 1);
-        const csel = document.getElementById('bible-chapter');
-        if (csel) csel.value = String(chapter);
         loadingBook = false;
-        updatePill();
+        updateRef();
         requestAnimationFrame(() => scrollToRef(chapter, verse, false));
       } else {
         const max = CHAPTER_COUNTS[bookId] || 1;
@@ -343,67 +270,156 @@
           return;
         }
         box.innerHTML = buildChapterHtml(1, first.chapters['1']);
-        const vMax1 = Object.keys(first.chapters['1']).map(Number).sort((a,c)=>a-c);
-        if (chapter === 1) fillVerses(vMax1.length ? vMax1[vMax1.length - 1] : 1);
         loadingBook = false;
-        updatePill();
+        updateRef();
         if (chapter === 1) requestAnimationFrame(() => scrollToRef(1, verse, false));
-
         for (let ch = 2; ch <= max; ch++) {
           await loadEnChapter(bookId, ch);
           const chData = enCache[bookId].chapters[String(ch)];
           if (!chData || document.getElementById('ch-' + ch)) continue;
           box.insertAdjacentHTML('beforeend', buildChapterHtml(ch, chData));
-          if (ch === chapter) {
-            const vMax = Object.keys(chData).map(Number).sort((a,c)=>a-c);
-            fillVerses(vMax.length ? vMax[vMax.length - 1] : 1);
-            scrollToRef(chapter, verse, false);
-          }
+          if (ch === chapter) scrollToRef(chapter, verse, false);
         }
       }
     } catch (e) {
-      if (showLoader) box.innerHTML = '<p class="bible-loading">' + t('errNet') + '</p>';
+      box.innerHTML = '<p class="bible-loading">' + t('errNet') + '</p>';
       loadingBook = false;
     }
   }
 
-  function onBookChange(e) {
-    bookId = Number(e.target.value);
-    chapter = 1;
-    verse = 1;
-    fillChapters();
-    fillVerses(1);
-    expandPanel();
-    renderBook(true);
+  function showTab(name) {
+    document.querySelectorAll('.mb-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.getAttribute('data-tab') === name);
+    });
+    document.getElementById('mb-books').classList.toggle('hidden', name !== 'books');
+    document.getElementById('mb-chapters').classList.toggle('hidden', name !== 'chapters');
+    document.getElementById('mb-verses').classList.toggle('hidden', name !== 'verses');
   }
 
-  function onChapterChange(e) {
-    chapter = Number(e.target.value);
-    verse = 1;
-    const block = document.getElementById('ch-' + chapter);
-    const maxV = block ? Number(block.getAttribute('data-max-verse') || 1) : 1;
-    fillVerses(maxV);
-    updatePill();
-    saveState();
-    expandPanel();
-    if (block) scrollToRef(chapter, 1, true);
-    else if (currentLang === 'en') {
-      loadEnChapter(bookId, chapter).then(() => {
-        const chData = enCache[bookId] && enCache[bookId].chapters[String(chapter)];
-        const box = document.getElementById('bible-verses');
-        if (chData && box && !document.getElementById('ch-' + chapter)) {
-          box.insertAdjacentHTML('beforeend', buildChapterHtml(chapter, chData));
-        }
+  function renderBookGrid() {
+    const box = document.getElementById('mb-books');
+    if (!box) return;
+    const list = availableBooks();
+    let html = '';
+    let lastGroup = '';
+    list.forEach(b => {
+      const group = b.id < 470 ? 'ot' : 'nt';
+      if (group !== lastGroup) {
+        html += '<div class="mb-group">' + t(group) + '</div>';
+        lastGroup = group;
+      }
+      const active = b.id === bookId ? ' active' : '';
+      const label = currentLang === 'fa' ? b.fa : b.en;
+      html += '<button type="button" class="mb-cell' + active + '" data-book="' + b.id + '">' + label + '</button>';
+    });
+    box.innerHTML = html;
+    box.querySelectorAll('[data-book]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        bookId = Number(btn.getAttribute('data-book'));
+        chapter = 1;
+        verse = 1;
+        renderBookGrid();
+        renderChapterGrid();
+        showTab('chapters');
+        renderBook(true);
+      });
+      btn.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        bookId = Number(btn.getAttribute('data-book'));
+        chapter = 1;
+        verse = 1;
+        closeSel();
+        renderBook(true);
+      });
+    });
+  }
+
+  function renderChapterGrid() {
+    const box = document.getElementById('mb-chapters');
+    if (!box) return;
+    const max = CHAPTER_COUNTS[bookId] || 1;
+    let html = '';
+    for (let i = 1; i <= max; i++) {
+      const active = i === chapter ? ' active' : '';
+      html += '<button type="button" class="mb-cell' + active + '" data-ch="' + i + '">' + i + '</button>';
+    }
+    box.innerHTML = html;
+    box.querySelectorAll('[data-ch]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        chapter = Number(btn.getAttribute('data-ch'));
+        verse = 1;
+        renderChapterGrid();
+        renderVerseGrid();
+        showTab('verses');
+        updateRef();
+        saveState();
         scrollToRef(chapter, 1, true);
       });
-    }
+      btn.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        chapter = Number(btn.getAttribute('data-ch'));
+        verse = 1;
+        closeSel();
+        updateRef();
+        saveState();
+        scrollToRef(chapter, 1, true);
+      });
+    });
   }
 
-  function onVerseChange(e) {
-    verse = Number(e.target.value);
-    updatePill();
-    saveState();
-    scrollToRef(chapter, verse, true);
+  function verseCountForChapter() {
+    const block = document.getElementById('ch-' + chapter);
+    if (block) return Number(block.getAttribute('data-max-verse') || 1);
+    if (currentLang === 'fa' && faCache[bookId]) {
+      const vs = faCache[bookId].chapters[String(chapter)] || {};
+      const nums = Object.keys(vs).map(Number);
+      return nums.length ? Math.max.apply(null, nums) : 1;
+    }
+    if (enCache[bookId] && enCache[bookId].chapters[String(chapter)]) {
+      const vs = enCache[bookId].chapters[String(chapter)];
+      const nums = Object.keys(vs).map(Number);
+      return nums.length ? Math.max.apply(null, nums) : 1;
+    }
+    return 30;
+  }
+
+  function renderVerseGrid() {
+    const box = document.getElementById('mb-verses');
+    if (!box) return;
+    const max = verseCountForChapter();
+    let html = '';
+    for (let i = 1; i <= max; i++) {
+      const active = i === verse ? ' active' : '';
+      html += '<button type="button" class="mb-cell' + active + '" data-vs="' + i + '">' + i + '</button>';
+    }
+    box.innerHTML = html;
+    box.querySelectorAll('[data-vs]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        verse = Number(btn.getAttribute('data-vs'));
+        renderVerseGrid();
+        updateRef();
+        saveState();
+        closeSel();
+        scrollToRef(chapter, verse, true);
+      });
+    });
+  }
+
+  function openSel() {
+    const el = document.getElementById('mb-sel');
+    if (!el) return;
+    el.classList.remove('hidden');
+    el.setAttribute('aria-hidden', 'false');
+    renderBookGrid();
+    renderChapterGrid();
+    renderVerseGrid();
+    showTab('books');
+  }
+  function closeSel() {
+    const el = document.getElementById('mb-sel');
+    if (!el) return;
+    el.classList.add('hidden');
+    el.setAttribute('aria-hidden', 'true');
   }
 
   function shiftChapter(dir) {
@@ -412,20 +428,143 @@
     if (next < 1 || next > max) return;
     chapter = next;
     verse = 1;
-    const csel = document.getElementById('bible-chapter');
-    if (csel) csel.value = String(chapter);
-    const block = document.getElementById('ch-' + chapter);
-    const maxV = block ? Number(block.getAttribute('data-max-verse') || 1) : 1;
-    fillVerses(maxV);
-    updatePill();
+    updateRef();
     saveState();
-    if (block) scrollToRef(chapter, 1, true);
-    else onChapterChange({ target: { value: String(chapter) } });
+    scrollToRef(chapter, 1, true);
+  }
+
+  function clearSelection() {
+    selected.clear();
+    document.querySelectorAll('.mb-verse.selected').forEach(n => n.classList.remove('selected'));
+    const bar = document.getElementById('mb-actions');
+    if (bar) bar.classList.add('hidden');
+  }
+
+  function refreshSelectionUI() {
+    document.querySelectorAll('.mb-verse').forEach(el => {
+      const key = el.getAttribute('data-chapter') + ':' + el.getAttribute('data-verse');
+      el.classList.toggle('selected', selected.has(key));
+    });
+    const bar = document.getElementById('mb-actions');
+    const label = document.getElementById('mb-sel-label');
+    if (!bar) return;
+    if (!selected.size) {
+      bar.classList.add('hidden');
+      return;
+    }
+    bar.classList.remove('hidden');
+    const keys = Array.from(selected).sort((a,b) => {
+      const [c1,v1] = a.split(':').map(Number);
+      const [c2,v2] = b.split(':').map(Number);
+      return c1 - c2 || v1 - v2;
+    });
+    if (label) label.textContent = bookLabel() + ' ' + keys.join(', ');
+  }
+
+  function toggleVerse(ch, vs) {
+    const key = ch + ':' + vs;
+    if (selected.has(key)) selected.delete(key);
+    else selected.add(key);
+    chapter = ch;
+    verse = vs;
+    updateRef();
+    saveState();
+    refreshSelectionUI();
+  }
+
+  function copySelected() {
+    if (!selected.size) return;
+    const keys = Array.from(selected).sort((a,b) => {
+      const [c1,v1] = a.split(':').map(Number);
+      const [c2,v2] = b.split(':').map(Number);
+      return c1 - c2 || v1 - v2;
+    });
+    const lines = keys.map(k => {
+      const [c, v] = k.split(':');
+      const el = document.getElementById('v-' + c + '-' + v);
+      const text = el ? el.textContent.replace(/^\d+\s*/, '').trim() : '';
+      return bookLabel() + ' ' + c + ':' + v + ' — ' + text;
+    });
+    const out = lines.join('\n');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(out).then(() => {
+        const label = document.getElementById('mb-sel-label');
+        if (label) { label.textContent = t('copied'); setTimeout(refreshSelectionUI, 900); }
+      });
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = out;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+    }
+  }
+
+  function bindVerseGestures() {
+    const box = document.getElementById('bible-verses');
+    if (!box || box._mbBound) return;
+    box._mbBound = true;
+    let pressTimer = null;
+
+    box.addEventListener('click', e => {
+      const verseEl = e.target.closest('.mb-verse');
+      if (!verseEl) return;
+      if (selected.size) {
+        toggleVerse(Number(verseEl.getAttribute('data-chapter')), Number(verseEl.getAttribute('data-verse')));
+      }
+    });
+
+    box.addEventListener('contextmenu', e => {
+      const verseEl = e.target.closest('.mb-verse');
+      if (!verseEl) return;
+      e.preventDefault();
+      toggleVerse(Number(verseEl.getAttribute('data-chapter')), Number(verseEl.getAttribute('data-verse')));
+    });
+
+    box.addEventListener('touchstart', e => {
+      const verseEl = e.target.closest('.mb-verse');
+      if (!verseEl) return;
+      pressTimer = setTimeout(() => {
+        toggleVerse(Number(verseEl.getAttribute('data-chapter')), Number(verseEl.getAttribute('data-verse')));
+        pressTimer = null;
+      }, 480);
+    }, { passive: true });
+    box.addEventListener('touchend', () => {
+      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+    });
+    box.addEventListener('touchmove', () => {
+      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+    }, { passive: true });
+  }
+
+  function bindSwipe() {
+    const reader = document.getElementById('mb-reader');
+    if (!reader || reader._swipeBound) return;
+    reader._swipeBound = true;
+    let startX = 0, startY = 0;
+    reader.addEventListener('touchstart', e => {
+      if (!e.touches[0]) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    reader.addEventListener('touchend', e => {
+      if (!e.changedTouches[0]) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+      if (currentLang === 'fa') {
+        if (dx > 0) shiftChapter(1);
+        else shiftChapter(-1);
+      } else {
+        if (dx < 0) shiftChapter(1);
+        else shiftChapter(-1);
+      }
+    }, { passive: true });
   }
 
   function initTheme() {
-    const saved = localStorage.getItem(THEME_KEY);
-    document.body.classList.toggle('dark', saved === 'dark');
+    document.body.classList.toggle('dark', localStorage.getItem(THEME_KEY) === 'dark');
   }
 
   async function boot() {
@@ -434,35 +573,35 @@
     applyChrome();
     await loadMeta();
     await loadManifest();
-    fillBooks();
-    fillChapters();
-    fillVerses(1);
+    if (bookId == null) {
+      const list = availableBooks();
+      bookId = list[0] ? list[0].id : 480;
+    }
     await renderBook(true);
+    bindVerseGestures();
+    bindSwipe();
 
-    document.getElementById('bible-book')?.addEventListener('change', onBookChange);
-    document.getElementById('bible-chapter')?.addEventListener('change', onChapterChange);
-    document.getElementById('bible-verse')?.addEventListener('change', onVerseChange);
-    document.getElementById('bible-prev')?.addEventListener('click', () => shiftChapter(-1));
-    document.getElementById('bible-next')?.addEventListener('click', () => shiftChapter(1));
+    document.getElementById('mb-ref')?.addEventListener('click', openSel);
+    document.getElementById('mb-sel-bg')?.addEventListener('click', closeSel);
+    document.getElementById('mb-close')?.addEventListener('click', closeSel);
+    document.getElementById('mb-prev')?.addEventListener('click', () => shiftChapter(-1));
+    document.getElementById('mb-next')?.addEventListener('click', () => shiftChapter(1));
+    document.getElementById('mb-copy')?.addEventListener('click', copySelected);
+    document.getElementById('mb-clear')?.addEventListener('click', clearSelection);
+    document.querySelectorAll('.mb-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const name = tab.getAttribute('data-tab');
+        if (name === 'chapters') renderChapterGrid();
+        if (name === 'verses') renderVerseGrid();
+        showTab(name);
+      });
+    });
     document.getElementById('lang-toggle')?.addEventListener('click', async () => {
       currentLang = currentLang === 'fa' ? 'en' : 'fa';
       localStorage.setItem(LANG_KEY, currentLang);
       applyChrome();
-      fillBooks();
-      fillChapters();
       await renderBook(true);
     });
-    document.getElementById('bible-ref-btn')?.addEventListener('click', () => {
-      expandPanel();
-    });
-    document.getElementById('bible-done')?.addEventListener('click', () => {
-      collapsePanel();
-      scrollToRef(chapter, verse, true);
-    });
-    document.getElementById('bible-verse')?.addEventListener('change', () => {
-      setTimeout(collapsePanel, 280);
-    });
-    setTimeout(collapsePanel, 400);
     window.addEventListener('scroll', () => {
       window.requestAnimationFrame(updateSelectorsFromScroll);
     }, { passive: true });
