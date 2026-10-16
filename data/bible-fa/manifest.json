@@ -17,7 +17,7 @@
   "450": ["b450.json"],
   "460": ["b460.json"],
   "550": ["b550c1.json", "b550c2a.json", "b550c2b.json", "b550c3a.json", "b550c3b.json", "b550c4a.json", "b550c4b.json", "b550c5.json", "b550c6.json"],
-  "560": ["b560.json"],
+  "560": ["b560c1.json", "b560c2.json", "b560c3a.json", "b560c3b.json", "b560c4a.json", "b560c4b.json", "b560c5.json", "b560c6.json"],
   "570": ["b570.json"],
   "580": ["b580.json"],
   "590": ["b590.json"],
