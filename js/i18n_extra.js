@@ -1,4 +1,4 @@
-/* Extra i18n keys + pure language side-menu support */
+/* Extra i18n keys */
 (function () {
   if (typeof T === 'undefined') return;
   const extra = {
@@ -10,7 +10,8 @@
       fbRatingNone: '— انتخاب کنید —', fbMessage: 'پیام بازخورد', fbSend: 'ارسال بازخورد',
       fbNamePh: 'نام (اختیاری)', fbEmailPh: 'ایمیل (اختیاری)', fbMessagePh: 'بازخورد شما...',
       verseOfDay: 'آیه امروز', newVerse: 'آیه دیگر', subscribeNav: 'آیه روزانه',
-      themeToggle: 'حالت شب / روز', menuTitle: 'منو'
+      themeToggle: 'حالت شب / روز', menuTitle: 'منو',
+      liveOffline: 'در حال حاضر پخش زنده‌ای فعال نیست.', questionsNav: 'سوالات'
     },
     en: {
       pageTitle: 'Seventh Trumpet — Three Angels Message',
@@ -20,13 +21,12 @@
       fbRatingNone: '— Choose —', fbMessage: 'Your feedback', fbSend: 'Send feedback',
       fbNamePh: 'Name (optional)', fbEmailPh: 'Email (optional)', fbMessagePh: 'Your feedback...',
       verseOfDay: 'Verse of the day', newVerse: 'Another verse', subscribeNav: 'Daily verse',
-      themeToggle: 'Dark / Light mode', menuTitle: 'Menu'
+      themeToggle: 'Dark / Light mode', menuTitle: 'Menu',
+      liveOffline: 'There is no live stream right now.', questionsNav: 'Questions'
     }
   };
   Object.assign(T.fa, extra.fa);
   Object.assign(T.en, extra.en);
   T.fa.pageTitle = extra.fa.pageTitle;
-  if (typeof applyLanguage === 'function') {
-    try { applyLanguage(); } catch (e) {}
-  }
+  if (typeof applyLanguage === 'function') { try { applyLanguage(); } catch (e) {} }
 })();
