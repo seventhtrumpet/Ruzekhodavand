@@ -132,3 +132,23 @@ body.dark .side-menu-nav a,
 body.dark .side-menu-btn { color: #e8eef5; border-color: #243447; }
 body.dark .side-menu-nav a:hover,
 body.dark .side-menu-btn:hover { background: #1c2d40; }
+
+/* Main nav stays visible; hamburger is extra */
+.nav-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+.header-inner {
+  flex-wrap: nowrap;
+}
+@media (max-width: 720px) {
+  .nav-main a {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.85rem;
+  }
+  .header-inner {
+    flex-wrap: wrap;
+  }
+}

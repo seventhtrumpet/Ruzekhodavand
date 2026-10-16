@@ -1,11 +1,15 @@
-/* Seventh Trumpet — side menu (hamburger) */
+/* Seventh Trumpet — side menu (hamburger) — secondary links only */
 (function () {
   const THEME_KEY = 'cog_theme';
 
   function applyThemeIcon(theme) {
     const icon = document.getElementById('theme-icon');
+    const btn = document.getElementById('theme-toggle');
     const emoji = theme === 'dark' ? '☀️' : '🌙';
     if (icon) icon.textContent = emoji;
+    if (btn && btn.tagName === 'BUTTON' && !btn.querySelector('#theme-icon')) {
+      btn.textContent = emoji;
+    }
     document.body.classList.toggle('dark', theme === 'dark');
     try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
   }
@@ -16,15 +20,25 @@
     const headerInner = document.querySelector('.header-inner');
     if (!headerInner) return;
 
-    const oldNav = headerInner.querySelector('.nav');
+    // Keep main nav visible — only add hamburger next to it
     const langBtn = document.getElementById('lang-toggle');
     const liveBadge = document.getElementById('live-badge');
-    const oldTheme = document.getElementById('theme-toggle');
+    const themeBtn = document.getElementById('theme-toggle');
 
-    const actions = document.createElement('div');
-    actions.className = 'header-actions';
-    if (langBtn) actions.appendChild(langBtn);
-    if (liveBadge) actions.appendChild(liveBadge);
+    let actions = headerInner.querySelector('.header-actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'header-actions';
+      headerInner.appendChild(actions);
+    }
+
+    // Move lang + live badge into actions if still in nav (keeps them on the right)
+    if (langBtn && langBtn.parentNode && langBtn.parentNode.classList.contains('nav')) {
+      actions.appendChild(langBtn);
+    }
+    if (liveBadge && liveBadge.parentNode && liveBadge.parentNode.classList.contains('nav')) {
+      actions.appendChild(liveBadge);
+    }
 
     const toggle = document.createElement('button');
     toggle.id = 'menu-toggle';
@@ -34,9 +48,6 @@
     toggle.setAttribute('aria-expanded', 'false');
     toggle.innerHTML = '<span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>';
     actions.appendChild(toggle);
-    headerInner.appendChild(actions);
-    if (oldNav) oldNav.style.display = 'none';
-    if (oldTheme && oldTheme.parentNode) oldTheme.remove();
 
     if (!document.querySelector('link[href*="menu.css"]')) {
       const link = document.createElement('link');
@@ -55,21 +66,16 @@
     panel.id = 'side-menu';
     panel.className = 'side-menu';
     panel.setAttribute('aria-hidden', 'true');
+    // Secondary only — important links stay in the top bar
     panel.innerHTML =
       '<div class="side-menu-head"><span>شیپور هفتم</span>' +
       '<button type="button" id="menu-close" class="menu-close" aria-label="Close">×</button></div>' +
       '<nav class="side-menu-nav">' +
-      '<a href="#media" data-menu-link>رسانه‌ها / Media</a>' +
       '<a href="#questions" data-menu-link>سوالات / Questions</a>' +
       '<a href="#feedback" data-menu-link>بازخورد / Feedback</a>' +
-      '<button type="button" id="theme-toggle" class="side-menu-btn">' +
-      '<span id="theme-icon">🌙</span> حالت شب / روز</button>' +
       '<a href="admin.html">مدیریت / Admin</a>' +
       '<hr class="side-menu-hr">' +
-      '<a href="#home" data-menu-link>خانه / Home</a>' +
-      '<a href="bible.html">کتاب مقدس / Bible</a>' +
       '<a href="#playlists" data-menu-link>پلی‌لیست‌ها / Playlists</a>' +
-      '<a href="#live" data-menu-link>پخش زنده / Live</a>' +
       '<a href="#subscribe" data-menu-link>آیه روزانه / Daily verse</a>' +
       '<a href="#contact" data-menu-link>تماس / Contact</a>' +
       '</nav>';
@@ -95,11 +101,14 @@
     panel.querySelectorAll('[data-menu-link]').forEach(a => a.addEventListener('click', closeMenu));
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
 
-    const themeBtn = document.getElementById('theme-toggle');
-    themeBtn.addEventListener('click', () => {
-      const next = document.body.classList.contains('dark') ? 'light' : 'dark';
-      applyThemeIcon(next);
-    });
+    // Theme button in main nav
+    if (themeBtn && !themeBtn.dataset.bound) {
+      themeBtn.dataset.bound = '1';
+      themeBtn.addEventListener('click', () => {
+        const next = document.body.classList.contains('dark') ? 'light' : 'dark';
+        applyThemeIcon(next);
+      });
+    }
     const saved = localStorage.getItem(THEME_KEY);
     if (saved === 'dark' || document.body.classList.contains('dark')) applyThemeIcon('dark');
     else applyThemeIcon(saved || 'light');
