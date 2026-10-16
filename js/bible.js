@@ -25,7 +25,7 @@
       note: 'ترجمهٔ فارسی «هزارۀ نو» © Elam Ministries. فقط کتاب‌های موجود نشان داده می‌شوند. می‌توانید تا پایان کتاب اسکرول کنید.',
       errLoad: 'این کتاب در دسترس نیست.',
       errNet: 'خطا در بارگذاری. اتصال اینترنت را بررسی کنید.',
-      chapterLabel: 'باب'
+      chapterLabel: 'باب', bibleDone: 'خواندن'
     },
     en: {
       siteName: 'Seventh Trumpet', home: 'Home', bibleNav: 'Bible', langBtn: 'Persian',
@@ -37,7 +37,7 @@
       note: 'English: King James Version (public domain). Scroll through the whole book.',
       errLoad: 'Could not load this book.',
       errNet: 'Network error. Check your connection.',
-      chapterLabel: 'Chapter'
+      chapterLabel: 'Chapter', bibleDone: 'Read'
     }
   };
 
@@ -61,12 +61,36 @@
   }
 
   function updatePill() {
-    const pill = document.getElementById('bible-pill');
-    if (!pill) return;
     const name = bookLabel();
-    if (!name) { pill.textContent = ''; return; }
-    pill.textContent = name + '  ·  ' + chapter + ':' + verse;
-    pill.classList.remove('hidden');
+    const text = name ? (name + '  ·  ' + chapter + ':' + verse) : '';
+    const refBtn = document.getElementById('bible-ref-btn');
+    if (refBtn) refBtn.textContent = text || (currentLang === 'fa' ? 'کتاب / باب / آیه' : 'Book / Chapter / Verse');
+    const pill = document.getElementById('bible-pill');
+    if (pill) {
+      if (text) { pill.textContent = text; pill.classList.remove('hidden'); }
+      else pill.classList.add('hidden');
+    }
+  }
+
+  function collapsePanel() {
+    const app = document.getElementById('bible-app');
+    const btn = document.getElementById('bible-ref-btn');
+    if (app) app.classList.add('panel-collapsed');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    updatePill();
+  }
+
+  function expandPanel() {
+    const app = document.getElementById('bible-app');
+    const btn = document.getElementById('bible-ref-btn');
+    if (app) app.classList.remove('panel-collapsed');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+  }
+
+  function togglePanel() {
+    const app = document.getElementById('bible-app');
+    if (app && app.classList.contains('panel-collapsed')) expandPanel();
+    else collapsePanel();
   }
 
   function applyChrome() {
@@ -349,6 +373,7 @@
     verse = 1;
     fillChapters();
     fillVerses(1);
+    expandPanel();
     renderBook(true);
   }
 
@@ -360,6 +385,7 @@
     fillVerses(maxV);
     updatePill();
     saveState();
+    expandPanel();
     if (block) scrollToRef(chapter, 1, true);
     else if (currentLang === 'en') {
       loadEnChapter(bookId, chapter).then(() => {
@@ -426,9 +452,17 @@
       fillChapters();
       await renderBook(true);
     });
-    document.getElementById('bible-pill')?.addEventListener('click', () => {
+    document.getElementById('bible-ref-btn')?.addEventListener('click', () => {
+      expandPanel();
+    });
+    document.getElementById('bible-done')?.addEventListener('click', () => {
+      collapsePanel();
       scrollToRef(chapter, verse, true);
     });
+    document.getElementById('bible-verse')?.addEventListener('change', () => {
+      setTimeout(collapsePanel, 280);
+    });
+    setTimeout(collapsePanel, 400);
     window.addEventListener('scroll', () => {
       window.requestAnimationFrame(updateSelectorsFromScroll);
     }, { passive: true });
