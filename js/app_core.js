@@ -15,40 +15,137 @@ function loadData() {
 function savePosts() { localStorage.setItem(STORAGE_KEY, JSON.stringify(posts)); }
 function saveLive() { localStorage.setItem(LIVE_KEY, JSON.stringify(liveData)); }
 
+function ensureAuthUI() {
+  const bar = document.getElementById('user-bar');
+  if (bar) bar.style.display = 'none';
+
+  if (!document.getElementById('signin-modal')) {
+    const modal = document.createElement('div');
+    modal.id = 'signin-modal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML =
+      '<div class="modal" style="max-width:380px;text-align:center;">' +
+      '<button type="button" class="modal-close" id="signin-modal-close">&times;</button>' +
+      '<h2 style="margin-bottom:1.2rem;color:var(--primary)" data-i18n-signin-title>ورود</h2>' +
+      '<button type="button" id="btn-google" class="btn btn-primary" style="width:100%;margin-bottom:0.7rem;display:flex;align-items:center;justify-content:center;gap:0.5rem;">' +
+      '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18" alt="">' +
+      '<span data-i18n-signin-google>ورود با گوگل</span></button>' +
+      '<button type="button" id="btn-email" class="btn btn-outline" style="width:100%;" data-i18n-signin-email>ورود با ایمیل</button>' +
+      '</div>';
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeSignInModal(); });
+    document.getElementById('signin-modal-close').addEventListener('click', closeSignInModal);
+  }
+
+  let actions = document.querySelector('.header-actions');
+  if (!actions) {
+    const inner = document.querySelector('.header-inner');
+    if (inner) {
+      actions = document.createElement('div');
+      actions.className = 'header-actions';
+      inner.appendChild(actions);
+    }
+  }
+  if (actions && !document.getElementById('btn-signin-top')) {
+    const wrap = document.createElement('div');
+    wrap.id = 'auth-header-wrap';
+    wrap.style.cssText = 'display:flex;align-items:center;gap:0.5rem;';
+    wrap.innerHTML =
+      '<button type="button" id="btn-signin-top" class="btn btn-primary btn-sm" data-i18n-signin>ورود</button>' +
+      '<div id="auth-header-user" class="hidden" style="display:none;align-items:center;gap:0.5rem;">' +
+      '<span id="user-display" style="font-size:0.85rem;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>' +
+      '<button type="button" id="btn-signout" class="btn btn-outline btn-sm" data-i18n-signout>خروج</button></div>';
+    const menuToggle = document.getElementById('menu-toggle');
+    if (menuToggle && menuToggle.parentNode === actions) {
+      actions.insertBefore(wrap, menuToggle);
+    } else {
+      actions.insertBefore(wrap, actions.firstChild);
+    }
+  }
+
+  if (!document.getElementById('email-modal')) {
+    const em = document.createElement('div');
+    em.id = 'email-modal';
+    em.className = 'modal-overlay';
+    em.innerHTML =
+      '<div class="modal" style="max-width:400px;">' +
+      '<button type="button" class="modal-close" onclick="closeEmailModal()">&times;</button>' +
+      '<h2 style="margin-bottom:1rem;color:var(--primary)" data-i18n="emailLoginTitle">ورود با ایمیل</h2>' +
+      '<div id="email-form">' +
+      '<div class="form-group"><label data-i18n="emailLabel">ایمیل</label><input type="email" id="email-input" required></div>' +
+      '<div class="form-group"><label data-i18n="passwordLabel">رمز عبور</label><input type="password" id="email-password" required></div>' +
+      '<div id="email-error" style="color:#c62828;font-size:0.9rem;margin-bottom:0.8rem;display:none;"></div>' +
+      '<button type="button" id="btn-email-login" class="btn btn-primary" style="width:100%;margin-bottom:0.5rem;" data-i18n="loginBtn">ورود</button>' +
+      '<button type="button" id="btn-email-register" class="btn btn-outline" style="width:100%;" data-i18n="registerBtn">ثبت‌نام</button>' +
+      '</div></div>';
+    document.body.appendChild(em);
+  }
+  applySignInLabels();
+}
+
+function applySignInLabels() {
+  const fa = (typeof currentLang !== 'undefined' ? currentLang : 'fa') === 'fa';
+  const set = (sel, faT, enT) => {
+    document.querySelectorAll(sel).forEach(el => { el.textContent = fa ? faT : enT; });
+  };
+  set('[data-i18n-signin]', 'ورود', 'Sign in');
+  set('[data-i18n-signout]', 'خروج', 'Sign out');
+  set('[data-i18n-signin-title]', 'ورود', 'Sign in');
+  set('[data-i18n-signin-google]', 'ورود با گوگل', 'Sign in with Google');
+  set('[data-i18n-signin-email]', 'ورود با ایمیل', 'Sign in with Email');
+}
+
+function openSignInModal() {
+  const m = document.getElementById('signin-modal');
+  if (m) m.classList.add('open');
+}
+function closeSignInModal() {
+  const m = document.getElementById('signin-modal');
+  if (m) m.classList.remove('open');
+}
+
 function setupAuth() {
+  ensureAuthUI();
   auth.getRedirectResult().then(() => {}).catch(err => console.log('Redirect result error:', err.message));
   auth.onAuthStateChanged(user => { currentUser = user; updateAuthUI(); });
+  document.getElementById('btn-signin-top')?.addEventListener('click', openSignInModal);
   document.getElementById('btn-google')?.addEventListener('click', () => {
     auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
   });
   document.getElementById('btn-email')?.addEventListener('click', () => {
-    document.getElementById('email-modal').classList.add('open');
+    closeSignInModal();
+    document.getElementById('email-modal')?.classList.add('open');
   });
   document.getElementById('btn-email-login')?.addEventListener('click', emailLogin);
   document.getElementById('btn-email-register')?.addEventListener('click', emailRegister);
   document.getElementById('btn-signout')?.addEventListener('click', () => auth.signOut());
+  document.getElementById('lang-toggle')?.addEventListener('click', () => setTimeout(applySignInLabels, 50));
 }
 
 function updateAuthUI() {
-  const loggedOut = document.getElementById('auth-logged-out');
-  const loggedIn = document.getElementById('auth-logged-in');
+  const btnSignIn = document.getElementById('btn-signin-top');
+  const userWrap = document.getElementById('auth-header-user');
   const display = document.getElementById('user-display');
-  const t = T[currentLang];
+  const t = (typeof T !== 'undefined' && T[currentLang]) ? T[currentLang] : { welcome: 'Welcome' };
+  const bar = document.getElementById('user-bar');
+  if (bar) bar.style.display = 'none';
   if (currentUser) {
-    if (loggedOut) loggedOut.style.display = 'none';
-    if (loggedIn) { loggedIn.style.display = 'flex'; loggedIn.classList.remove('hidden'); }
+    if (btnSignIn) btnSignIn.style.display = 'none';
+    if (userWrap) { userWrap.style.display = 'flex'; userWrap.classList.remove('hidden'); }
     if (display) {
       const name = currentUser.displayName || currentUser.email || 'User';
-      display.innerHTML = `${t.welcome}, <strong>${escapeHtml(name)}</strong>`;
+      display.innerHTML = (t.welcome || '') + ', <strong>' + escapeHtml(name) + '</strong>';
     }
+    closeSignInModal();
   } else {
-    if (loggedOut) loggedOut.style.display = 'flex';
-    if (loggedIn) { loggedIn.style.display = 'none'; loggedIn.classList.add('hidden'); }
+    if (btnSignIn) btnSignIn.style.display = '';
+    if (userWrap) { userWrap.style.display = 'none'; userWrap.classList.add('hidden'); }
   }
+  applySignInLabels();
 }
 
 function closeEmailModal() {
-  document.getElementById('email-modal').classList.remove('open');
+  document.getElementById('email-modal')?.classList.remove('open');
   const errEl = document.getElementById('email-error');
   if (errEl) errEl.style.display = 'none';
 }
@@ -98,246 +195,92 @@ function saveProgress(postId, time) {
   if (!currentUser || time < 3) return;
   try {
     const all = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}');
-    all[currentUser.uid + '::' + postId] = Math.floor(time);
+    all[currentUser.uid + '::' + postId] = time;
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(all));
   } catch {}
 }
 
 function loadVisitorCount() {
-  if (sessionStorage.getItem('cog_auth') === 'true') return;
-  const today = new Date().toISOString().slice(0, 10);
-  const key = 'cog_visited_' + today;
-  if (localStorage.getItem(key)) return;
-  localStorage.setItem(key, '1');
-  fetch('https://api.countapi.xyz/hit/ruzekhodavand-site/visits').catch(() => {});
+  try {
+    let n = parseInt(localStorage.getItem('cog_visits') || '0', 10);
+    if (!sessionStorage.getItem('cog_counted')) {
+      n += 1;
+      localStorage.setItem('cog_visits', String(n));
+      sessionStorage.setItem('cog_counted', '1');
+    }
+  } catch {}
 }
 
-function applyLanguage() {
-  document.body.classList.toggle('lang-en', currentLang === 'en');
-  document.documentElement.lang = currentLang;
-  document.documentElement.dir = currentLang === 'fa' ? 'rtl' : 'ltr';
-  const t = T[currentLang] || T.en;
-  if (t.pageTitle) document.title = t.pageTitle;
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (t[key]) el.textContent = t[key];
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    if (t[key]) el.placeholder = t[key];
-  });
-  const bookSelect = document.getElementById('filter-book');
-  if (bookSelect) {
-    const currentVal = bookSelect.value;
-    bookSelect.innerHTML = `<option value="">${t.all}</option>` + BIBLE_BOOKS[currentLang].map(b => `<option value="${b}">${b}</option>`).join('');
-    bookSelect.value = currentVal;
-  }
-  updateLiveBadge();
-  updateAuthUI();
-  if (typeof window.updateSideMenuLang === 'function') window.updateSideMenuLang();
-}
-
-function toggleLanguage() {
-  currentLang = currentLang === 'fa' ? 'en' : 'fa';
-  localStorage.setItem(LANG_KEY, currentLang);
-  applyLanguage();
-  renderMedia();
-}
-
-function isAudioFile(post) {
-  if (post.type === 'audio') return true;
-  const name = (post.filename || post.externalUrl || '').toLowerCase();
-  return /\.(mp3|wav|m4a|ogg|aac|flac|wma)(\?|$)/.test(name) || (post.dataUrl && post.dataUrl.startsWith('data:audio/'));
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function getYouTubeEmbedUrl(url) {
   if (!url) return null;
-  try {
-    if (url.includes('youtube.com/watch')) {
-      const id = new URL(url).searchParams.get('v');
-      if (id) return `https://www.youtube.com/embed/${id}`;
-    }
-    if (url.includes('youtu.be/')) {
-      const id = url.split('youtu.be/')[1].split(/[?&]/)[0];
-      if (id) return `https://www.youtube.com/embed/${id}`;
-    }
-    if (url.includes('youtube.com/embed/')) return url;
-  } catch (e) {}
-  return null;
-}
-
-function renderAll() { renderMedia(); renderLive(); updateLiveBadge(); }
-
-function updateLiveBadge() {
-  const badge = document.getElementById('live-badge');
-  if (badge) badge.classList.toggle('hidden', !liveData.isLive);
+  const m = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
+  return m ? 'https://www.youtube.com/embed/' + m[1] : null;
 }
 
 function renderLive() {
   const section = document.getElementById('live-section');
   if (!section) return;
+  const offline = document.getElementById('live-offline');
+  const iframe = document.getElementById('live-iframe');
   if (liveData.isLive && liveData.streamUrl) {
     section.classList.remove('hidden');
+    if (offline) offline.style.display = 'none';
+    if (iframe) iframe.style.display = 'block';
     const titleEl = document.getElementById('live-title');
-    if (titleEl) titleEl.textContent = liveData.title || T[currentLang].liveNow;
-    const iframe = document.getElementById('live-iframe');
+    if (titleEl) titleEl.textContent = liveData.title || (T[currentLang] && T[currentLang].liveNow) || 'LIVE';
     if (iframe) {
       let src = liveData.streamUrl;
       const yt = getYouTubeEmbedUrl(src);
       if (yt) src = yt + '?autoplay=1';
       iframe.src = src;
     }
-  } else section.classList.add('hidden');
-}
-
-function renderMedia() {
-  const grid = document.getElementById('media-grid');
-  if (!grid) return;
-  const bookFilter = document.getElementById('filter-book')?.value || '';
-  const typeFilter = document.getElementById('filter-type')?.value || '';
-  const search = (document.getElementById('filter-search')?.value || '').toLowerCase();
-  let filtered = posts.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
-  if (bookFilter) filtered = filtered.filter(p => p.book_fa === bookFilter || p.book_en === bookFilter);
-  if (typeFilter) filtered = filtered.filter(p => p.type === typeFilter);
-  if (search) {
-    filtered = filtered.filter(p => {
-      const title = (currentLang === 'fa' ? p.title_fa : p.title_en) || '';
-      const desc = (currentLang === 'fa' ? p.desc_fa : p.desc_en) || '';
-      const writing = p.writing || '';
-      return title.toLowerCase().includes(search) || desc.toLowerCase().includes(search) || writing.toLowerCase().includes(search);
-    });
-  }
-  const t = T[currentLang];
-  if (filtered.length === 0) {
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>${t.noPosts}</p></div>`;
-    return;
-  }
-  grid.innerHTML = filtered.map(p => {
-    const title = currentLang === 'fa' ? (p.title_fa || p.title_en || t.untitled) : (p.title_en || p.title_fa || t.untitled);
-    const desc = currentLang === 'fa' ? (p.desc_fa || p.desc_en) : (p.desc_en || p.desc_fa);
-    const book = currentLang === 'fa' ? p.book_fa : p.book_en;
-    const date = new Date(p.date).toLocaleString(currentLang === 'fa' ? 'fa-IR' : 'en-GB', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    const typeIcon = p.type === 'photo' ? '🖼️' : p.type === 'video' ? '🎬' : p.type === 'audio' ? '🔊' : p.type === 'text' ? '📝' : '📄';
-    const commentsCount = (p.comments || []).length;
-    let preview = desc || '';
-    if (!preview && p.writing) preview = p.writing.slice(0, 120) + (p.writing.length > 120 ? '...' : '');
-    let thumb = '';
-    if (p.type === 'photo' && p.dataUrl) thumb = `<img src="${p.dataUrl}" alt="${escapeHtml(title)}" loading="lazy">`;
-    else if (p.type === 'video' && p.dataUrl) thumb = `<video src="${p.dataUrl}" muted></video>`;
-    else if (isAudioFile(p)) thumb = '🔊';
-    else if (p.externalUrl && getYouTubeEmbedUrl(p.externalUrl)) thumb = '▶️';
-    else thumb = typeIcon;
-    return `<article class="media-card" data-id="${p.id}">
-      <div class="media-thumb">${thumb}</div>
-      <div class="media-body">
-        <div class="media-book">${book || ''}</div>
-        <h3 class="media-title">${escapeHtml(title)}</h3>
-        <p class="media-desc">${escapeHtml(preview)}</p>
-        <div class="media-meta"><span>${date}</span><span>${commentsCount} ${t.comments}</span></div>
-        <div class="media-actions">
-          <button class="btn btn-primary btn-sm" onclick="openPost('${p.id}')">${t.view}</button>
-          ${p.dataUrl ? `<a class="btn btn-outline btn-sm" href="${p.dataUrl}" download="${p.filename || 'file'}">${t.download}</a>` : ''}
-        </div>
-      </div>
-    </article>`;
-  }).join('');
-}
-
-function openPost(id) {
-  const post = posts.find(p => p.id === id);
-  if (!post) return;
-  const t = T[currentLang];
-  const title = currentLang === 'fa' ? (post.title_fa || post.title_en || t.untitled) : (post.title_en || post.title_fa || t.untitled);
-  const desc = currentLang === 'fa' ? (post.desc_fa || post.desc_en) : (post.desc_en || post.desc_fa);
-  const book = currentLang === 'fa' ? post.book_fa : post.book_en;
-  const dateStr = new Date(post.date).toLocaleString(currentLang === 'fa' ? 'fa-IR' : 'en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-  const modal = document.getElementById('post-modal');
-  const content = document.getElementById('modal-content');
-  let mediaHtml = '';
-  const savedTime = getProgress(id);
-  if (isAudioFile(post) && (post.dataUrl || post.externalUrl)) {
-    const src = post.dataUrl || post.externalUrl;
-    mediaHtml = `<div style="margin:1rem 0;padding:1.2rem;background:#f5f3ee;border-radius:12px;text-align:center;"><div style="font-size:2.5rem;margin-bottom:0.8rem;">🔊</div><audio id="progress-audio" controls style="width:100%;max-width:480px;" src="${escapeHtml(src)}"></audio></div>`;
-  } else if (post.externalUrl) {
-    const ytEmbed = getYouTubeEmbedUrl(post.externalUrl);
-    if (ytEmbed) {
-      const startParam = savedTime > 5 ? `?start=${savedTime}` : '';
-      mediaHtml = `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin:1rem 0;background:#000;"><iframe src="${ytEmbed}${startParam}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-    } else {
-      mediaHtml = `<p><a href="${escapeHtml(post.externalUrl)}" target="_blank" rel="noopener">${escapeHtml(post.externalUrl)}</a></p>`;
-    }
-  } else if (post.type === 'photo' && post.dataUrl) {
-    mediaHtml = `<img src="${post.dataUrl}" alt="${escapeHtml(title)}" style="max-width:100%;border-radius:12px;margin:1rem 0;">`;
-  } else if (post.type === 'video' && post.dataUrl) {
-    mediaHtml = `<video id="progress-video" controls style="width:100%;border-radius:12px;margin:1rem 0;" src="${post.dataUrl}"></video>`;
-  } else if (post.dataUrl) {
-    mediaHtml = `<p><a class="btn btn-primary" href="${post.dataUrl}" download="${post.filename || 'file'}">${t.download}</a></p>`;
-  }
-  if (post.writing) {
-    mediaHtml += `<div class="writing-block" style="margin:1rem 0;padding:1rem;background:var(--bg,#f8f9fb);border-radius:12px;white-space:pre-wrap;line-height:1.7;">${escapeHtml(post.writing)}</div>`;
-  }
-  const comments = (post.comments || []).map(c => `<div class="comment"><strong>${escapeHtml(c.name)}</strong><p>${escapeHtml(c.text)}</p></div>`).join('') || `<p style="opacity:0.6">${t.comments}: 0</p>`;
-  content.innerHTML = `<button class="modal-close" onclick="closeModal()">&times;</button>
-    <div class="media-book">${book || ''}</div>
-    <h2>${escapeHtml(title)}</h2>
-    <p style="opacity:0.7;font-size:0.9rem;">${dateStr}</p>
-    ${desc ? `<p>${escapeHtml(desc)}</p>` : ''}
-    ${mediaHtml}
-    <h3 style="margin-top:1.5rem;">${t.comments}</h3>
-    <div id="comments-list">${comments}</div>
-    <div class="comment-form" style="margin-top:1rem;">
-      <input type="text" id="comment-name" placeholder="${t.yourName}" style="width:100%;margin-bottom:0.5rem;padding:0.5rem;">
-      <textarea id="comment-text" placeholder="${t.writeComment}" rows="3" style="width:100%;padding:0.5rem;"></textarea>
-      <button class="btn btn-primary" style="margin-top:0.5rem;" onclick="addComment('${id}')">${t.send}</button>
-    </div>`;
-  modal.classList.add('open');
-  const video = document.getElementById('progress-video');
-  const audio = document.getElementById('progress-audio');
-  const media = video || audio;
-  if (media && savedTime > 3) {
-    media.currentTime = savedTime;
-  }
-  if (media) {
-    media.addEventListener('timeupdate', () => saveProgress(id, media.currentTime));
+  } else {
+    if (iframe) { iframe.src = ''; iframe.style.display = 'none'; }
+    if (offline) offline.style.display = 'block';
+    section.classList.remove('hidden');
   }
 }
 
-function closeModal() {
-  document.getElementById('post-modal')?.classList.remove('open');
-  const iframe = document.querySelector('#modal-content iframe');
-  if (iframe) iframe.src = '';
-}
-
-function addComment(postId) {
-  const name = document.getElementById('comment-name')?.value.trim();
-  const text = document.getElementById('comment-text')?.value.trim();
-  if (!name || !text) return;
-  const post = posts.find(p => p.id === postId);
-  if (!post) return;
-  if (!post.comments) post.comments = [];
-  post.comments.push({ name, text, date: new Date().toISOString() });
-  savePosts();
-  openPost(postId);
-  renderMedia();
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function renderAll() {
+  if (typeof renderMedia === 'function') renderMedia();
+  if (typeof renderLive === 'function') renderLive();
+  const badge = document.getElementById('live-badge');
+  if (badge) badge.classList.toggle('hidden', !(liveData && liveData.isLive));
 }
 
 function setupEventListeners() {
-  document.getElementById('lang-toggle')?.addEventListener('click', toggleLanguage);
-  document.getElementById('filter-book')?.addEventListener('change', renderMedia);
-  document.getElementById('filter-type')?.addEventListener('change', renderMedia);
-  document.getElementById('filter-search')?.addEventListener('input', renderMedia);
-  document.getElementById('post-modal')?.addEventListener('click', (e) => { if (e.target.id === 'post-modal') closeModal(); });
-  document.getElementById('email-modal')?.addEventListener('click', (e) => { if (e.target.id === 'email-modal') closeEmailModal(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal(); closeEmailModal(); } });
+  document.getElementById('filter-book')?.addEventListener('change', () => { if (typeof renderMedia === 'function') renderMedia(); });
+  document.getElementById('filter-type')?.addEventListener('change', () => { if (typeof renderMedia === 'function') renderMedia(); });
+  document.getElementById('filter-search')?.addEventListener('input', () => { if (typeof renderMedia === 'function') renderMedia(); });
 }
 
-window.openPost = openPost;
-window.closeModal = closeModal;
-window.closeEmailModal = closeEmailModal;
-window.addComment = addComment;
-window.toggleLanguage = toggleLanguage;
+function applyLanguage() {
+  if (typeof T === 'undefined') return;
+  const t = T[currentLang] || T.fa;
+  document.documentElement.lang = currentLang === 'fa' ? 'fa' : 'en';
+  document.documentElement.dir = currentLang === 'fa' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('lang-en', currentLang === 'en');
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (t[k] !== undefined) el.textContent = t[k];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const k = el.getAttribute('data-i18n-placeholder');
+    if (t[k] !== undefined) el.placeholder = t[k];
+  });
+  if (typeof applySignInLabels === 'function') applySignInLabels();
+  if (typeof updateSideMenuLang === 'function') updateSideMenuLang();
+  if (typeof renderAll === 'function') renderAll();
+}
+
+function toggleLanguage() {
+  currentLang = currentLang === 'fa' ? 'en' : 'fa';
+  localStorage.setItem(LANG_KEY, currentLang);
+  applyLanguage();
+}
+
+document.getElementById('lang-toggle')?.addEventListener('click', toggleLanguage);
