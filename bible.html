@@ -2,26 +2,28 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bible — کتاب مقدس | Seventh Trumpet</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>کتاب مقدس — شیپور هفتم</title>
+  <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/bible.css">
+  <link rel="stylesheet" href="css/menu.css">
 </head>
 <body>
-  <header class="header">
+  <header class="site-header">
     <div class="header-inner">
-      <a href="index.html" class="logo"><span data-i18n="siteName">شیپور هفتم</span></a>
-      <nav class="nav">
+      <a href="index.html" class="logo" data-i18n="siteName">شیپور هفتم</a>
+      <nav class="main-nav">
         <a href="index.html" data-i18n="home">خانه</a>
+        <a href="media.html" data-i18n="media">رسانه‌ها</a>
         <a href="bible.html" class="active" data-i18n="bibleNav">کتاب مقدس</a>
-        <button id="theme-toggle" class="theme-toggle" title="Theme">🌙</button>
-        <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
+        <a href="live.html" data-i18n="live">پخش زنده</a>
       </nav>
+      <div class="header-actions">
+        <button type="button" id="lang-toggle" class="btn btn-outline btn-sm">English</button>
+        <button type="button" id="menu-toggle" class="menu-toggle" aria-label="Menu">☰</button>
+      </div>
     </div>
   </header>
-
   <main class="bible-app">
     <aside class="bible-sidebar">
       <div class="bible-version" id="bible-version-label">هزارۀ نو</div>
@@ -42,11 +44,11 @@
       </div>
     </section>
   </main>
-
-  <footer class="footer">
-    <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه 14</p>
+  <footer class="site-footer">
+    <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه ۱۴</p>
   </footer>
-
+  <script src="js/bible_patch.js"></script>
   <script src="js/bible.js"></script>
+  <script src="js/menu.js"></script>
 </body>
 </html>
