@@ -14,7 +14,8 @@
       theme: fa ? 'حالت شب / روز' : 'Dark / Light mode',
       playlists: fa ? 'پلی‌لیست‌ها' : 'Playlists',
       subscribe: fa ? 'آیه روزانه' : 'Daily verse',
-      contact: fa ? 'تماس' : 'Contact'
+      contact: fa ? 'تماس' : 'Contact',
+      sponsors: fa ? 'حامیان' : 'Sponsors'
     };
   }
   function applyThemeIcon(theme) {
@@ -36,7 +37,8 @@
       'menu-link-admin': L.admin,
       'menu-link-playlists': L.playlists,
       'menu-link-subscribe': L.subscribe,
-      'menu-link-contact': L.contact
+      'menu-link-contact': L.contact,
+      'menu-link-sponsors': L.sponsors
     };
     Object.keys(map).forEach(id => { const el = document.getElementById(id); if (el) el.textContent = map[id]; });
     const themeLabel = document.getElementById('theme-label');
@@ -48,54 +50,75 @@
     const headerInner = document.querySelector('.header-inner');
     if (!headerInner) return;
     const themeInNav = document.querySelector('.nav #theme-toggle, .nav-main #theme-toggle');
-    if (themeInNav) themeInNav.remove();
-    const langBtn = document.getElementById('lang-toggle');
-    const liveBadge = document.getElementById('live-badge');
+    const L = labels();
     let actions = headerInner.querySelector('.header-actions');
     if (!actions) { actions = document.createElement('div'); actions.className = 'header-actions'; headerInner.appendChild(actions); }
-    if (langBtn && langBtn.parentNode && langBtn.parentNode.classList.contains('nav')) actions.appendChild(langBtn);
-    if (liveBadge && liveBadge.parentNode && liveBadge.parentNode.classList.contains('nav')) actions.appendChild(liveBadge);
     const toggle = document.createElement('button');
-    toggle.id = 'menu-toggle'; toggle.className = 'menu-toggle'; toggle.type = 'button';
-    toggle.setAttribute('aria-label', 'Menu'); toggle.setAttribute('aria-expanded', 'false');
-    toggle.innerHTML = '<span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>';
-    actions.appendChild(toggle);
+    toggle.type = 'button'; toggle.id = 'menu-toggle'; toggle.className = 'menu-toggle';
+    toggle.setAttribute('aria-label', 'Menu'); toggle.innerHTML = '<span></span><span></span><span></span>';
+    actions.insertBefore(toggle, actions.firstChild);
     const overlay = document.createElement('div');
     overlay.id = 'menu-overlay'; overlay.className = 'menu-overlay'; overlay.hidden = true;
-    document.body.appendChild(overlay);
-    const L = labels();
     const panel = document.createElement('aside');
     panel.id = 'side-menu'; panel.className = 'side-menu'; panel.setAttribute('aria-hidden', 'true');
     panel.innerHTML =
       '<div class="side-menu-head"><span>' + L.title + '</span>' +
-      '<button type="button" id="menu-close" class="menu-close" aria-label="Close">×</button></div>' +
+      '<button type="button" id="menu-close" class="menu-close" aria-label="Close">&times;</button></div>' +
       '<nav class="side-menu-nav">' +
       '<a href="questions.html" id="menu-link-questions">' + L.questions + '</a>' +
       '<a href="feedback.html" id="menu-link-feedback">' + L.feedback + '</a>' +
       '<a href="admin.html" id="menu-link-admin">' + L.admin + '</a>' +
+      '<a href="playlists.html" id="menu-link-playlists">' + L.playlists + '</a>' +
       '<button type="button" id="theme-toggle" class="side-menu-btn">' +
       '<span id="theme-icon">🌙</span> <span id="theme-label">' + L.theme + '</span></button>' +
       '<hr class="side-menu-hr">' +
-      '<a href="playlists.html" id="menu-link-playlists">' + L.playlists + '</a>' +
       '<a href="subscribe.html" id="menu-link-subscribe">' + L.subscribe + '</a>' +
       '<a href="contact.html" id="menu-link-contact">' + L.contact + '</a>' +
+      '<a href="sponsors.html" id="menu-link-sponsors">' + L.sponsors + '</a>' +
       '</nav>';
+    document.body.appendChild(overlay);
     document.body.appendChild(panel);
-    function openMenu() { panel.classList.add('open'); panel.setAttribute('aria-hidden', 'false'); toggle.setAttribute('aria-expanded', 'true'); overlay.hidden = false; document.body.classList.add('menu-open'); }
-    function closeMenu() { panel.classList.remove('open'); panel.setAttribute('aria-hidden', 'true'); toggle.setAttribute('aria-expanded', 'false'); overlay.hidden = true; document.body.classList.remove('menu-open'); }
-    toggle.addEventListener('click', () => panel.classList.contains('open') ? closeMenu() : openMenu());
+    function openMenu() {
+      panel.classList.add('open'); overlay.hidden = false; panel.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('menu-open');
+    }
+    function closeMenu() {
+      panel.classList.remove('open'); overlay.hidden = true; panel.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('menu-open');
+    }
+    toggle.addEventListener('click', openMenu);
     document.getElementById('menu-close').addEventListener('click', closeMenu);
     overlay.addEventListener('click', closeMenu);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-      applyThemeIcon(document.body.classList.contains('dark') ? 'light' : 'dark');
+    var saved = localStorage.getItem(THEME_KEY) || 'light';
+    applyThemeIcon(saved);
+    document.getElementById('theme-toggle').addEventListener('click', function () {
+      var next = document.body.classList.contains('dark') ? 'light' : 'dark';
+      applyThemeIcon(next);
     });
-    const saved = localStorage.getItem(THEME_KEY);
-    applyThemeIcon(saved === 'dark' || document.body.classList.contains('dark') ? 'dark' : (saved || 'light'));
-    document.getElementById('lang-toggle')?.addEventListener('click', () => setTimeout(refreshMenuLabels, 30));
-    const page = document.body.getAttribute('data-page');
-    if (page) document.querySelectorAll('.nav-main a[data-nav]').forEach(a => { if (a.getAttribute('data-nav') === page) a.classList.add('active'); });
+    refreshMenuLabels();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSideMenu);
   else initSideMenu();
+})();
+
+/* Auto-load ads + perf on every page that includes menu.js */
+(function loadAdsAssets() {
+  if (!document.querySelector('link[href*="ads.css"]')) {
+    var l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = 'css/ads.css';
+    document.head.appendChild(l);
+  }
+  if (!document.querySelector('script[src*="ads.js"]')) {
+    var s = document.createElement('script');
+    s.src = 'js/ads.js';
+    s.defer = true;
+    document.body.appendChild(s);
+  }
+  if (!document.querySelector('script[src*="perf.js"]')) {
+    var p = document.createElement('script');
+    p.src = 'js/perf.js';
+    p.defer = true;
+    document.body.appendChild(p);
+  }
 })();
