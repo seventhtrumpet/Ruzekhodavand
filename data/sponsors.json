@@ -1,0 +1,11 @@
+{
+  "sponsors": [
+    {
+      "name": "Example Sponsor",
+      "nameFa": "نمونه حامی",
+      "url": "https://seventhtrumpet.org",
+      "image": "",
+      "active": false
+    }
+  ]
+}
