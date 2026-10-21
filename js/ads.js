@@ -1,12 +1,12 @@
 /* Seventh Trumpet — ads + sponsors
-   1) Replace ADSENSE_CLIENT with your publisher ID from Google AdSense
-   2) Set slot IDs after creating ad units in AdSense
-   3) Edit data/sponsors.json for banner sponsors
+   Publisher: ca-pub-3616286446774634
+   Optional: set SLOTS after creating ad units in AdSense dashboard
+   Sponsors: edit data/sponsors.json
 */
 (function () {
-  const ADSENSE_CLIENT = ''; // e.g. 'ca-pub-1234567890123456'
+  const ADSENSE_CLIENT = 'ca-pub-3616286446774634';
   const SLOTS = {
-    top: '',      // e.g. '1234567890'
+    top: '',
     bottom: '',
     infeed: ''
   };
