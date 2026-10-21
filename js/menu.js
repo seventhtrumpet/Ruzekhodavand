@@ -49,18 +49,28 @@
     if (document.getElementById('menu-toggle')) return;
     const headerInner = document.querySelector('.header-inner');
     if (!headerInner) return;
-    const themeInNav = document.querySelector('.nav #theme-toggle, .nav-main #theme-toggle');
     const L = labels();
     let actions = headerInner.querySelector('.header-actions');
-    if (!actions) { actions = document.createElement('div'); actions.className = 'header-actions'; headerInner.appendChild(actions); }
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'header-actions';
+      headerInner.insertBefore(actions, headerInner.firstChild);
+    }
     const toggle = document.createElement('button');
-    toggle.type = 'button'; toggle.id = 'menu-toggle'; toggle.className = 'menu-toggle';
-    toggle.setAttribute('aria-label', 'Menu'); toggle.innerHTML = '<span></span><span></span><span></span>';
+    toggle.type = 'button';
+    toggle.id = 'menu-toggle';
+    toggle.className = 'menu-toggle';
+    toggle.setAttribute('aria-label', 'Menu');
+    toggle.innerHTML = '<span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>';
     actions.insertBefore(toggle, actions.firstChild);
     const overlay = document.createElement('div');
-    overlay.id = 'menu-overlay'; overlay.className = 'menu-overlay'; overlay.hidden = true;
+    overlay.id = 'menu-overlay';
+    overlay.className = 'menu-overlay';
+    overlay.hidden = true;
     const panel = document.createElement('aside');
-    panel.id = 'side-menu'; panel.className = 'side-menu'; panel.setAttribute('aria-hidden', 'true');
+    panel.id = 'side-menu';
+    panel.className = 'side-menu';
+    panel.setAttribute('aria-hidden', 'true');
     panel.innerHTML =
       '<div class="side-menu-head"><span>' + L.title + '</span>' +
       '<button type="button" id="menu-close" class="menu-close" aria-label="Close">&times;</button></div>' +
@@ -79,11 +89,17 @@
     document.body.appendChild(overlay);
     document.body.appendChild(panel);
     function openMenu() {
-      panel.classList.add('open'); overlay.hidden = false; panel.setAttribute('aria-hidden', 'false');
+      panel.classList.add('open');
+      overlay.hidden = false;
+      panel.setAttribute('aria-hidden', 'false');
+      toggle.setAttribute('aria-expanded', 'true');
       document.body.classList.add('menu-open');
     }
     function closeMenu() {
-      panel.classList.remove('open'); overlay.hidden = true; panel.setAttribute('aria-hidden', 'true');
+      panel.classList.remove('open');
+      overlay.hidden = true;
+      panel.setAttribute('aria-hidden', 'true');
+      toggle.setAttribute('aria-expanded', 'false');
       document.body.classList.remove('menu-open');
     }
     toggle.addEventListener('click', openMenu);
@@ -101,7 +117,7 @@
   else initSideMenu();
 })();
 
-/* Auto-load ads + perf on every page that includes menu.js */
+/* Auto-load ads + perf */
 (function loadAdsAssets() {
   if (!document.querySelector('link[href*="ads.css"]')) {
     var l = document.createElement('link');
