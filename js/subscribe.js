@@ -65,7 +65,7 @@
         '<input type="hidden" name="_subject" value="New daily verse subscriber — Seventh Trumpet">' +
         '<input type="hidden" name="_captcha" value="false">' +
         '<input type="hidden" name="_template" value="table">' +
-        '<input type="hidden" name="_next" value="https://ruzekhodavand.vercel.app/#subscribe">' +
+        '<input type="hidden" name="_next" value="https://www.seventhtrumpet.org/#subscribe">' +
         '<input type="hidden" name="form_type" value="daily_verse_subscribe">' +
         '<input type="hidden" name="source" id="sub-source" value="website">' +
         '<div class="subscribe-row">' +
@@ -91,7 +91,7 @@
         '<input type="hidden" name="_subject" value="New daily verse subscriber — Seventh Trumpet">' +
         '<input type="hidden" name="_captcha" value="false">' +
         '<input type="hidden" name="_template" value="table">' +
-        '<input type="hidden" name="_next" value="https://ruzekhodavand.vercel.app/#subscribe">' +
+        '<input type="hidden" name="_next" value="https://www.seventhtrumpet.org/#subscribe">' +
         '<input type="hidden" name="form_type" value="daily_verse_subscribe">' +
         '<input type="hidden" name="source" value="popup">' +
         '<input type="email" name="email" id="popup-email" required data-i18n-placeholder="subscribeEmailPh" placeholder="you@email.com" autocomplete="email">' +
