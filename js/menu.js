@@ -15,6 +15,7 @@
       playlists: fa ? 'پلی‌لیست‌ها' : 'Playlists',
       subscribe: fa ? 'آیه روزانه' : 'Daily verse',
       contact: fa ? 'تماس' : 'Contact',
+      about: fa ? 'درباره ما' : 'About',
       sponsors: fa ? 'حامیان' : 'Sponsors'
     };
   }
@@ -37,6 +38,7 @@
       'menu-link-admin': L.admin,
       'menu-link-playlists': L.playlists,
       'menu-link-subscribe': L.subscribe,
+      'menu-link-about': L.about,
       'menu-link-contact': L.contact,
       'menu-link-sponsors': L.sponsors
     };
@@ -73,6 +75,7 @@
       '<a id="menu-link-questions" href="questions.html">' + L.questions + '</a>' +
       '<a id="menu-link-feedback" href="feedback.html">' + L.feedback + '</a>' +
       '<a id="menu-link-subscribe" href="index.html#daily-verse">' + L.subscribe + '</a>' +
+      '<a id="menu-link-about" href="about.html">' + L.about + '</a>' +
       '<a id="menu-link-contact" href="contact.html">' + L.contact + '</a>' +
       '<a id="menu-link-sponsors" href="sponsors.html">' + L.sponsors + '</a>' +
       '<a id="menu-link-admin" href="admin.html">' + L.admin + '</a>' +
@@ -114,7 +117,6 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  // Load ads helper if present
   try {
     if (!document.querySelector('script[data-ads-js]')) {
       var ads = document.createElement('script');
@@ -125,7 +127,6 @@
     }
   } catch (e) {}
 
-  // Load social icons + styles site-wide
   (function loadSocial() {
     if (!document.querySelector('link[data-social-css]')) {
       var l = document.createElement('link');
