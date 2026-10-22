@@ -116,11 +116,9 @@
           </div>
 
           <div class="form-group" style="background:#fff8e1;padding:1rem;border-radius:10px;border:1px solid #ffe082;">
-            <label data-i18n="externalLabel" style="color:#e65100;font-weight:700;">لینک ویدیو یا فایل بزرگ (توصیه برای ویدیوهای بالای ۵۰ مگابایت تا ۵ گیگابایت+)</label>
-            <input type="url" name="externalUrl" id="external-url" data-i18n-placeholder="externalPh" placeholder="https://www.youtube.com/watch?v=... یا لینک مستقیم ویدیو">
-            <p style="font-size:0.85rem;color:#bf360c;margin-top:0.4rem;" data-i18n="externalNote">
-              برای ویدیوهای بزرگ: اول ویدیو را در یوتیوب، گوگل درایو یا ویمو آپلود کنید، بعد لینک را اینجا بگذارید. این بهترین روش برای ویدیوهای ۵ گیگابایتی است.
-            </p>
+            <label data-i18n="externalLabel" style="color:#e65100;font-weight:700;">لینک ویدیو یا فایل بزرگ</label>
+            <input type="url" name="externalUrl" id="external-url" data-i18n-placeholder="externalPh" placeholder="https://www.youtube.com/watch?v=...">
+            <p style="font-size:0.85rem;color:#bf360c;margin-top:0.4rem;" data-i18n="externalNote">برای ویدیوهای بزرگ اول در یوتیوب آپلود کنید و لینک را اینجا بگذارید.</p>
           </div>
 
           <div class="form-group" id="file-group">
@@ -128,8 +126,15 @@
             <div class="upload-zone" id="upload-zone">
               <input type="file" id="file-input" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.mp3,.wav,.m4a,.ogg,.aac,.mp4,.mov,.avi,.zip,.txt">
               <p id="file-label" data-i18n="dropFile">فایل را اینجا رها کنید یا کلیک کنید</p>
-              <p style="font-size:0.8rem;color:#888;margin-top:0.5rem" data-i18n="fileNote">حداکثر ۱۲ مگابایت. برای ویدیوهای بزرگ‌تر حتماً از لینک خارجی استفاده کنید.</p>
+              <p style="font-size:0.8rem;color:#888;margin-top:0.5rem" data-i18n="fileNote">حداکثر ۱۲ مگابایت. برای ویدیوهای بزرگ‌تر از لینک خارجی استفاده کنید.</p>
             </div>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="plAddOnPublish">افزودن به پلی‌لیست (اختیاری)</label>
+            <select id="post-playlist" name="playlistId">
+              <option value="">—</option>
+            </select>
           </div>
 
           <button type="submit" class="btn btn-accent" style="width:100%;padding:0.8rem;font-size:1rem" data-i18n="publish">انتشار</button>
@@ -181,15 +186,12 @@
       </div>
 
       <div id="tab-backup" class="admin-tab-content hidden">
-        <p style="margin-bottom:1rem;color:var(--text-muted)" data-i18n="backupNote">داده‌ها در مرورگر شما ذخیره می‌شوند. برای پشتیبان‌گیری یا انتقال به دستگاه دیگر از این بخش استفاده کنید.</p>
+        <p style="margin-bottom:1rem;color:var(--text-muted)" data-i18n="backupNote">داده‌ها در مرورگر شما ذخیره می‌شوند.</p>
         <div style="display:flex;gap:1rem;flex-wrap:wrap">
           <button id="export-btn" class="btn btn-primary" data-i18n="exportBtn">دانلود پشتیبان</button>
           <button id="import-btn" class="btn btn-outline" data-i18n="importBtn">وارد کردن پشتیبان</button>
           <input type="file" id="import-file" accept=".json" class="hidden">
         </div>
-        <p style="margin-top:1.5rem;font-size:0.85rem;color:#888" data-i18n="importantNote">
-          نکته مهم: برای ویدیوهای بزرگ (حتی ۵ گیگابایت) حتماً از بخش «لینک ویدیو» استفاده کنید. اول ویدیو را در یوتیوب یا گوگل درایو آپلود کنید و لینک را وارد نمایید.
-        </p>
       </div>
     </div>
   </main>
