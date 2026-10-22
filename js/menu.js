@@ -40,101 +40,105 @@
       'menu-link-contact': L.contact,
       'menu-link-sponsors': L.sponsors
     };
-    Object.keys(map).forEach(id => { const el = document.getElementById(id); if (el) el.textContent = map[id]; });
+    Object.keys(map).forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = map[id];
+    });
     const themeLabel = document.getElementById('theme-label');
     if (themeLabel) themeLabel.textContent = L.theme;
   }
-  window.updateSideMenuLang = refreshMenuLabels;
-  function initSideMenu() {
-    if (document.getElementById('menu-toggle')) return;
-    const headerInner = document.querySelector('.header-inner');
-    if (!headerInner) return;
+  function ensureMenu() {
+    if (document.getElementById('side-menu')) return;
     const L = labels();
-    let actions = headerInner.querySelector('.header-actions');
-    if (!actions) {
-      actions = document.createElement('div');
-      actions.className = 'header-actions';
-      headerInner.insertBefore(actions, headerInner.firstChild);
-    }
-    const toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.id = 'menu-toggle';
-    toggle.className = 'menu-toggle';
-    toggle.setAttribute('aria-label', 'Menu');
-    toggle.innerHTML = '<span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>';
-    actions.insertBefore(toggle, actions.firstChild);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'menu-toggle';
+    btn.className = 'menu-toggle';
+    btn.setAttribute('aria-label', 'Menu');
+    btn.innerHTML = '<span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>';
+    document.body.appendChild(btn);
+
     const overlay = document.createElement('div');
     overlay.id = 'menu-overlay';
     overlay.className = 'menu-overlay';
-    overlay.hidden = true;
-    const panel = document.createElement('aside');
+    document.body.appendChild(overlay);
+
+    const panel = document.createElement('div');
     panel.id = 'side-menu';
     panel.className = 'side-menu';
-    panel.setAttribute('aria-hidden', 'true');
     panel.innerHTML =
-      '<div class="side-menu-head"><span>' + L.title + '</span>' +
-      '<button type="button" id="menu-close" class="menu-close" aria-label="Close">&times;</button></div>' +
+      '<div class="side-menu-head"><span>' + L.title + '</span><button type="button" id="menu-close" aria-label="Close">&times;</button></div>' +
       '<nav class="side-menu-nav">' +
-      '<a href="questions.html" id="menu-link-questions">' + L.questions + '</a>' +
-      '<a href="feedback.html" id="menu-link-feedback">' + L.feedback + '</a>' +
-      '<a href="admin.html" id="menu-link-admin">' + L.admin + '</a>' +
-      '<a href="playlists.html" id="menu-link-playlists">' + L.playlists + '</a>' +
-      '<button type="button" id="theme-toggle" class="side-menu-btn">' +
-      '<span id="theme-icon">🌙</span> <span id="theme-label">' + L.theme + '</span></button>' +
-      '<hr class="side-menu-hr">' +
-      '<a href="subscribe.html" id="menu-link-subscribe">' + L.subscribe + '</a>' +
-      '<a href="contact.html" id="menu-link-contact">' + L.contact + '</a>' +
-      '<a href="sponsors.html" id="menu-link-sponsors">' + L.sponsors + '</a>' +
+      '<a id="menu-link-playlists" href="playlists.html">' + L.playlists + '</a>' +
+      '<a id="menu-link-questions" href="questions.html">' + L.questions + '</a>' +
+      '<a id="menu-link-feedback" href="feedback.html">' + L.feedback + '</a>' +
+      '<a id="menu-link-subscribe" href="index.html#daily-verse">' + L.subscribe + '</a>' +
+      '<a id="menu-link-contact" href="contact.html">' + L.contact + '</a>' +
+      '<a id="menu-link-sponsors" href="sponsors.html">' + L.sponsors + '</a>' +
+      '<a id="menu-link-admin" href="admin.html">' + L.admin + '</a>' +
+      '<button type="button" id="theme-toggle" class="theme-toggle-btn"><span id="theme-icon">🌙</span> <span id="theme-label">' + L.theme + '</span></button>' +
       '</nav>';
-    document.body.appendChild(overlay);
     document.body.appendChild(panel);
+
     function openMenu() {
       panel.classList.add('open');
-      overlay.hidden = false;
-      panel.setAttribute('aria-hidden', 'false');
-      toggle.setAttribute('aria-expanded', 'true');
+      overlay.classList.add('open');
       document.body.classList.add('menu-open');
     }
     function closeMenu() {
       panel.classList.remove('open');
-      overlay.hidden = true;
-      panel.setAttribute('aria-hidden', 'true');
-      toggle.setAttribute('aria-expanded', 'false');
+      overlay.classList.remove('open');
       document.body.classList.remove('menu-open');
     }
-    toggle.addEventListener('click', openMenu);
-    document.getElementById('menu-close').addEventListener('click', closeMenu);
+    btn.addEventListener('click', openMenu);
     overlay.addEventListener('click', closeMenu);
-    var saved = localStorage.getItem(THEME_KEY) || 'light';
-    applyThemeIcon(saved);
+    document.getElementById('menu-close').addEventListener('click', closeMenu);
     document.getElementById('theme-toggle').addEventListener('click', function () {
-      var next = document.body.classList.contains('dark') ? 'light' : 'dark';
+      const next = document.body.classList.contains('dark') ? 'light' : 'dark';
       applyThemeIcon(next);
     });
-    refreshMenuLabels();
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSideMenu);
-  else initSideMenu();
-})();
 
-/* Auto-load ads + perf */
-(function loadAdsAssets() {
-  if (!document.querySelector('link[href*="ads.css"]')) {
-    var l = document.createElement('link');
-    l.rel = 'stylesheet';
-    l.href = 'css/ads.css';
-    document.head.appendChild(l);
+  function boot() {
+    try {
+      const saved = localStorage.getItem(THEME_KEY) || 'light';
+      applyThemeIcon(saved);
+    } catch (e) {}
+    ensureMenu();
+    refreshMenuLabels();
+    document.getElementById('lang-toggle')?.addEventListener('click', function () {
+      setTimeout(refreshMenuLabels, 80);
+    });
   }
-  if (!document.querySelector('script[src*="ads.js"]')) {
-    var s = document.createElement('script');
-    s.src = 'js/ads.js';
-    s.defer = true;
-    document.body.appendChild(s);
-  }
-  if (!document.querySelector('script[src*="perf.js"]')) {
-    var p = document.createElement('script');
-    p.src = 'js/perf.js';
-    p.defer = true;
-    document.body.appendChild(p);
-  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+
+  // Load ads helper if present
+  try {
+    if (!document.querySelector('script[data-ads-js]')) {
+      var ads = document.createElement('script');
+      ads.src = 'js/ads.js';
+      ads.setAttribute('data-ads-js', '1');
+      ads.async = true;
+      document.body.appendChild(ads);
+    }
+  } catch (e) {}
+
+  // Load social icons + styles site-wide
+  (function loadSocial() {
+    if (!document.querySelector('link[data-social-css]')) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = 'css/social.css';
+      l.setAttribute('data-social-css', '1');
+      document.head.appendChild(l);
+    }
+    if (!document.querySelector('script[data-social-js]')) {
+      var s = document.createElement('script');
+      s.src = 'js/social.js';
+      s.setAttribute('data-social-js', '1');
+      document.body.appendChild(s);
+    }
+  })();
 })();
