@@ -16,6 +16,8 @@
   border: 1px solid rgba(255,255,255,0.25);
   border-radius: 10px;
   cursor: pointer;
+  z-index: 1250;
+  position: relative;
 }
 .menu-toggle:hover { background: rgba(255,255,255,0.22); }
 .menu-bar {
@@ -33,6 +35,8 @@
 .menu-toggle[aria-expanded="true"] .menu-bar:nth-child(3) {
   transform: translateY(-7px) rotate(-45deg);
 }
+
+/* CRITICAL: hidden by default so it does not block the whole page */
 .menu-overlay {
   position: fixed;
   inset: 0;
@@ -42,8 +46,18 @@
   padding: 0;
   margin: 0;
   cursor: pointer;
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
-.menu-overlay[hidden] { display: none !important; }
+.menu-overlay.open {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+}
+.menu-overlay[hidden] { display: none !important; pointer-events: none !important; }
+
 .side-menu {
   position: fixed;
   top: 0;
@@ -58,6 +72,13 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  pointer-events: none;
+  visibility: hidden;
+}
+.side-menu.open {
+  transform: translateX(0) !important;
+  pointer-events: auto;
+  visibility: visible;
 }
 html[dir="rtl"] .side-menu {
   right: 0;
@@ -70,9 +91,11 @@ html[dir="ltr"] .side-menu {
   transform: translateX(-100%);
   box-shadow: 4px 0 24px rgba(0,0,0,0.2);
 }
-.side-menu.open {
+html[dir="rtl"] .side-menu.open,
+html[dir="ltr"] .side-menu.open {
   transform: translateX(0) !important;
 }
+
 .side-menu-head {
   display: flex;
   align-items: center;
@@ -100,7 +123,8 @@ html[dir="ltr"] .side-menu {
   padding: 0.6rem 0;
 }
 .side-menu-nav a,
-.side-menu-btn {
+.side-menu-btn,
+.theme-toggle-btn {
   display: block;
   width: 100%;
   text-align: start;
@@ -115,7 +139,8 @@ html[dir="ltr"] .side-menu {
   border-bottom: 1px solid var(--border, #e8ecf0);
 }
 .side-menu-nav a:hover,
-.side-menu-btn:hover {
+.side-menu-btn:hover,
+.theme-toggle-btn:hover {
   background: var(--bg, #f5f7fa);
 }
 .side-menu-hr {
@@ -129,11 +154,12 @@ body.dark .side-menu {
   color: #e8eef5;
 }
 body.dark .side-menu-nav a,
-body.dark .side-menu-btn { color: #e8eef5; border-color: #243447; }
+body.dark .side-menu-btn,
+body.dark .theme-toggle-btn { color: #e8eef5; border-color: #243447; }
 body.dark .side-menu-nav a:hover,
-body.dark .side-menu-btn:hover { background: #1c2d40; }
+body.dark .side-menu-btn:hover,
+body.dark .theme-toggle-btn:hover { background: #1c2d40; }
 
-/* Main nav stays visible; hamburger is extra */
 .nav-main {
   display: flex;
   flex-wrap: wrap;
