@@ -83,8 +83,8 @@
           </div>
 
           <div class="form-group">
-            <label data-i18n="writingLabel">متن یا نوشته (می‌توانید اینجا پیست کنید)</label>
-            <textarea name="writing" id="writing-area" rows="8" data-i18n-placeholder="writingPh" placeholder="متن کامل، موعظه، مطالعه کتاب مقدس یا هر نوشته‌ای را اینجا وارد یا پیست کنید..." style="min-height:160px;font-size:1rem;line-height:1.7;"></textarea>
+            <label data-i18n="writingLabel">متن یا نوشته</label>
+            <textarea name="writing" id="writing-area" rows="8" data-i18n-placeholder="writingPh" placeholder="متن کامل..." style="min-height:160px;font-size:1rem;line-height:1.7;"></textarea>
           </div>
 
           <div class="form-row">
@@ -95,11 +95,11 @@
             <div class="form-group">
               <label data-i18n="typeLabel">نوع</label>
               <select name="type" id="post-type" required>
-                <option value="text" data-i18n="typeText">متن / نوشته</option>
-                <option value="photo" data-i18n="typePhoto">عکس</option>
-                <option value="video" data-i18n="typeVideo">ویدیو</option>
-                <option value="audio" data-i18n="typeAudio">صوت / صوت</option>
-                <option value="file" data-i18n="typeFile">فایل</option>
+                <option value="text">متن</option>
+                <option value="photo">عکس</option>
+                <option value="video">ویدیو</option>
+                <option value="audio">صوت</option>
+                <option value="file">فایل</option>
               </select>
             </div>
           </div>
@@ -117,21 +117,20 @@
 
           <div class="form-group" style="background:#fff8e1;padding:1rem;border-radius:10px;border:1px solid #ffe082;">
             <label data-i18n="externalLabel" style="color:#e65100;font-weight:700;">لینک ویدیو یا فایل بزرگ</label>
-            <input type="url" name="externalUrl" id="external-url" data-i18n-placeholder="externalPh" placeholder="https://www.youtube.com/watch?v=...">
-            <p style="font-size:0.85rem;color:#bf360c;margin-top:0.4rem;" data-i18n="externalNote">برای ویدیوهای بزرگ اول در یوتیوب آپلود کنید و لینک را اینجا بگذارید.</p>
+            <input type="url" name="externalUrl" id="external-url" placeholder="https://www.youtube.com/watch?v=...">
+            <p style="font-size:0.85rem;color:#bf360c;margin-top:0.4rem;">برای ویدیوهای بزرگ اول در یوتیوب آپلود کنید و لینک را اینجا بگذارید.</p>
           </div>
 
           <div class="form-group" id="file-group">
             <label data-i18n="fileLabel">فایل مستقیم (حداکثر ۱۲ مگابایت)</label>
             <div class="upload-zone" id="upload-zone">
-              <input type="file" id="file-input" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.mp3,.wav,.m4a,.ogg,.aac,.mp4,.mov,.avi,.zip,.txt">
+              <input type="file" id="file-input" accept="image/*,video/*,audio/*,.pdf,.mp3,.wav,.m4a,.mp4,.mov">
               <p id="file-label" data-i18n="dropFile">فایل را اینجا رها کنید یا کلیک کنید</p>
-              <p style="font-size:0.8rem;color:#888;margin-top:0.5rem" data-i18n="fileNote">حداکثر ۱۲ مگابایت. برای ویدیوهای بزرگ‌تر از لینک خارجی استفاده کنید.</p>
             </div>
           </div>
 
           <div class="form-group">
-            <label data-i18n="plAddOnPublish">افزودن به پلی‌لیست (اختیاری)</label>
+            <label>افزودن به پلی‌لیست (اختیاری) / Add to playlist (optional)</label>
             <select id="post-playlist" name="playlistId">
               <option value="">—</option>
             </select>
@@ -149,12 +148,11 @@
         <form id="live-form">
           <div class="form-group">
             <label data-i18n="liveTitleLabel">عنوان پخش زنده</label>
-            <input type="text" name="liveTitle" data-i18n-placeholder="liveTitlePh" placeholder="مثلاً: موعظه یکشنبه">
+            <input type="text" name="liveTitle" placeholder="مثلاً: موعظه یکشنبه">
           </div>
           <div class="form-group">
-            <label data-i18n="streamUrlLabel">لینک پخش (یوتیوب و غیره)</label>
+            <label data-i18n="streamUrlLabel">لینک پخش</label>
             <input type="url" name="streamUrl" placeholder="https://www.youtube.com/watch?v=..." required>
-            <p style="font-size:0.8rem;color:#888;margin-top:0.3rem" data-i18n="streamNote">لینک یوتیوب لایو یا هر امبدی که پشتیبانی شود</p>
           </div>
           <button type="submit" class="btn btn-primary" style="width:100%;padding:0.8rem" data-i18n="goLive">شروع پخش زنده</button>
         </form>
@@ -162,31 +160,28 @@
 
       <div id="tab-manage" class="admin-tab-content hidden">
         <h3 style="margin-bottom:1rem" data-i18n="existingPosts">پست‌های موجود</h3>
-        <p style="font-size:0.9rem;color:#666;margin-bottom:1rem" data-i18n="manageNote">برای حذف هر پست روی دکمه حذف کلیک کنید.</p>
         <div id="posts-list"></div>
       </div>
 
       <div id="tab-playlists" class="admin-tab-content hidden">
-        <h3 style="margin-bottom:1rem" data-i18n="playlistsTitle">پلی‌لیست‌ها</h3>
-        <p style="font-size:0.9rem;color:#666;margin-bottom:1rem" data-i18n="playlistsNote">پلی‌لیست با نام دلخواه بسازید و پست‌ها را به آن اضافه کنید.</p>
+        <h3 style="margin-bottom:1rem">پلی‌لیست‌ها</h3>
         <form id="playlist-form" style="background:#f8f6f1;padding:1.2rem;border-radius:12px;margin-bottom:1.5rem;">
           <div class="form-row">
             <div class="form-group">
-              <label data-i18n="plNameFa">نام پلی‌لیست (فارسی)</label>
-              <input type="text" id="pl-name-fa" data-i18n-placeholder="plNameFaPh" placeholder="مثلاً: موعظه‌های مکاشفه">
+              <label>نام پلی‌لیست (فارسی)</label>
+              <input type="text" id="pl-name-fa" placeholder="مثلاً: موعظه‌های مکاشفه">
             </div>
             <div class="form-group">
-              <label data-i18n="plNameEn">Playlist name (English)</label>
-              <input type="text" id="pl-name-en" data-i18n-placeholder="plNameEnPh" placeholder="e.g. Revelation sermons">
+              <label>Playlist name (English)</label>
+              <input type="text" id="pl-name-en" placeholder="e.g. Revelation sermons">
             </div>
           </div>
-          <button type="submit" class="btn btn-primary" data-i18n="plCreate">ساخت پلی‌لیست</button>
+          <button type="submit" class="btn btn-primary">ساخت پلی‌لیست</button>
         </form>
         <div id="playlists-admin-list"></div>
       </div>
 
       <div id="tab-backup" class="admin-tab-content hidden">
-        <p style="margin-bottom:1rem;color:var(--text-muted)" data-i18n="backupNote">داده‌ها در مرورگر شما ذخیره می‌شوند.</p>
         <div style="display:flex;gap:1rem;flex-wrap:wrap">
           <button id="export-btn" class="btn btn-primary" data-i18n="exportBtn">دانلود پشتیبان</button>
           <button id="import-btn" class="btn btn-outline" data-i18n="importBtn">وارد کردن پشتیبان</button>
@@ -198,5 +193,6 @@
 
   <script src="js/admin.js"></script>
   <script src="js/playlists.js"></script>
+  <script src="js/admin_playlist_hook.js"></script>
 </body>
 </html>
