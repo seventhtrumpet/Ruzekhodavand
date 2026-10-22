@@ -63,13 +63,15 @@
     const overlay = document.createElement('div');
     overlay.id = 'menu-overlay';
     overlay.className = 'menu-overlay';
+    overlay.setAttribute('hidden', '');
+    overlay.style.display = 'none';
     document.body.appendChild(overlay);
 
     const panel = document.createElement('div');
     panel.id = 'side-menu';
     panel.className = 'side-menu';
     panel.innerHTML =
-      '<div class="side-menu-head"><span>' + L.title + '</span><button type="button" id="menu-close" aria-label="Close">&times;</button></div>' +
+      '<div class="side-menu-head"><span>' + L.title + '</span><button type="button" id="menu-close" class="menu-close" aria-label="Close">&times;</button></div>' +
       '<nav class="side-menu-nav">' +
       '<a id="menu-link-playlists" href="playlists.html">' + L.playlists + '</a>' +
       '<a id="menu-link-questions" href="questions.html">' + L.questions + '</a>' +
@@ -86,14 +88,25 @@
     function openMenu() {
       panel.classList.add('open');
       overlay.classList.add('open');
+      overlay.removeAttribute('hidden');
+      overlay.style.display = 'block';
+      overlay.style.pointerEvents = 'auto';
       document.body.classList.add('menu-open');
+      btn.setAttribute('aria-expanded', 'true');
     }
     function closeMenu() {
       panel.classList.remove('open');
       overlay.classList.remove('open');
+      overlay.setAttribute('hidden', '');
+      overlay.style.display = 'none';
+      overlay.style.pointerEvents = 'none';
       document.body.classList.remove('menu-open');
+      btn.setAttribute('aria-expanded', 'false');
     }
-    btn.addEventListener('click', openMenu);
+    btn.addEventListener('click', function () {
+      if (panel.classList.contains('open')) closeMenu();
+      else openMenu();
+    });
     overlay.addEventListener('click', closeMenu);
     document.getElementById('menu-close').addEventListener('click', closeMenu);
     document.getElementById('theme-toggle').addEventListener('click', function () {
@@ -125,6 +138,12 @@
       ads.async = true;
       document.body.appendChild(ads);
     }
+  } catch (e) {}
+
+  try {
+    var fx = document.createElement('script');
+    fx.src = 'js/menu_overlay_fix.js';
+    document.body.appendChild(fx);
   } catch (e) {}
 
   (function loadSocial() {
