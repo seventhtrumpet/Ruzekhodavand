@@ -9,9 +9,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/menu.css">
+  <link rel="stylesheet" href="css/media_rotator.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3616286446774634" crossorigin="anonymous"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
   <title>خانه | شیپور هفتم</title>
   <meta name="description" content="Home — Seventh Trumpet">
 </head>
@@ -62,6 +64,18 @@
     <div class="hero-inner">
       <h1 data-i18n="heroTitle">شیپور هفتم</h1>
       <p class="hero-sub" data-i18n="heroSub">پیام جاودانی انجیل برای تمام قوم‌ها، زبان‌ها و ملت‌ها</p>
+      <div id="media-rotator" class="media-rotator" aria-live="polite">
+        <div class="media-rotator-label" data-i18n="rotatorLabel">از رسانه‌ها</div>
+        <a class="media-rotator-card" id="media-rotator-card" href="media.html">
+          <div class="media-rotator-type" id="media-rotator-type"></div>
+          <div class="media-rotator-body">
+            <div class="media-rotator-title" id="media-rotator-title"></div>
+            <div class="media-rotator-text" id="media-rotator-text"></div>
+          </div>
+          <div class="media-rotator-media" id="media-rotator-media"></div>
+        </a>
+        <div class="media-rotator-dots" id="media-rotator-dots" aria-hidden="true"></div>
+      </div>
       <div class="angels-row">
         <div class="angel-card"><div class="angel-num">1</div><div class="angel-title" data-i18n="angel1">فرشته اول</div><div class="angel-text" data-i18n="angel1Text">از خدا بترسید و او را جلال دهید، زیرا ساعت داوری او رسیده است</div></div>
         <div class="angel-card"><div class="angel-num">2</div><div class="angel-title" data-i18n="angel2">فرشته دوم</div><div class="angel-text" data-i18n="angel2Text">بابل سقوط کرده است! سقوط کرده است!</div></div>
@@ -108,6 +122,8 @@
   <script src="js/app_core.js"></script>
   <script src="js/i18n_extra.js"></script>
   <script src="js/about_i18n.js"></script>
+  <script src="js/cloud_sync.js"></script>
+  <script src="js/media_rotator.js"></script>
   <script src="js/menu.js"></script>
   <script src="js/enhancements.js"></script>
   <script src="js/subscribe.js"></script>
