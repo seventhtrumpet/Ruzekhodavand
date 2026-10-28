@@ -1,0 +1,151 @@
+/* Three Angels detail — only via angel.html?n=1|2|3 */
+(function () {
+  var CONTENT = {
+    1: {
+      fa: {
+        title: '\u0641\u0631\u0634\u062a\u0647 \u0627\u0648\u0644',
+        ref: '\u0645\u06a9\u0627\u0634\u0641\u0647 \u06f1\u06f4:\u06f6\u2013\u06f7',
+        verse: '\u0648 \u0641\u0631\u0634\u062a\u0647\u200c\u0627\u06cc \u062f\u06cc\u06af\u0631 \u0631\u0627 \u062f\u06cc\u062f\u0645 \u06a9\u0647 \u062f\u0631 \u0648\u0633\u0637 \u0622\u0633\u0645\u0627\u0646 \u067e\u0631\u0648\u0627\u0632 \u0645\u06cc\u200c\u06a9\u0646\u062f \u0648 \u0627\u0646\u062c\u06cc\u0644 \u062c\u0627\u0648\u062f\u0627\u0646\u06cc \u0628\u0627 \u062e\u0648\u062f \u062f\u0627\u0631\u062f \u062a\u0627 \u0628\u0647 \u0633\u0627\u06a9\u0646\u0627\u0646 \u0632\u0645\u06cc\u0646 \u0628\u0634\u0627\u0631\u062a \u062f\u0647\u062f\u060c \u0628\u0647 \u0647\u0631 \u0642\u0648\u0645 \u0648 \u0642\u0628\u06cc\u0644\u0647 \u0648 \u0632\u0628\u0627\u0646 \u0648 \u0627\u0645\u062a. \u0648 \u0628\u0647 \u0622\u0648\u0627\u0632 \u0628\u0644\u0646\u062f \u0645\u06cc\u200c\u06af\u0641\u062a: \u00ab\u0627\u0632 \u062e\u062f\u0627 \u0628\u062a\u0631\u0633\u06cc\u062f \u0648 \u0627\u0648 \u0631\u0627 \u062c\u0644\u0627\u0644 \u062f\u0647\u06cc\u062f\u060c \u0632\u06cc\u0631\u0627 \u0633\u0627\u0639\u062a \u062f\u0627\u0648\u0631\u06cc \u0627\u0648 \u0631\u0633\u06cc\u062f\u0647 \u0627\u0633\u062a\u061b \u0648 \u0627\u0648 \u0631\u0627 \u06a9\u0647 \u0622\u0633\u0645\u0627\u0646 \u0648 \u0632\u0645\u06cc\u0646 \u0648 \u062f\u0631\u06cc\u0627 \u0648 \u0686\u0634\u0645\u0647\u200c\u0647\u0627\u06cc \u0622\u0628 \u0631\u0627 \u0622\u0641\u0631\u06cc\u062f\u060c \u067e\u0631\u0633\u062a\u0634 \u06a9\u0646\u06cc\u062f.\u00bb',
+        message: '\u0641\u0631\u0634\u062a\u0647 \u0627\u0648\u0644 \u0627\u0646\u062c\u06cc\u0644 \u062c\u0627\u0648\u062f\u0627\u0646\u06cc \u0631\u0627 \u0627\u0639\u0644\u0627\u0645 \u0645\u06cc\u200c\u06a9\u0646\u062f: \u0627\u0632 \u062e\u062f\u0627 \u0628\u062a\u0631\u0633\u06cc\u062f\u060c \u0627\u0648 \u0631\u0627 \u062c\u0644\u0627\u0644 \u062f\u0647\u06cc\u062f\u060c \u0632\u06cc\u0631\u0627 \u0633\u0627\u0639\u062a \u062f\u0627\u0648\u0631\u06cc\u200c\u0627\u0634 \u0631\u0633\u06cc\u062f\u0647 \u0627\u0633\u062a\u060c \u0648 \u062e\u0627\u0644\u0642 \u0622\u0633\u0645\u0627\u0646 \u0648 \u0632\u0645\u06cc\u0646 \u0631\u0627 \u0628\u067e\u0631\u0633\u062a\u06cc\u062f.',
+        explain: [
+          '\u0627\u06cc\u0646 \u067e\u06cc\u0627\u0645 \u0628\u0631\u0627\u06cc \u0647\u0645\u0647 \u0645\u0631\u062f\u0645 \u062c\u0647\u0627\u0646 \u0627\u0633\u062a \u2014 \u0647\u0631 \u0642\u0648\u0645\u060c \u0632\u0628\u0627\u0646 \u0648 \u0645\u0644\u062a.',
+          '\u00ab\u0627\u0646\u062c\u06cc\u0644 \u062c\u0627\u0648\u062f\u0627\u0646\u06cc\u00bb \u0647\u0645\u0627\u0646 \u062e\u0628\u0631 \u062e\u0648\u0634 \u0646\u062c\u0627\u062a \u062f\u0631 \u0639\u06cc\u0633\u06cc \u0645\u0633\u06cc\u062d \u0627\u0633\u062a \u06a9\u0647 \u0647\u0631\u06af\u0632 \u06a9\u0647\u0646\u0647 \u0646\u0645\u06cc\u200c\u0634\u0648\u062f.',
+          '\u00ab\u0633\u0627\u0639\u062a \u062f\u0627\u0648\u0631\u06cc\u00bb \u0628\u0647 \u0632\u0645\u0627\u0646 \u062f\u0627\u0648\u0631\u06cc \u062e\u062f\u0627 \u0627\u0634\u0627\u0631\u0647 \u062f\u0627\u0631\u062f\u061b \u062f\u0639\u0648\u062a \u0627\u06cc\u0646 \u0627\u0633\u062a \u06a9\u0647 \u067e\u06cc\u0634 \u0627\u0632 \u067e\u0627\u06cc\u0627\u0646 \u0641\u0631\u0635\u062a\u060c \u0628\u0647 \u0633\u0648\u06cc \u062e\u062f\u0627 \u0628\u0627\u0632\u06af\u0631\u062f\u06cc\u0645.',
+          '\u067e\u0631\u0633\u062a\u0634 \u062e\u0627\u0644\u0642 \u062f\u0631 \u0628\u0631\u0627\u0628\u0631 \u0647\u0631 \u0633\u06cc\u0633\u062a\u0645 \u0648 \u0642\u062f\u0631\u062a\u06cc \u0642\u0631\u0627\u0631 \u0645\u06cc\u200c\u06af\u06cc\u0631\u062f \u06a9\u0647 \u0627\u0646\u0633\u0627\u0646 \u0631\u0627 \u0628\u0647 \u067e\u0631\u0633\u062a\u0634 \u0645\u062e\u0644\u0648\u0642 \u06cc\u0627 \u0642\u062f\u0631\u062a \u0627\u0646\u0633\u0627\u0646\u06cc \u0641\u0631\u0627 \u0645\u06cc\u200c\u062e\u0648\u0627\u0646\u062f. \u0631\u0648\u0632 \u0633\u0628\u062a \u0646\u06cc\u0632 \u06cc\u0627\u062f\u0622\u0648\u0631 \u062e\u0627\u0644\u0642 \u0627\u0633\u062a (\u062e\u0631\u0648\u062c \u06f2\u06f0:\u06f8\u2013\u06f1\u06f1).'
+        ]
+      },
+      en: {
+        title: 'The First Angel',
+        ref: 'Revelation 14:6\u20137',
+        verse: 'Then I saw another angel flying in the midst of heaven, having the everlasting gospel to preach to those who dwell on the earth\u2014to every nation, tribe, tongue, and people\u2014saying with a loud voice, \u201cFear God and give glory to Him, for the hour of His judgment has come; and worship Him who made heaven and earth, the sea and springs of water.\u201d',
+        message: 'The first angel announces the everlasting gospel: fear God, give Him glory, for the hour of His judgment has come, and worship the Creator of heaven and earth.',
+        explain: [
+          'This message is for the whole world \u2014 every nation, language, and people.',
+          'The \u201ceverlasting gospel\u201d is the good news of salvation in Jesus Christ; it never grows old.',
+          '\u201cThe hour of His judgment\u201d points to God\u2019s time of judgment and calls us to turn to Him while there is still opportunity.',
+          'Worship of the Creator stands against every system that calls people to worship the creature or human power. The Sabbath also points to the Creator (Exodus 20:8\u201311).'
+        ]
+      }
+    },
+    2: {
+      fa: {
+        title: '\u0641\u0631\u0634\u062a\u0647 \u062f\u0648\u0645',
+        ref: '\u0645\u06a9\u0627\u0634\u0641\u0647 \u06f1\u06f4:\u06f8',
+        verse: '\u0648 \u0641\u0631\u0634\u062a\u0647\u200c\u0627\u06cc \u062f\u06cc\u06af\u0631\u060c \u062f\u0648\u0645\u06cc\u060c \u0627\u0632 \u067e\u06cc \u0627\u0648 \u0622\u0645\u062f \u0648 \u06af\u0641\u062a: \u00ab\u0633\u0642\u0648\u0637 \u06a9\u0631\u062f\u060c \u0633\u0642\u0648\u0637 \u06a9\u0631\u062f \u0628\u0627\u0628\u0644\u060c \u0622\u0646 \u0634\u0647\u0631 \u0628\u0632\u0631\u06af\u060c \u0632\u06cc\u0631\u0627 \u0647\u0645\u0647 \u0627\u0645\u062a\u200c\u0647\u0627 \u0631\u0627 \u0627\u0632 \u0634\u0631\u0627\u0628 \u063a\u0636\u0628 \u0632\u0646\u0627\u06cc \u062e\u0648\u062f \u0646\u0648\u0634\u0627\u0646\u06cc\u062f.\u00bb',
+        message: '\u0641\u0631\u0634\u062a\u0647 \u062f\u0648\u0645 \u0627\u0639\u0644\u0627\u0645 \u0645\u06cc\u200c\u06a9\u0646\u062f \u06a9\u0647 \u0628\u0627\u0628\u0644 \u0628\u0632\u0631\u06af \u0633\u0642\u0648\u0637 \u06a9\u0631\u062f\u0647 \u0627\u0633\u062a\u060c \u0632\u06cc\u0631\u0627 \u0627\u0645\u062a\u200c\u0647\u0627 \u0631\u0627 \u0628\u0627 \u0634\u0631\u0627\u0628 \u063a\u0636\u0628 \u0632\u0646\u0627\u06cc \u062e\u0648\u062f \u0641\u0631\u06cc\u0641\u062a.',
+        explain: [
+          '\u00ab\u0628\u0627\u0628\u0644\u00bb \u062f\u0631 \u0645\u06a9\u0627\u0634\u0641\u0647 \u0646\u0645\u0627\u062f \u0633\u06cc\u0633\u062a\u0645 \u0645\u0630\u0647\u0628\u06cc \u0648 \u0642\u062f\u0631\u062a\u200c\u0647\u0627\u06cc \u06af\u0645\u0631\u0627\u0647\u200c\u06a9\u0646\u0646\u062f\u0647\u200c\u0627\u06cc \u0627\u0633\u062a \u06a9\u0647 \u0628\u0627 \u062d\u0642\u06cc\u0642\u062a \u062e\u062f\u0627 \u0645\u062e\u0627\u0644\u0641\u062a \u0645\u06cc\u200c\u06a9\u0646\u0646\u062f.',
+          '\u00ab\u0633\u0642\u0648\u0637 \u06a9\u0631\u062f\u060c \u0633\u0642\u0648\u0637 \u06a9\u0631\u062f\u00bb \u062a\u0623\u06a9\u06cc\u062f \u0628\u0631 \u0642\u0637\u0639\u06cc\u062a \u062f\u0627\u0648\u0631\u06cc \u062e\u062f\u0627 \u0628\u0631 \u0627\u06cc\u0646 \u0633\u06cc\u0633\u062a\u0645 \u0627\u0633\u062a.',
+          '\u00ab\u0634\u0631\u0627\u0628 \u0632\u0646\u0627\u00bb \u0627\u0634\u0627\u0631\u0647 \u0628\u0647 \u0622\u0645\u0648\u0632\u0647\u200c\u0647\u0627\u06cc \u062f\u0631\u0648\u063a\u06cc\u0646 \u0648 \u0627\u062a\u062d\u0627\u062f \u0646\u0627\u062f\u0631\u0633\u062a \u062f\u06cc\u0646 \u0648 \u0642\u062f\u0631\u062a \u062f\u0646\u06cc\u0648\u06cc \u062f\u0627\u0631\u062f.',
+          '\u0627\u06cc\u0646 \u067e\u06cc\u0627\u0645 \u062f\u0639\u0648\u062a \u0627\u0633\u062a \u06a9\u0647 \u0627\u0632 \u0628\u0627\u0628\u0644 \u0628\u06cc\u0631\u0648\u0646 \u0622\u06cc\u06cc\u0645 \u0648 \u0628\u0647 \u0627\u0637\u0627\u0639\u062a \u0627\u0632 \u06a9\u0644\u0627\u0645 \u062e\u062f\u0627 \u0628\u0627\u0632\u06af\u0631\u062f\u06cc\u0645 (\u0645\u06a9\u0627\u0634\u0641\u0647 \u06f1\u06f8:\u06f4).'
+        ]
+      },
+      en: {
+        title: 'The Second Angel',
+        ref: 'Revelation 14:8',
+        verse: 'And another angel followed, saying, \u201cBabylon is fallen, is fallen, that great city, because she has made all nations drink of the wine of the wrath of her fornication.\u201d',
+        message: 'The second angel announces that Babylon the great is fallen, because she made the nations drink the wine of the wrath of her fornication.',
+        explain: [
+          'In Revelation, \u201cBabylon\u201d symbolizes religious systems and powers that oppose God\u2019s truth and lead people away from pure obedience.',
+          '\u201cIs fallen, is fallen\u201d stresses the certainty of God\u2019s judgment on that system.',
+          'The \u201cwine of fornication\u201d points to false teachings and unholy alliances of religion with worldly power that intoxicate the nations.',
+          'This message calls us to come out of Babylon and return to obedience to God\u2019s Word and loyalty to Jesus (Revelation 18:4).'
+        ]
+      }
+    },
+    3: {
+      fa: {
+        title: '\u0641\u0631\u0634\u062a\u0647 \u0633\u0648\u0645',
+        ref: '\u0645\u06a9\u0627\u0634\u0641\u0647 \u06f1\u06f4:\u06f9\u2013\u06f1\u06f2',
+        verse: '\u0648 \u0641\u0631\u0634\u062a\u0647\u200c\u0627\u06cc \u0633\u0648\u0645 \u0627\u0632 \u067e\u06cc \u0627\u06cc\u0634\u0627\u0646 \u0622\u0645\u062f \u0648 \u0628\u0647 \u0622\u0648\u0627\u0632 \u0628\u0644\u0646\u062f \u06af\u0641\u062a: \u00ab\u0627\u06af\u0631 \u06a9\u0633\u06cc \u0648\u062d\u0634 \u0648 \u062a\u0635\u0648\u06cc\u0631\u0634 \u0631\u0627 \u0628\u067e\u0631\u0633\u062a\u062f \u0648 \u0646\u0634\u0627\u0646 \u0628\u0631 \u067e\u06cc\u0634\u0627\u0646\u06cc \u06cc\u0627 \u0628\u0631 \u062f\u0633\u062a \u062e\u0648\u062f \u0628\u067e\u0630\u06cc\u0631\u062f\u060c \u0627\u0648 \u0646\u06cc\u0632 \u0627\u0632 \u0634\u0631\u0627\u0628 \u063a\u0636\u0628 \u062e\u062f\u0627 ... \u0639\u0630\u0627\u0628 \u062e\u0648\u0627\u0647\u062f \u0634\u062f... \u0627\u06cc\u0646\u062c\u0627 \u0627\u0633\u062a \u0635\u0628\u0631 \u0645\u0642\u062f\u0633\u0627\u0646\u060c \u0627\u06cc\u0646\u062c\u0627 \u0647\u0633\u062a\u0646\u062f \u06a9\u0633\u0627\u0646\u06cc \u06a9\u0647 \u0627\u062d\u06a9\u0627\u0645 \u062e\u062f\u0627 \u0648 \u0627\u06cc\u0645\u0627\u0646 \u0639\u06cc\u0633\u06cc \u0631\u0627 \u0646\u06af\u0627\u0647 \u0645\u06cc\u200c\u062f\u0627\u0631\u0646\u062f.\u00bb',
+        message: '\u0641\u0631\u0634\u062a\u0647 \u0633\u0648\u0645 \u0647\u0634\u062f\u0627\u0631 \u0645\u06cc\u200c\u062f\u0647\u062f \u06a9\u0647 \u067e\u0631\u0633\u062a\u0634 \u0648\u062d\u0634 \u0648 \u062a\u0635\u0648\u06cc\u0631\u0634 \u0648 \u067e\u0630\u06cc\u0631\u0634 \u0646\u0634\u0627\u0646 \u0627\u0648 \u0628\u0647 \u062f\u0627\u0648\u0631\u06cc \u062e\u062f\u0627 \u0645\u06cc\u200c\u0627\u0646\u062c\u0627\u0645\u062f. \u0645\u0642\u062f\u0633\u0627\u0646 \u0627\u062d\u06a9\u0627\u0645 \u062e\u062f\u0627 \u0648 \u0627\u06cc\u0645\u0627\u0646 \u0639\u06cc\u0633\u06cc \u0631\u0627 \u0646\u06af\u0627\u0647 \u0645\u06cc\u200c\u062f\u0627\u0631\u0646\u062f.',
+        explain: [
+          '\u0627\u06cc\u0646 \u062c\u062f\u06cc\u200c\u062a\u0631\u06cc\u0646 \u0647\u0634\u062f\u0627\u0631 \u06a9\u062a\u0627\u0628 \u0645\u0642\u062f\u0633 \u0627\u0633\u062a: \u0627\u0646\u062a\u062e\u0627\u0628 \u0646\u0647\u0627\u06cc\u06cc \u0645\u06cc\u0627\u0646 \u0648\u0641\u0627\u062f\u0627\u0631\u06cc \u0628\u0647 \u062e\u062f\u0627 \u0648 \u062a\u0633\u0644\u06cc\u0645 \u062f\u0631 \u0628\u0631\u0627\u0628\u0631 \u0633\u06cc\u0633\u062a\u0645 \u0648\u062d\u0634.',
+          '\u00ab\u0648\u062d\u0634\u00bb \u0648 \u00ab\u062a\u0635\u0648\u06cc\u0631\u0634\u00bb \u0628\u0647 \u0642\u062f\u0631\u062a\u200c\u0647\u0627\u06cc\u06cc \u0627\u0634\u0627\u0631\u0647 \u062f\u0627\u0631\u0646\u062f \u06a9\u0647 \u062f\u0631 \u0645\u062e\u0627\u0644\u0641\u062a \u0628\u0627 \u062e\u062f\u0627 \u0639\u0645\u0644 \u0645\u06cc\u200c\u06a9\u0646\u0646\u062f.',
+          '\u00ab\u0646\u0634\u0627\u0646 \u0648\u062d\u0634\u00bb \u0646\u0642\u0637\u0647 \u0627\u0648\u062c \u0648\u0641\u0627\u062f\u0627\u0631\u06cc \u0627\u062c\u0628\u0627\u0631\u06cc \u0628\u0647 \u0622\u0646 \u0633\u06cc\u0633\u062a\u0645 \u0627\u0633\u062a.',
+          '\u0622\u06cc\u0647 \u06f1\u06f2 \u0646\u062a\u06cc\u062c\u0647 \u0631\u0627 \u0646\u0634\u0627\u0646 \u0645\u06cc\u200c\u062f\u0647\u062f: \u0635\u0628\u0631 \u0645\u0642\u062f\u0633\u0627\u0646 \u2014 \u06a9\u0633\u0627\u0646\u06cc \u06a9\u0647 \u0627\u062d\u06a9\u0627\u0645 \u062e\u062f\u0627 \u0648 \u0627\u06cc\u0645\u0627\u0646 \u0628\u0647 \u0639\u06cc\u0633\u06cc \u0631\u0627 \u0628\u0627 \u0647\u0645 \u0646\u06af\u0627\u0647 \u0645\u06cc\u200c\u062f\u0627\u0631\u0646\u062f.'
+        ]
+      },
+      en: {
+        title: 'The Third Angel',
+        ref: 'Revelation 14:9\u201312',
+        verse: 'Then a third angel followed them, saying with a loud voice, \u201cIf anyone worships the beast and his image, and receives his mark on his forehead or on his hand, he himself shall also drink of the wine of the wrath of God... Here is the patience of the saints; here are those who keep the commandments of God and the faith of Jesus.\u201d',
+        message: 'The third angel warns that worshiping the beast and his image and receiving his mark leads to God\u2019s judgment. The saints keep the commandments of God and the faith of Jesus.',
+        explain: [
+          'This is one of Scripture\u2019s strongest warnings: a final choice between loyalty to God and surrender to the beast\u2019s system.',
+          'The \u201cbeast\u201d and his \u201cimage\u201d point to powers that act against God and demand forced worship and obedience.',
+          'The \u201cmark of the beast\u201d is the climax of enforced loyalty to that system; opposite it is the seal of God on those who obey Him.',
+          'Verse 12 shows the result: the patience of the saints \u2014 those who keep the commandments of God and the faith of Jesus together. Salvation is by grace; obedience is the loving response to that grace.'
+        ]
+      }
+    }
+  };
+
+  function lang() {
+    try { return localStorage.getItem('cog_lang') || 'fa'; } catch (e) { return 'fa'; }
+  }
+
+  function nFromUrl() {
+    try {
+      var n = parseInt(new URLSearchParams(location.search).get('n') || '1', 10);
+      if (n < 1 || n > 3 || isNaN(n)) n = 1;
+      return n;
+    } catch (e) { return 1; }
+  }
+
+  function render() {
+    var n = nFromUrl();
+    var L = lang();
+    var data = CONTENT[n][L] || CONTENT[n].en;
+
+    var numEl = document.getElementById('angel-num');
+    var titleEl = document.getElementById('angel-title');
+    var refEl = document.getElementById('angel-ref');
+    var verseEl = document.getElementById('angel-verse');
+    var msgEl = document.getElementById('angel-message');
+    var expEl = document.getElementById('angel-explain');
+    if (!titleEl) return;
+
+    if (numEl) numEl.textContent = String(n);
+    titleEl.textContent = data.title;
+    if (refEl) refEl.textContent = data.ref;
+    if (verseEl) verseEl.textContent = data.verse;
+    if (msgEl) msgEl.textContent = data.message;
+    if (expEl) {
+      expEl.innerHTML = (data.explain || []).map(function (p) {
+        return '<p>' + p + '</p>';
+      }).join('');
+    }
+
+    document.title = data.title + ' | Seventh Trumpet';
+
+    document.querySelectorAll('#angel-switch a').forEach(function (a) {
+      a.classList.toggle('active', a.getAttribute('data-n') === String(n));
+    });
+
+    try {
+      var back = document.querySelector('[data-i18n="angelBack"]');
+      if (back) back.textContent = L === 'en' ? '\u2190 Back to home' : '\u2190 \u0628\u0627\u0632\u06af\u0634\u062a \u0628\u0647 \u062e\u0627\u0646\u0647';
+      var ml = document.querySelector('[data-i18n="angelMessageLabel"]');
+      if (ml) ml.textContent = L === 'en' ? 'Message' : '\u067e\u06cc\u0627\u0645';
+      var el = document.querySelector('[data-i18n="angelExplainLabel"]');
+      if (el) el.textContent = L === 'en' ? 'Explanation' : '\u062a\u0648\u0636\u06cc\u062d';
+    } catch (e) {}
+  }
+
+  function boot() {
+    render();
+    var btn = document.getElementById('lang-toggle');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        setTimeout(render, 50);
+      });
+    }
+    window.addEventListener('storage', function (e) {
+      if (e.key === 'cog_lang') render();
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
