@@ -1,0 +1,112 @@
+/* Angel detail page */
+.angel-page {
+  max-width: 720px;
+  padding-top: 1.5rem;
+  padding-bottom: 3rem;
+}
+
+.angel-back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.angel-back:hover { text-decoration: underline; }
+
+.angel-switch {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+.angel-switch a {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 800;
+  color: var(--primary);
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+}
+.angel-switch a.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.angel-detail {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem 1.35rem 1.75rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.angel-badge {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0a2540, #1a3a5c);
+  color: var(--accent-soft, #e8d48b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 0.85rem;
+}
+
+.angel-detail-title {
+  font-size: clamp(1.35rem, 4vw, 1.75rem);
+  color: var(--primary);
+  margin-bottom: 0.35rem;
+  line-height: 1.3;
+}
+
+.angel-verse-ref {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.angel-verse {
+  background: var(--verse-bg);
+  border-right: 4px solid var(--accent);
+  padding: 1rem 1.1rem;
+  margin: 0 0 1.4rem;
+  border-radius: 0 12px 12px 0;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+body.lang-en .angel-verse {
+  border-right: none;
+  border-left: 4px solid var(--accent);
+  border-radius: 12px 0 0 12px;
+}
+
+.angel-section-label {
+  font-size: 1.05rem;
+  color: var(--primary);
+  margin: 1.1rem 0 0.5rem;
+  font-weight: 700;
+}
+
+.angel-message {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  margin-bottom: 0.5rem;
+}
+
+.angel-explain p {
+  margin-bottom: 0.85rem;
+  line-height: 1.8;
+  color: var(--text);
+}
+.angel-explain p:last-child { margin-bottom: 0; }
