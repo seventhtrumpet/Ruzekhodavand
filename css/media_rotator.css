@@ -172,3 +172,63 @@
 body.dark .media-rotator-card {
   background: rgba(255, 255, 255, 0.1);
 }
+
+/* Compact single-row three angels on home */
+.angels-row {
+  display: flex !important;
+  justify-content: center;
+  align-items: stretch;
+  gap: 0.55rem;
+  margin-top: 1.5rem;
+  flex-wrap: nowrap !important;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.angels-row .angel-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 12px;
+  padding: 0.55rem 0.45rem 0.65rem;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 160px;
+  transition: transform 0.2s, background 0.2s;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  width: auto !important;
+}
+.angels-row .angel-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255,255,255,0.18);
+}
+.angels-row .angel-num {
+  font-size: 1.15rem;
+  color: var(--accent);
+  font-weight: 800;
+  margin-bottom: 0.15rem;
+  line-height: 1.1;
+}
+.angels-row .angel-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  line-height: 1.2;
+}
+.angels-row .angel-text {
+  font-size: 0.68rem;
+  opacity: 0.88;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+@media (max-width: 560px) {
+  .angels-row { gap: 0.4rem; max-width: 100%; }
+  .angels-row .angel-card { max-width: none; padding: 0.5rem 0.35rem; }
+}
