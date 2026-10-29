@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/menu.css">
   <link rel="stylesheet" href="css/media_rotator.css">
-  <!-- AdSense disabled until Google approval; enable ADSENSE_ENABLED in js/ads.js -->
+  <link rel="stylesheet" href="css/features.css">
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
@@ -114,6 +114,12 @@
       <button type="button" id="verse-refresh" class="verse-refresh" data-i18n="newVerse">آیه دیگر</button>
     </div>
   </section>
+
+  <section class="features-section" id="features">
+    <h2 class="features-heading" data-i18n="featuresHeading">امکانات سایت</h2>
+    <div class="features-grid" id="features-grid"></div>
+  </section>
+
   <main class="container" style="padding-bottom:3rem;">
     <div class="home-links" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-top:2rem;">
       <a class="btn btn-primary" href="media.html" data-i18n="media">رسانه‌ها</a>
@@ -150,6 +156,7 @@
   <script src="js/legal_i18n.js"></script>
   <script src="js/cloud_sync.js"></script>
   <script src="js/media_rotator.js"></script>
+  <script src="js/features.js"></script>
   <script src="js/menu.js"></script>
   <script src="js/footer_legal.js"></script>
   <script src="js/enhancements.js"></script>
