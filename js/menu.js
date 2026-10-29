@@ -1,114 +1,72 @@
-/* Seventh Trumpet — side menu (page links + theme) */
+/* Header hamburger menu + theme + load shared scripts */
 (function () {
-  const THEME_KEY = 'cog_theme';
-  function getLang() {
-    return (typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'fa';
-  }
-  function labels() {
-    const fa = getLang() === 'fa';
-    return {
-      title: fa ? '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645' : 'Seventh Trumpet',
-      questions: fa ? '\u0633\u0648\u0627\u0644\u0627\u062a' : 'Questions',
-      feedback: fa ? '\u0628\u0627\u0632\u062e\u0648\u0631\u062f' : 'Feedback',
-      admin: fa ? '\u0645\u062f\u06cc\u0631\u06cc\u062a' : 'Admin',
-      theme: fa ? '\u062d\u0627\u0644\u062a \u0634\u0628 / \u0631\u0648\u0632' : 'Dark / Light mode',
-      playlists: fa ? '\u067e\u0644\u06cc\u200c\u0644\u06cc\u0633\u062a\u200c\u0647\u0627' : 'Playlists',
-      subscribe: fa ? '\u0622\u06cc\u0647 \u0631\u0648\u0632\u0627\u0646\u0647' : 'Daily verse',
-      contact: fa ? '\u062a\u0645\u0627\u0633' : 'Contact',
-      about: fa ? '\u062f\u0631\u0628\u0627\u0631\u0647 \u0645\u0627' : 'About',
-      sponsors: fa ? '\u062d\u0627\u0645\u06cc\u0627\u0646' : 'Sponsors'
-    };
-  }
-  function applyThemeIcon(theme) {
-    const icon = document.getElementById('theme-icon');
-    const btn = document.getElementById('theme-toggle');
-    const emoji = theme === 'dark' ? '\u2600\ufe0f' : '\ud83c\udf19';
-    if (icon) icon.textContent = emoji;
-    if (btn && btn.tagName === 'BUTTON' && !btn.querySelector('#theme-icon')) btn.textContent = emoji;
-    document.body.classList.toggle('dark', theme === 'dark');
-    try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
-  }
-  function refreshMenuLabels() {
-    const L = labels();
-    const head = document.querySelector('.side-menu-head span');
-    if (head) head.textContent = L.title;
-    const map = {
-      'menu-link-questions': L.questions,
-      'menu-link-feedback': L.feedback,
-      'menu-link-admin': L.admin,
-      'menu-link-playlists': L.playlists,
-      'menu-link-subscribe': L.subscribe,
-      'menu-link-about': L.about,
-      'menu-link-contact': L.contact,
-      'menu-link-sponsors': L.sponsors
-    };
-    Object.keys(map).forEach(function (id) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = map[id];
-    });
-    const themeLabel = document.getElementById('theme-label');
-    if (themeLabel) themeLabel.textContent = L.theme;
-  }
-  window.updateSideMenuLang = refreshMenuLabels;
+  var THEME_KEY = 'cog_theme';
 
-  function placeToggleInHeader(btn) {
-    btn = btn || document.getElementById('menu-toggle');
-    if (!btn) return;
-    var headerInner = document.querySelector('.header .header-inner');
-    if (headerInner) {
-      var actions = headerInner.querySelector('.header-actions');
-      if (!actions) {
-        actions = document.createElement('div');
-        actions.className = 'header-actions';
-        headerInner.appendChild(actions);
-      }
-      if (btn.parentNode !== actions) actions.appendChild(btn);
-      btn.classList.remove('menu-toggle-fixed');
-    } else {
-      btn.classList.add('menu-toggle-fixed');
-      if (btn.parentNode !== document.body) document.body.appendChild(btn);
-    }
+  function applyThemeIcon(theme) {
+    try {
+      if (theme === 'dark') document.body.classList.add('dark');
+      else document.body.classList.remove('dark');
+      localStorage.setItem(THEME_KEY, theme);
+      var btn = document.getElementById('theme-toggle');
+      if (btn) btn.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    } catch (e) {}
+  }
+
+  function refreshMenuLabels() {
+    try {
+      var lang = (typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'fa';
+      var Tref = typeof T !== 'undefined' ? T[lang] : null;
+      if (!Tref) return;
+      document.querySelectorAll('#menu-panel [data-i18n], .menu-panel [data-i18n]').forEach(function (el) {
+        var k = el.getAttribute('data-i18n');
+        if (Tref[k]) el.textContent = Tref[k];
+      });
+    } catch (e) {}
   }
 
   function ensureMenu() {
-    if (document.getElementById('side-menu')) {
-      placeToggleInHeader();
-      return;
-    }
-    const L = labels();
-    const btn = document.createElement('button');
+    if (document.getElementById('menu-btn')) return;
+    var headerInner = document.querySelector('.header-inner');
+    if (!headerInner) return;
+
+    var btn = document.createElement('button');
+    btn.id = 'menu-btn';
+    btn.className = 'menu-btn';
     btn.type = 'button';
-    btn.id = 'menu-toggle';
-    btn.className = 'menu-toggle';
     btn.setAttribute('aria-label', 'Menu');
     btn.setAttribute('aria-expanded', 'false');
-    btn.innerHTML = '<span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>';
+    btn.innerHTML = '<span></span><span></span><span></span>';
 
-    const overlay = document.createElement('div');
+    var overlay = document.createElement('div');
     overlay.id = 'menu-overlay';
     overlay.className = 'menu-overlay';
     overlay.setAttribute('hidden', '');
-    overlay.style.display = 'none';
-    document.body.appendChild(overlay);
 
-    const panel = document.createElement('div');
-    panel.id = 'side-menu';
-    panel.className = 'side-menu';
+    var panel = document.createElement('div');
+    panel.id = 'menu-panel';
+    panel.className = 'menu-panel';
     panel.innerHTML =
-      '<div class="side-menu-head"><span>' + L.title + '</span><button type="button" id="menu-close" class="menu-close" aria-label="Close">&times;</button></div>' +
-      '<nav class="side-menu-nav">' +
-      '<a id="menu-link-playlists" href="playlists.html">' + L.playlists + '</a>' +
-      '<a id="menu-link-questions" href="questions.html">' + L.questions + '</a>' +
-      '<a id="menu-link-feedback" href="feedback.html">' + L.feedback + '</a>' +
-      '<a id="menu-link-subscribe" href="index.html#daily-verse">' + L.subscribe + '</a>' +
-      '<a id="menu-link-about" href="about.html">' + L.about + '</a>' +
-      '<a id="menu-link-contact" href="contact.html">' + L.contact + '</a>' +
-      '<a id="menu-link-sponsors" href="sponsors.html">' + L.sponsors + '</a>' +
-      '<a id="menu-link-admin" href="admin.html">' + L.admin + '</a>' +
-      '<button type="button" id="theme-toggle" class="theme-toggle-btn"><span id="theme-icon">\ud83c\udf19</span> <span id="theme-label">' + L.theme + '</span></button>' +
+      '<div class="menu-panel-head">' +
+      '<button type="button" id="menu-close" class="menu-close" aria-label="Close">&times;</button>' +
+      '<button type="button" id="theme-toggle" class="theme-toggle" aria-label="Theme">\u263E</button>' +
+      '</div>' +
+      '<nav class="menu-nav">' +
+      '<a href="index.html" data-i18n="home">\u062e\u0627\u0646\u0647</a>' +
+      '<a href="media.html" data-i18n="media">\u0631\u0633\u0627\u0646\u0647\u200c\u0647\u0627</a>' +
+      '<a href="bible.html" data-i18n="bibleNav">\u06a9\u062a\u0627\u0628 \u0645\u0642\u062f\u0633</a>' +
+      '<a href="teachings.html" data-i18n="teachingsNav">\u0622\u0645\u0648\u0632\u0634\u200c\u0647\u0627</a>' +
+      '<a href="live.html" data-i18n="live">\u067e\u062e\u0634 \u0632\u0646\u062f\u0647</a>' +
+      '<a href="questions.html" data-i18n="questionsNav">\u0633\u0648\u0627\u0644\u0627\u062a</a>' +
+      '<a href="feedback.html" data-i18n="feedbackNav">\u0628\u0627\u0632\u062e\u0648\u0631\u062f</a>' +
+      '<a href="about.html" data-i18n="about">\u062f\u0631\u0628\u0627\u0631\u0647 \u0645\u0627</a>' +
+      '<a href="contact.html" data-i18n="contact">\u062a\u0645\u0627\u0633</a>' +
+      '<a href="privacy.html" data-i18n="privacyNav">\u062d\u0631\u06cc\u0645 \u062e\u0635\u0648\u0635\u06cc</a>' +
+      '<a href="admin.html" data-i18n="admin">\u0645\u062f\u06cc\u0631\u06cc\u062a</a>' +
       '</nav>';
+
+    headerInner.insertBefore(btn, headerInner.firstChild);
+    document.body.appendChild(overlay);
     document.body.appendChild(panel);
-    placeToggleInHeader(btn);
 
     function openMenu() {
       panel.classList.add('open');
@@ -135,19 +93,19 @@
     overlay.addEventListener('click', closeMenu);
     document.getElementById('menu-close').addEventListener('click', closeMenu);
     document.getElementById('theme-toggle').addEventListener('click', function () {
-      const next = document.body.classList.contains('dark') ? 'light' : 'dark';
+      var next = document.body.classList.contains('dark') ? 'light' : 'dark';
       applyThemeIcon(next);
     });
   }
 
   function boot() {
     try {
-      const saved = localStorage.getItem(THEME_KEY) || 'light';
+      var saved = localStorage.getItem(THEME_KEY) || 'light';
       applyThemeIcon(saved);
     } catch (e) {}
     ensureMenu();
     refreshMenuLabels();
-    document.getElementById('lang-toggle')?.addEventListener('click', function () {
+    document.getElementById('lang-toggle') && document.getElementById('lang-toggle').addEventListener('click', function () {
       setTimeout(refreshMenuLabels, 80);
     });
   }
@@ -177,6 +135,33 @@
       bf.src = 'js/bugfixes.js';
       bf.setAttribute('data-bugfixes', '1');
       document.body.appendChild(bf);
+    }
+  } catch (e) {}
+
+  try {
+    if (!document.querySelector('script[data-footer-legal]')) {
+      var fl = document.createElement('script');
+      fl.src = 'js/footer_legal.js';
+      fl.setAttribute('data-footer-legal', '1');
+      document.body.appendChild(fl);
+    }
+  } catch (e) {}
+
+  try {
+    if (!document.querySelector('script[data-privacy-banner]')) {
+      var pb = document.createElement('script');
+      pb.src = 'js/privacy_banner.js';
+      pb.setAttribute('data-privacy-banner', '1');
+      document.body.appendChild(pb);
+    }
+  } catch (e) {}
+
+  try {
+    if (!document.querySelector('script[data-visits]')) {
+      var vs = document.createElement('script');
+      vs.src = 'js/visits.js';
+      vs.setAttribute('data-visits', '1');
+      document.body.appendChild(vs);
     }
   } catch (e) {}
 
