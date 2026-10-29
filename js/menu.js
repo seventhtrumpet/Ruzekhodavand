@@ -156,33 +156,13 @@
     }
   } catch (e) {}
 
+  // Logo: only load the loader — it waits for chunks then runs site_logo.js
   try {
     if (!document.querySelector('script[data-logo-data]')) {
       var ld = document.createElement('script');
       ld.src = 'js/logo_data.js';
       ld.setAttribute('data-logo-data', '1');
-      ld.onload = function () {
-        if (!document.querySelector('script[data-site-logo]')) {
-          var sl = document.createElement('script');
-          sl.src = 'js/site_logo.js';
-          sl.setAttribute('data-site-logo', '1');
-          document.body.appendChild(sl);
-        }
-      };
-      ld.onerror = function () {
-        if (!document.querySelector('script[data-site-logo]')) {
-          var sl = document.createElement('script');
-          sl.src = 'js/site_logo.js';
-          sl.setAttribute('data-site-logo', '1');
-          document.body.appendChild(sl);
-        }
-      };
       document.body.appendChild(ld);
-    } else if (!document.querySelector('script[data-site-logo]')) {
-      var sl2 = document.createElement('script');
-      sl2.src = 'js/site_logo.js';
-      sl2.setAttribute('data-site-logo', '1');
-      document.body.appendChild(sl2);
     }
   } catch (e) {}
 
