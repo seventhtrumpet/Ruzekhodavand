@@ -1,8 +1,12 @@
-/* Seventh Trumpet profile logo */
+/* Seventh Trumpet profile logo — high quality */
 (function () {
+  // High-resolution hosted logo (sharp when opened large)
+  var HQ = 'https://iili.io/n8MSJBp.jpg';
+  var HQ256 = 'https://iili.io/n8M8tYF.jpg';
   var FILE = (location.origin || 'https://seventhtrumpet.org') + '/img/logo.jpg';
-  var LOGO = (window.ST_LOGO && window.ST_LOGO.length > 200) ? window.ST_LOGO : FILE;
-  var FAV = (window.ST_FAV && window.ST_FAV.length > 80) ? window.ST_FAV : LOGO;
+  // Prefer HQ for display; embedded only as last fallback
+  var LOGO = HQ;
+  var FAV = (window.ST_FAV && window.ST_FAV.length > 80) ? window.ST_FAV : HQ256;
 
   function openLogoViewer(src) {
     if (document.getElementById('logo-viewer')) return;
@@ -11,7 +15,7 @@
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-label', 'Logo');
     overlay.style.cssText =
-      'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.9);' +
+      'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);' +
       'display:flex;align-items:center;justify-content:center;padding:0.8rem;' +
       'cursor:pointer;-webkit-tap-highlight-color:transparent;';
 
@@ -85,13 +89,13 @@
       apple.rel = 'apple-touch-icon';
       document.head.appendChild(apple);
     }
-    apple.href = LOGO;
+    apple.href = HQ256;
 
-    // Header circle logo — tap opens full view (does not navigate)
+    // Header circle logo — tap opens sharp full view
     document.querySelectorAll('a.logo').forEach(function (a) {
       if (a.querySelector('img.logo-img')) return;
       var img = document.createElement('img');
-      img.src = LOGO;
+      img.src = HQ256;
       img.alt = 'Seventh Trumpet';
       img.className = 'logo-img';
       img.width = 48;
@@ -101,12 +105,12 @@
       img.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        openLogoViewer(LOGO);
+        openLogoViewer(HQ);
       });
       a.insertBefore(img, a.firstChild);
     });
 
-    // Social / search preview
+    // Google / social previews use the sharp 512 logo
     function setMeta(attr, key, val) {
       var m = document.querySelector('meta[' + attr + '="' + key + '"]');
       if (!m) {
@@ -116,10 +120,10 @@
       }
       m.setAttribute('content', val);
     }
-    setMeta('property', 'og:image', FILE);
+    setMeta('property', 'og:image', HQ);
     setMeta('property', 'og:image:width', '512');
     setMeta('property', 'og:image:height', '512');
-    setMeta('name', 'twitter:image', FILE);
+    setMeta('name', 'twitter:image', HQ);
     setMeta('name', 'twitter:card', 'summary');
   }
 
