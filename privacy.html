@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <meta name="description" content="Privacy Policy — Seventh Trumpet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/menu.css">
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+  <title>حریم خصوصی | شیپور هفتم</title>
+</head>
+<body data-page="privacy">
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span data-i18n="siteName">شیپور هفتم</span></a>
+      <nav class="nav nav-main">
+        <a href="index.html" data-i18n="home" data-nav="home">خانه</a>
+        <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
+        <a href="bible.html" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
+        <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
+        <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
+      </nav>
+    </div>
+  </header>
+  <main class="container legal-page" style="padding-top:2rem;padding-bottom:3rem;max-width:720px;">
+    <h1 class="section-title" data-i18n="privacyTitle">حریم خصوصی</h1>
+    <div class="about-card" style="background:var(--card-bg,#fff);border-radius:14px;padding:1.5rem 1.35rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);line-height:1.85;">
+      <p data-i18n="privacyUpdated" style="font-size:0.9rem;opacity:0.75;margin-bottom:1rem;">آخرین به‌روزرسانی: ۲۹ اکتبر ۲۰۲۶</p>
+      <p data-i18n="privacyIntro" style="margin-bottom:1rem;">شیپور هفتم («ما») به حریم خصوصی شما احترام می‌گذارد. این صفحه توضیح می‌دهد چه اطلاعاتی جمع‌آوری می‌شود و چگونه استفاده می‌شود.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="privacyWho">چه کسی مسئول است</h2>
+      <p data-i18n="privacyWhoT" style="margin-bottom:1rem;">وب‌سایت seventhtrumpet.org توسط شیپور هفتم اداره می‌شود. برای پرسش درباره حریم خصوصی با ما تماس بگیرید: info.seventhtrumpet@gmail.com</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="privacyCollect">چه اطلاعاتی جمع می‌شود</h2>
+      <ul style="padding-inline-start:1.2rem;margin-bottom:1rem;">
+        <li data-i18n="privacyC1">اگر با گوگل یا ایمیل وارد شوید: نشانی ایمیل و نام نمایشی از طریق Firebase Authentication.</li>
+        <li data-i18n="privacyC2">داده‌های ذخیره‌شده در مرورگر شما (localStorage / sessionStorage): زبان، پیشرفت پخش ویدیو، تنظیمات پوسته، و در صورت اشتراک، ایمیل برای آیه روزانه.</li>
+        <li data-i18n="privacyC3">اگر سوال، بازخورد یا فرم تماس بفرستید: متنی که خودتان وارد می‌کنید و راه تماس اختیاری.</li>
+        <li data-i18n="privacyC4">اطلاعات فنی معمول وب‌سرور (مانند آدرس IP تقریبی و نوع مرورگر) ممکن است توسط میزبان (مثلاً Vercel) ثبت شود.</li>
+      </ul>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="privacyUse">چگونه استفاده می‌شود</h2>
+      <p data-i18n="privacyUseT" style="margin-bottom:1rem;">برای ارائه ورود اختیاری، ذخیره تنظیمات شما، ارسال آیه روزانه در صورت اشتراک، پاسخ به پیام‌ها، و بهبود سایت. ما اطلاعات شما را برای فروش به دیگران نمی‌فروشیم.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="privacyCookies">کوکی‌ها و ذخیره‌سازی محلی</h2>
+      <p data-i18n="privacyCookiesT" style="margin-bottom:1rem;">ما از کوکی‌ها و فضای ذخیره‌سازی مرورگر برای زبان، نشست ورود و ترجیحات استفاده می‌کنیم. سرویس‌های شخص ثالث مانند Firebase ممکن است کوکی‌های خود را تنظیم کنند. می‌توانید کوکی‌ها را در مرورگر پاک یا محدود کنید؛ برخی امکانات ممکن است کار نکنند.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="privacyThird">خدمات شخص ثالث</h2>
+      <p data-i18n="privacyThirdT" style="margin-bottom:1rem;">ممکن است از Firebase (Google) برای ورود و پایگاه داده، و Vercel برای میزبانی استفاده کنیم. سیاست حریم خصوصی آن‌ها جداگانه اعمال می‌شود. اگر در آینده تبلیغات فعال شود، ارائه‌دهنده تبلیغات نیز ممکن است داده جمع کند؛ این صفحه به‌روز خواهد شد.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="privacyRights">حقوق شما</h2>
+      <p data-i18n="privacyRightsT" style="margin-bottom:1rem;">می‌توانید درخواست دسترسی، اصلاح یا حذف داده‌های مرتبط با حساب را با ایمیل به ما بفرستید. اشتراک آیه روزانه را می‌توانید با پیام به همان ایمیل لغو کنید.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="privacyChildren">کودکان</h2>
+      <p data-i18n="privacyChildrenT" style="margin-bottom:1rem;">سایت برای مخاطب عمومی درباره کتاب مقدس است. ما عمداً اطلاعات شخصی کودکان زیر ۱۳ سال را جمع نمی‌کنیم.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="privacyContact">تماس</h2>
+      <p data-i18n="privacyContactT">info.seventhtrumpet@gmail.com · seventh.trumpet@yahoo.com</p>
+    </div>
+  </main>
+  <footer class="footer">
+    <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه ۱۴</p>
+    <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7" data-i18n="footerSub">شیپور هفتم · مکاشفه ۱۴:۶–۱۲</p>
+  </footer>
+  <script src="js/app.js"></script>
+  <script src="js/app_core.js"></script>
+  <script src="js/i18n_extra.js"></script>
+  <script src="js/legal_i18n.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/footer_legal.js"></script>
+  <script src="js/enhancements.js"></script>
+</body>
+</html>
