@@ -108,7 +108,6 @@
       '<button type="button" id="theme-toggle" class="theme-toggle-btn"><span id="theme-icon">\ud83c\udf19</span> <span id="theme-label">' + L.theme + '</span></button>' +
       '</nav>';
     document.body.appendChild(panel);
-
     placeToggleInHeader(btn);
 
     function openMenu() {
@@ -170,6 +169,15 @@
     var fx = document.createElement('script');
     fx.src = 'js/menu_overlay_fix.js';
     document.body.appendChild(fx);
+  } catch (e) {}
+
+  try {
+    if (!document.querySelector('script[data-bugfixes]')) {
+      var bf = document.createElement('script');
+      bf.src = 'js/bugfixes.js';
+      bf.setAttribute('data-bugfixes', '1');
+      document.body.appendChild(bf);
+    }
   } catch (e) {}
 
   (function loadSocial() {
