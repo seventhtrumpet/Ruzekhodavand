@@ -71,3 +71,37 @@ if (currentLang === 'ru') currentLang = 'en';
 let posts = [];
 let liveData = { isLive: false, streamUrl: '', title: '' };
 let currentUser = null;
+
+function applyLanguage() {
+  var lang = currentLang === 'en' ? 'en' : 'fa';
+  currentLang = lang;
+  document.body.classList.toggle('lang-en', lang === 'en');
+  document.body.classList.toggle('lang-fa', lang === 'fa');
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+  var t = (T && T[lang]) ? T[lang] : {};
+  if (t.pageTitle) document.title = t.pageTitle;
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    var key = el.getAttribute('data-i18n');
+    if (key && t[key] != null && String(t[key]).length) el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+    var key = el.getAttribute('data-i18n-placeholder');
+    if (key && t[key] != null) el.placeholder = t[key];
+  });
+  document.querySelectorAll('[data-lang-only]').forEach(function (el) {
+    el.style.display = (el.getAttribute('data-lang-only') === lang) ? '' : 'none';
+  });
+  try { if (typeof updateLiveBadge === 'function') updateLiveBadge(); } catch (e) {}
+  try { if (typeof updateAuthUI === 'function') updateAuthUI(); } catch (e) {}
+  try { if (typeof window.updateSideMenuLang === 'function') window.updateSideMenuLang(); } catch (e) {}
+  try { window.dispatchEvent(new CustomEvent('cog-lang-changed', { detail: { lang: lang } })); } catch (e) {}
+}
+
+function toggleLanguage() {
+  currentLang = currentLang === 'fa' ? 'en' : 'fa';
+  try { localStorage.setItem(LANG_KEY, currentLang); } catch (e) {}
+  applyLanguage();
+  try { if (typeof renderMedia === 'function') renderMedia(); } catch (e) {}
+  try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
+}
