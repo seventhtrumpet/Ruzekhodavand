@@ -4,6 +4,8 @@
    Sponsors: edit data/sponsors.json
 */
 (function () {
+  /* Set true only AFTER Google AdSense approves the site */
+  const ADSENSE_ENABLED = false;
   const ADSENSE_CLIENT = 'ca-pub-3616286446774634';
   const SLOTS = {
     top: '',
@@ -24,12 +26,15 @@
     el.setAttribute('aria-label', 'Advertisement');
     const label = document.createElement('span');
     label.className = 'ad-slot-label';
-    label.textContent = t('تبلیغات', 'Ad');
+    label.textContent = t('\u062a\u0628\u0644\u06cc\u063a\u0627\u062a', 'Ad');
     el.appendChild(label);
     return el;
   }
 
   function injectSlots() {
+    if (!ADSENSE_ENABLED) {
+      return;
+    }
     const main = document.querySelector('main.container, main.mb-reader, .home-links');
     const footer = document.querySelector('footer.footer');
     const daily = document.getElementById('daily-verse');
@@ -41,127 +46,25 @@
       const top = makeSlot('ad-slot-top', '');
       main.parentNode.insertBefore(top, main);
     }
-
     if (footer && footer.parentNode) {
       const bottom = makeSlot('ad-slot-bottom', '');
       footer.parentNode.insertBefore(bottom, footer);
     }
-
-    if (document.body.getAttribute('data-page') === 'media') {
-      const feed = document.getElementById('posts-list') || document.querySelector('.posts-grid, #media-list');
-      if (feed) {
-        const infeed = makeSlot('ad-slot-infeed', 'ad-slot-infeed');
-        feed.parentNode.insertBefore(infeed, feed);
-      }
-    }
   }
 
   function loadAdSense() {
-    if (!ADSENSE_CLIENT || !ADSENSE_CLIENT.startsWith('ca-pub-')) return;
-    if (document.getElementById('adsense-script')) return;
-
-    const s = document.createElement('script');
-    s.id = 'adsense-script';
+    if (!ADSENSE_ENABLED) return;
+    if (document.querySelector('script[data-adsense-client]')) return;
+    var s = document.createElement('script');
     s.async = true;
-    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(ADSENSE_CLIENT);
+    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + ADSENSE_CLIENT;
     s.crossOrigin = 'anonymous';
+    s.setAttribute('data-adsense-client', '1');
     document.head.appendChild(s);
-
-    function fill(slotElId, adSlotId) {
-      const host = document.getElementById(slotElId);
-      if (!host || !adSlotId) return;
-      host.classList.add('ready');
-      host.innerHTML = '';
-      const ins = document.createElement('ins');
-      ins.className = 'adsbygoogle';
-      ins.style.display = 'block';
-      ins.setAttribute('data-ad-client', ADSENSE_CLIENT);
-      ins.setAttribute('data-ad-slot', adSlotId);
-      ins.setAttribute('data-ad-format', 'auto');
-      ins.setAttribute('data-full-width-responsive', 'true');
-      host.appendChild(ins);
-      try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
-    }
-
-    setTimeout(function () {
-      fill('ad-slot-top', SLOTS.top);
-      fill('ad-slot-bottom', SLOTS.bottom);
-      fill('ad-slot-infeed', SLOTS.infeed);
-    }, 400);
   }
 
-  function loadSponsors() {
-    const mount =
-      document.getElementById('sponsors-mount') ||
-      (function () {
-        const footer = document.querySelector('footer.footer');
-        if (!footer) return null;
-        const sec = document.createElement('section');
-        sec.className = 'sponsors-section';
-        sec.id = 'sponsors-mount';
-        footer.parentNode.insertBefore(sec, footer);
-        return sec;
-      })();
-    if (!mount) return;
-
-    fetch('data/sponsors.json?v=' + Date.now())
-      .then(function (r) { return r.ok ? r.json() : { sponsors: [] }; })
-      .catch(function () { return { sponsors: [] }; })
-      .then(function (data) {
-        const list = (data.sponsors || []).filter(function (s) { return s.active !== false && (s.image || s.name); });
-        const lang = (typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'fa';
-        mount.innerHTML = '';
-        const h2 = document.createElement('h2');
-        h2.textContent = t('حامیان', 'Sponsors');
-        mount.appendChild(h2);
-        const sub = document.createElement('p');
-        sub.className = 'sponsors-sub';
-        sub.textContent = t('از حامیان پیام سپاسگزاریم', 'Thank you to our sponsors');
-        mount.appendChild(sub);
-
-        if (!list.length) {
-          const empty = document.createElement('p');
-          empty.className = 'sponsors-empty';
-          empty.textContent = t('به‌زودی…', 'Coming soon…');
-          mount.appendChild(empty);
-          return;
-        }
-        const grid = document.createElement('div');
-        grid.className = 'sponsors-grid';
-        list.forEach(function (s) {
-          const a = document.createElement('a');
-          a.className = 'sponsor-card';
-          a.href = s.url || '#';
-          a.target = '_blank';
-          a.rel = 'noopener sponsored';
-          if (s.image) {
-            const img = document.createElement('img');
-            img.src = s.image;
-            img.alt = s.name || '';
-            img.loading = 'lazy';
-            a.appendChild(img);
-          }
-          const span = document.createElement('span');
-          span.textContent = lang === 'fa' && s.nameFa ? s.nameFa : (s.name || '');
-          a.appendChild(span);
-          grid.appendChild(a);
-        });
-        mount.appendChild(grid);
-      });
-  }
-
-  function init() {
+  document.addEventListener('DOMContentLoaded', function () {
+    loadAdSense();
     injectSlots();
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(function () { loadAdSense(); loadSponsors(); }, { timeout: 2500 });
-    } else {
-      setTimeout(function () { loadAdSense(); loadSponsors(); }, 800);
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  });
 })();
