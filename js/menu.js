@@ -165,6 +165,16 @@
     }
   } catch (e) {}
 
+  try {
+    if (!document.querySelector('link[data-mobile-header]')) {
+      var mh = document.createElement('link');
+      mh.rel = 'stylesheet';
+      mh.href = 'css/mobile_header.css';
+      mh.setAttribute('data-mobile-header', '1');
+      document.head.appendChild(mh);
+    }
+  } catch (e) {}
+
   (function loadSocial() {
     if (!document.querySelector('link[data-social-css]')) {
       var l = document.createElement('link');
