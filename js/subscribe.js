@@ -1,206 +1,149 @@
-/* Daily verse email subscribe */
+/* Daily verse email subscribe + popup with Not now */
 (function () {
-  const SUB_KEY = 'cog_verse_subscribed';
-  const SUB_POPUP_KEY = 'cog_verse_popup_seen';
+  var style = document.createElement('style');
+  style.textContent = '.subscribe-popup{position:fixed!important;inset:0!important;background:rgba(0,0,0,.55)!important;z-index:99999!important;display:none;align-items:center;justify-content:center;padding:1rem}.subscribe-popup.is-open{display:flex!important}.subscribe-popup[hidden],.subscribe-popup.hidden{display:none!important}.subscribe-popup-card{background:var(--bg-card,#fff);color:var(--text,#222);border-radius:16px;padding:1.6rem 1.4rem 1.2rem;max-width:400px;width:100%;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.3);text-align:center}.subscribe-popup-later{display:block!important;width:100%;margin-top:.85rem!important;padding:.65rem 1rem!important;background:transparent!important;border:1px solid var(--border,#ccc)!important;border-radius:10px!important;color:var(--text,#333)!important;font-family:inherit!important;font-size:.95rem!important;cursor:pointer!important;text-decoration:none!important}.subscribe-popup-close{position:absolute;top:.5rem;inset-inline-start:.7rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#888}';
+  document.head.appendChild(style);
 
-  const I18N = {
+  var SUB_KEY = 'cog_verse_subscribed';
+  var SUB_POPUP_KEY = 'cog_verse_popup_dismissed_v2';
+
+  var I18N = {
     fa: {
-      subscribeNav: 'آیه روزانه', subscribeTitle: 'آیه روزانه با ایمیل',
-      subscribeIntro: 'هر روز یک آیه از کلام خدا را در ایمیل خود دریافت کنید — رایگان.',
-      subscribeEmailPh: 'you@email.com', subscribeBtn: 'عضویت',
-      subscribeConsent: 'موافقم که آیه روزانه به ایمیلم ارسال شود. هر زمان می‌توانم لغو کنم.',
-      subscribeThanks: 'متشکریم! به فهرست آیه روزانه اضافه شدید.',
-      subscribeWithAccount: 'عضویت با ایمیل حساب من',
-      popupTitle: 'هر روز یک آیه در ایمیل شما',
-      popupText: 'مثل یک یادآوری آرام از کلام خدا — رایگان، هر روز صبح.',
-      popupLater: 'الان نه'
+      subscribeTitle: '\u0622\u06cc\u0647 \u0631\u0648\u0632\u0627\u0646\u0647 \u0628\u0627 \u0627\u06cc\u0645\u06cc\u0644',
+      subscribeIntro: '\u0647\u0631 \u0631\u0648\u0632 \u06cc\u06a9 \u0622\u06cc\u0647 \u0627\u0632 \u06a9\u0644\u0627\u0645 \u062e\u062f\u0627 \u0631\u0627 \u062f\u0631 \u0627\u06cc\u0645\u06cc\u0644 \u062e\u0648\u062f \u062f\u0631\u06cc\u0627\u0641\u062a \u06a9\u0646\u06cc\u062f \u2014 \u0631\u0627\u06cc\u06af\u0627\u0646.',
+      subscribeBtn: '\u0639\u0636\u0648\u06cc\u062a',
+      subscribeConsent: '\u0645\u0648\u0627\u0641\u0642\u0645 \u06a9\u0647 \u0622\u06cc\u0647 \u0631\u0648\u0632\u0627\u0646\u0647 \u0628\u0647 \u0627\u06cc\u0645\u06cc\u0644\u0645 \u0627\u0631\u0633\u0627\u0644 \u0634\u0648\u062f. \u0647\u0631 \u0632\u0645\u0627\u0646 \u0645\u06cc\u200c\u062a\u0648\u0627\u0646\u0645 \u0644\u063a\u0648 \u06a9\u0646\u0645.',
+      subscribeThanks: '\u0645\u062a\u0634\u06a9\u0631\u06cc\u0645! \u0628\u0647 \u0641\u0647\u0631\u0633\u062a \u0622\u06cc\u0647 \u0631\u0648\u0632\u0627\u0646\u0647 \u0627\u0636\u0627\u0641\u0647 \u0634\u062f\u06cc\u062f.',
+      popupTitle: '\u0647\u0631 \u0631\u0648\u0632 \u06cc\u06a9 \u0622\u06cc\u0647 \u062f\u0631 \u0627\u06cc\u0645\u06cc\u0644 \u0634\u0645\u0627',
+      popupText: '\u0645\u062b\u0644 \u06cc\u06a9 \u06cc\u0627\u062f\u0622\u0648\u0631\u06cc \u0622\u0631\u0627\u0645 \u0627\u0632 \u06a9\u0644\u0627\u0645 \u062e\u062f\u0627 \u2014 \u0631\u0627\u06cc\u06af\u0627\u0646\u060c \u0647\u0631 \u0631\u0648\u0632.',
+      popupLater: '\u0627\u0644\u0627\u0646 \u0646\u0647',
+      popupSubscribe: '\u0639\u0636\u0648\u06cc\u062a'
     },
     en: {
-      subscribeNav: 'Daily verse', subscribeTitle: 'Daily verse by email',
-      subscribeIntro: 'Receive a Bible verse in your inbox every day — free.',
-      subscribeEmailPh: 'you@email.com', subscribeBtn: 'Subscribe',
+      subscribeTitle: 'Daily verse by email',
+      subscribeIntro: 'Receive a Bible verse in your inbox every day \u2014 free.',
+      subscribeBtn: 'Subscribe',
       subscribeConsent: 'I agree to receive a daily verse by email. I can unsubscribe anytime.',
       subscribeThanks: 'Thank you! You are on the daily verse list.',
-      subscribeWithAccount: 'Subscribe with my account email',
       popupTitle: 'A verse in your inbox every day',
-      popupText: "A gentle reminder from God's Word — free, every morning.",
-      popupLater: 'Not now'
+      popupText: "A gentle reminder from God's Word \u2014 free, every day.",
+      popupLater: 'Not now',
+      popupSubscribe: 'Subscribe'
     }
   };
 
   function lang() {
     return (typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'fa';
   }
-
   function t(key) {
-    const L = I18N[lang() === 'fa' ? 'fa' : 'en'];
-    return L[key] || key;
+    var L = I18N[lang() === 'en' ? 'en' : 'fa'];
+    return (L && L[key]) || I18N.en[key] || key;
   }
-
   function applyLabels() {
-    Object.keys(I18N.en).forEach(key => {
-      document.querySelectorAll('[data-i18n="' + key + '"]').forEach(el => { el.textContent = t(key); });
-      document.querySelectorAll('[data-i18n-placeholder="' + key + '"]').forEach(el => { el.placeholder = t(key); });
+    Object.keys(I18N.en).forEach(function (key) {
+      document.querySelectorAll('[data-i18n="' + key + '"]').forEach(function (el) {
+        el.textContent = t(key);
+      });
     });
   }
-
   function isSubscribed() {
     try { return !!localStorage.getItem(SUB_KEY); } catch (e) { return false; }
   }
-
   function markSubscribed(email) {
     try { localStorage.setItem(SUB_KEY, email || '1'); } catch (e) {}
   }
+  function wasDismissedThisSession() {
+    try { return sessionStorage.getItem(SUB_POPUP_KEY) === '1'; } catch (e) { return false; }
+  }
+  function markDismissedThisSession() {
+    try { sessionStorage.setItem(SUB_POPUP_KEY, '1'); } catch (e) {}
+  }
 
   function injectHTML() {
-    const mount = document.getElementById('subscribe-mount');
-    if (mount && !document.getElementById('subscribe-form')) {
-      mount.innerHTML =
-        '<section class="subscribe-section" id="subscribe">' +
-        '<div class="subscribe-card">' +
-        '<div class="subscribe-icon">✉️</div>' +
-        '<h2 class="subscribe-title" data-i18n="subscribeTitle"></h2>' +
-        '<p class="subscribe-intro" data-i18n="subscribeIntro"></p>' +
-        '<form id="subscribe-form" class="subscribe-form" action="https://formsubmit.co/info.seventhtrumpet@gmail.com" method="POST">' +
-        '<input type="hidden" name="_subject" value="New daily verse subscriber — Seventh Trumpet">' +
-        '<input type="hidden" name="_captcha" value="false">' +
-        '<input type="hidden" name="_template" value="table">' +
-        '<input type="hidden" name="_next" value="https://www.seventhtrumpet.org/#subscribe">' +
-        '<input type="hidden" name="form_type" value="daily_verse_subscribe">' +
-        '<input type="hidden" name="source" id="sub-source" value="website">' +
-        '<div class="subscribe-row">' +
-        '<input type="email" name="email" id="subscribe-email" required data-i18n-placeholder="subscribeEmailPh" placeholder="you@email.com" autocomplete="email">' +
-        '<button type="submit" class="btn btn-accent" data-i18n="subscribeBtn"></button>' +
-        '</div>' +
-        '<label class="subscribe-check"><input type="checkbox" name="consent" value="yes" required> <span data-i18n="subscribeConsent"></span></label>' +
-        '</form>' +
-        '<p id="subscribe-thanks" class="subscribe-thanks hidden" data-i18n="subscribeThanks"></p>' +
-        '<button type="button" id="subscribe-with-account" class="btn btn-outline btn-sm subscribe-account-btn hidden" data-i18n="subscribeWithAccount"></button>' +
-        '</div></section>';
+    var pm = document.getElementById('subscribe-popup-mount');
+    if (!pm) {
+      pm = document.createElement('div');
+      pm.id = 'subscribe-popup-mount';
+      document.body.appendChild(pm);
     }
-    const pm = document.getElementById('subscribe-popup-mount');
-    if (pm && !document.getElementById('subscribe-popup')) {
+    if (!document.getElementById('subscribe-popup')) {
       pm.innerHTML =
-        '<div id="subscribe-popup" class="subscribe-popup hidden" role="dialog">' +
+        '<div id="subscribe-popup" class="subscribe-popup" hidden role="dialog" aria-modal="true">' +
         '<div class="subscribe-popup-card">' +
-        '<button type="button" class="subscribe-popup-close" id="subscribe-popup-close">&times;</button>' +
-        '<div class="subscribe-icon">📖</div>' +
-        '<h3 data-i18n="popupTitle"></h3>' +
-        '<p data-i18n="popupText"></p>' +
+        '<button type="button" class="subscribe-popup-close" id="subscribe-popup-close" aria-label="Close">&times;</button>' +
+        '<div style="font-size:2rem;margin-bottom:0.3rem;">\uD83D\uDCD6</div>' +
+        '<h3 data-i18n="popupTitle">' + t('popupTitle') + '</h3>' +
+        '<p data-i18n="popupText" style="font-size:0.92rem;color:#666;margin:0.5rem 0 1rem;">' + t('popupText') + '</p>' +
         '<form id="subscribe-popup-form" action="https://formsubmit.co/info.seventhtrumpet@gmail.com" method="POST">' +
-        '<input type="hidden" name="_subject" value="New daily verse subscriber — Seventh Trumpet">' +
+        '<input type="hidden" name="_subject" value="New daily verse subscriber (popup)">' +
         '<input type="hidden" name="_captcha" value="false">' +
-        '<input type="hidden" name="_template" value="table">' +
-        '<input type="hidden" name="_next" value="https://www.seventhtrumpet.org/#subscribe">' +
+        '<input type="hidden" name="_next" value="https://seventhtrumpet.org/">' +
         '<input type="hidden" name="form_type" value="daily_verse_subscribe">' +
         '<input type="hidden" name="source" value="popup">' +
-        '<input type="email" name="email" id="popup-email" required data-i18n-placeholder="subscribeEmailPh" placeholder="you@email.com" autocomplete="email">' +
-        '<label class="subscribe-check"><input type="checkbox" name="consent" value="yes" required> <span data-i18n="subscribeConsent"></span></label>' +
-        '<button type="submit" class="btn btn-accent" style="width:100%;margin-top:0.6rem" data-i18n="subscribeBtn"></button>' +
+        '<input type="email" name="email" id="popup-email" required placeholder="you@email.com" autocomplete="email" style="width:100%;padding:0.65rem;margin-bottom:0.5rem;border:1px solid #ccc;border-radius:8px;direction:ltr;box-sizing:border-box;">' +
+        '<label style="display:flex;gap:0.4rem;font-size:0.85rem;text-align:start;margin-bottom:0.8rem;">' +
+        '<input type="checkbox" name="consent" value="yes" required> <span data-i18n="subscribeConsent">' + t('subscribeConsent') + '</span></label>' +
+        '<button type="submit" class="btn btn-primary" style="width:100%;padding:0.7rem;" data-i18n="popupSubscribe">' + t('popupSubscribe') + '</button>' +
         '</form>' +
-        '<button type="button" class="subscribe-popup-later" id="subscribe-popup-later" data-i18n="popupLater"></button>' +
+        '<button type="button" class="subscribe-popup-later" id="subscribe-popup-later" data-i18n="popupLater">' + t('popupLater') + '</button>' +
         '</div></div>';
     }
   }
 
-  function closePopup(permanent) {
-    const popup = document.getElementById('subscribe-popup');
-    if (popup) popup.classList.add('hidden');
-    try {
-      if (permanent) localStorage.setItem(SUB_POPUP_KEY, '1');
-      else sessionStorage.setItem(SUB_POPUP_KEY, '1');
-    } catch (e) {}
+  function openPopup() {
+    var popup = document.getElementById('subscribe-popup');
+    if (!popup) return;
+    popup.hidden = false;
+    popup.classList.add('is-open');
+    popup.classList.remove('hidden');
+    applyLabels();
   }
 
-  function syncAuthEmail() {
-    let user = null;
-    try {
-      if (typeof currentUser !== 'undefined' && currentUser) user = currentUser;
-      else if (typeof auth !== 'undefined' && auth.currentUser) user = auth.currentUser;
-    } catch (e) {}
-    const email = user && user.email ? user.email : '';
-    const mainInput = document.getElementById('subscribe-email');
-    const popupInput = document.getElementById('popup-email');
-    const accountBtn = document.getElementById('subscribe-with-account');
-    if (email) {
-      if (mainInput && !mainInput.value) mainInput.value = email;
-      if (popupInput && !popupInput.value) popupInput.value = email;
-      if (accountBtn && !isSubscribed()) accountBtn.classList.remove('hidden');
+  function closePopup() {
+    var popup = document.getElementById('subscribe-popup');
+    if (popup) {
+      popup.hidden = true;
+      popup.classList.remove('is-open');
+      popup.classList.add('hidden');
     }
+    markDismissedThisSession();
+  }
+
+  function schedulePopup() {
+    if (isSubscribed()) return;
+    if (wasDismissedThisSession()) return;
+    setTimeout(function () {
+      if (isSubscribed() || wasDismissedThisSession()) return;
+      openPopup();
+    }, 2500);
   }
 
   function init() {
     injectHTML();
     applyLabels();
-
-    const form = document.getElementById('subscribe-form');
-    const popupForm = document.getElementById('subscribe-popup-form');
-    const thanks = document.getElementById('subscribe-thanks');
-    const accountBtn = document.getElementById('subscribe-with-account');
-
-    [form, popupForm].forEach(f => {
-      if (!f) return;
-      f.addEventListener('submit', () => {
-        const emailInput = f.querySelector('input[type="email"]');
+    var popupForm = document.getElementById('subscribe-popup-form');
+    if (popupForm) {
+      popupForm.addEventListener('submit', function () {
+        var emailInput = popupForm.querySelector('input[type="email"]');
         markSubscribed(emailInput ? emailInput.value.trim() : '1');
-      });
-    });
-
-    if (accountBtn) {
-      accountBtn.addEventListener('click', () => {
-        let user = null;
-        try {
-          if (typeof currentUser !== 'undefined' && currentUser) user = currentUser;
-          else if (typeof auth !== 'undefined' && auth.currentUser) user = auth.currentUser;
-        } catch (e) {}
-        if (!user || !user.email || !form) return;
-        const mainInput = document.getElementById('subscribe-email');
-        const consent = form.querySelector('input[name="consent"]');
-        if (mainInput) mainInput.value = user.email;
-        if (consent) consent.checked = true;
-        const source = document.getElementById('sub-source');
-        if (source) source.value = 'signed_in_account';
-        form.requestSubmit();
+        closePopup();
       });
     }
-
-    try {
-      if (typeof auth !== 'undefined' && auth.onAuthStateChanged) {
-        auth.onAuthStateChanged(() => setTimeout(syncAuthEmail, 100));
-      }
-    } catch (e) {}
-    setTimeout(syncAuthEmail, 600);
-    setTimeout(syncAuthEmail, 2000);
-
-    if (isSubscribed()) {
-      if (thanks) thanks.classList.remove('hidden');
-      if (form) form.classList.add('hidden');
-      if (accountBtn) accountBtn.classList.add('hidden');
-    }
-
-    document.getElementById('lang-toggle')?.addEventListener('click', () => setTimeout(applyLabels, 80));
-
-    if (!isSubscribed()) {
-      try {
-        if (!localStorage.getItem(SUB_POPUP_KEY) && !sessionStorage.getItem(SUB_POPUP_KEY)) {
-          setTimeout(() => {
-            if (isSubscribed()) return;
-            const popup = document.getElementById('subscribe-popup');
-            if (popup) popup.classList.remove('hidden');
-          }, 4500);
-        }
-      } catch (e) {}
-    }
-    document.getElementById('subscribe-popup-close')?.addEventListener('click', () => closePopup(false));
-    document.getElementById('subscribe-popup-later')?.addEventListener('click', () => closePopup(false));
-    document.getElementById('subscribe-popup')?.addEventListener('click', (e) => {
-      if (e.target.id === 'subscribe-popup') closePopup(false);
+    var later = document.getElementById('subscribe-popup-later');
+    var closeBtn = document.getElementById('subscribe-popup-close');
+    var popup = document.getElementById('subscribe-popup');
+    if (later) later.addEventListener('click', function (e) { e.preventDefault(); closePopup(); });
+    if (closeBtn) closeBtn.addEventListener('click', function (e) { e.preventDefault(); closePopup(); });
+    if (popup) popup.addEventListener('click', function (e) { if (e.target === popup) closePopup(); });
+    document.getElementById('lang-toggle') && document.getElementById('lang-toggle').addEventListener('click', function () {
+      setTimeout(applyLabels, 80);
     });
+    schedulePopup();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(init, 80));
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 50); });
   } else {
-    setTimeout(init, 80);
+    setTimeout(init, 50);
   }
 })();
