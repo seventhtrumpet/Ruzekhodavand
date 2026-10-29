@@ -26,27 +26,171 @@
       <h2 style="margin-bottom:0.5rem;color:var(--primary)" data-i18n="loginTitle">ورود مدیر</h2>
       <form id="login-form">
         <input type="password" id="password" data-i18n-placeholder="passwordPlaceholder" placeholder="رمز عبور" required autocomplete="current-password">
-        <label style="display:flex;align-items:center;gap:0.5rem;margin:0.6rem 0 1rem;cursor:pointer;font-size:0.9rem;">
+        <label style="display:flex;align-items:center;gap:0.5rem;margin:0.6rem 0 1rem;font-size:0.9rem;cursor:pointer;user-select:none;">
           <input type="checkbox" id="show-password" style="width:auto;margin:0;">
           <span data-i18n="showPassword">نمایش رمز عبور</span>
         </label>
         <button type="submit" class="btn btn-primary" style="width:100%" data-i18n="loginBtn">ورود</button>
       </form>
-      <div id="status" class="status"></div>
+      <div id="status-msg" class="status-msg hidden" style="margin-top:1rem"></div>
     </div>
 
-    <div id="admin-panel" class="hidden">
-      <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+    <div id="admin-panel" class="admin-panel hidden">
+      <h1 style="margin-bottom:0.8rem;color:var(--primary)" data-i18n="panelTitle">پنل مدیریت</h1>
+
+      <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:0.8rem 1.2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.6rem;">
+        <span style="font-size:1.3rem;">👥</span>
         <div>
           <div style="font-size:0.85rem;color:#2e7d32;" data-i18n="visitorsLabel">بازدید کل سایت</div>
           <div style="font-size:1.3rem;font-weight:700;color:#1b5e20;" id="admin-visitor-count">…</div>
         </div>
-        <p style="font-size:0.8rem;color:#555;margin:0;max-width:280px;">Only counts real visitors. Your admin visits are removed when you log in.</p>
       </div>
 
-      <!-- rest of admin panel is loaded from previous structure via admin.js expectations -->
-      <div id="admin-panel-body">
-        <p style="color:var(--text-muted);font-size:0.9rem;">If the rest of the admin form is missing, hard-refresh. Full panel markup is restored below.</p>
+      <div id="status-msg" class="status-msg hidden"></div>
+
+      <div class="admin-tabs">
+        <button class="active" data-tab="tab-upload" data-i18n="tabUpload">آپلود / متن</button>
+        <button data-tab="tab-live" data-i18n="tabLive">پخش زنده</button>
+        <button data-tab="tab-manage" data-i18n="tabManage">مدیریت پست‌ها</button>
+        <button data-tab="tab-playlists" data-i18n="tabPlaylists">پلی‌لیست‌ها</button>
+        <button data-tab="tab-backup" data-i18n="tabBackup">پشتیبان</button>
+      </div>
+
+      <div id="tab-upload" class="admin-tab-content">
+        <form id="post-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="titleFa">عنوان فارسی (اختیاری)</label>
+              <input type="text" name="title_fa" data-i18n-placeholder="titleFaPh" placeholder="عنوان به فارسی">
+            </div>
+            <div class="form-group">
+              <label data-i18n="titleEn">عنوان انگلیسی (اختیاری)</label>
+              <input type="text" name="title_en" data-i18n-placeholder="titleEnPh" placeholder="Title in English">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="descFa">توضیحات فارسی (اختیاری)</label>
+              <textarea name="desc_fa" data-i18n-placeholder="descFaPh" placeholder="توضیحات کوتاه..."></textarea>
+            </div>
+            <div class="form-group">
+              <label data-i18n="descEn">توضیحات انگلیسی (اختیاری)</label>
+              <textarea name="desc_en" data-i18n-placeholder="descEnPh" placeholder="Short description..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="writingLabel">متن یا نوشته (می‌توانید اینجا پیست کنید)</label>
+            <textarea name="writing" id="writing-area" rows="8" data-i18n-placeholder="writingPh" placeholder="متن کامل، موعظه، مطالعه کتاب مقدس یا هر نوشته‌ای را اینجا وارد یا پیست کنید..." style="min-height:160px;font-size:1rem;line-height:1.7;"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="bibleBook">کتاب مقدس</label>
+              <select name="book" id="post-book" required></select>
+            </div>
+            <div class="form-group">
+              <label data-i18n="typeLabel">نوع</label>
+              <select name="type" id="post-type" required>
+                <option value="text">متن / نوشته</option>
+                <option value="photo">عکس</option>
+                <option value="video">ویدیو</option>
+                <option value="audio">صوت</option>
+                <option value="file">فایل</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="postDate">تاریخ</label>
+              <input type="date" name="postDate" id="post-date">
+            </div>
+            <div class="form-group">
+              <label data-i18n="postTime">ساعت</label>
+              <input type="time" name="postTime" id="post-time">
+            </div>
+          </div>
+
+          <div class="form-group" style="background:#fff8e1;padding:1rem;border-radius:10px;border:1px solid #ffe082;">
+            <label data-i18n="externalLabel" style="color:#e65100;font-weight:700;">لینک ویدیو یا فایل بزرگ</label>
+            <input type="url" name="externalUrl" id="external-url" data-i18n-placeholder="externalPh" placeholder="https://www.youtube.com/watch?v=...">
+            <p style="font-size:0.85rem;color:#bf360c;margin-top:0.4rem;" data-i18n="externalNote">برای ویدیوهای بزرگ: اول در یوتیوب آپلود کنید، بعد لینک را اینجا بگذارید.</p>
+          </div>
+
+          <div class="form-group" id="file-group">
+            <label data-i18n="fileLabel">فایل مستقیم (حداکثر ۱۲ مگابایت)</label>
+            <div class="upload-zone" id="upload-zone">
+              <input type="file" id="file-input" accept="image/*,video/*,audio/*,.pdf,.mp3,.wav,.m4a,.mp4,.mov">
+              <p id="file-label" data-i18n="dropFile">فایل را اینجا رها کنید یا کلیک کنید</p>
+              <p style="font-size:0.8rem;color:#888;margin-top:0.5rem" data-i18n="fileNote">حداکثر ۱۲ مگابایت. برای ویدیوهای بزرگ‌تر از لینک خارجی استفاده کنید.</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="plAddOnPublish">افزودن به پلی‌لیست (اختیاری)</label>
+            <select id="post-playlist" name="playlistId">
+              <option value="">—</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-accent" style="width:100%;padding:0.8rem;font-size:1rem" data-i18n="publish">انتشار</button>
+        </form>
+      </div>
+
+      <div id="tab-live" class="admin-tab-content hidden">
+        <div class="live-controls">
+          <p style="margin-bottom:0.8rem"><strong data-i18n="currentStatus">وضعیت فعلی:</strong> <span id="live-status">خاموش</span></p>
+          <button id="stop-live-btn" class="btn btn-outline hidden" style="color:#c62828;border-color:#c62828" data-i18n="stopLive">توقف پخش زنده</button>
+        </div>
+        <form id="live-form">
+          <div class="form-group">
+            <label data-i18n="liveTitleLabel">عنوان پخش زنده</label>
+            <input type="text" name="liveTitle" data-i18n-placeholder="liveTitlePh" placeholder="مثلاً: موعظه یکشنبه">
+          </div>
+          <div class="form-group">
+            <label data-i18n="streamUrlLabel">لینک پخش (یوتیوب و غیره)</label>
+            <input type="url" name="streamUrl" placeholder="https://www.youtube.com/watch?v=..." required>
+            <p style="font-size:0.8rem;color:#888;margin-top:0.3rem" data-i18n="streamNote">لینک یوتیوب لایو یا هر امبدی که پشتیبانی شود</p>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;padding:0.8rem" data-i18n="goLive">شروع پخش زنده</button>
+        </form>
+      </div>
+
+      <div id="tab-manage" class="admin-tab-content hidden">
+        <h3 style="margin-bottom:1rem" data-i18n="existingPosts">پست‌های موجود</h3>
+        <p style="font-size:0.9rem;color:#666;margin-bottom:1rem" data-i18n="manageNote">برای حذف هر پست روی دکمه حذف کلیک کنید.</p>
+        <div id="posts-list"></div>
+      </div>
+
+      <div id="tab-playlists" class="admin-tab-content hidden">
+        <h3 style="margin-bottom:1rem" data-i18n="playlistsTitle">پلی‌لیست‌ها</h3>
+        <p style="font-size:0.9rem;color:#666;margin-bottom:1rem" data-i18n="playlistsNote">پلی‌لیست با نام دلخواه بسازید و پست‌ها را به آن اضافه کنید.</p>
+        <form id="playlist-form" style="background:#f8f6f1;padding:1.2rem;border-radius:12px;margin-bottom:1.5rem;">
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="plNameFa">نام پلی‌لیست (فارسی)</label>
+              <input type="text" id="pl-name-fa" data-i18n-placeholder="plNameFaPh" placeholder="مثلاً: موعظه‌های مکاشفه">
+            </div>
+            <div class="form-group">
+              <label data-i18n="plNameEn">نام پلی‌لیست (انگلیسی)</label>
+              <input type="text" id="pl-name-en" data-i18n-placeholder="plNameEnPh" placeholder="e.g. Revelation sermons">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" data-i18n="plCreate">ساخت پلی‌لیست</button>
+        </form>
+        <div id="playlists-admin-list"></div>
+      </div>
+
+      <div id="tab-backup" class="admin-tab-content hidden">
+        <p style="margin-bottom:1rem;color:var(--text-muted)" data-i18n="backupNote">داده‌ها در مرورگر شما ذخیره می‌شوند. برای پشتیبان‌گیری یا انتقال به دستگاه دیگر از این بخش استفاده کنید.</p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+          <button id="export-btn" class="btn btn-primary" data-i18n="exportBtn">دانلود پشتیبان</button>
+          <button id="import-btn" class="btn btn-outline" data-i18n="importBtn">وارد کردن پشتیبان</button>
+          <input type="file" id="import-file" accept=".json" class="hidden">
+        </div>
+        <p style="margin-top:1.5rem;font-size:0.85rem;color:#888" data-i18n="importantNote">نکته مهم: برای ویدیوهای بزرگ حتماً از بخش «لینک ویدیو» استفاده کنید.</p>
       </div>
     </div>
   </main>
