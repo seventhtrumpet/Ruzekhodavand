@@ -1,9 +1,9 @@
 /* Seventh Trumpet profile logo */
 (function () {
-  // Prefer real file on the site (best for Google / social previews)
   var FILE = (location.origin || 'https://seventhtrumpet.org') + '/img/logo.jpg';
+  // Prefer embedded logo (always works), fall back to file if present
   var LOGO = (window.ST_LOGO && window.ST_LOGO.length > 200) ? window.ST_LOGO : FILE;
-  var FAV = (window.ST_FAV && window.ST_FAV.length > 100) ? window.ST_FAV : FILE;
+  var FAV = (window.ST_FAV && window.ST_FAV.length > 80) ? window.ST_FAV : LOGO;
 
   function boot() {
     var style = document.createElement('style');
@@ -15,7 +15,7 @@
       '@media(min-width:600px){.logo-img{width:2.9rem;height:2.9rem}}';
     document.head.appendChild(style);
 
-    // Favicon (what appears in browser tab + often in Google)
+    // Browser tab icon
     var links = document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"]');
     if (!links.length) {
       var l = document.createElement('link');
@@ -44,14 +44,10 @@
       img.width = 48;
       img.height = 48;
       img.decoding = 'async';
-      img.onerror = function () {
-        // fallback if img/ not uploaded yet
-        if (window.ST_LOGO) img.src = window.ST_LOGO;
-      };
       a.insertBefore(img, a.firstChild);
     });
 
-    // Search engines + WhatsApp / Telegram / Facebook previews
+    // Social / search preview (needs a real public URL when img/logo.jpg exists)
     function setMeta(attr, key, val) {
       var m = document.querySelector('meta[' + attr + '="' + key + '"]');
       if (!m) {
