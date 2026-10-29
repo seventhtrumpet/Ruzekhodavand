@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <meta name="description" content="Teachings — Three Angels Message | Seventh Trumpet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/menu.css">
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+  <title>آموزش‌ها | شیپور هفتم</title>
+</head>
+<body data-page="teachings">
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span data-i18n="siteName">شیپور هفتم</span></a>
+      <nav class="nav nav-main">
+        <a href="index.html" data-i18n="home" data-nav="home">خانه</a>
+        <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
+        <a href="bible.html" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
+        <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
+        <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
+      </nav>
+    </div>
+  </header>
+  <main class="container" style="padding-top:2rem;padding-bottom:3rem;max-width:720px;">
+    <h1 class="section-title" data-i18n="teachTitle">آموزش‌ها</h1>
+    <p data-i18n="teachIntro" style="margin-bottom:1.5rem;opacity:0.9;">یادداشت‌های کوتاه درباره پیام سه فرشته و انجیل جاودانی — به زبان خودمان.</p>
+    <article class="about-card" style="background:var(--card-bg,#fff);border-radius:14px;padding:1.4rem 1.3rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);line-height:1.85;margin-bottom:1.2rem;">
+      <h2 style="font-size:1.15rem;color:var(--primary);margin-bottom:0.6rem;" data-i18n="teach1Title">انجیل جاودانی برای همه قوم‌ها</h2>
+      <p data-i18n="teach1P1" style="margin-bottom:0.8rem;">مکاشفه ۱۴ از فرشته‌ای سخن می‌گوید که انجیل جاودانی را به هر امت و قبیله و زبان و قوم موعظه می‌کند. این پیام محدود به یک ملت نیست. خدا همه را به توبه و ایمان به عیسی مسیح دعوت می‌کند.</p>
+      <p data-i18n="teach1P2">«انجیل جاودانی» همان خبر خوش نجات به صلیب و قیام مسیح است — خبری که کهنه نمی‌شود و تا آمدن دوباره خداوند اعتبار دارد.</p>
+    </article>
+    <article class="about-card" style="background:var(--card-bg,#fff);border-radius:14px;padding:1.4rem 1.3rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);line-height:1.85;margin-bottom:1.2rem;">
+      <h2 style="font-size:1.15rem;color:var(--primary);margin-bottom:0.6rem;" data-i18n="teach2Title">فرشته اول: ترس از خدا و ساعت داوری</h2>
+      <p data-i18n="teach2P1" style="margin-bottom:0.8rem;">پیام اول ما را فرا می‌خواند از خدا بترسیم، او را جلال دهیم، و او را بپرستیم که آسمان و زمین را آفرید. «ترس از خدا» به معنای وحشت بی‌معنا نیست، بلکه احترام، اطاعت و جدی گرفتن کلام اوست.</p>
+      <p data-i18n="teach2P2">«ساعت داوری او رسیده است» یادآوری می‌کند که تاریخ بی‌هدف پیش نمی‌رود. هر کس در برابر خدا پاسخگو است؛ تنها پناهگاه ما عدالت مسیح است که به ایمان به ما داده می‌شود.</p>
+    </article>
+    <article class="about-card" style="background:var(--card-bg,#fff);border-radius:14px;padding:1.4rem 1.3rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);line-height:1.85;margin-bottom:1.2rem;">
+      <h2 style="font-size:1.15rem;color:var(--primary);margin-bottom:0.6rem;" data-i18n="teach3Title">فرشته دوم: سقوط بابل</h2>
+      <p data-i18n="teach3P1" style="margin-bottom:0.8rem;">بابل در کتاب مقدس نماد آشفتگی مذهبی و سیستم‌هایی است که انسان را به جای حقیقت کامل خدا می‌نشانند. پیام دوم هشدار می‌دهد که این سیستم‌ها در نظر خدا محکوم شده‌اند.</p>
+      <p data-i18n="teach3P2">دعوت این است که به کلام خدا وفادار بمانیم و از تعالیمی که انجیل را تحریف می‌کنند دوری کنیم — با محبت، نه با غرور.</p>
+    </article>
+    <article class="about-card" style="background:var(--card-bg,#fff);border-radius:14px;padding:1.4rem 1.3rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);line-height:1.85;margin-bottom:1.2rem;">
+      <h2 style="font-size:1.15rem;color:var(--primary);margin-bottom:0.6rem;" data-i18n="teach4Title">فرشته سوم: هشدار نهایی و صبر مقدسین</h2>
+      <p data-i18n="teach4P1" style="margin-bottom:0.8rem;">پیام سوم جدی‌ترین هشدار کتاب مقدس را درباره پرستش وحش و تصویرش بیان می‌کند. در عین حال، آیات پایانی از کسانی یاد می‌کنند که احکام خدا و ایمان به عیسی را نگاه می‌دارند.</p>
+      <p data-i18n="teach4P2">صبر مقدسین به معنای ایستادگی با امید است: نه با ترس انسان، بلکه با اعتماد به بره خدا که ما را خرید.</p>
+    </article>
+    <article class="about-card" style="background:var(--card-bg,#fff);border-radius:14px;padding:1.4rem 1.3rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);line-height:1.85;margin-bottom:1.2rem;">
+      <h2 style="font-size:1.15rem;color:var(--primary);margin-bottom:0.6rem;" data-i18n="teach5Title">چگونه پاسخ دهیم</h2>
+      <p data-i18n="teach5P1" style="margin-bottom:0.8rem;">کتاب مقدس را بخوانید، دعا کنید، و به عیسی به‌عنوان نجات‌دهنده و خداوند اعتماد کنید. پیام سه فرشته ما را از انجیل جدا نمی‌کند؛ آن را در زمان آخر با وضوح اعلام می‌کند.</p>
+      <p data-i18n="teach5P2">در این سایت می‌توانید کتاب مقدس را بخوانید، رسانه‌ها را ببینید، و سوال بپرسید. خدا شما را برکت دهد.</p>
+    </article>
+    <div style="display:flex;flex-wrap:wrap;gap:0.7rem;margin-top:0.5rem;">
+      <a class="btn btn-primary" href="bible.html" data-i18n="bibleNav">کتاب مقدس</a>
+      <a class="btn btn-outline" href="media.html" data-i18n="media">رسانه‌ها</a>
+      <a class="btn btn-outline" href="angel.html?n=1" data-i18n="angel1">فرشته اول</a>
+    </div>
+  </main>
+  <footer class="footer">
+    <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه ۱۴</p>
+    <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7" data-i18n="footerSub">شیپور هفتم · مکاشفه ۱۴:۶–۱۲</p>
+  </footer>
+  <script src="js/app.js"></script>
+  <script src="js/app_core.js"></script>
+  <script src="js/i18n_extra.js"></script>
+  <script src="js/legal_i18n.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/footer_legal.js"></script>
+  <script src="js/enhancements.js"></script>
+</body>
+</html>
