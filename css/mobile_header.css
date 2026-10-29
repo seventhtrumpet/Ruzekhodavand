@@ -1,0 +1,19 @@
+/* Force phone header to look mobile, not desktop-stacked */
+@media (max-width: 900px) {
+  .header-inner {
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+  }
+  .nav.nav-main {
+    width: auto !important;
+    flex-wrap: nowrap !important;
+  }
+  .nav.nav-main > a:not(.lang-toggle),
+  .nav-main a[data-nav] {
+    display: none !important;
+  }
+  .menu-btn {
+    display: flex !important;
+  }
+}
