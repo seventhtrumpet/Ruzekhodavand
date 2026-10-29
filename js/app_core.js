@@ -113,14 +113,7 @@ function saveProgress(postId, time) {
 }
 
 function loadVisitorCount() {
-  const KEY = 'cog_visitor_count';
-  const ADMIN_SKIP = 'cog_admin_skip_visit';
   try {
-    if (sessionStorage.getItem('cog_visit_session')) return;
-    if (localStorage.getItem(ADMIN_SKIP) === '1') return;
-    let n = parseInt(localStorage.getItem(KEY) || '0', 10) || 0;
-    n += 1;
-    localStorage.setItem(KEY, String(n));
-    sessionStorage.setItem('cog_visit_session', '1');
-  } catch {}
+    if (typeof window.recordSiteVisit === 'function') window.recordSiteVisit();
+  } catch (e) {}
 }
