@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <meta name="description" content="Terms of Use — Seventh Trumpet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/menu.css">
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+  <title>شرایط استفاده | شیپور هفتم</title>
+</head>
+<body data-page="terms">
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span data-i18n="siteName">شیپور هفتم</span></a>
+      <nav class="nav nav-main">
+        <a href="index.html" data-i18n="home" data-nav="home">خانه</a>
+        <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
+        <a href="bible.html" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
+        <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
+        <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
+      </nav>
+    </div>
+  </header>
+  <main class="container legal-page" style="padding-top:2rem;padding-bottom:3rem;max-width:720px;">
+    <h1 class="section-title" data-i18n="termsTitle">شرایط استفاده</h1>
+    <div class="about-card" style="background:var(--card-bg,#fff);border-radius:14px;padding:1.5rem 1.35rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);line-height:1.85;">
+      <p data-i18n="termsUpdated" style="font-size:0.9rem;opacity:0.75;margin-bottom:1rem;">آخرین به‌روزرسانی: ۲۹ اکتبر ۲۰۲۶</p>
+      <p data-i18n="termsIntro" style="margin-bottom:1rem;">با استفاده از seventhtrumpet.org («سایت») این شرایط را می‌پذیرید. اگر موافق نیستید، لطفاً از سایت استفاده نکنید.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="termsPurpose">هدف سایت</h2>
+      <p data-i18n="termsPurposeT" style="margin-bottom:1rem;">سایت برای اشتراک پیام انجیل، پیام سه فرشته (مکاشفه ۱۴)، کتاب مقدس، و رسانه‌های آموزشی به فارسی و انگلیسی است.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="termsUse">استفاده مجاز</h2>
+      <p data-i18n="termsUseT" style="margin-bottom:1rem;">می‌توانید محتوا را برای مطالعه شخصی و رشد معنوی مشاهده و دانلود کنید، در جایی که سایت اجازه می‌دهد. سوءاستفاده، هک، اسپم، یا بارگذاری محتوای غیرقانونی یا توهین‌آمیز ممنوع است.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="termsContent">محتوا</h2>
+      <p data-i18n="termsContentT" style="margin-bottom:1rem;">متن کتاب مقدس و رسانه‌های منتشرشده ممکن است دارای حقوق مربوط به ترجمه یا سازنده باشند. محتوای اصلی شیپور هفتم برای استفاده غیرتجاری شخصی آزاد است مگر خلاف آن نوشته شده باشد. نام و نشان سایت را بدون اجازه برای گمراه‌کردن دیگران به کار نبرید.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="termsAccounts">حساب‌ها</h2>
+      <p data-i18n="termsAccountsT" style="margin-bottom:1rem;">ورود اختیاری است. مسئول حفظ امنیت حساب خود هستید. ما می‌توانیم دسترسی را در صورت سوءاستفاده قطع کنیم.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="termsDisclaimer">سلب مسئولیت</h2>
+      <p data-i18n="termsDisclaimerT" style="margin-bottom:1rem;">محتوا برای آموزش و تشویق ایمانی ارائه می‌شود. سایت «همان‌گونه که هست» ارائه می‌شود. ما تضمین نمی‌کنیم که همیشه بدون خطا یا بدون قطعی باشد.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="termsLinks">پیوندهای بیرونی</h2>
+      <p data-i18n="termsLinksT" style="margin-bottom:1rem;">سایت ممکن است به یوتیوب، شبکه‌های اجتماعی یا سایت‌های دیگر پیوند دهد. ما مسئول محتوای آن‌ها نیستیم.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="termsChanges">تغییرات</h2>
+      <p data-i18n="termsChangesT" style="margin-bottom:1rem;">ممکن است این شرایط را به‌روز کنیم. تاریخ بالا نشان‌دهنده آخرین تغییر است. ادامه استفاده به معنای پذیرش نسخه جدید است.</p>
+      <h2 style="font-size:1.1rem;color:var(--primary);margin:1.2rem 0 0.5rem;" data-i18n="termsContact">تماس</h2>
+      <p data-i18n="termsContactT">info.seventhtrumpet@gmail.com · seventh.trumpet@yahoo.com</p>
+    </div>
+  </main>
+  <footer class="footer">
+    <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه ۱۴</p>
+    <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7" data-i18n="footerSub">شیپور هفتم · مکاشفه ۱۴:۶–۱۲</p>
+  </footer>
+  <script src="js/app.js"></script>
+  <script src="js/app_core.js"></script>
+  <script src="js/i18n_extra.js"></script>
+  <script src="js/legal_i18n.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/footer_legal.js"></script>
+  <script src="js/enhancements.js"></script>
+</body>
+</html>
