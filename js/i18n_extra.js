@@ -29,7 +29,9 @@
       socialFollow: '\u0634\u0628\u06a9\u0647\u200c\u0647\u0627\u06cc \u0627\u062c\u062a\u0645\u0627\u0639\u06cc',
       sponsors: '\u062d\u0627\u0645\u06cc\u0627\u0646',
       sponsorsTitle: '\u062d\u0627\u0645\u06cc\u0627\u0646',
-      contactTitle: '\u062a\u0645\u0627\u0633 \u0628\u0627 \u0645\u0627'
+      contactTitle: '\u062a\u0645\u0627\u0633 \u0628\u0627 \u0645\u0627',
+      featuresHeading: '\u0627\u0645\u06a9\u0627\u0646\u0627\u062a \u0633\u0627\u06cc\u062a',
+      teachingsNav: '\u0622\u0645\u0648\u0632\u0634\u200c\u0647\u0627'
     },
     en: {
       pageTitle: 'Seventh Trumpet \u2014 Three Angels Message',
@@ -58,7 +60,9 @@
       socialFollow: 'Follow us',
       sponsors: 'Sponsors',
       sponsorsTitle: 'Sponsors',
-      contactTitle: 'Contact us'
+      contactTitle: 'Contact us',
+      featuresHeading: 'What you can do here',
+      teachingsNav: 'Teachings'
     }
   };
   Object.assign(T.fa, extra.fa);
