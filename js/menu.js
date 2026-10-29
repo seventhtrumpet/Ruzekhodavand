@@ -157,6 +157,15 @@
   } catch (e) {}
 
   try {
+    if (!document.querySelector('script[data-site-logo]')) {
+      var sl = document.createElement('script');
+      sl.src = 'js/site_logo.js';
+      sl.setAttribute('data-site-logo', '1');
+      document.body.appendChild(sl);
+    }
+  } catch (e) {}
+
+  try {
     if (!document.querySelector('script[data-visits]')) {
       var vs = document.createElement('script');
       vs.src = 'js/visits.js';
