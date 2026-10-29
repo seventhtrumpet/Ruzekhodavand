@@ -11,25 +11,25 @@
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-label', 'Logo');
     overlay.style.cssText =
-      'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.88);' +
-      'display:flex;align-items:center;justify-content:center;padding:1.2rem;' +
+      'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.9);' +
+      'display:flex;align-items:center;justify-content:center;padding:0.8rem;' +
       'cursor:pointer;-webkit-tap-highlight-color:transparent;';
 
     var img = document.createElement('img');
     img.src = src;
     img.alt = 'Seventh Trumpet';
     img.style.cssText =
-      'max-width:min(92vw,420px);max-height:85vh;border-radius:50%;' +
-      'border:3px solid rgba(201,162,39,.95);box-shadow:0 12px 40px rgba(0,0,0,.5);' +
-      'object-fit:cover;background:#0a2540;';
+      'width:min(96vw,560px);height:auto;aspect-ratio:1;border-radius:50%;' +
+      'border:4px solid rgba(201,162,39,.95);box-shadow:0 16px 48px rgba(0,0,0,.55);' +
+      'object-fit:cover;background:#0a2540;max-height:90vh;';
 
     var close = document.createElement('button');
     close.type = 'button';
     close.setAttribute('aria-label', 'Close');
     close.textContent = '\u00d7';
     close.style.cssText =
-      'position:absolute;top:12px;right:14px;width:44px;height:44px;border:0;' +
-      'border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:1.6rem;' +
+      'position:absolute;top:12px;right:14px;width:48px;height:48px;border:0;' +
+      'border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:1.8rem;' +
       'line-height:1;cursor:pointer;';
 
     function dismiss() {
