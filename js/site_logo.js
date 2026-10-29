@@ -1,15 +1,9 @@
 /* Seventh Trumpet profile logo */
 (function () {
-  // Prefer embedded data (logo_data.js), then local file, then external
-  var LOGO = (window.ST_LOGO && window.ST_LOGO.length > 100)
-    ? window.ST_LOGO
-    : 'img/logo.jpg';
-  var FAV = (window.ST_FAV && window.ST_FAV.length > 50)
-    ? window.ST_FAV
-    : (window.ST_LOGO && window.ST_LOGO.length > 100 ? window.ST_LOGO : 'img/favicon.jpg');
-
-  // Absolute URL for social / Open Graph (works after deploy)
-  var OG_URL = (location.origin || 'https://seventhtrumpet.org') + '/img/logo.jpg';
+  // Prefer real file on the site (best for Google / social previews)
+  var FILE = (location.origin || 'https://seventhtrumpet.org') + '/img/logo.jpg';
+  var LOGO = (window.ST_LOGO && window.ST_LOGO.length > 200) ? window.ST_LOGO : FILE;
+  var FAV = (window.ST_FAV && window.ST_FAV.length > 100) ? window.ST_FAV : FILE;
 
   function boot() {
     var style = document.createElement('style');
@@ -21,7 +15,7 @@
       '@media(min-width:600px){.logo-img{width:2.9rem;height:2.9rem}}';
     document.head.appendChild(style);
 
-    // Favicon
+    // Favicon (what appears in browser tab + often in Google)
     var links = document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"]');
     if (!links.length) {
       var l = document.createElement('link');
@@ -40,7 +34,7 @@
     }
     apple.href = LOGO;
 
-    // Header logo image
+    // Header circle logo
     document.querySelectorAll('a.logo').forEach(function (a) {
       if (a.querySelector('img.logo-img')) return;
       var img = document.createElement('img');
@@ -50,25 +44,28 @@
       img.width = 48;
       img.height = 48;
       img.decoding = 'async';
+      img.onerror = function () {
+        // fallback if img/ not uploaded yet
+        if (window.ST_LOGO) img.src = window.ST_LOGO;
+      };
       a.insertBefore(img, a.firstChild);
     });
 
-    // Open Graph / social share image
-    var og = document.querySelector('meta[property="og:image"]');
-    if (!og) {
-      og = document.createElement('meta');
-      og.setAttribute('property', 'og:image');
-      document.head.appendChild(og);
+    // Search engines + WhatsApp / Telegram / Facebook previews
+    function setMeta(attr, key, val) {
+      var m = document.querySelector('meta[' + attr + '="' + key + '"]');
+      if (!m) {
+        m = document.createElement('meta');
+        m.setAttribute(attr, key);
+        document.head.appendChild(m);
+      }
+      m.setAttribute('content', val);
     }
-    og.setAttribute('content', OG_URL);
-
-    var tw = document.querySelector('meta[name="twitter:image"]');
-    if (!tw) {
-      tw = document.createElement('meta');
-      tw.setAttribute('name', 'twitter:image');
-      document.head.appendChild(tw);
-    }
-    tw.setAttribute('content', OG_URL);
+    setMeta('property', 'og:image', FILE);
+    setMeta('property', 'og:image:width', '512');
+    setMeta('property', 'og:image:height', '512');
+    setMeta('name', 'twitter:image', FILE);
+    setMeta('name', 'twitter:card', 'summary');
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
