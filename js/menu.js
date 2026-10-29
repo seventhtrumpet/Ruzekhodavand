@@ -7,22 +7,22 @@
   function labels() {
     const fa = getLang() === 'fa';
     return {
-      title: fa ? 'شیپور هفتم' : 'Seventh Trumpet',
-      questions: fa ? 'سوالات' : 'Questions',
-      feedback: fa ? 'بازخورد' : 'Feedback',
-      admin: fa ? 'مدیریت' : 'Admin',
-      theme: fa ? 'حالت شب / روز' : 'Dark / Light mode',
-      playlists: fa ? 'پلی‌لیست‌ها' : 'Playlists',
-      subscribe: fa ? 'آیه روزانه' : 'Daily verse',
-      contact: fa ? 'تماس' : 'Contact',
-      about: fa ? 'درباره ما' : 'About',
-      sponsors: fa ? 'حامیان' : 'Sponsors'
+      title: fa ? '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645' : 'Seventh Trumpet',
+      questions: fa ? '\u0633\u0648\u0627\u0644\u0627\u062a' : 'Questions',
+      feedback: fa ? '\u0628\u0627\u0632\u062e\u0648\u0631\u062f' : 'Feedback',
+      admin: fa ? '\u0645\u062f\u06cc\u0631\u06cc\u062a' : 'Admin',
+      theme: fa ? '\u062d\u0627\u0644\u062a \u0634\u0628 / \u0631\u0648\u0632' : 'Dark / Light mode',
+      playlists: fa ? '\u067e\u0644\u06cc\u200c\u0644\u06cc\u0633\u062a\u200c\u0647\u0627' : 'Playlists',
+      subscribe: fa ? '\u0622\u06cc\u0647 \u0631\u0648\u0632\u0627\u0646\u0647' : 'Daily verse',
+      contact: fa ? '\u062a\u0645\u0627\u0633' : 'Contact',
+      about: fa ? '\u062f\u0631\u0628\u0627\u0631\u0647 \u0645\u0627' : 'About',
+      sponsors: fa ? '\u062d\u0627\u0645\u06cc\u0627\u0646' : 'Sponsors'
     };
   }
   function applyThemeIcon(theme) {
     const icon = document.getElementById('theme-icon');
     const btn = document.getElementById('theme-toggle');
-    const emoji = theme === 'dark' ? '☀️' : '🌙';
+    const emoji = theme === 'dark' ? '\u2600\ufe0f' : '\ud83c\udf19';
     if (icon) icon.textContent = emoji;
     if (btn && btn.tagName === 'BUTTON' && !btn.querySelector('#theme-icon')) btn.textContent = emoji;
     document.body.classList.toggle('dark', theme === 'dark');
@@ -49,16 +49,40 @@
     const themeLabel = document.getElementById('theme-label');
     if (themeLabel) themeLabel.textContent = L.theme;
   }
+  window.updateSideMenuLang = refreshMenuLabels;
+
+  function placeToggleInHeader(btn) {
+    btn = btn || document.getElementById('menu-toggle');
+    if (!btn) return;
+    var headerInner = document.querySelector('.header .header-inner');
+    if (headerInner) {
+      var actions = headerInner.querySelector('.header-actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'header-actions';
+        headerInner.appendChild(actions);
+      }
+      if (btn.parentNode !== actions) actions.appendChild(btn);
+      btn.classList.remove('menu-toggle-fixed');
+    } else {
+      btn.classList.add('menu-toggle-fixed');
+      if (btn.parentNode !== document.body) document.body.appendChild(btn);
+    }
+  }
+
   function ensureMenu() {
-    if (document.getElementById('side-menu')) return;
+    if (document.getElementById('side-menu')) {
+      placeToggleInHeader();
+      return;
+    }
     const L = labels();
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.id = 'menu-toggle';
     btn.className = 'menu-toggle';
     btn.setAttribute('aria-label', 'Menu');
+    btn.setAttribute('aria-expanded', 'false');
     btn.innerHTML = '<span class="menu-bar"></span><span class="menu-bar"></span><span class="menu-bar"></span>';
-    document.body.appendChild(btn);
 
     const overlay = document.createElement('div');
     overlay.id = 'menu-overlay';
@@ -81,9 +105,11 @@
       '<a id="menu-link-contact" href="contact.html">' + L.contact + '</a>' +
       '<a id="menu-link-sponsors" href="sponsors.html">' + L.sponsors + '</a>' +
       '<a id="menu-link-admin" href="admin.html">' + L.admin + '</a>' +
-      '<button type="button" id="theme-toggle" class="theme-toggle-btn"><span id="theme-icon">🌙</span> <span id="theme-label">' + L.theme + '</span></button>' +
+      '<button type="button" id="theme-toggle" class="theme-toggle-btn"><span id="theme-icon">\ud83c\udf19</span> <span id="theme-label">' + L.theme + '</span></button>' +
       '</nav>';
     document.body.appendChild(panel);
+
+    placeToggleInHeader(btn);
 
     function openMenu() {
       panel.classList.add('open');
