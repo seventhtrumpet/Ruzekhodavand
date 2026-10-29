@@ -1,0 +1,101 @@
+/* Home feature blocks */
+.features-section {
+  padding: 1.5rem 1rem 0.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.features-heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+@media (min-width: 560px) {
+  .features-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .feature-card--bible {
+    grid-column: 1 / -1;
+  }
+}
+.feature-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.feature-card:hover,
+.feature-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(10, 37, 64, 0.12);
+  border-color: rgba(201, 162, 39, 0.55);
+  outline: none;
+}
+.feature-card--bible {
+  border-color: rgba(201, 162, 39, 0.65);
+  background: linear-gradient(135deg, #fffdf6 0%, var(--bg-card) 55%);
+}
+body.dark .feature-card--bible {
+  background: linear-gradient(135deg, #252218 0%, var(--bg-card) 60%);
+}
+.feature-icon {
+  font-size: 1.65rem;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 2.4rem;
+  height: 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 37, 64, 0.06);
+  border-radius: 10px;
+}
+body.dark .feature-icon {
+  background: rgba(255, 255, 255, 0.06);
+}
+.feature-card--bible .feature-icon {
+  background: rgba(201, 162, 39, 0.18);
+}
+.feature-body {
+  flex: 1;
+  min-width: 0;
+}
+.feature-title {
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+.feature-detail {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+.feature-arrow {
+  flex-shrink: 0;
+  color: var(--accent);
+  font-size: 1.4rem;
+  font-weight: 700;
+  align-self: center;
+  opacity: 0.85;
+}
+body.lang-en .feature-arrow {
+  transform: none;
+}
+body:not(.lang-en) .feature-arrow {
+  transform: scaleX(-1);
+}
