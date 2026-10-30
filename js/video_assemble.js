@@ -1,8 +1,8 @@
 (function(){
   function go(){
     var parts=window.ST_VID_PARTS||[];
-    if(parts.length<5) return;
-    for(var i=0;i<5;i++) if(!parts[i]) return;
+    if(parts.length<10) return;
+    for(var i=0;i<10;i++) if(!parts[i]) return;
     try {
       var b64=parts.join('');
       var bin=atob(b64);
