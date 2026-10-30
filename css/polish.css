@@ -20,33 +20,53 @@ body {
 .btn-primary { box-shadow: 0 4px 14px rgba(10, 37, 64, 0.18); }
 .btn-primary:hover { box-shadow: 0 6px 20px rgba(10, 37, 64, 0.22); }
 
-/* Hero + muted video background */
+/* Hero + image background */
 .hero {
   padding-bottom: 3.25rem;
   position: relative;
   overflow: hidden;
+  min-height: 70vh;
 }
-.hero-bg-video {
+@media (min-width: 768px) {
+  .hero { min-height: 78vh; }
+}
+@media (min-width: 1100px) {
+  .hero { min-height: 85vh; }
+}
+.hero-bg-video,
+.hero-bg-image {
   position: absolute;
   inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
 }
-.hero-bg-video video {
+.hero-bg-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center;
+  object-position: center 20%;
   display: block;
-  filter: brightness(0.55) contrast(1.05);
+  filter: brightness(0.72) contrast(1.05);
 }
-.hero.has-video-bg::before {
+@media (max-width: 600px) {
+  .hero-bg-image img {
+    object-position: center 25%;
+    filter: brightness(0.68) contrast(1.06);
+  }
+}
+@media (min-width: 900px) {
+  .hero-bg-image img {
+    object-position: center 18%;
+  }
+}
+.hero.has-video-bg::before,
+.hero.has-image-bg::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(180deg, rgba(7, 26, 46, 0.55) 0%, rgba(10, 37, 64, 0.72) 55%, rgba(10, 37, 64, 0.88) 100%);
+  background: linear-gradient(180deg, rgba(7, 26, 46, 0.45) 0%, rgba(10, 37, 64, 0.55) 40%, rgba(10, 37, 64, 0.82) 100%);
   pointer-events: none;
 }
 .hero .hero-inner {
@@ -55,13 +75,14 @@ body {
 }
 .hero h1 {
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
 }
 .hero-sub {
   max-width: 36rem;
   margin-left: auto;
   margin-right: auto;
   opacity: 0.92;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
 }
 
 .daily-verse {
