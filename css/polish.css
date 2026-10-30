@@ -20,64 +20,64 @@ body {
 .btn-primary { box-shadow: 0 4px 14px rgba(10, 37, 64, 0.18); }
 .btn-primary:hover { box-shadow: 0 6px 20px rgba(10, 37, 64, 0.22); }
 
-/* Hero + image background (parallax) */
+/* Hero — full poster visible + parallax */
 .hero {
-  padding-bottom: 2.5rem;
+  padding-bottom: 2rem;
   position: relative;
   overflow: hidden;
+  /* Tall enough so the full portrait poster can fit */
   min-height: 100vh;
   min-height: 100dvh;
+  background: #050a14;
 }
 @media (min-width: 768px) {
-  .hero { min-height: 90vh; }
+  .hero {
+    min-height: 100vh;
+  }
 }
 .hero-bg-video,
 .hero-bg-image {
   position: absolute;
-  inset: -12% 0 -12% 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
   will-change: transform;
+  background: #050a14;
 }
 .hero-bg-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* Show the ENTIRE photo — no cropping */
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
   display: block;
-  /* brighter = less "transparent" / washed look */
-  filter: brightness(0.92) contrast(1.08) saturate(1.05);
-  will-change: transform;
-  transform: scale(1.12);
+  filter: brightness(0.98) contrast(1.06) saturate(1.05);
+  transform: translate(-50%, -50%);
   transform-origin: center center;
+  will-change: transform;
 }
-/* Mobile: show more of the poster (angels + earth), less crop */
+/* Mobile: use almost full viewport height so poster fits */
 @media (max-width: 700px) {
   .hero {
     min-height: 100vh;
     min-height: 100dvh;
   }
-  .hero-bg-image {
-    inset: -8% 0 -8% 0;
-  }
   .hero-bg-image img {
-    object-fit: cover;
-    object-position: center 30%;
-    filter: brightness(0.95) contrast(1.08) saturate(1.06);
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
   }
 }
-@media (min-width: 701px) and (max-width: 1024px) {
-  .hero-bg-image img {
-    object-position: center 22%;
-  }
-}
-@media (min-width: 1025px) {
-  .hero-bg-image img {
-    object-position: center 18%;
-  }
-}
-/* Lighter overlay so the photo is clearer */
+/* Lighter overlay — photo stays clear */
 .hero.has-video-bg::before,
 .hero.has-image-bg::before {
   content: '';
@@ -86,28 +86,28 @@ body {
   z-index: 1;
   background: linear-gradient(
     180deg,
-    rgba(7, 26, 46, 0.18) 0%,
-    rgba(10, 37, 64, 0.28) 45%,
-    rgba(10, 37, 64, 0.55) 100%
+    rgba(5, 10, 20, 0.12) 0%,
+    rgba(10, 37, 64, 0.22) 50%,
+    rgba(10, 37, 64, 0.5) 100%
   );
   pointer-events: none;
 }
 .hero .hero-inner {
   position: relative;
   z-index: 2;
-  padding-top: 1.5rem;
+  padding-top: 1.25rem;
   padding-bottom: 1.5rem;
 }
 .hero h1 {
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55), 0 0 40px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.65), 0 0 40px rgba(0, 0, 0, 0.3);
 }
 .hero-sub {
   max-width: 36rem;
   margin-left: auto;
   margin-right: auto;
   opacity: 0.95;
-  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
 }
 
 .daily-verse {
