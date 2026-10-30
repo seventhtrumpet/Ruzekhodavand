@@ -13,6 +13,51 @@ body {
 .logo { letter-spacing: 0.01em; }
 .logo:hover { opacity: 0.92; }
 
+/* Social icons next to profile / logo */
+.header-social {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  margin-inline-start: 0.35rem;
+  margin-inline-end: auto;
+}
+.header-social a {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.header-social a:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+.header-social a svg {
+  width: 1rem;
+  height: 1rem;
+}
+@media (max-width: 520px) {
+  .header-social a {
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+  .header-social {
+    gap: 0.25rem;
+  }
+}
+/* On very small screens keep 5 icons but slightly tighter */
+@media (max-width: 380px) {
+  .header-social a:nth-child(n+5) {
+    display: none;
+  }
+}
+
 .btn {
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
@@ -20,7 +65,7 @@ body {
 .btn-primary { box-shadow: 0 4px 14px rgba(10, 37, 64, 0.18); }
 .btn-primary:hover { box-shadow: 0 6px 20px rgba(10, 37, 64, 0.22); }
 
-/* Fixed background — stays while content scrolls */
+/* Fixed background */
 .hero-bg-image {
   position: fixed !important;
   inset: 0;
@@ -66,7 +111,6 @@ body {
   background: transparent !important;
   overflow: hidden;
 }
-/* Kill any leftover overlays from base CSS */
 .hero::before,
 .hero.has-image-bg::before,
 .hero.has-video-bg::before {
@@ -79,9 +123,54 @@ body {
   z-index: 2;
   padding-top: 1.25rem;
   padding-bottom: 1.5rem;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* Readable text on bright photo — no blue wash, only soft text shadow */
+/* Desktop: more comfortable spacing */
+@media (min-width: 900px) {
+  .header .header-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+  .hero {
+    min-height: 92vh;
+    padding-top: 0.5rem;
+  }
+  .hero .hero-inner {
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 3.5vw, 3rem);
+  }
+  .angels-row {
+    max-width: 720px !important;
+    gap: 1rem !important;
+  }
+  .angels-row .angel-card {
+    max-width: 220px !important;
+    padding: 1.1rem 0.85rem !important;
+  }
+  .home-cta {
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+  .home-cta .btn {
+    min-width: 160px;
+    padding: 0.8rem 1.4rem;
+  }
+  .daily-verse-inner,
+  .mission-section {
+    max-width: 760px;
+  }
+  .container {
+    max-width: 1100px;
+  }
+}
+
 .hero h1 {
   letter-spacing: -0.02em;
   color: #fff !important;
@@ -101,7 +190,6 @@ body {
     0 2px 16px rgba(0, 0, 0, 0.65);
 }
 
-/* Angel cards — glass so they read on the photo */
 .angels-heading-title,
 .angels-heading-hint {
   color: #fff !important;
@@ -133,7 +221,6 @@ body {
   opacity: 0.95;
 }
 
-/* CTA buttons on hero */
 .home-cta .btn-primary {
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
 }
@@ -147,7 +234,6 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
-/* Content sections above fixed bg */
 .daily-verse,
 .mission-section,
 main.container,
@@ -239,7 +325,6 @@ body.dark {
 .media-card { border: 1px solid var(--border); }
 .lang-toggle { border-radius: 999px !important; font-weight: 700 !important; }
 
-/* Accessibility: less motion if user prefers */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .btn:hover,
@@ -248,13 +333,11 @@ body.dark {
   }
 }
 
-/* Selection color */
 ::selection {
   background: rgba(201, 162, 39, 0.35);
   color: inherit;
 }
 
-/* Focus visible for keyboard users */
 a:focus-visible,
 button:focus-visible {
   outline: 2px solid var(--accent, #c9a227);
