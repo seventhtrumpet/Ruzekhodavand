@@ -27,6 +27,17 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
   <title>خانه | شیپور هفتم</title>
   <meta name="description" content="Home — Seventh Trumpet — Three angels message, Revelation 14">
+  <script>
+    // Early language bootstrap — default Persian; sync before paint if possible
+    (function () {
+      try {
+        var L = localStorage.getItem('cog_lang');
+        if (L !== 'en' && L !== 'fa') { localStorage.setItem('cog_lang', 'fa'); L = 'fa'; }
+        document.documentElement.lang = L;
+        document.documentElement.dir = L === 'fa' ? 'rtl' : 'ltr';
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body data-page="home">
   <header class="header">
@@ -37,9 +48,12 @@
         <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
         <a href="bible.html" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
         <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
-        <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
         <span id="live-badge" class="live-badge hidden" data-i18n="liveBadge">زنده</span>
       </nav>
+      <div class="header-actions" style="display:flex;align-items:center;gap:0.4rem;margin-inline-start:auto;">
+        <button type="button" id="lang-toggle" class="lang-toggle" data-i18n="langBtn" data-lang-toggle="1"
+          onclick="if(window.__toggleLang){window.__toggleLang();}else if(window.toggleLanguage){window.toggleLanguage();}return false;">English</button>
+      </div>
     </div>
   </header>
   <div id="user-bar" style="background:#f0f4f8;padding:0.6rem 1rem;border-bottom:1px solid #dde3ea;font-size:0.9rem;">
