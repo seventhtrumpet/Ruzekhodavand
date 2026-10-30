@@ -1,133 +1,112 @@
-/* Force reliable Persian/English switching + feature tiles + sign-in */
+/* Bulletproof language switch — runs last, overrides everything */
 (function () {
-  var LANG_KEY = 'cog_lang';
+  var KEY = 'cog_lang';
 
-  function getLang() {
+  function read() {
     try {
-      if (typeof currentLang !== 'undefined' && (currentLang === 'fa' || currentLang === 'en')) {
-        return currentLang;
-      }
+      var s = localStorage.getItem(KEY);
+      if (s === 'en' || s === 'fa') return s;
     } catch (e) {}
     try {
-      var s = localStorage.getItem(LANG_KEY);
-      if (s === 'en' || s === 'fa') return s;
+      if (typeof currentLang === 'string' && (currentLang === 'en' || currentLang === 'fa')) return currentLang;
     } catch (e2) {}
     return 'fa';
   }
 
-  function setLang(lang) {
+  function write(lang) {
     lang = lang === 'en' ? 'en' : 'fa';
-    try { currentLang = lang; } catch (e) {}
-    try { localStorage.setItem(LANG_KEY, lang); } catch (e2) {}
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+    try { currentLang = lang; } catch (e2) {}
+    try { window.currentLang = lang; } catch (e3) {}
     return lang;
   }
 
-  function applyAll() {
-    var lang = setLang(getLang());
-    document.body.classList.toggle('lang-en', lang === 'en');
-    document.body.classList.toggle('lang-fa', lang === 'fa');
-    document.documentElement.lang = lang;
-    document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+  function dict(lang) {
+    if (typeof T !== 'undefined' && T && T[lang]) return T[lang];
+    return {};
+  }
 
-    var t = (typeof T !== 'undefined' && T[lang]) ? T[lang] : {};
+  function apply(lang) {
+    lang = write(lang);
+    var t = dict(lang);
+
+    document.documentElement.setAttribute('lang', lang);
+    document.documentElement.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+    document.body.classList.remove('lang-en', 'lang-fa');
+    document.body.classList.add(lang === 'en' ? 'lang-en' : 'lang-fa');
+
     if (t.pageTitle) document.title = t.pageTitle;
 
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
-      var key = el.getAttribute('data-i18n');
-      if (key && t[key] != null && String(t[key]).length) {
-        el.textContent = t[key];
-      }
+      var k = el.getAttribute('data-i18n');
+      if (k && t[k] != null && String(t[k]).length) el.textContent = t[k];
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
-      var key = el.getAttribute('data-i18n-placeholder');
-      if (key && t[key] != null) el.placeholder = t[key];
+      var k = el.getAttribute('data-i18n-placeholder');
+      if (k && t[k] != null) el.placeholder = t[k];
     });
     document.querySelectorAll('[data-lang-only]').forEach(function (el) {
-      el.style.display = (el.getAttribute('data-lang-only') === lang) ? '' : 'none';
+      el.style.display = el.getAttribute('data-lang-only') === lang ? '' : 'none';
     });
 
-    // Feature tiles (keep same cards, only update language)
+    // Lang button label: show the OTHER language name
+    var btn = document.getElementById('lang-toggle');
+    if (btn) {
+      btn.textContent = lang === 'fa' ? (t.langBtn || 'English') : (t.langBtn || 'Persian');
+      // Also hard-set in case T missing
+      if (!t.langBtn) btn.textContent = lang === 'fa' ? 'English' : '\u0641\u0627\u0631\u0633\u06CC';
+    }
+
     try {
       if (typeof window.renderFeaturesLang === 'function') window.renderFeaturesLang();
+    } catch (e) {}
+    try {
+      if (typeof applySignInLabels === 'function') applySignInLabels();
+    } catch (e2) {}
+    try {
+      if (typeof updateAuthUI === 'function') updateAuthUI();
     } catch (e3) {}
-
-    try { if (typeof applySignInLabels === 'function') applySignInLabels(); } catch (e4) {}
-    try { if (typeof updateAuthUI === 'function') updateAuthUI(); } catch (e5) {}
-    try { if (typeof updateLiveBadge === 'function') updateLiveBadge(); } catch (e6) {}
+    try {
+      if (typeof updateLiveBadge === 'function') updateLiveBadge();
+    } catch (e4) {}
     try {
       window.dispatchEvent(new CustomEvent('cog-lang-changed', { detail: { lang: lang } }));
-    } catch (e7) {}
+    } catch (e5) {}
   }
 
   function toggle() {
-    var next = getLang() === 'fa' ? 'en' : 'fa';
-    setLang(next);
-    applyAll();
+    var next = read() === 'en' ? 'fa' : 'en';
+    apply(next);
     try { if (typeof renderMedia === 'function') renderMedia(); } catch (e) {}
     try { if (typeof renderAll === 'function') renderAll(); } catch (e2) {}
   }
 
-  // Override global functions so every script uses this fixed version
-  window.applyLanguage = applyAll;
+  window.applyLanguage = function () { apply(read()); };
   window.toggleLanguage = toggle;
-  try {
-    applyLanguage = applyAll;
-    toggleLanguage = toggle;
-  } catch (e) {}
+  window.__toggleLang = toggle;
+  window.__setLang = apply;
+  window.__getLang = read;
 
-  function bindToggle() {
-    var btn = document.getElementById('lang-toggle');
-    if (!btn) return;
-    // Replace node to drop broken/duplicate listeners
-    var neu = btn.cloneNode(true);
-    btn.parentNode.replaceChild(neu, btn);
-    neu.id = 'lang-toggle';
-    neu.addEventListener('click', function (ev) {
-      ev.preventDefault();
-      ev.stopPropagation();
-      toggle();
-    });
-  }
-
-  function ensureSignIn() {
-    // Feature tile / any [data-open-signin] opens the modal
-    document.addEventListener('click', function (e) {
-      var a = e.target.closest('[data-open-signin], a[href="#signin"], a[href="index.html#user-bar"]');
-      if (!a) return;
-      e.preventDefault();
-      if (typeof openSignInModal === 'function') {
-        openSignInModal();
-        return;
-      }
-      var modal = document.getElementById('signin-modal');
-      if (modal) {
-        modal.classList.add('open');
-        return;
-      }
-      // Fallback: show classic user-bar + email modal path
-      var bar = document.getElementById('user-bar');
-      if (bar) {
-        bar.style.display = '';
-        bar.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      var emailBtn = document.getElementById('btn-email');
-      var googleBtn = document.getElementById('btn-google');
-      if (googleBtn) googleBtn.click();
-      else if (emailBtn) emailBtn.click();
+  function bind() {
+    // Bind every lang-toggle (in case clones exist)
+    document.querySelectorAll('#lang-toggle, [data-lang-toggle], button.lang-toggle').forEach(function (btn) {
+      if (btn._stLangBound) return;
+      btn._stLangBound = true;
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        toggle();
+      }, true); // capture so we win over other handlers
     });
   }
 
   function boot() {
-    // Default Persian if never set
-    try {
-      if (!localStorage.getItem(LANG_KEY)) localStorage.setItem(LANG_KEY, 'fa');
-    } catch (e) {}
-    bindToggle();
-    ensureSignIn();
-    // Apply after other i18n merges finish
-    setTimeout(applyAll, 0);
-    setTimeout(applyAll, 200);
-    setTimeout(applyAll, 600);
+    // If somehow stuck, still apply current preference
+    apply(read());
+    bind();
+    // Re-bind after late scripts inject UI
+    setTimeout(function () { bind(); apply(read()); }, 300);
+    setTimeout(function () { bind(); apply(read()); }, 1000);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
