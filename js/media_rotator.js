@@ -145,6 +145,7 @@
     var url = mediaUrl(p);
     var title = pickTitle(p) || typeLabel(kind);
     var text = pickText(p);
+    var hasVisual = false;
 
     card.classList.remove('is-visible');
     setTimeout(function () {
@@ -161,6 +162,7 @@
           img.alt = title;
           img.loading = 'lazy';
           mediaEl.appendChild(img);
+          hasVisual = true;
         }
       } else if (kind === 'image' && url && ((!url.startsWith('data:')) || (url.indexOf('data:image') === 0 && url.length < 200000))) {
         var im = document.createElement('img');
@@ -168,10 +170,20 @@
         im.alt = title;
         im.loading = 'lazy';
         mediaEl.appendChild(im);
+        hasVisual = true;
       } else if (kind === 'audio') {
         mediaEl.innerHTML = '<div class="media-rotator-audio-icon" aria-hidden="true">\u266a</div>';
+        hasVisual = true;
       } else if (kind === 'text') {
         mediaEl.innerHTML = '<div class="media-rotator-quote" aria-hidden="true">\u201c</div>';
+        hasVisual = true;
+      }
+
+      // Balanced layout: no empty half
+      if (hasVisual) {
+        card.classList.remove('no-media');
+      } else {
+        card.classList.add('no-media');
       }
 
       card.href = 'media.html';
@@ -193,6 +205,7 @@
     if (!items.length) {
       if (card) {
         card.classList.add('is-empty');
+        card.classList.add('no-media');
         typeEl.textContent = '';
         titleEl.textContent = lang() === 'fa' ? '\u0647\u0646\u0648\u0632 \u0631\u0633\u0627\u0646\u0647\u200c\u0627\u06cc \u0646\u06cc\u0633\u062a' : 'No media yet';
         textEl.textContent = lang() === 'fa' ? '\u067e\u0633 \u0627\u0632 \u0627\u0646\u062a\u0634\u0627\u0631 \u062f\u0631 \u0627\u062f\u0645\u06cc\u0646\u060c \u0627\u06cc\u0646\u062c\u0627 \u0646\u0645\u0627\u06cc\u0634 \u062f\u0627\u062f\u0647 \u0645\u06cc\u200c\u0634\u0648\u062f.' : 'Posts will appear here after you publish them.';
@@ -201,7 +214,9 @@
       }
       return;
     }
-    if (card) card.classList.remove('is-empty');
+    if (card) {
+      card.classList.remove('is-empty');
+    }
     order = shuffle(items.map(function (_, i) { return i; }));
     next();
     timer = setInterval(next, INTERVAL_MS);
