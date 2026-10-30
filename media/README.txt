@@ -1,6 +1,8 @@
-Put the muted intro video here as:
+Put the muted intro or hero background image here as:
 
-  media/intro-bg.mp4
+  media/hero-bg.jpg
 
-It will play as a silent looping background on the homepage hero.
-No audio is used (muted + volume 0).
+If this file is present, the homepage uses it as the permanent background.
+Otherwise the site uses the permanent hosted image.
+
+Recommended size: about 900–1200px wide, JPG, under 300 KB.
