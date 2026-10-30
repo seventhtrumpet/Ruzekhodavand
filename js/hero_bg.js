@@ -1,6 +1,8 @@
 /* Muted looping intro video behind hero — no sound */
 (function () {
-  var SRC = 'media/intro-bg.mp4';
+  // Temporary hosted muted video (until media/intro-bg.mp4 is in the repo)
+  var HOSTED = 'https://h.uguu.se/NvnoNbgl.mp4';
+  var LOCAL = 'media/intro-bg.mp4';
 
   function mount(url) {
     var hero = document.querySelector('section.hero');
@@ -23,7 +25,6 @@
     v.preload = 'auto';
     v.disablePictureInPicture = true;
     v.controls = false;
-    // Ensure no audio track plays even if file has sound
     v.addEventListener('play', function () {
       try { v.muted = true; v.volume = 0; } catch (e) {}
     });
@@ -35,6 +36,13 @@
       if (p && p.catch) p.catch(function () {});
     };
     v.addEventListener('loadeddata', play);
+    v.addEventListener('error', function () {
+      if (url !== LOCAL && window.ST_INTRO_VIDEO_URL) {
+        wrap.remove();
+        hero.classList.remove('has-video-bg');
+        mount(window.ST_INTRO_VIDEO_URL);
+      }
+    });
     play();
     document.addEventListener('visibilitychange', function () {
       if (!document.hidden) play();
@@ -46,15 +54,28 @@
       mount(window.ST_INTRO_VIDEO_URL);
       return;
     }
-    // Prefer site media file (muted)
+    // Prefer permanent local file if present
     var test = document.createElement('video');
     test.preload = 'metadata';
     test.muted = true;
-    test.src = SRC;
-    test.onloadeddata = function () { mount(SRC); };
-    test.onerror = function () {
-      // file not uploaded yet — keep hero gradient only
+    test.src = LOCAL;
+    var done = false;
+    test.onloadeddata = function () {
+      if (done) return;
+      done = true;
+      mount(LOCAL);
     };
+    test.onerror = function () {
+      if (done) return;
+      done = true;
+      mount(HOSTED);
+    };
+    setTimeout(function () {
+      if (!done) {
+        done = true;
+        mount(HOSTED);
+      }
+    }, 1500);
   }
 
   document.addEventListener('st-intro-ready', tryMount);
