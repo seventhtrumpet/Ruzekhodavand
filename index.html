@@ -21,14 +21,12 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/menu.css">
   <link rel="stylesheet" href="css/media_rotator.css">
-  <link rel="stylesheet" href="css/features.css">
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
   <title>خانه | شیپور هفتم</title>
   <meta name="description" content="Home — Seventh Trumpet — Three angels message, Revelation 14">
   <script>
-    // Early language bootstrap — default Persian; sync before paint if possible
     (function () {
       try {
         var L = localStorage.getItem('cog_lang');
@@ -56,26 +54,17 @@
       </div>
     </div>
   </header>
-  <div id="user-bar" style="background:#f0f4f8;padding:0.6rem 1rem;border-bottom:1px solid #dde3ea;font-size:0.9rem;">
-    <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.7rem;max-width:1200px;margin:0 auto;">
-      <div id="auth-logged-out" style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">
-        <span data-i18n="guestText">مهمان</span>
-        <button id="btn-google" class="btn btn-primary btn-sm" style="display:flex;align-items:center;gap:0.4rem;">
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16" height="16" alt="">
-          <span data-i18n="signInGoogle">ورود با گوگل</span>
-        </button>
-        <button id="btn-email" class="btn btn-outline btn-sm" data-i18n="signInEmail">ورود با ایمیل</button>
-      </div>
-      <div id="auth-logged-in" class="hidden" style="display:none;align-items:center;gap:0.7rem;flex-wrap:wrap;">
-        <span id="user-display"></span>
-        <button id="btn-signout" class="btn btn-outline btn-sm" data-i18n="signOut">خروج</button>
-      </div>
+
+  <div id="user-bar" style="display:none" aria-hidden="true">
+    <div id="auth-logged-out">
+      <button id="btn-google" type="button"></button>
+      <button id="btn-email" type="button"></button>
+    </div>
+    <div id="auth-logged-in" class="hidden">
+      <span id="user-display"></span>
+      <button id="btn-signout" type="button"></button>
     </div>
   </div>
-
-  <section class="features-section" id="features">
-    <div class="features-grid" id="features-grid"></div>
-  </section>
 
   <div id="email-modal" class="modal-overlay">
     <div class="modal" style="max-width:400px;">
@@ -90,8 +79,9 @@
       </div>
     </div>
   </div>
+
   <section class="hero">
-    <div class="hero-inner">
+    <div class="hero-inner" style="max-width:1100px;margin:0 auto;position:relative;z-index:1;">
       <div id="media-rotator" class="media-rotator" aria-live="polite">
         <div class="media-rotator-label" data-i18n="rotatorLabel">از رسانه‌ها</div>
         <a class="media-rotator-card" id="media-rotator-card" href="media.html">
@@ -104,8 +94,10 @@
         </a>
         <div class="media-rotator-dots" id="media-rotator-dots" aria-hidden="true"></div>
       </div>
-      <h1 data-i18n="heroTitle">شیپور هفتم</h1>
+
+      <h1 data-i18n="heroTitle" style="margin-top:0.5rem;">شیپور هفتم</h1>
       <p class="hero-sub" data-i18n="heroSub">پیام جاودانی انجیل برای تمام قوم‌ها، زبان‌ها و ملت‌ها</p>
+
       <div class="angels-row" role="navigation" aria-label="Three angels">
         <a class="angel-card" href="angel.html?n=1">
           <div class="angel-num">1</div>
@@ -123,8 +115,16 @@
           <div class="angel-text" data-i18n="angel3Short">هشدار وحش</div>
         </a>
       </div>
+
+      <div class="home-cta">
+        <a class="btn btn-primary" href="bible.html" data-i18n="bibleNav">کتاب مقدس</a>
+        <a class="btn btn-primary" href="media.html" data-i18n="media">رسانه‌ها</a>
+        <a class="btn btn-primary" href="live.html" data-i18n="live">پخش زنده</a>
+        <a class="btn btn-outline" href="about.html" data-i18n="about" style="color:#fff;border-color:rgba(255,255,255,.45);">درباره ما</a>
+      </div>
     </div>
   </section>
+
   <section class="daily-verse" id="daily-verse">
     <div class="daily-verse-inner">
       <div class="daily-verse-label" data-i18n="verseOfDay">آیه امروز</div>
@@ -134,20 +134,9 @@
     </div>
   </section>
 
-  <main class="container" style="padding-bottom:3rem;">
-    <div class="home-links" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-top:2rem;">
-      <a class="btn btn-primary" href="media.html" data-i18n="media">رسانه‌ها</a>
-      <a class="btn btn-primary" href="bible.html" data-i18n="bibleNav">کتاب مقدس</a>
-      <a class="btn btn-primary" href="teachings.html" data-i18n="teachingsNav">آموزش‌ها</a>
-      <a class="btn btn-outline" href="about.html" data-i18n="about">درباره ما</a>
-      <a class="btn btn-outline" href="questions.html" data-i18n="questionsNav">سوالات</a>
-      <a class="btn btn-outline" href="feedback.html" data-i18n="feedbackNav">بازخورد</a>
-      <a class="btn btn-outline" href="contact.html" data-i18n="contact">تماس</a>
-      <a class="btn btn-primary" href="live.html" data-i18n="live">پخش زنده</a>
-    </div>
-
-    <section id="home-contact" class="home-contact" style="margin-top:2.5rem;max-width:520px;margin-left:auto;margin-right:auto;">
-      <h2 class="section-title" style="font-size:1.35rem;" data-i18n="homeContactTitle">تماس با ما</h2>
+  <main class="container" style="padding-bottom:2.5rem;">
+    <section id="home-contact" class="home-contact">
+      <h2 class="section-title" style="font-size:1.2rem;justify-content:center;" data-i18n="homeContactTitle">تماس با ما</h2>
       <div class="contact-card" style="margin:0 auto;">
         <div class="contact-item"><span>📱</span><div><div data-i18n="whatsapp">واتساپ</div><a href="https://wa.me/442081333076" target="_blank" rel="noopener" dir="ltr" class="num-ltr">+44 208 133 3076</a></div></div>
         <div class="contact-item"><span>📞</span><div><div data-i18n="phone">تلفن</div><a href="tel:+37433222450" dir="ltr" class="num-ltr">+374 33 222 450</a></div></div>
@@ -155,13 +144,16 @@
       </div>
     </section>
   </main>
+
   <footer class="footer">
     <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه ۱۴</p>
     <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7" data-i18n="footerSub">شیپور هفتم · مکاشفه ۱۴:۶–۱۲</p>
   </footer>
+
   <div id="post-modal" class="modal-overlay"><div class="modal"><div id="modal-content"></div></div></div>
   <div id="subscribe-popup-mount"></div>
   <button type="button" id="scroll-top" class="scroll-top" aria-label="Scroll to top" title="Top">↑</button>
+
   <script src="js/visits.js"></script>
   <script src="js/app.js"></script>
   <script src="js/app_core.js"></script>
@@ -170,7 +162,6 @@
   <script src="js/legal_i18n.js"></script>
   <script src="js/cloud_sync.js"></script>
   <script src="js/media_rotator.js"></script>
-  <script src="js/features.js"></script>
   <script src="js/menu.js"></script>
   <script src="js/footer_legal.js"></script>
   <script src="js/enhancements.js"></script>
