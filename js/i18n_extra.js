@@ -31,7 +31,12 @@
       sponsorsTitle: '\u062d\u0627\u0645\u06cc\u0627\u0646',
       contactTitle: '\u062a\u0645\u0627\u0633 \u0628\u0627 \u0645\u0627',
       featuresHeading: '\u0627\u0645\u06a9\u0627\u0646\u0627\u062a \u0633\u0627\u06cc\u062a',
-      teachingsNav: '\u0622\u0645\u0648\u0632\u0634\u200c\u0647\u0627'
+      teachingsNav: '\u0622\u0645\u0648\u0632\u0634\u200c\u0647\u0627',
+      missionTitle: '\u0645\u0623\u0645\u0648\u0631\u06CC\u062A \u0645\u0627',
+      missionP1: '\u0634\u06CC\u067E\u0648\u0631 \u0647\u0641\u062A\u0645 \u0628\u0631\u0627\u06CC \u0628\u0647 \u0627\u0634\u062A\u0631\u0627\u06A9 \u06AF\u0630\u0627\u0634\u062A\u0646 \u067E\u06CC\u0627\u0645 \u0627\u0646\u062C\u06CC\u0644 \u062C\u0627\u0648\u062F\u0627\u0646\u06CC \u0648 \u067E\u06CC\u0627\u0645 \u0633\u0647 \u0641\u0631\u0634\u062A\u0647 \u062F\u0631 \u0645\u06A9\u0627\u0634\u0641\u0647 \u06F1\u06F4 \u0633\u0627\u062E\u062A\u0647 \u0634\u062F\u0647 \u0627\u0633\u062A.',
+      missionP2: '\u0645\u0627 \u0648\u06CC\u062F\u06CC\u0648\u060C \u0635\u0648\u062A\u060C \u0639\u06A9\u0633 \u0648 \u0646\u0648\u0634\u062A\u0647 \u062F\u0631\u0628\u0627\u0631\u0647 \u06A9\u062A\u0627\u0628 \u0645\u0642\u062F\u0633 \u0645\u0646\u062A\u0634\u0631 \u0645\u06CC\u200C\u06A9\u0646\u06CC\u0645 \u062A\u0627 \u062D\u0642\u06CC\u0642\u062A \u0628\u0647 \u0641\u0627\u0631\u0633\u06CC \u0648 \u0627\u0646\u06AF\u0644\u06CC\u0633\u06CC \u062F\u0631 \u062F\u0633\u062A\u0631\u0633 \u0647\u0645\u0647 \u0628\u0627\u0634\u062F.',
+      missionP3: '\u0647\u062F\u0641 \u0645\u0627 \u0631\u0633\u0627\u0646\u062F\u0646 \u0627\u06CC\u0646 \u067E\u06CC\u0627\u0645 \u0646\u0647\u0627\u06CC\u06CC \u0628\u0627 \u0648\u0636\u0648\u062D \u0648 \u0645\u062D\u0628\u062A \u0628\u0647 \u0647\u0631 \u0642\u0648\u0645\u060C \u0632\u0628\u0627\u0646 \u0648 \u0645\u0644\u062A \u0627\u0633\u062A.',
+      missionMore: '\u0628\u06CC\u0634\u062A\u0631 \u0628\u062F\u0627\u0646\u06CC\u062F'
     },
     en: {
       pageTitle: 'Seventh Trumpet \u2014 Three Angels Message',
@@ -62,7 +67,12 @@
       sponsorsTitle: 'Sponsors',
       contactTitle: 'Contact us',
       featuresHeading: 'What you can do here',
-      teachingsNav: 'Teachings'
+      teachingsNav: 'Teachings',
+      missionTitle: 'Our mission',
+      missionP1: 'Seventh Trumpet exists to share the everlasting gospel and the three angels\u2019 messages of Revelation 14.',
+      missionP2: 'We publish videos, audio, photos, and writings about the Bible so the truth is available in Persian and English for everyone.',
+      missionP3: 'Our goal is to carry this final message clearly and with love to every nation, language, and people.',
+      missionMore: 'Learn more'
     }
   };
   Object.assign(T.fa, extra.fa);
