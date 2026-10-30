@@ -45,6 +45,7 @@
     var panel = document.createElement('div');
     panel.id = 'menu-panel';
     panel.className = 'menu-panel';
+    /* Admin removed from public menu — open admin.html directly when needed */
     panel.innerHTML =
       '<div class="menu-panel-head">' +
       '<button type="button" id="menu-close" class="menu-close" aria-label="Close">&times;</button>' +
@@ -54,14 +55,12 @@
       '<a href="index.html" data-i18n="home">\u062e\u0627\u0646\u0647</a>' +
       '<a href="media.html" data-i18n="media">\u0631\u0633\u0627\u0646\u0647\u200c\u0647\u0627</a>' +
       '<a href="bible.html" data-i18n="bibleNav">\u06a9\u062a\u0627\u0628 \u0645\u0642\u062f\u0633</a>' +
-      '<a href="teachings.html" data-i18n="teachingsNav">\u0622\u0645\u0648\u0632\u0634\u200c\u0647\u0627</a>' +
       '<a href="live.html" data-i18n="live">\u067e\u062e\u0634 \u0632\u0646\u062f\u0647</a>' +
       '<a href="questions.html" data-i18n="questionsNav">\u0633\u0648\u0627\u0644\u0627\u062a</a>' +
       '<a href="feedback.html" data-i18n="feedbackNav">\u0628\u0627\u0632\u062e\u0648\u0631\u062f</a>' +
       '<a href="about.html" data-i18n="about">\u062f\u0631\u0628\u0627\u0631\u0647 \u0645\u0627</a>' +
       '<a href="contact.html" data-i18n="contact">\u062a\u0645\u0627\u0633</a>' +
       '<a href="privacy.html" data-i18n="privacyNav">\u062d\u0631\u06cc\u0645 \u062e\u0635\u0648\u0635\u06cc</a>' +
-      '<a href="admin.html" data-i18n="admin">\u0645\u062f\u06cc\u0631\u06cc\u062a</a>' +
       '</nav>' +
       '<div class="menu-social">' +
       '<div class="menu-social-title" data-i18n="followUs">Follow us</div>' +
@@ -134,90 +133,36 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  try {
-    if (!document.querySelector('script[data-ads-js]')) {
-      var ads = document.createElement('script');
-      ads.src = 'js/ads.js';
-      ads.setAttribute('data-ads-js', '1');
-      ads.async = true;
-      document.body.appendChild(ads);
-    }
-  } catch (e) {}
-
-  try {
-    var fx = document.createElement('script');
-    fx.src = 'js/menu_overlay_fix.js';
-    document.body.appendChild(fx);
-  } catch (e) {}
-
-  try {
-    if (!document.querySelector('script[data-bugfixes]')) {
-      var bf = document.createElement('script');
-      bf.src = 'js/bugfixes.js';
-      bf.setAttribute('data-bugfixes', '1');
-      document.body.appendChild(bf);
-    }
-  } catch (e) {}
-
-  try {
-    if (!document.querySelector('script[data-footer-legal]')) {
-      var fl = document.createElement('script');
-      fl.src = 'js/footer_legal.js';
-      fl.setAttribute('data-footer-legal', '1');
-      document.body.appendChild(fl);
-    }
-  } catch (e) {}
-
-  try {
-    if (!document.querySelector('script[data-privacy-banner]')) {
-      var pb = document.createElement('script');
-      pb.src = 'js/privacy_banner.js';
-      pb.setAttribute('data-privacy-banner', '1');
-      document.body.appendChild(pb);
-    }
-  } catch (e) {}
-
-  try {
-    if (!document.querySelector('script[data-logo-data]')) {
-      var ld = document.createElement('script');
-      ld.src = 'js/logo_data.js';
-      ld.setAttribute('data-logo-data', '1');
-      document.body.appendChild(ld);
-    }
-  } catch (e) {}
-
-  try {
-    if (!document.querySelector('script[data-visits]')) {
-      var vs = document.createElement('script');
-      vs.src = 'js/visits.js';
-      vs.setAttribute('data-visits', '1');
-      document.body.appendChild(vs);
-    }
-  } catch (e) {}
-
-  try {
-    if (!document.querySelector('link[data-mobile-header]')) {
-      var mh = document.createElement('link');
-      mh.rel = 'stylesheet';
-      mh.href = 'css/mobile_header.css';
-      mh.setAttribute('data-mobile-header', '1');
-      document.head.appendChild(mh);
-    }
-  } catch (e) {}
-
-  (function loadSocial() {
-    if (!document.querySelector('link[data-social-css]')) {
+  function loadScript(src, attr) {
+    try {
+      if (document.querySelector('script[' + attr + ']')) return;
+      var s = document.createElement('script');
+      s.src = src;
+      s.setAttribute(attr, '1');
+      document.body.appendChild(s);
+    } catch (e) {}
+  }
+  function loadCss(href, attr) {
+    try {
+      if (document.querySelector('link[' + attr + ']')) return;
       var l = document.createElement('link');
       l.rel = 'stylesheet';
-      l.href = 'css/social.css';
-      l.setAttribute('data-social-css', '1');
+      l.href = href;
+      l.setAttribute(attr, '1');
       document.head.appendChild(l);
-    }
-    if (!document.querySelector('script[data-social-js]')) {
-      var s = document.createElement('script');
-      s.src = 'js/social.js';
-      s.setAttribute('data-social-js', '1');
-      document.body.appendChild(s);
-    }
-  })();
+    } catch (e) {}
+  }
+
+  loadScript('js/ads.js', 'data-ads-js');
+  loadScript('js/menu_overlay_fix.js', 'data-menu-overlay-fix');
+  loadScript('js/bugfixes.js', 'data-bugfixes');
+  loadScript('js/footer_legal.js', 'data-footer-legal');
+  loadScript('js/privacy_banner.js', 'data-privacy-banner');
+  loadScript('js/logo_data.js', 'data-logo-data');
+  loadScript('js/visits.js', 'data-visits');
+  loadScript('js/text_size.js', 'data-text-size');
+  loadScript('js/share.js', 'data-share');
+  loadCss('css/mobile_header.css', 'data-mobile-header');
+  loadCss('css/social.css', 'data-social-css');
+  loadScript('js/social.js', 'data-social-js');
 })();
