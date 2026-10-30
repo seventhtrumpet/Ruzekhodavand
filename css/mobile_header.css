@@ -16,4 +16,20 @@
   .menu-btn {
     display: flex !important;
   }
+  /* Language switch always visible on phones */
+  #lang-toggle,
+  button.lang-toggle,
+  .header-actions {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  #lang-toggle,
+  button.lang-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.7rem !important;
+  }
 }
