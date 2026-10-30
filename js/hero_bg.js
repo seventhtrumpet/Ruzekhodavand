@@ -1,88 +1,44 @@
-/* Muted looping intro video behind hero — no sound */
+/* Hero background image — three/four angels poster (no video) */
 (function () {
-  // Temporary hosted muted video (until media/intro-bg.mp4 is in the repo)
-  var HOSTED = 'https://h.uguu.se/NvnoNbgl.mp4';
-  var LOCAL = 'media/intro-bg.mp4';
+  var LOCAL = 'media/hero-bg.jpg';
+  var HOSTED = 'https://litter.catbox.moe/nv205i.jpg';
 
   function mount(url) {
     var hero = document.querySelector('section.hero');
-    if (!hero || hero.querySelector('.hero-bg-video')) return;
-    hero.classList.add('has-video-bg');
+    if (!hero) return;
+    if (hero.querySelector('.hero-bg-video')) return;
+    hero.classList.add('has-video-bg', 'has-image-bg');
     var wrap = document.createElement('div');
-    wrap.className = 'hero-bg-video';
+    wrap.className = 'hero-bg-video hero-bg-image';
     wrap.setAttribute('aria-hidden', 'true');
-    var v = document.createElement('video');
-    v.src = url;
-    v.muted = true;
-    v.defaultMuted = true;
-    v.volume = 0;
-    v.setAttribute('muted', '');
-    v.setAttribute('playsinline', '');
-    v.setAttribute('webkit-playsinline', '');
-    v.playsInline = true;
-    v.loop = true;
-    v.autoplay = true;
-    v.preload = 'auto';
-    v.disablePictureInPicture = true;
-    v.controls = false;
-    v.addEventListener('play', function () {
-      try { v.muted = true; v.volume = 0; } catch (e) {}
-    });
-    wrap.appendChild(v);
-    hero.insertBefore(wrap, hero.firstChild);
-    var play = function () {
-      try { v.muted = true; v.volume = 0; } catch (e) {}
-      var p = v.play();
-      if (p && p.catch) p.catch(function () {});
-    };
-    v.addEventListener('loadeddata', play);
-    v.addEventListener('error', function () {
-      if (url !== LOCAL && window.ST_INTRO_VIDEO_URL) {
-        wrap.remove();
-        hero.classList.remove('has-video-bg');
-        mount(window.ST_INTRO_VIDEO_URL);
+    var img = document.createElement('img');
+    img.src = url;
+    img.alt = '';
+    img.decoding = 'async';
+    img.loading = 'eager';
+    img.onload = function () { hero.classList.add('hero-bg-ready'); };
+    img.onerror = function () {
+      if (url !== HOSTED) {
+        img.src = HOSTED;
       }
-    });
-    play();
-    document.addEventListener('visibilitychange', function () {
-      if (!document.hidden) play();
-    });
+    };
+    wrap.appendChild(img);
+    hero.insertBefore(wrap, hero.firstChild);
   }
 
   function tryMount() {
-    if (window.ST_INTRO_VIDEO_URL) {
-      mount(window.ST_INTRO_VIDEO_URL);
-      return;
-    }
-    // Prefer permanent local file if present
-    var test = document.createElement('video');
-    test.preload = 'metadata';
-    test.muted = true;
+    var hero = document.querySelector('section.hero');
+    if (!hero || hero.querySelector('.hero-bg-video')) return;
+    var test = new Image();
+    test.onload = function () { mount(LOCAL); };
+    test.onerror = function () { mount(HOSTED); };
     test.src = LOCAL;
-    var done = false;
-    test.onloadeddata = function () {
-      if (done) return;
-      done = true;
-      mount(LOCAL);
-    };
-    test.onerror = function () {
-      if (done) return;
-      done = true;
-      mount(HOSTED);
-    };
-    setTimeout(function () {
-      if (!done) {
-        done = true;
-        mount(HOSTED);
-      }
-    }, 1500);
   }
 
-  document.addEventListener('st-intro-ready', tryMount);
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', tryMount);
   } else {
     tryMount();
   }
-  setTimeout(tryMount, 400);
+  setTimeout(tryMount, 200);
 })();
