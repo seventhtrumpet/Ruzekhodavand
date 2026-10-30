@@ -1,4 +1,4 @@
-/* Social links — header (next to logo) + footer */
+/* Social links — header (beside logo, not on it) + footer */
 (function () {
   var LINKS = [
     {
@@ -28,26 +28,23 @@
     }
   ];
 
-  function makeIcons(className) {
-    var host = document.createElement('div');
-    host.className = className;
-    LINKS.forEach(function (item) {
-      var a = document.createElement('a');
-      a.href = item.href;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.title = item.name;
-      a.setAttribute('aria-label', item.name);
-      a.innerHTML = item.svg;
-      host.appendChild(a);
-    });
-    return host;
-  }
-
   function fillHeaderSocial() {
     if (document.getElementById('header-social')) return;
     var logo = document.querySelector('a.logo');
     if (!logo || !logo.parentNode) return;
+
+    var parent = logo.parentNode;
+
+    // Brand row: logo + social side by side (not overlapping)
+    var brand = document.getElementById('header-brand');
+    if (!brand) {
+      brand = document.createElement('div');
+      brand.id = 'header-brand';
+      brand.className = 'header-brand';
+      parent.insertBefore(brand, logo);
+      brand.appendChild(logo);
+    }
+
     var row = document.createElement('div');
     row.id = 'header-social';
     row.className = 'header-social';
@@ -62,12 +59,7 @@
       a.innerHTML = item.svg;
       row.appendChild(a);
     });
-    // Place right after the logo (next to profile)
-    if (logo.nextSibling) {
-      logo.parentNode.insertBefore(row, logo.nextSibling);
-    } else {
-      logo.parentNode.appendChild(row);
-    }
+    brand.appendChild(row);
   }
 
   function fillFooterSocial() {
