@@ -45,7 +45,6 @@
     var panel = document.createElement('div');
     panel.id = 'menu-panel';
     panel.className = 'menu-panel';
-    /* Admin removed from public menu — open admin.html directly when needed */
     panel.innerHTML =
       '<div class="menu-panel-head">' +
       '<button type="button" id="menu-close" class="menu-close" aria-label="Close">&times;</button>' +
@@ -162,6 +161,7 @@
   loadScript('js/visits.js', 'data-visits');
   loadScript('js/text_size.js', 'data-text-size');
   loadScript('js/share.js', 'data-share');
+  loadScript('js/loading.js', 'data-loading');
   loadCss('css/mobile_header.css', 'data-mobile-header');
   loadCss('css/social.css', 'data-social-css');
   loadScript('js/social.js', 'data-social-js');
