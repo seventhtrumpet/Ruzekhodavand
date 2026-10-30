@@ -20,69 +20,94 @@ body {
 .btn-primary { box-shadow: 0 4px 14px rgba(10, 37, 64, 0.18); }
 .btn-primary:hover { box-shadow: 0 6px 20px rgba(10, 37, 64, 0.22); }
 
-/* Hero + image background */
+/* Hero + image background (parallax) */
 .hero {
-  padding-bottom: 3.25rem;
+  padding-bottom: 2.5rem;
   position: relative;
   overflow: hidden;
-  min-height: 70vh;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 @media (min-width: 768px) {
-  .hero { min-height: 78vh; }
-}
-@media (min-width: 1100px) {
-  .hero { min-height: 85vh; }
+  .hero { min-height: 90vh; }
 }
 .hero-bg-video,
 .hero-bg-image {
   position: absolute;
-  inset: 0;
+  inset: -12% 0 -12% 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  will-change: transform;
 }
 .hero-bg-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 20%;
+  object-position: center center;
   display: block;
-  filter: brightness(0.72) contrast(1.05);
+  /* brighter = less "transparent" / washed look */
+  filter: brightness(0.92) contrast(1.08) saturate(1.05);
+  will-change: transform;
+  transform: scale(1.12);
+  transform-origin: center center;
 }
-@media (max-width: 600px) {
+/* Mobile: show more of the poster (angels + earth), less crop */
+@media (max-width: 700px) {
+  .hero {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  .hero-bg-image {
+    inset: -8% 0 -8% 0;
+  }
   .hero-bg-image img {
-    object-position: center 25%;
-    filter: brightness(0.68) contrast(1.06);
+    object-fit: cover;
+    object-position: center 30%;
+    filter: brightness(0.95) contrast(1.08) saturate(1.06);
   }
 }
-@media (min-width: 900px) {
+@media (min-width: 701px) and (max-width: 1024px) {
+  .hero-bg-image img {
+    object-position: center 22%;
+  }
+}
+@media (min-width: 1025px) {
   .hero-bg-image img {
     object-position: center 18%;
   }
 }
+/* Lighter overlay so the photo is clearer */
 .hero.has-video-bg::before,
 .hero.has-image-bg::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(180deg, rgba(7, 26, 46, 0.45) 0%, rgba(10, 37, 64, 0.55) 40%, rgba(10, 37, 64, 0.82) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(7, 26, 46, 0.18) 0%,
+    rgba(10, 37, 64, 0.28) 45%,
+    rgba(10, 37, 64, 0.55) 100%
+  );
   pointer-events: none;
 }
 .hero .hero-inner {
   position: relative;
   z-index: 2;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 .hero h1 {
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55), 0 0 40px rgba(0, 0, 0, 0.25);
 }
 .hero-sub {
   max-width: 36rem;
   margin-left: auto;
   margin-right: auto;
-  opacity: 0.92;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
+  opacity: 0.95;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.5);
 }
 
 .daily-verse {
