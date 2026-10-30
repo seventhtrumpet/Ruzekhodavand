@@ -49,6 +49,13 @@ function postSortTime(p) {
   return new Date(p.date || p.createdAt || 0).getTime();
 }
 
+function isNewPost(p) {
+  var t = postSortTime(p);
+  if (!t) return false;
+  var week = 7 * 24 * 60 * 60 * 1000;
+  return (Date.now() - t) <= week;
+}
+
 function populateFilterBooks() {
   const sel = document.getElementById('filter-book');
   if (!sel || sel.options.length > 1) return;
@@ -124,12 +131,17 @@ function renderMedia() {
     grid.innerHTML = '<p class="no-posts">' + (t.noPosts || 'No posts yet') + '</p>';
     return;
   }
+  const newLabel = currentLang === 'fa' ? '\u062c\u062f\u06cc\u062f' : 'NEW';
   grid.innerHTML = list.map(p => {
     const title = escapeHtml(postTitle(p));
     const desc = escapeHtml((postDesc(p) || '').slice(0, 140));
-    const typeIcon = p.type === 'photo' ? '🖼️' : p.type === 'video' ? '🎬' : p.type === 'audio' ? '🔊' : p.type === 'text' ? '📝' : '📄';
+    const typeIcon = p.type === 'photo' ? '\uD83D\uDDBC\uFE0F' : p.type === 'video' ? '\uD83C\uDFAC' : p.type === 'audio' ? '\uD83D\uDD0A' : p.type === 'text' ? '\uD83D\uDCDD' : '\uD83D\uDCC4';
     const bookLabel = escapeHtml((currentLang === 'fa' ? p.book_fa : p.book_en) || '');
-    return '<article class="media-card" data-id="' + p.id + '">' +
+    const badge = isNewPost(p)
+      ? '<span class="media-new-badge" style="position:absolute;top:8px;inset-inline-start:8px;background:#c9a227;color:#0a2540;font-size:0.72rem;font-weight:800;padding:0.2rem 0.5rem;border-radius:999px;letter-spacing:0.03em;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,0.25);">' + newLabel + '</span>'
+      : '';
+    return '<article class="media-card" data-id="' + p.id + '" style="position:relative;">' +
+      badge +
       '<div class="media-thumb" style="display:flex;align-items:center;justify-content:center;font-size:2.4rem;min-height:100px;background:linear-gradient(135deg,#0a2540,#1a4a7a);color:#fff;">' + typeIcon + '</div>' +
       '<div class="media-body" style="padding:1rem;flex:1;display:flex;flex-direction:column;">' +
       '<h3 class="media-title" style="margin:0 0 0.4rem;font-size:1.1rem;">' + title + '</h3>' +
