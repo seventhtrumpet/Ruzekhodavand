@@ -1,4 +1,4 @@
-/* Prevent sideways scroll + fix mobile header overflow */
+/* Prevent sideways scroll + mobile header with social next to logo */
 html, body {
   max-width: 100%;
   overflow-x: hidden !important;
@@ -25,47 +25,62 @@ html, body {
 
 @media (max-width: 900px) {
   .header {
-    padding: 0.45rem 0.5rem !important;
+    padding: 0.4rem 0.4rem !important;
   }
   .header-inner {
     flex-direction: row !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
-    gap: 0.35rem !important;
+    gap: 0.25rem !important;
     width: 100% !important;
     max-width: 100% !important;
     overflow: hidden;
   }
 
-  /* Logo: shrink name so it fits */
+  /* Logo: icon + short name */
   .logo {
     min-width: 0;
     flex-shrink: 1;
-    gap: 0.35rem !important;
+    gap: 0.3rem !important;
   }
   .logo-img {
-    width: 2.1rem !important;
-    height: 2.1rem !important;
+    width: 2rem !important;
+    height: 2rem !important;
     flex-shrink: 0;
   }
   .logo .logo-name,
   .logo [data-i18n="siteName"] {
-    font-size: 0.85rem !important;
+    font-size: 0.78rem !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 5.5rem;
+    max-width: 4.2rem;
   }
 
-  /* Social icons in HEADER — hide on phone (still in menu + footer) */
+  /* Social icons NEXT TO PROFILE — show on mobile, compact */
   .header-social {
-    display: none !important;
+    display: flex !important;
+    align-items: center;
+    gap: 0.15rem !important;
+    flex-shrink: 0;
+    margin-inline-start: 0.15rem !important;
+    margin-inline-end: 0.15rem !important;
+  }
+  .header-social a {
+    width: 1.65rem !important;
+    height: 1.65rem !important;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+  }
+  .header-social a svg {
+    width: 0.85rem !important;
+    height: 0.85rem !important;
   }
 
   .nav.nav-main {
     width: auto !important;
     flex-wrap: nowrap !important;
-    gap: 0.25rem !important;
+    gap: 0.2rem !important;
   }
   .nav.nav-main > a:not(.lang-toggle),
   .nav-main a[data-nav] {
@@ -73,15 +88,15 @@ html, body {
   }
   .menu-btn {
     display: flex !important;
-    width: 2.3rem !important;
-    height: 2.3rem !important;
-    margin-inline-end: 0.2rem !important;
+    width: 2.15rem !important;
+    height: 2.15rem !important;
+    margin-inline-end: 0.15rem !important;
   }
 
   .header-actions {
     display: flex !important;
     align-items: center !important;
-    gap: 0.3rem !important;
+    gap: 0.25rem !important;
     margin-inline-start: auto !important;
     flex-shrink: 0;
   }
@@ -91,21 +106,19 @@ html, body {
     display: inline-flex !important;
     align-items: center;
     white-space: nowrap;
-    font-size: 0.78rem !important;
-    padding: 0.3rem 0.55rem !important;
+    font-size: 0.72rem !important;
+    padding: 0.28rem 0.45rem !important;
   }
 
-  /* Text size controls smaller */
   .text-size-controls button {
-    width: 1.75rem !important;
-    height: 1.75rem !important;
-    font-size: 0.7rem !important;
+    width: 1.6rem !important;
+    height: 1.6rem !important;
+    font-size: 0.65rem !important;
   }
   .text-size-controls #text-size-label {
     display: none !important;
   }
 
-  /* Media rotator full width of phone */
   .media-rotator {
     width: 100% !important;
     max-width: 100% !important;
@@ -118,7 +131,6 @@ html, body {
     width: 100% !important;
   }
 
-  /* Hero text not cut off */
   .hero .hero-inner {
     padding-left: 0.85rem !important;
     padding-right: 0.85rem !important;
@@ -142,9 +154,14 @@ html, body {
   }
 }
 
-@media (max-width: 380px) {
+/* Very small phones: keep social, hide site name text */
+@media (max-width: 400px) {
   .logo .logo-name,
   .logo [data-i18n="siteName"] {
-    max-width: 4rem;
+    display: none !important;
+  }
+  .header-social a {
+    width: 1.55rem !important;
+    height: 1.55rem !important;
   }
 }
