@@ -1,7 +1,8 @@
-/* Hero background image with parallax scroll */
+/* Hero background image with parallax — permanent hosted image */
 (function () {
   var LOCAL = 'media/hero-bg.jpg';
-  var HOSTED = 'https://litter.catbox.moe/nv205i.jpg';
+  // Permanent host (Imgur)
+  var HOSTED = 'https://i.imgur.com/Nmz3YPt.jpeg';
 
   function mount(url) {
     var hero = document.querySelector('section.hero');
@@ -16,9 +17,14 @@
     img.alt = '';
     img.decoding = 'async';
     img.loading = 'eager';
+    img.referrerPolicy = 'no-referrer';
     img.onload = function () { hero.classList.add('hero-bg-ready'); };
     img.onerror = function () {
-      if (url !== HOSTED) img.src = HOSTED;
+      if (url !== HOSTED && window.ST_HERO_BG_URL) {
+        img.src = window.ST_HERO_BG_URL;
+      } else if (url !== HOSTED) {
+        img.src = HOSTED;
+      }
     };
     wrap.appendChild(img);
     hero.insertBefore(wrap, hero.firstChild);
@@ -31,14 +37,11 @@
       ticking = false;
       var rect = hero.getBoundingClientRect();
       var viewH = window.innerHeight || 1;
-      // Move while hero is in view
       if (rect.bottom < 0 || rect.top > viewH) return;
-      // 0 at top of page, increases as you scroll down
       var scrolled = Math.max(0, -rect.top);
       var maxMove = Math.min(viewH * 0.35, hero.offsetHeight * 0.25);
       var progress = Math.min(1, scrolled / (hero.offsetHeight || 1));
       var y = progress * maxMove;
-      // Scale a bit so edges never show empty
       wrap.style.transform = 'translate3d(0,' + (y * 0.45) + 'px,0)';
       img.style.transform = 'translate3d(0,' + (-y * 0.25) + 'px,0) scale(1.12)';
     }
@@ -56,12 +59,19 @@
   function tryMount() {
     var hero = document.querySelector('section.hero');
     if (!hero || hero.querySelector('.hero-bg-video')) return;
+
+    if (window.ST_HERO_BG_URL) {
+      mount(window.ST_HERO_BG_URL);
+      return;
+    }
+
     var test = new Image();
     test.onload = function () { mount(LOCAL); };
     test.onerror = function () { mount(HOSTED); };
     test.src = LOCAL;
   }
 
+  document.addEventListener('st-hero-ready', tryMount);
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', tryMount);
   } else {
