@@ -1,12 +1,8 @@
 /* Seventh Trumpet profile logo — high quality */
 (function () {
-  // High-resolution hosted logo (sharp when opened large)
   var HQ = 'https://iili.io/n8MSJBp.jpg';
   var HQ256 = 'https://iili.io/n8M8tYF.jpg';
-  var FILE = (location.origin || 'https://seventhtrumpet.org') + '/img/logo.jpg';
-  // Prefer HQ for display; embedded only as last fallback
-  var LOGO = HQ;
-  var FAV = (window.ST_FAV && window.ST_FAV.length > 80) ? window.ST_FAV : HQ256;
+  var HOME = 'index.html';
 
   function openLogoViewer(src) {
     if (document.getElementById('logo-viewer')) return;
@@ -62,24 +58,24 @@
   function boot() {
     var style = document.createElement('style');
     style.textContent =
-      '.logo{display:inline-flex!important;align-items:center;gap:.55rem}' +
+      '.logo{display:inline-flex!important;align-items:center;gap:.55rem;text-decoration:none;color:inherit;cursor:pointer}' +
       '.logo-img{width:2.5rem;height:2.5rem;border-radius:50%;object-fit:cover;' +
       'border:2px solid rgba(201,162,39,.9);box-shadow:0 0 0 1px rgba(255,255,255,.2);' +
       'flex-shrink:0;background:#0a2540;cursor:pointer}' +
+      '.logo .logo-name,.logo [data-i18n="siteName"]{cursor:pointer}' +
       '@media(min-width:600px){.logo-img{width:2.9rem;height:2.9rem}}';
     document.head.appendChild(style);
 
-    // Browser tab icon
     var links = document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"]');
     if (!links.length) {
       var l = document.createElement('link');
       l.rel = 'icon';
       l.type = 'image/jpeg';
-      l.href = FAV;
+      l.href = HQ256;
       document.head.appendChild(l);
     } else {
       links.forEach(function (el) {
-        el.href = FAV;
+        el.href = HQ256;
         el.type = 'image/jpeg';
       });
     }
@@ -91,26 +87,54 @@
     }
     apple.href = HQ256;
 
-    // Header circle logo — tap opens sharp full view
     document.querySelectorAll('a.logo').forEach(function (a) {
-      if (a.querySelector('img.logo-img')) return;
-      var img = document.createElement('img');
-      img.src = HQ256;
-      img.alt = 'Seventh Trumpet';
-      img.className = 'logo-img';
-      img.width = 48;
-      img.height = 48;
-      img.decoding = 'async';
-      img.title = 'View logo';
-      img.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        openLogoViewer(HQ);
-      });
-      a.insertBefore(img, a.firstChild);
+      // Name / whole logo link always goes home
+      a.setAttribute('href', HOME);
+      a.title = 'Home';
+
+      // Ensure site name is clickable text inside the link
+      var nameEl = a.querySelector('[data-i18n="siteName"], .logo-name');
+      if (!nameEl) {
+        // wrap leftover text nodes if any
+        var span = document.createElement('span');
+        span.className = 'logo-name';
+        span.setAttribute('data-i18n', 'siteName');
+        while (a.childNodes.length) {
+          var n = a.childNodes[0];
+          if (n.nodeType === 3 && n.textContent.trim()) {
+            span.textContent = n.textContent.trim();
+            a.removeChild(n);
+            break;
+          }
+          if (n.nodeType === 1 && n.tagName !== 'IMG') {
+            // already structured
+            break;
+          }
+          if (n.nodeType === 3) a.removeChild(n);
+          else break;
+        }
+        if (span.textContent) a.appendChild(span);
+      }
+
+      if (!a.querySelector('img.logo-img')) {
+        var img = document.createElement('img');
+        img.src = HQ256;
+        img.alt = 'Seventh Trumpet';
+        img.className = 'logo-img';
+        img.width = 48;
+        img.height = 48;
+        img.decoding = 'async';
+        img.title = 'View logo';
+        // Only the circle image opens the big logo view
+        img.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openLogoViewer(HQ);
+        });
+        a.insertBefore(img, a.firstChild);
+      }
     });
 
-    // Google / social previews use the sharp 512 logo
     function setMeta(attr, key, val) {
       var m = document.querySelector('meta[' + attr + '="' + key + '"]');
       if (!m) {
