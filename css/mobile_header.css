@@ -1,13 +1,71 @@
-/* Force phone header to look mobile, not desktop-stacked */
+/* Prevent sideways scroll + fix mobile header overflow */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.hero,
+.hero-inner,
+.media-rotator,
+.media-rotator-card,
+.angels-row,
+.home-cta,
+.daily-verse,
+.mission-section,
+.container {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
 @media (max-width: 900px) {
+  .header {
+    padding: 0.45rem 0.5rem !important;
+  }
   .header-inner {
     flex-direction: row !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden;
   }
+
+  /* Logo: shrink name so it fits */
+  .logo {
+    min-width: 0;
+    flex-shrink: 1;
+    gap: 0.35rem !important;
+  }
+  .logo-img {
+    width: 2.1rem !important;
+    height: 2.1rem !important;
+    flex-shrink: 0;
+  }
+  .logo .logo-name,
+  .logo [data-i18n="siteName"] {
+    font-size: 0.85rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 5.5rem;
+  }
+
+  /* Social icons in HEADER — hide on phone (still in menu + footer) */
+  .header-social {
+    display: none !important;
+  }
+
   .nav.nav-main {
     width: auto !important;
     flex-wrap: nowrap !important;
+    gap: 0.25rem !important;
   }
   .nav.nav-main > a:not(.lang-toggle),
   .nav-main a[data-nav] {
@@ -15,21 +73,78 @@
   }
   .menu-btn {
     display: flex !important;
+    width: 2.3rem !important;
+    height: 2.3rem !important;
+    margin-inline-end: 0.2rem !important;
   }
-  /* Language switch always visible on phones */
-  #lang-toggle,
-  button.lang-toggle,
+
   .header-actions {
     display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
+    margin-inline-start: auto !important;
+    flex-shrink: 0;
   }
+
   #lang-toggle,
   button.lang-toggle {
     display: inline-flex !important;
     align-items: center;
     white-space: nowrap;
-    font-size: 0.85rem;
-    padding: 0.35rem 0.7rem !important;
+    font-size: 0.78rem !important;
+    padding: 0.3rem 0.55rem !important;
+  }
+
+  /* Text size controls smaller */
+  .text-size-controls button {
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+    font-size: 0.7rem !important;
+  }
+  .text-size-controls #text-size-label {
+    display: none !important;
+  }
+
+  /* Media rotator full width of phone */
+  .media-rotator {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  .media-rotator-card {
+    width: 100% !important;
+  }
+
+  /* Hero text not cut off */
+  .hero .hero-inner {
+    padding-left: 0.85rem !important;
+    padding-right: 0.85rem !important;
+    width: 100% !important;
+  }
+  .hero h1 {
+    font-size: clamp(1.55rem, 7vw, 2.1rem) !important;
+    word-break: break-word;
+  }
+  .hero-sub {
+    font-size: 0.95rem !important;
+    padding: 0 0.25rem;
+  }
+  .start-here-wrap {
+    padding: 0 0.5rem;
+  }
+  .start-here-btn {
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .logo .logo-name,
+  .logo [data-i18n="siteName"] {
+    max-width: 4rem;
   }
 }
