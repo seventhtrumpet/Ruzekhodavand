@@ -1,7 +1,6 @@
-/* Hero background image with parallax — permanent hosted image */
+/* Hero background — full image visible + parallax on scroll */
 (function () {
   var LOCAL = 'media/hero-bg.jpg';
-  // Permanent host (Imgur)
   var HOSTED = 'https://i.imgur.com/Nmz3YPt.jpeg';
 
   function mount(url) {
@@ -9,50 +8,68 @@
     if (!hero) return;
     if (hero.querySelector('.hero-bg-video')) return;
     hero.classList.add('has-video-bg', 'has-image-bg');
+
     var wrap = document.createElement('div');
     wrap.className = 'hero-bg-video hero-bg-image';
     wrap.setAttribute('aria-hidden', 'true');
+
     var img = document.createElement('img');
     img.src = url;
     img.alt = '';
     img.decoding = 'async';
     img.loading = 'eager';
     img.referrerPolicy = 'no-referrer';
-    img.onload = function () { hero.classList.add('hero-bg-ready'); };
-    img.onerror = function () {
-      if (url !== HOSTED && window.ST_HERO_BG_URL) {
-        img.src = window.ST_HERO_BG_URL;
-      } else if (url !== HOSTED) {
-        img.src = HOSTED;
-      }
+    img.onload = function () {
+      hero.classList.add('hero-bg-ready');
+      setupParallax(hero, wrap, img);
     };
+    img.onerror = function () {
+      if (url !== HOSTED) img.src = HOSTED;
+    };
+
     wrap.appendChild(img);
     hero.insertBefore(wrap, hero.firstChild);
-    setupParallax(hero, wrap, img);
   }
 
   function setupParallax(hero, wrap, img) {
+    if (wrap._parallaxBound) return;
+    wrap._parallaxBound = true;
+
     var ticking = false;
+
     function update() {
       ticking = false;
       var rect = hero.getBoundingClientRect();
       var viewH = window.innerHeight || 1;
-      if (rect.bottom < 0 || rect.top > viewH) return;
+
+      // How far the hero has scrolled through the viewport (0 → 1+)
       var scrolled = Math.max(0, -rect.top);
-      var maxMove = Math.min(viewH * 0.35, hero.offsetHeight * 0.25);
-      var progress = Math.min(1, scrolled / (hero.offsetHeight || 1));
-      var y = progress * maxMove;
-      wrap.style.transform = 'translate3d(0,' + (y * 0.45) + 'px,0)';
-      img.style.transform = 'translate3d(0,' + (-y * 0.25) + 'px,0) scale(1.12)';
+      var range = Math.max(hero.offsetHeight * 0.8, viewH * 0.6);
+      var progress = Math.min(1.2, scrolled / range);
+
+      // Stronger parallax so you can see the image move
+      var shift = progress * 80; // px
+
+      // Move the whole layer slower than the page
+      wrap.style.transform = 'translate3d(0, ' + (shift * 0.5) + 'px, 0)';
+
+      // Keep image centered + shift opposite direction slightly
+      img.style.transform =
+        'translate(-50%, calc(-50% + ' + (-shift * 0.35) + 'px))';
     }
+
     function onScroll() {
       if (!ticking) {
         ticking = true;
-        requestAnimationFrame(update);
+        window.requestAnimationFrame(update);
       }
     }
+
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
+    // Also listen on touchmove for some mobile browsers
+    window.addEventListener('touchmove', onScroll, { passive: true });
+
     update();
   }
 
