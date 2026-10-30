@@ -39,7 +39,13 @@
       missionMore: '\u0628\u06CC\u0634\u062A\u0631 \u0628\u062F\u0627\u0646\u06CC\u062F',
       angelsHeading: '\u067E\u06CC\u0627\u0645 \u0633\u0647 \u0641\u0631\u0634\u062A\u0647',
       angelsHint: '\u0628\u0631\u0627\u06CC \u062E\u0648\u0627\u0646\u062F\u0646 \u067E\u06CC\u0627\u0645 \u0647\u0631 \u0641\u0631\u0634\u062A\u0647 \u0644\u0645\u0633 \u06A9\u0646\u06CC\u062F',
-      angelOpen: '\u0628\u0627\u0632 \u06A9\u0631\u062F\u0646'
+      angelOpen: '\u0628\u0627\u0632 \u06A9\u0631\u062F\u0646',
+      startHere: '\u0627\u0632 \u0627\u06cc\u0646\u062c\u0627 \u0634\u0631\u0648\u0639 \u06a9\u0646\u06cc\u062f',
+      startHereHint: '\u067e\u06cc\u0627\u0645 \u0641\u0631\u0634\u062a\u0647 \u0627\u0648\u0644 \u0631\u0627 \u0628\u062e\u0648\u0627\u0646\u06cc\u062f',
+      howToTitle: '\u0686\u06af\u0648\u0646\u0647 \u0627\u0632 \u0627\u06cc\u0646 \u0633\u0627\u06cc\u062a \u0627\u0633\u062a\u0641\u0627\u062f\u0647 \u06a9\u0646\u06cc\u0645',
+      howTo1: '\u06f1. \u0631\u0648\u06cc \u062f\u06a9\u0645\u0647\u200c\u0647\u0627\u06cc \u0628\u0632\u0631\u06af \u0628\u0632\u0646\u06cc\u062f: \u06a9\u062a\u0627\u0628 \u0645\u0642\u062f\u0633\u060c \u0631\u0633\u0627\u0646\u0647\u200c\u0647\u0627\u060c \u06cc\u0627 \u067e\u06cc\u0627\u0645 \u0633\u0647 \u0641\u0631\u0634\u062a\u0647.',
+      howTo2: '\u06f2. \u0628\u0631\u0627\u06cc \u062a\u063a\u06cc\u06cc\u0631 \u0632\u0628\u0627\u0646\u060c \u062f\u06a9\u0645\u0647 English / \u0641\u0627\u0631\u0633\u06cc \u0631\u0627 \u0628\u0632\u0646\u06cc\u062f.',
+      howTo3: '\u06f3. \u0628\u0631\u0627\u06cc \u062a\u0645\u0627\u0633 \u0628\u0627 \u0645\u0627\u060c \u0648\u0627\u062a\u0633\u0627\u067e \u06cc\u0627 \u0627\u06cc\u0645\u06cc\u0644 \u0631\u0627 \u0627\u0632 \u0645\u0646\u0648 \u06cc\u0627 \u067e\u0627\u06cc\u06cc\u0646 \u0635\u0641\u062d\u0647 \u0628\u0627\u0632 \u06a9\u0646\u06cc\u062f.'
     },
     en: {
       pageTitle: 'Seventh Trumpet \u2014 Three Angels Message',
@@ -78,7 +84,13 @@
       missionMore: 'Learn more',
       angelsHeading: 'The three angels\u2019 messages',
       angelsHint: 'Tap a card to read that angel\u2019s message',
-      angelOpen: 'Open'
+      angelOpen: 'Open',
+      startHere: 'Start here',
+      startHereHint: 'Read the first angel\u2019s message',
+      howToTitle: 'How to use this site',
+      howTo1: '1. Tap the big buttons: Bible, Media, or the three angels\u2019 messages.',
+      howTo2: '2. To change language, tap the English / Persian button.',
+      howTo3: '3. To contact us, open WhatsApp or email from the menu or the bottom of the page.'
     }
   };
   Object.assign(T.fa, extra.fa);
