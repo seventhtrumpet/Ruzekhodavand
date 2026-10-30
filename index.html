@@ -36,6 +36,46 @@
       } catch (e) {}
     })();
   </script>
+  <style>
+    .mission-section {
+      max-width: 720px;
+      margin: 0 auto 2rem;
+      padding: 0 1rem;
+    }
+    .mission-card {
+      background: var(--bg-card, #fff);
+      border: 1px solid var(--border, #e0dcd3);
+      border-radius: 16px;
+      padding: 1.6rem 1.4rem 1.5rem;
+      box-shadow: var(--shadow, 0 4px 20px rgba(10,37,64,.08));
+      line-height: 1.8;
+    }
+    .mission-card h2 {
+      font-size: 1.25rem;
+      color: var(--primary, #0a2540);
+      margin: 0 0 0.9rem;
+      text-align: center;
+    }
+    .mission-card p {
+      margin: 0 0 0.85rem;
+      color: var(--text, #1a1a1a);
+      font-size: 0.98rem;
+    }
+    .mission-card p:last-of-type { margin-bottom: 1rem; }
+    .mission-card .mission-more {
+      display: inline-block;
+      font-weight: 600;
+      color: var(--primary, #0a2540);
+      text-decoration: none;
+      border-bottom: 2px solid var(--accent, #c9a227);
+      padding-bottom: 1px;
+    }
+    .mission-card .mission-more:hover { opacity: 0.85; }
+    body.dark .mission-card {
+      background: var(--bg-card);
+      border-color: var(--border);
+    }
+  </style>
 </head>
 <body data-page="home">
   <header class="header">
@@ -131,6 +171,16 @@
       <blockquote id="verse-text" class="daily-verse-text"></blockquote>
       <cite id="verse-ref" class="daily-verse-ref"></cite>
       <button type="button" id="verse-refresh" class="verse-refresh" data-i18n="newVerse">آیه دیگر</button>
+    </div>
+  </section>
+
+  <section class="mission-section" id="mission">
+    <div class="mission-card">
+      <h2 data-i18n="missionTitle">مأموریت ما</h2>
+      <p data-i18n="missionP1">شیپور هفتم برای به اشتراک گذاشتن پیام انجیل جاودانی و پیام سه فرشته در مکاشفه ۱۴ ساخته شده است.</p>
+      <p data-i18n="missionP2">ما ویدیو، صوت، عکس و نوشته درباره کتاب مقدس منتشر می‌کنیم تا حقیقت به فارسی و انگلیسی در دسترس همه باشد.</p>
+      <p data-i18n="missionP3">هدف ما رساندن این پیام نهایی با وضوح و محبت به هر قوم، زبان و ملت است.</p>
+      <a class="mission-more" href="about.html" data-i18n="missionMore">بیشتر بدانید</a>
     </div>
   </section>
 
