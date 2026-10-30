@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="index, follow">
   <meta name="description" content="About Seventh Trumpet — Three Angels Message of Revelation 14">
+  <meta name="theme-color" content="#0a2540">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/menu.css">
+  <link rel="stylesheet" href="css/polish.css">
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
   <title>درباره ما | شیپور هفتم</title>
@@ -30,7 +32,14 @@
   <main class="container" style="padding-top:2rem;padding-bottom:3rem;max-width:720px;">
     <h1 class="section-title" data-i18n="aboutTitle">درباره ما</h1>
 
-    <div class="about-card" style="background:var(--card-bg,#fff);border-radius:14px;padding:1.5rem 1.35rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);line-height:1.85;">
+    <div class="about-card" style="background:var(--bg-card,#fff);border-radius:14px;padding:1.5rem 1.35rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);line-height:1.85;margin-bottom:1.25rem;border:1px solid var(--border,#e0dcd3);">
+      <h2 style="font-size:1.15rem;color:var(--primary);margin:0 0 0.75rem;" data-i18n="howToTitle">چگونه از این سایت استفاده کنیم</h2>
+      <p data-i18n="howTo1" style="margin-bottom:0.55rem;">۱. روی دکمه‌های بزرگ بزنید: کتاب مقدس، رسانه‌ها، یا پیام سه فرشته.</p>
+      <p data-i18n="howTo2" style="margin-bottom:0.55rem;">۲. برای تغییر زبان، دکمه English / فارسی را بزنید.</p>
+      <p data-i18n="howTo3" style="margin-bottom:0;">۳. برای تماس با ما، واتساپ یا ایمیل را از منو یا پایین صفحه باز کنید.</p>
+    </div>
+
+    <div class="about-card" style="background:var(--bg-card,#fff);border-radius:14px;padding:1.5rem 1.35rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);line-height:1.85;border:1px solid var(--border,#e0dcd3);">
       <p data-i18n="aboutP1" style="margin-bottom:1rem;">
         <strong>شیپور هفتم</strong> وب‌سایتی است برای به اشتراک گذاشتن پیام انجیل جاودانی و پیام سه فرشته در مکاشفه ۱۴.
       </p>
@@ -50,9 +59,10 @@
         برای تماشای محتوا به بخش رسانه‌ها بروید. برای سوال یا تماس، از صفحه تماس یا سوالات استفاده کنید.
       </p>
       <div style="display:flex;flex-wrap:wrap;gap:0.7rem;margin-top:1.5rem;">
-        <a class="btn btn-primary" href="media.html" data-i18n="media">رسانه‌ها</a>
+        <a class="btn btn-primary" href="angel.html?n=1" data-i18n="startHere">از اینجا شروع کنید</a>
+        <a class="btn btn-primary" href="bible.html" data-i18n="bibleNav">کتاب مقدس</a>
+        <a class="btn btn-outline" href="media.html" data-i18n="media">رسانه‌ها</a>
         <a class="btn btn-outline" href="contact.html" data-i18n="contact">تماس</a>
-        <a class="btn btn-outline" href="bible.html" data-i18n="bibleNav">کتاب مقدس</a>
       </div>
     </div>
   </main>
@@ -65,6 +75,9 @@
   <script src="js/i18n_extra.js"></script>
   <script src="js/about_i18n.js"></script>
   <script src="js/menu.js"></script>
+  <script src="js/text_size.js"></script>
+  <script src="js/social.js"></script>
   <script src="js/enhancements.js"></script>
+  <script src="js/lang_fix.js"></script>
 </body>
 </html>
