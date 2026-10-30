@@ -1,45 +1,61 @@
 /* Global visual polish for Seventh Trumpet */
 
-/* Smoother page feel */
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Header glass */
 .header {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
-.logo {
-  letter-spacing: 0.01em;
-}
-.logo:hover {
-  opacity: 0.92;
-}
+.logo { letter-spacing: 0.01em; }
+.logo:hover { opacity: 0.92; }
 
-/* Buttons */
 .btn {
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
-.btn:hover {
-  transform: translateY(-1px);
-}
-.btn-primary {
-  box-shadow: 0 4px 14px rgba(10, 37, 64, 0.18);
-}
-.btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(10, 37, 64, 0.22);
-}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { box-shadow: 0 4px 14px rgba(10, 37, 64, 0.18); }
+.btn-primary:hover { box-shadow: 0 6px 20px rgba(10, 37, 64, 0.22); }
 
-/* Hero depth */
+/* Hero + muted video background */
 .hero {
   padding-bottom: 3.25rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg-video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero-bg-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  filter: brightness(0.55) contrast(1.05);
+}
+.hero.has-video-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(7, 26, 46, 0.55) 0%, rgba(10, 37, 64, 0.72) 55%, rgba(10, 37, 64, 0.88) 100%);
+  pointer-events: none;
+}
+.hero .hero-inner {
+  position: relative;
+  z-index: 2;
 }
 .hero h1 {
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.15);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
 }
 .hero-sub {
   max-width: 36rem;
@@ -48,7 +64,6 @@ body {
   opacity: 0.92;
 }
 
-/* Daily verse card */
 .daily-verse {
   margin-top: -1.5rem;
   position: relative;
@@ -60,54 +75,24 @@ body {
   border: 1px solid rgba(201, 162, 39, 0.25);
 }
 
-/* Mission */
-.mission-section {
-  margin-top: 0.5rem;
-}
-.mission-card {
-  transition: box-shadow 0.2s ease;
-}
-.mission-card:hover {
-  box-shadow: 0 10px 32px rgba(10, 37, 64, 0.1);
-}
+.mission-section { margin-top: 0.5rem; }
+.mission-card { transition: box-shadow 0.2s ease; }
+.mission-card:hover { box-shadow: 0 10px 32px rgba(10, 37, 64, 0.1); }
 
-/* Contact */
-.contact-card {
-  border-radius: 16px;
-  overflow: hidden;
-}
-.contact-item {
-  transition: background 0.15s ease;
-}
-.contact-item:hover {
-  background: rgba(10, 37, 64, 0.03);
-}
-body.dark .contact-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
+.contact-card { border-radius: 16px; overflow: hidden; }
+.contact-item { transition: background 0.15s ease; }
+.contact-item:hover { background: rgba(10, 37, 64, 0.03); }
+body.dark .contact-item:hover { background: rgba(255, 255, 255, 0.04); }
 
-/* Richer footer */
 .footer {
   padding: 2.25rem 1.25rem 2rem;
   background: linear-gradient(180deg, #0a2540 0%, #071a2e 100%);
   color: rgba(255, 255, 255, 0.9);
   text-align: center;
 }
-.footer-inner {
-  max-width: 900px;
-  margin: 0 auto;
-}
-.footer-brand {
-  font-weight: 700;
-  font-size: 1.05rem;
-  margin-bottom: 0.35rem;
-  color: #fff;
-}
-.footer-tag {
-  font-size: 0.85rem;
-  opacity: 0.75;
-  margin-bottom: 1.1rem;
-}
+.footer-inner { max-width: 900px; margin: 0 auto; }
+.footer-brand { font-weight: 700; font-size: 1.05rem; margin-bottom: 0.35rem; color: #fff; }
+.footer-tag { font-size: 0.85rem; opacity: 0.75; margin-bottom: 1.1rem; }
 .footer-nav {
   display: flex;
   flex-wrap: wrap;
@@ -115,14 +100,8 @@ body.dark .contact-item:hover {
   gap: 0.35rem 1rem;
   margin-bottom: 1.15rem;
 }
-.footer-nav a {
-  color: rgba(255, 255, 255, 0.85);
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-.footer-nav a:hover {
-  color: var(--accent-soft, #e8d48b);
-}
+.footer-nav a { color: rgba(255, 255, 255, 0.85); text-decoration: none; font-size: 0.9rem; }
+.footer-nav a:hover { color: var(--accent-soft, #e8d48b); }
 .footer-social {
   display: flex;
   justify-content: center;
@@ -146,57 +125,22 @@ body.dark .contact-item:hover {
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.2);
 }
-.footer-social a svg {
-  width: 1.15rem;
-  height: 1.15rem;
-}
-.footer-legal {
-  font-size: 0.78rem;
-  opacity: 0.65;
-  margin-top: 0.5rem;
-}
-.footer-legal a {
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
-  margin: 0 0.35rem;
-}
-.footer-legal a:hover {
-  color: #fff;
-  text-decoration: underline;
-}
+.footer-social a svg { width: 1.15rem; height: 1.15rem; }
+.footer-legal { font-size: 0.78rem; opacity: 0.65; margin-top: 0.5rem; }
+.footer-legal a { color: rgba(255, 255, 255, 0.8); text-decoration: none; margin: 0 0.35rem; }
+.footer-legal a:hover { color: #fff; text-decoration: underline; }
 
-/* Scroll top */
-.scroll-top {
-  border-radius: 50%;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-}
+.scroll-top { border-radius: 50%; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); }
 
-/* Soft page background texture */
 body {
-  background-image:
-    radial-gradient(ellipse at top, rgba(201, 162, 39, 0.04), transparent 55%);
+  background-image: radial-gradient(ellipse at top, rgba(201, 162, 39, 0.04), transparent 55%);
   background-attachment: fixed;
 }
 body.dark {
-  background-image:
-    radial-gradient(ellipse at top, rgba(201, 162, 39, 0.06), transparent 50%);
+  background-image: radial-gradient(ellipse at top, rgba(201, 162, 39, 0.06), transparent 50%);
 }
 
-/* Media cards polish if present */
-.media-card {
-  border: 1px solid var(--border);
-}
-
-/* Lang button more readable */
-.lang-toggle {
-  border-radius: 999px !important;
-  font-weight: 700 !important;
-}
-
-/* Home CTA outline on dark hero */
-.home-cta .btn-outline {
-  background: transparent;
-}
-.home-cta .btn-outline:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
+.media-card { border: 1px solid var(--border); }
+.lang-toggle { border-radius: 999px !important; font-weight: 700 !important; }
+.home-cta .btn-outline { background: transparent; }
+.home-cta .btn-outline:hover { background: rgba(255, 255, 255, 0.12); }
