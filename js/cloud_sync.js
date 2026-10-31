@@ -1,16 +1,18 @@
-/* Cross-device media sync via Firestore */
+/* Cross-device media sync via Firestore — pull aggressively so all phones see posts */
 (function () {
-  const POSTS_KEY = 'cog_posts_v1';
-  const PL_KEY = 'cog_playlists_v1';
-  const LIVE_KEY = 'cog_live_v1';
-  const SYNC_META = 'cog_cloud_sync_at';
+  var POSTS_KEY = 'cog_posts_v1';
+  var PL_KEY = 'cog_playlists_v1';
+  var LIVE_KEY = 'cog_live_v1';
+  var SYNC_META = 'cog_cloud_sync_at';
   var pushTimer = null;
   var pulling = false;
 
   function hasFirestore() {
     try {
       return typeof firebase !== 'undefined' && firebase.firestore;
-    } catch (e) { return false; }
+    } catch (e) {
+      return false;
+    }
   }
 
   function stripHeavy(list) {
@@ -28,24 +30,61 @@
   function scheduleCloudPush() {
     if (!hasFirestore()) return;
     if (pushTimer) clearTimeout(pushTimer);
-    pushTimer = setTimeout(function () { window.pushMediaToCloud(); }, 1200);
+    pushTimer = setTimeout(function () {
+      window.pushMediaToCloud();
+    }, 1200);
+  }
+
+  function applyPosts(merged) {
+    if (!merged) return;
+    try {
+      if (typeof posts !== 'undefined') posts = merged;
+    } catch (e) {}
+    try {
+      window.posts = merged;
+    } catch (e) {}
+    try {
+      if (typeof window.renderMedia === 'function') window.renderMedia();
+    } catch (e) {}
+    try {
+      if (typeof window.renderPlaylistsPublic === 'function') window.renderPlaylistsPublic();
+    } catch (e) {}
+    try {
+      if (typeof window.renderAll === 'function') window.renderAll();
+    } catch (e) {}
+    try {
+      if (typeof window.refreshMediaRotator === 'function') window.refreshMediaRotator();
+    } catch (e) {}
+    try {
+      window.dispatchEvent(new CustomEvent('cog-posts-updated', { detail: { posts: merged } }));
+    } catch (e) {}
   }
 
   window.pushMediaToCloud = function pushToCloud() {
     if (!hasFirestore()) return Promise.resolve(false);
-    var posts = [];
+    var postsList = [];
     var playlists = [];
     var live = {};
-    try { posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]'); } catch (e) {}
-    try { playlists = JSON.parse(localStorage.getItem(PL_KEY) || '[]'); } catch (e) {}
-    try { live = JSON.parse(localStorage.getItem(LIVE_KEY) || '{}'); } catch (e) {}
+    try {
+      postsList = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
+    } catch (e) {}
+    try {
+      playlists = JSON.parse(localStorage.getItem(PL_KEY) || '[]');
+    } catch (e) {}
+    try {
+      live = JSON.parse(localStorage.getItem(LIVE_KEY) || '{}');
+    } catch (e) {}
     var payload = {
-      posts: stripHeavy(posts),
+      posts: stripHeavy(postsList),
       playlists: playlists,
       live: live,
       updatedAt: Date.now()
     };
-    return firebase.firestore().collection('site').doc('media').set(payload)
+    return firebase
+      .firestore()
+      .collection('site')
+      .doc('media')
+      .set(payload)
       .then(function () {
         localStorage.setItem(SYNC_META, String(payload.updatedAt));
         console.log('[cloud] pushed', payload.posts.length, 'posts');
@@ -60,7 +99,11 @@
   window.pullMediaFromCloud = function pullFromCloud() {
     if (!hasFirestore() || pulling) return Promise.resolve(null);
     pulling = true;
-    return firebase.firestore().collection('site').doc('media').get()
+    return firebase
+      .firestore()
+      .collection('site')
+      .doc('media')
+      .get()
       .then(function (snap) {
         pulling = false;
         if (!snap.exists) return null;
@@ -68,35 +111,55 @@
         var remoteAt = data.updatedAt || 0;
         var localAt = parseInt(localStorage.getItem(SYNC_META) || '0', 10) || 0;
         var localPosts = [];
-        try { localPosts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]'); } catch (e) {}
+        try {
+          localPosts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
+        } catch (e) {}
         var remotePosts = Array.isArray(data.posts) ? data.posts : [];
-        var useCloud = remotePosts.length > localPosts.length || remoteAt > localAt;
-        if (!useCloud && remotePosts.length === 0) return null;
-        if (useCloud || (remotePosts.length && !localPosts.length)) {
-          var byId = {};
-          localPosts.forEach(function (p) { if (p && p.id) byId[p.id] = p; });
-          remotePosts.forEach(function (p) {
-            if (!p || !p.id) return;
-            var loc = byId[p.id];
-            if (loc && loc.dataUrl && !p.dataUrl) p.dataUrl = loc.dataUrl;
+
+        // Always take cloud if it has posts and local is empty OR cloud is newer OR cloud has more
+        var useCloud =
+          remotePosts.length > 0 &&
+          (localPosts.length === 0 ||
+            remoteAt >= localAt ||
+            remotePosts.length >= localPosts.length);
+
+        if (!useCloud) return null;
+
+        var byId = {};
+        // Start from remote (source of truth for other phones)
+        remotePosts.forEach(function (p) {
+          if (p && p.id) byId[p.id] = p;
+        });
+        // Keep local-only posts (not yet pushed) and local dataUrls
+        localPosts.forEach(function (p) {
+          if (!p || !p.id) return;
+          if (!byId[p.id]) {
             byId[p.id] = p;
-          });
-          var merged = Object.keys(byId).map(function (k) { return byId[k]; });
-          merged.sort(function (a, b) {
-            return new Date(b.date || b.created || 0) - new Date(a.date || a.created || 0);
-          });
-          localStorage.setItem(POSTS_KEY, JSON.stringify(merged));
-          if (Array.isArray(data.playlists)) {
-            localStorage.setItem(PL_KEY, JSON.stringify(data.playlists));
+          } else if (p.dataUrl && !byId[p.id].dataUrl) {
+            byId[p.id].dataUrl = p.dataUrl;
           }
-          if (data.live && typeof data.live === 'object') {
-            localStorage.setItem(LIVE_KEY, JSON.stringify(data.live));
-          }
-          localStorage.setItem(SYNC_META, String(remoteAt || Date.now()));
-          console.log('[cloud] pulled', merged.length, 'posts');
-          return merged;
+        });
+
+        var merged = Object.keys(byId).map(function (k) {
+          return byId[k];
+        });
+        merged.sort(function (a, b) {
+          return (
+            new Date(b.date || b.createdAt || b.created || 0) -
+            new Date(a.date || a.createdAt || a.created || 0)
+          );
+        });
+
+        localStorage.setItem(POSTS_KEY, JSON.stringify(merged));
+        if (Array.isArray(data.playlists)) {
+          localStorage.setItem(PL_KEY, JSON.stringify(data.playlists));
         }
-        return null;
+        if (data.live && typeof data.live === 'object') {
+          localStorage.setItem(LIVE_KEY, JSON.stringify(data.live));
+        }
+        localStorage.setItem(SYNC_META, String(Math.max(remoteAt, Date.now())));
+        console.log('[cloud] pulled', merged.length, 'posts');
+        return merged;
       })
       .catch(function (err) {
         pulling = false;
@@ -115,26 +178,35 @@
     };
   } catch (e) {}
 
-  document.addEventListener('DOMContentLoaded', function () {
-    if (!hasFirestore()) return;
-    var path = (location.pathname || '').toLowerCase();
-    var isAdmin = path.indexOf('admin') >= 0;
+  function tryPull(attempt) {
+    attempt = attempt || 0;
+    if (!hasFirestore()) {
+      if (attempt < 15) {
+        setTimeout(function () {
+          tryPull(attempt + 1);
+        }, 400);
+      }
+      return;
+    }
     window.pullMediaFromCloud().then(function (merged) {
-      if (!merged) return;
-      try { if (typeof posts !== 'undefined') posts = merged; } catch (e) {}
-      try { window.posts = merged; } catch (e) {}
-      if (typeof window.renderMedia === 'function') {
-        try { window.renderMedia(); } catch (e) {}
-      }
-      if (typeof window.renderPlaylistsPublic === 'function') {
-        try { window.renderPlaylistsPublic(); } catch (e) {}
-      }
-      if (typeof window.renderAll === 'function' && !isAdmin) {
-        try { window.renderAll(); } catch (e) {}
-      }
-      try {
-        window.dispatchEvent(new CustomEvent('cog-posts-updated', { detail: { posts: merged } }));
-      } catch (e) {}
+      if (merged) applyPosts(merged);
     });
-  });
+  }
+
+  function boot() {
+    tryPull(0);
+    // Extra pulls for slow networks / late Firebase init
+    setTimeout(function () {
+      tryPull(0);
+    }, 2500);
+    setTimeout(function () {
+      tryPull(0);
+    }, 6000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 })();
