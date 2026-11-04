@@ -1,7 +1,8 @@
-/* Home page rotating showcase of posts (video / audio / text / image) — 3s each, random order */
+/* Home page rotating showcase — few items, random each visit, tap opens player */
 (function () {
   var POSTS_KEY = 'cog_posts_v1';
-  var INTERVAL_MS = 3000;
+  var INTERVAL_MS = 4000;
+  var MAX_ITEMS = 5;
   var card = null;
   var titleEl = null;
   var textEl = null;
@@ -12,6 +13,7 @@
   var order = [];
   var idx = 0;
   var timer = null;
+  var currentPost = null;
 
   function lang() {
     try {
@@ -125,13 +127,19 @@
     return a;
   }
 
+  function pickSubset(list) {
+    var all = normalize(list);
+    if (all.length <= MAX_ITEMS) return shuffle(all);
+    return shuffle(all).slice(0, MAX_ITEMS);
+  }
+
   function renderDots() {
     if (!dotsEl) return;
     if (items.length < 2) {
       dotsEl.innerHTML = '';
       return;
     }
-    var n = Math.min(items.length, 8);
+    var n = items.length;
     var html = '';
     for (var i = 0; i < n; i++) {
       html += '<span class="media-rotator-dot' + (i === (idx % n) ? ' active' : '') + '"></span>';
@@ -139,8 +147,28 @@
     dotsEl.innerHTML = html;
   }
 
+  function openCurrent() {
+    if (!currentPost || !currentPost.id) return;
+    stop();
+    try {
+      if (typeof window.openPost === 'function') {
+        window.openPost(currentPost.id);
+        return;
+      }
+    } catch (e) {}
+    try {
+      window.posts = loadLocal();
+      if (typeof window.openPost === 'function') {
+        window.openPost(currentPost.id);
+        return;
+      }
+    } catch (e2) {}
+    window.location.href = 'media.html#post-' + encodeURIComponent(currentPost.id);
+  }
+
   function showItem(p) {
     if (!card || !p) return;
+    currentPost = p;
     var kind = classify(p);
     var url = mediaUrl(p);
     var title = pickTitle(p) || typeLabel(kind);
@@ -179,15 +207,14 @@
         hasVisual = true;
       }
 
-      // Balanced layout: no empty half
-      if (hasVisual) {
-        card.classList.remove('no-media');
-      } else {
-        card.classList.add('no-media');
-      }
+      if (hasVisual) card.classList.remove('no-media');
+      else card.classList.add('no-media');
 
-      card.href = 'media.html';
+      card.removeAttribute('href');
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
       card.setAttribute('data-id', p.id || '');
+      card.style.cursor = 'pointer';
       card.classList.add('is-visible');
       renderDots();
     }, 180);
@@ -214,9 +241,7 @@
       }
       return;
     }
-    if (card) {
-      card.classList.remove('is-empty');
-    }
+    if (card) card.classList.remove('is-empty');
     order = shuffle(items.map(function (_, i) { return i; }));
     next();
     timer = setInterval(next, INTERVAL_MS);
@@ -228,13 +253,12 @@
   }
 
   function applyPosts(list) {
-    items = normalize(list);
+    items = pickSubset(list);
     start();
   }
 
   function initFromSources() {
     applyPosts(loadLocal());
-
     function tryCloud() {
       if (typeof window.pullMediaFromCloud === 'function') {
         window.pullMediaFromCloud().then(function () {
@@ -248,9 +272,7 @@
             if (!snap.exists) return;
             var data = snap.data() || {};
             if (Array.isArray(data.posts) && data.posts.length) {
-              try {
-                localStorage.setItem(POSTS_KEY, JSON.stringify(data.posts));
-              } catch (e) {}
+              try { localStorage.setItem(POSTS_KEY, JSON.stringify(data.posts)); } catch (e) {}
               applyPosts(data.posts);
             }
           }).catch(function () {});
@@ -270,6 +292,18 @@
     dotsEl = document.getElementById('media-rotator-dots');
     if (!card) return;
     initFromSources();
+
+    card.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openCurrent();
+    });
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openCurrent();
+      }
+    });
 
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) stop();
