@@ -1,4 +1,4 @@
-/* Home page rotating showcase — few items, random each visit, tap opens player */
+/* Home page rotating showcase — few items, random each visit, tap opens on Media page */
 (function () {
   var POSTS_KEY = 'cog_posts_v1';
   var INTERVAL_MS = 4000;
@@ -150,20 +150,8 @@
   function openCurrent() {
     if (!currentPost || !currentPost.id) return;
     stop();
-    try {
-      if (typeof window.openPost === 'function') {
-        window.openPost(currentPost.id);
-        return;
-      }
-    } catch (e) {}
-    try {
-      window.posts = loadLocal();
-      if (typeof window.openPost === 'function') {
-        window.openPost(currentPost.id);
-        return;
-      }
-    } catch (e2) {}
-    window.location.href = 'media.html#post-' + encodeURIComponent(currentPost.id);
+    // Always go to Media page and auto-open this item
+    window.location.href = 'media.html?play=' + encodeURIComponent(currentPost.id);
   }
 
   function showItem(p) {
