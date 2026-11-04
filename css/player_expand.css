@@ -1,7 +1,21 @@
 /* Expanded / fullscreen media player */
 #player-expand-btn {
-  border-color: #c9a227 !important;
+  background: #c9a227 !important;
   color: #0a2540 !important;
+  border: 2px solid #a8861a !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+#player-expand-btn:hover,
+#player-expand-btn:focus {
+  background: #dbb43a !important;
+  color: #061828 !important;
+}
+body.dark #player-expand-btn {
+  background: #c9a227 !important;
+  color: #0a2540 !important;
+  border-color: #e8c84a !important;
 }
 body.player-expanded #post-modal .modal {
   max-width: 100% !important;
@@ -43,4 +57,37 @@ video.player-fs {
     padding-bottom: 0 !important;
     height: 70vh !important;
   }
+}
+
+/* Compact My Playlists panel */
+#my-playlists-panel {
+  margin: 0 0 1rem !important;
+  padding: 0.75rem 0.9rem !important;
+  border-radius: 12px !important;
+}
+#my-playlists-panel h2 {
+  font-size: 1rem !important;
+  margin: 0 0 0.35rem !important;
+}
+#my-playlists-panel > p {
+  font-size: 0.8rem !important;
+  margin: 0 0 0.65rem !important;
+  line-height: 1.35;
+}
+#my-playlists-panel #new-pl-name {
+  padding: 0.45rem 0.6rem !important;
+  font-size: 0.95rem !important;
+  min-width: 120px !important;
+}
+#my-playlists-panel #btn-create-pl {
+  padding: 0.45rem 0.8rem !important;
+  font-size: 0.9rem !important;
+}
+#my-playlists-panel .my-pl-card {
+  padding: 0.7rem 0.8rem !important;
+  margin-bottom: 0.55rem !important;
+  border-radius: 10px !important;
+}
+#my-playlists-panel .my-pl-card strong {
+  font-size: 0.95rem !important;
 }

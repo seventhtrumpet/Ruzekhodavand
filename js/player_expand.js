@@ -28,14 +28,12 @@
       return;
     }
     try {
-      // Ensure posts loaded
       if (typeof posts === 'undefined' || !posts || !posts.length) {
         try {
           window.posts = JSON.parse(localStorage.getItem('cog_posts_v1') || '[]');
         } catch (e) {}
       }
       window.openPost(id);
-      // Clean URL without reload
       try {
         var u = new URL(window.location.href);
         u.searchParams.delete('play');
@@ -60,9 +58,10 @@
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.id = 'player-expand-btn';
-    btn.className = 'btn btn-outline';
+    btn.className = 'btn';
     btn.style.cssText =
-      'margin:0.6rem 0 0;width:100%;padding:0.65rem 1rem;font-size:1rem;font-weight:700;';
+      'margin:0.6rem 0 0;width:100%;padding:0.7rem 1rem;font-size:1.05rem;font-weight:800;' +
+      'background:#c9a227;color:#0a2540;border:2px solid #a8861a;border-radius:10px;';
     btn.textContent = isFa() ? '\u0628\u0632\u0631\u06af / \u062a\u0645\u0627\u0645\u200c\u0635\u0641\u062d\u0647' : 'Expand / Fullscreen';
 
     function enterExpand() {
@@ -94,12 +93,10 @@
       else enterExpand();
     });
 
-    // Place button after media
     if (wrap && wrap.parentNode) wrap.parentNode.insertBefore(btn, wrap.nextSibling);
     else if (video && video.parentNode) video.parentNode.insertBefore(btn, video.nextSibling);
     else content.appendChild(btn);
 
-    // Auto-expand feel in landscape
     function onOrient() {
       try {
         var landscape = window.matchMedia('(orientation: landscape)').matches;
