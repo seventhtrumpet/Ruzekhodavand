@@ -1,4 +1,4 @@
-/* Mobile header — no overlap between social and Sign in */
+/* Mobile header — stable, no overlap */
 html, body {
   max-width: 100%;
   overflow-x: hidden !important;
@@ -23,7 +23,6 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Brand = logo + social only */
 .header-brand {
   display: inline-flex !important;
   flex-direction: row !important;
@@ -31,7 +30,6 @@ html, body {
   gap: 0.3rem !important;
   flex: 0 1 auto;
   min-width: 0;
-  max-width: 55%;
   position: relative;
   z-index: 2;
 }
@@ -40,22 +38,14 @@ html, body {
   align-items: center;
   gap: 0.25rem;
   flex-shrink: 0;
-  position: relative;
-  z-index: 2;
 }
 .header-brand .header-social {
   display: inline-flex !important;
   align-items: center;
-  gap: 0.15rem !important;
+  gap: 0.12rem !important;
   flex-shrink: 0;
   margin: 0 !important;
-  margin-inline-start: 0 !important;
-  margin-inline-end: 0 !important;
-  position: relative;
-  z-index: 2;
 }
-
-/* Kill any pull-apart margins from polish.css */
 .header-social {
   margin-inline-end: 0 !important;
   margin-inline-start: 0 !important;
@@ -70,7 +60,7 @@ html, body {
     flex-direction: row !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
-    gap: 0.3rem !important;
+    gap: 0.25rem !important;
     width: 100% !important;
     max-width: 100% !important;
     overflow: hidden;
@@ -86,7 +76,6 @@ html, body {
 
   .header-brand {
     order: 1;
-    max-width: none;
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
@@ -99,13 +88,13 @@ html, body {
   }
   .logo .logo-name,
   .logo [data-i18n="siteName"] {
-    display: none !important; /* free space for social + sign in */
+    display: none !important;
   }
 
   .header-social a {
-    width: 1.55rem !important;
-    height: 1.55rem !important;
-    min-width: 1.55rem !important;
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    min-width: 1.5rem !important;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.14);
     display: inline-flex !important;
@@ -114,27 +103,27 @@ html, body {
     flex-shrink: 0;
   }
   .header-social a svg {
-    width: 0.78rem !important;
-    height: 0.78rem !important;
+    width: 0.75rem !important;
+    height: 0.75rem !important;
+  }
+  /* Show ALL social icons including WhatsApp */
+  .header-social a:nth-child(n) {
+    display: inline-flex !important;
   }
 
   .nav.nav-main {
-    display: none !important; /* links are in hamburger */
+    display: none !important;
   }
 
-  /* Actions = lang + size + sign in — own group on the end, never under social */
   .header-actions {
     display: flex !important;
     align-items: center !important;
     gap: 0.2rem !important;
-    margin-inline-start: 0.25rem !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    margin-inline-start: 0.2rem !important;
     flex-shrink: 0 !important;
     order: 2;
     position: relative;
     z-index: 3;
-    background: transparent;
   }
 
   #lang-toggle,
@@ -146,10 +135,9 @@ html, body {
   }
 
   .text-size-controls {
-    display: none !important; /* hide A+/- on phone to stop crowding */
+    display: none !important;
   }
 
-  /* Sign-in / ورود — must stay clear */
   .header-actions .btn,
   .header-actions button:not(.lang-toggle),
   #auth-btn,
@@ -183,12 +171,5 @@ html, body {
   .hero h1 {
     font-size: clamp(1.55rem, 7vw, 2.1rem) !important;
     word-break: break-word;
-  }
-}
-
-/* Extra-small: keep only 4 social icons */
-@media (max-width: 380px) {
-  .header-social a:nth-child(n+5) {
-    display: none !important;
   }
 }
