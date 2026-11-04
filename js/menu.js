@@ -164,6 +164,7 @@
   loadScript('js/loading.js', 'data-loading');
   loadScript('js/cloud_sync.js', 'data-cloud-sync');
   loadScript('js/media_public_fix.js', 'data-media-public-fix');
+  loadScript('js/user_playlists.js', 'data-user-playlists');
   loadScript('js/app_media.js', 'data-app-media');
   loadCss('css/mobile_header.css', 'data-mobile-header');
   loadCss('css/social.css', 'data-social-css');
