@@ -162,6 +162,7 @@
   loadScript('js/text_size.js', 'data-text-size');
   loadScript('js/share.js', 'data-share');
   loadScript('js/loading.js', 'data-loading');
+  loadScript('js/cloud_sync.js', 'data-cloud-sync');
   loadCss('css/mobile_header.css', 'data-mobile-header');
   loadCss('css/social.css', 'data-social-css');
   loadCss('css/quality.css', 'data-quality-css');
