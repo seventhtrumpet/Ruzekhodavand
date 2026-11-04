@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://seventhtrumpet.org/sitemap.xml

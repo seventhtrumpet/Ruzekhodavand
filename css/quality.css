@@ -1,0 +1,171 @@
+/* Premium quality layer — safe visual upgrades */
+
+/* ---- Typography ---- */
+body {
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+}
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+/* ---- Header: crisp glass ---- */
+.header {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 28px rgba(0, 0, 0, 0.18);
+}
+
+/* ---- Hero media rotator: controlled size on desktop ---- */
+@media (min-width: 900px) {
+  .media-rotator {
+    max-width: 560px !important;
+  }
+  .media-rotator-media {
+    max-height: 280px;
+    aspect-ratio: 16 / 9;
+  }
+  .media-rotator-card {
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  }
+}
+
+.media-rotator-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.35s ease !important;
+}
+.media-rotator-card.is-visible:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+}
+
+/* ---- Start here: more premium ---- */
+.start-here-btn,
+.home-cta .btn-primary,
+a.btn.btn-primary.start-here-btn {
+  box-shadow: 0 8px 28px rgba(201, 162, 39, 0.35) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em;
+}
+.start-here-btn:hover,
+.home-cta .btn-primary:hover {
+  box-shadow: 0 12px 36px rgba(201, 162, 39, 0.45) !important;
+}
+
+/* ---- Angel cards equal height polish ---- */
+.angels-row .angel-card {
+  min-height: 7.5rem;
+}
+
+/* ---- Daily verse card ---- */
+.daily-verse-inner {
+  padding: 1.5rem 1.35rem !important;
+}
+.daily-verse-inner #verse-text,
+.daily-verse-inner .verse-text {
+  font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+  line-height: 1.75;
+}
+
+/* ---- Media page cards ---- */
+.media-card {
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(10, 37, 64, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: var(--bg-card, #fff);
+}
+.media-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 40px rgba(10, 37, 64, 0.14);
+}
+body.dark .media-card {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+.media-card .media-view-btn,
+.media-card .btn-primary {
+  width: 100%;
+  border-radius: 10px !important;
+  font-weight: 700;
+  padding: 0.7rem 1rem !important;
+}
+
+/* ---- Filters on media ---- */
+#filter-book,
+#filter-type,
+#filter-search,
+.filter-bar select,
+.filter-bar input {
+  border-radius: 12px !important;
+  border: 1px solid var(--border, #e0dcd3) !important;
+  padding: 0.65rem 0.9rem !important;
+  font-size: 1rem !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+#filter-search:focus,
+.filter-bar input:focus,
+.filter-bar select:focus {
+  outline: none;
+  border-color: var(--accent, #c9a227) !important;
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2);
+}
+
+/* ---- Bible reader comfort ---- */
+.bible-content,
+#bible-reader,
+.verse-list,
+#chapter-text {
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.9;
+  font-size: 1.08rem;
+}
+
+/* ---- Footer premium ---- */
+.footer {
+  padding-top: 2.75rem !important;
+  padding-bottom: 2.25rem !important;
+}
+.footer-social a {
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+/* ---- Sections breathing room ---- */
+.mission-section,
+.daily-verse,
+main.container {
+  padding-top: 1.75rem;
+  padding-bottom: 1.75rem;
+}
+
+/* ---- Smooth page feel ---- */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ---- New badge polish ---- */
+.media-new-badge {
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase;
+}
+
+/* ---- Contact / about cards ---- */
+.contact-card,
+.mission-card,
+.about-card {
+  border-radius: 18px !important;
+  border: 1px solid rgba(201, 162, 39, 0.2);
+  box-shadow: 0 10px 32px rgba(10, 37, 64, 0.07);
+}
+
+/* ---- Mobile: keep premium but compact ---- */
+@media (max-width: 700px) {
+  .media-rotator {
+    max-width: 100% !important;
+  }
+  .media-card:hover {
+    transform: none;
+  }
+}
