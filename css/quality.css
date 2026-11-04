@@ -1,27 +1,34 @@
-/* Premium quality layer — safe visual upgrades */
+/* Premium quality layer — final pass */
 
-/* ---- Typography ---- */
 body {
   line-height: 1.65;
   letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
 }
 h1, h2, h3 {
   letter-spacing: -0.02em;
   line-height: 1.25;
 }
 
-/* ---- Header: crisp glass ---- */
 .header {
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 28px rgba(0, 0, 0, 0.18);
 }
 
-/* ---- Hero media rotator: controlled size on desktop ---- */
+/* Media rotator: IMAGE first, then title */
+.media-rotator-card {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.media-rotator-media { order: 1 !important; }
+.media-rotator-type { order: 2 !important; }
+.media-rotator-body { order: 3 !important; }
+
 @media (min-width: 900px) {
   .media-rotator {
-    max-width: 560px !important;
+    max-width: 520px !important;
   }
   .media-rotator-media {
-    max-height: 280px;
+    max-height: 260px;
     aspect-ratio: 16 / 9;
   }
   .media-rotator-card {
@@ -38,7 +45,6 @@ h1, h2, h3 {
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
 }
 
-/* ---- Start here: more premium ---- */
 .start-here-btn,
 .home-cta .btn-primary,
 a.btn.btn-primary.start-here-btn {
@@ -51,22 +57,50 @@ a.btn.btn-primary.start-here-btn {
   box-shadow: 0 12px 36px rgba(201, 162, 39, 0.45) !important;
 }
 
-/* ---- Angel cards equal height polish ---- */
 .angels-row .angel-card {
   min-height: 7.5rem;
 }
+.angels-row .angel-cta {
+  opacity: 1 !important;
+  margin-top: auto;
+  padding-top: 0.35rem;
+}
 
-/* ---- Daily verse card ---- */
 .daily-verse-inner {
-  padding: 1.5rem 1.35rem !important;
+  padding: 1.75rem 1.5rem !important;
+  text-align: center !important;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .daily-verse-inner #verse-text,
 .daily-verse-inner .verse-text {
-  font-size: clamp(1.05rem, 2.2vw, 1.25rem);
-  line-height: 1.75;
+  font-size: clamp(1.08rem, 2.2vw, 1.3rem);
+  line-height: 1.85;
 }
 
-/* ---- Media page cards ---- */
+.mission-section {
+  text-align: center !important;
+}
+.mission-card {
+  max-width: 720px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+  padding: 1.75rem 1.5rem !important;
+}
+.mission-card p,
+.mission-card .mission-text {
+  text-align: center !important;
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+.mission-card a {
+  display: inline-block;
+  margin-top: 0.75rem;
+}
+
 .media-card {
   border-radius: 16px !important;
   overflow: hidden;
@@ -89,7 +123,6 @@ body.dark .media-card {
   padding: 0.7rem 1rem !important;
 }
 
-/* ---- Filters on media ---- */
 #filter-book,
 #filter-type,
 #filter-search,
@@ -109,7 +142,6 @@ body.dark .media-card {
   box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2);
 }
 
-/* ---- Bible reader comfort ---- */
 .bible-content,
 #bible-reader,
 .verse-list,
@@ -121,16 +153,28 @@ body.dark .media-card {
   font-size: 1.08rem;
 }
 
-/* ---- Footer premium ---- */
+.home-contact,
+.contact-card {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 480px;
+}
+.contact-card,
+.mission-card,
+.about-card {
+  border-radius: 18px !important;
+  border: 1px solid rgba(201, 162, 39, 0.22);
+  box-shadow: 0 10px 32px rgba(10, 37, 64, 0.07);
+}
+
 .footer {
   padding-top: 2.75rem !important;
   padding-bottom: 2.25rem !important;
 }
-.footer-social a {
-  transition: transform 0.2s ease, background 0.2s ease;
+.footer-social a:hover {
+  transform: translateY(-3px);
 }
 
-/* ---- Sections breathing room ---- */
 .mission-section,
 .daily-verse,
 main.container {
@@ -138,29 +182,28 @@ main.container {
   padding-bottom: 1.75rem;
 }
 
-/* ---- Smooth page feel ---- */
 @media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
+  html { scroll-behavior: smooth; }
 }
 
-/* ---- New badge polish ---- */
 .media-new-badge {
   letter-spacing: 0.06em !important;
   text-transform: uppercase;
 }
 
-/* ---- Contact / about cards ---- */
-.contact-card,
-.mission-card,
-.about-card {
-  border-radius: 18px !important;
-  border: 1px solid rgba(201, 162, 39, 0.2);
-  box-shadow: 0 10px 32px rgba(10, 37, 64, 0.07);
+@media (min-width: 901px) {
+  .header-brand {
+    gap: 0.55rem !important;
+  }
+  .header-social a {
+    width: 2.05rem;
+    height: 2.05rem;
+  }
+  .header-inner {
+    gap: 0.75rem;
+  }
 }
 
-/* ---- Mobile: keep premium but compact ---- */
 @media (max-width: 700px) {
   .media-rotator {
     max-width: 100% !important;
