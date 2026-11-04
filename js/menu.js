@@ -164,5 +164,6 @@
   loadScript('js/loading.js', 'data-loading');
   loadCss('css/mobile_header.css', 'data-mobile-header');
   loadCss('css/social.css', 'data-social-css');
+  loadCss('css/quality.css', 'data-quality-css');
   loadScript('js/social.js', 'data-social-js');
 })();
