@@ -1,0 +1,28 @@
+{
+  "name": "Seventh Trumpet — شیپور هفتم",
+  "short_name": "Seventh Trumpet",
+  "description": "The everlasting gospel — Three Angels' Message. Bible, media, and live.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a2540",
+  "theme_color": "#0a2540",
+  "lang": "fa",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "https://iili.io/n8M8tYF.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "https://iili.io/n8M8tYF.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "lifestyle"]
+}
