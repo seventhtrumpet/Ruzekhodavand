@@ -127,7 +127,7 @@
   }
 
   function flashShare(msg) {
-    var el = document.getElementById('mb-share');
+    var el = document.getElementById('mb-share') || document.getElementById('daily-share');
     if (!el) return;
     var old = el.textContent;
     el.textContent = msg;
@@ -168,13 +168,13 @@
       var text = (document.getElementById('verse-text') || {}).textContent || '';
       var ref = (document.getElementById('verse-ref') || {}).textContent || '';
       var url = (location.origin || 'https://seventhtrumpet.org') + '/';
-      var shareText = (ref ? ref + '\n' : '') + text + '\n\n' + url;
+      var shareText = (ref ? ref + '\n' : '') + text;
       if (navigator.share) {
         navigator.share({ title: ref || 'Daily Verse', text: shareText, url: url }).catch(function () {
-          copyLink(shareText);
+          copyLink(url);
         });
       } else {
-        copyLink(shareText);
+        copyLink((ref ? ref + ' — ' : '') + url);
       }
     });
   }
