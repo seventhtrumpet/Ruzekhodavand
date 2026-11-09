@@ -1,4 +1,4 @@
-/* Load bible core + fix navigation: Book → Chapter → Verse, then Read */
+/* Bible core loader: Book → Chapter → Verse → Read */
 (async function () {
   try {
     var urls = [
@@ -14,10 +14,13 @@
     }
     if (!code) throw new Error('Could not load bible core');
 
-    // Fix wrong toolbar id
     code = code.replace(/mb-sel-actions/g, 'mb-actions');
 
-    // Auto-discover per-chapter Persian files
+    // Style classes used by CSS
+    code = code.replace(/mb-book-btn/g, 'mb-cell');
+    code = code.replace(/mb-num-btn/g, 'mb-cell');
+
+    // Discover chapter files
     code = code.replace(
       "const files = man[String(id)] || ['b' + id + '.json'];",
       "let files = (man[String(id)] || []).slice();" +
@@ -26,150 +29,89 @@
       "if (!files.length) files = ['b' + id + '.json'];"
     );
 
-    // CRITICAL FIX: tapping a book must NOT jump in — show chapters instead
-    code = code.replace(
-      "btn.addEventListener('click', async () => {\n        bookId = Number(btn.getAttribute('data-book'));\n        chapter = 1; verse = 1;\n        closeSel();\n        await renderBook(true);\n      });",
-      "btn.addEventListener('click', async () => {\n        bookId = Number(btn.getAttribute('data-book'));\n        chapter = 1; verse = 1;\n        updateRef();\n        saveState();\n        showTab('chapters');\n        await renderChapterGrid();\n        // preload book in background so chapters/verses are ready\n        try { if (currentLang === 'fa') await loadFaBook(bookId); } catch (e) {}\n      });"
-    );
-
-    // Also handle single-line version if minified differently
+    // Book click: go to chapter list (do NOT open book yet)
     code = code.replace(
       "bookId = Number(btn.getAttribute('data-book'));\n        chapter = 1; verse = 1;\n        closeSel();\n        await renderBook(true);",
-      "bookId = Number(btn.getAttribute('data-book'));\n        chapter = 1; verse = 1;\n        updateRef();\n        saveState();\n        showTab('chapters');\n        await renderChapterGrid();\n        try { if (currentLang === 'fa') await loadFaBook(bookId); } catch (e) {}"
+      "bookId = Number(btn.getAttribute('data-book'));\n        chapter = 1; verse = 1;\n        updateRef(); saveState();\n        showTab('chapters');\n        await renderChapterGrid();\n        try { if (currentLang === 'fa') await loadFaBook(bookId); } catch(__e){}"
     );
 
-    // Chapter pick: stay in picker, go to verses (already mostly does this — ensure no close)
+    // Chapter click: go to verse list only (no scroll while picker open)
     code = code.replace(
       "showTab('verses');\n        renderVerseGrid();\n        scrollToRef(chapter, verse, true);",
       "showTab('verses');\n        renderVerseGrid();"
     );
 
-    // Verse pick: close and jump
+    // Verse click: close + load book + jump
     code = code.replace(
       "verse = Number(btn.getAttribute('data-vs'));\n        updateRef();\n        saveState();\n        closeSel();\n        scrollToRef(chapter, verse, true);",
-      "verse = Number(btn.getAttribute('data-vs'));\n        updateRef();\n        saveState();\n        closeSel();\n        renderBook(true).then(function(){ scrollToRef(chapter, verse, true); });"
+      "verse = Number(btn.getAttribute('data-vs'));\n        updateRef(); saveState();\n        closeSel();\n        await renderBook(true);\n        scrollToRef(chapter, verse, true);"
+    );
+
+    // Done/Read button: close + load at current book/chapter/verse
+    code = code.replace(
+      "document.getElementById('mb-close')?.addEventListener('click', closeSel);",
+      "document.getElementById('mb-close')?.addEventListener('click', async () => { closeSel(); await renderBook(true); scrollToRef(chapter, verse, true); });"
     );
 
     (0, eval)(code);
 
-    // Wire "Read / Done" button to load book at chosen chapter:verse
     function isEn() {
-      try {
-        return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en';
-      } catch (e) { return false; }
+      try { return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en'; }
+      catch (e) { return false; }
     }
-
     function setLabels() {
       var en = isEn();
-      var s = document.getElementById('mb-share');
-      var c = document.getElementById('mb-copy');
-      var x = document.getElementById('mb-clear');
-      var d = document.getElementById('mb-close');
-      if (s) s.textContent = en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9';
-      if (c) c.textContent = en ? 'Copy' : '\u06a9\u067e\u06cc';
-      if (x) x.textContent = en ? 'Clear' : '\u067e\u0627\u06a9';
-      if (d) d.textContent = en ? 'Read' : '\u062e\u0648\u0627\u0646\u062f\u0646';
+      var map = {
+        'mb-share': en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9',
+        'mb-copy': en ? 'Copy' : '\u06a9\u067e\u06cc',
+        'mb-clear': en ? 'Clear' : '\u067e\u0627\u06a9',
+        'mb-close': en ? 'Read' : '\u062e\u0648\u0627\u0646\u062f\u0646'
+      };
+      Object.keys(map).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = map[id];
+      });
     }
-
     function shareSelectedVerses() {
       var nodes = document.querySelectorAll('.mb-verse.selected');
       if (!nodes.length) {
-        alert(isEn() ? 'Tap one or more verses first, then Share' : '\u0627\u0628\u062a\u062f\u0627 \u06cc\u06a9 \u06cc\u0627 \u0686\u0646\u062f \u0622\u06cc\u0647 \u0631\u0627 \u0644\u0645\u0633 \u06a9\u0646\u06cc\u062f');
+        alert(isEn()
+          ? 'Tap verses to select them, then press Share'
+          : '\u0622\u06cc\u0647\u200c\u0647\u0627 \u0631\u0627 \u0644\u0645\u0633 \u06a9\u0646\u06cc\u062f\u060c \u0628\u0639\u062f \u0627\u0634\u062a\u0631\u0627\u06a9');
         return;
       }
-      var lines = [];
-      var firstCh = null, firstV = null, lastV = null;
+      var lines = [], firstCh = null, firstV = null, lastV = null;
       nodes.forEach(function (el) {
         var ch = el.getAttribute('data-chapter');
         var vs = el.getAttribute('data-verse');
         if (firstCh == null) { firstCh = ch; firstV = vs; }
         lastV = vs;
-        var t = (el.textContent || '').replace(/^\d+\s*/, '').trim();
-        lines.push(ch + ':' + vs + ' — ' + t);
+        lines.push(ch + ':' + vs + ' — ' + (el.textContent || '').replace(/^\d+\s*/, '').trim());
       });
       var state = {};
       try { state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}'); } catch (e) {}
-      var bookId = state.bookId || '';
-      var base = (location.origin || 'https://seventhtrumpet.org') + '/bible.html';
-      var vParam = firstV + (lastV && lastV !== firstV ? ('-' + lastV) : '');
-      var url = base + '?b=' + bookId + '&c=' + firstCh + '&v=' + vParam;
+      var url = (location.origin || 'https://seventhtrumpet.org') + '/bible.html?b=' + (state.bookId || '') + '&c=' + firstCh + '&v=' + firstV + (lastV !== firstV ? '-' + lastV : '');
       var body = lines.join('\n') + '\n\n' + url;
-      if (navigator.share) {
-        navigator.share({ title: 'Bible', text: body, url: url }).catch(function () {
-          if (navigator.clipboard) navigator.clipboard.writeText(body);
-        });
-      } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(body);
-      }
+      if (navigator.share) navigator.share({ title: 'Bible', text: body, url: url }).catch(function () {});
+      else if (navigator.clipboard) navigator.clipboard.writeText(body);
     }
-
     window.shareSelected = shareSelectedVerses;
-
-    // Make Done/Read load the selection
-    var closeBtn = document.getElementById('mb-close');
-    if (closeBtn && !closeBtn._readBound) {
-      closeBtn._readBound = true;
-      closeBtn.addEventListener('click', function () {
-        try {
-          var st = JSON.parse(localStorage.getItem('cog_bible_state') || '{}');
-          // core closeSel already runs via its own listener; force load
-          setTimeout(function () {
-            if (typeof window !== 'undefined') {
-              // trigger re-render by dispatching — core state already set
-            }
-          }, 50);
-        } catch (e) {}
-      });
-    }
-
-    // After picker closes via Done, ensure book is rendered
-    var origClose = null;
-    setTimeout(function () {
-      var btn = document.getElementById('mb-close');
-      if (!btn || btn._extraBound) return;
-      btn._extraBound = true;
-      btn.addEventListener('click', function () {
-        setTimeout(function () {
-          // Force navigate to chosen place
-          try {
-            var panel = document.getElementById('mb-sel');
-            if (panel) {
-              panel.classList.add('hidden');
-              panel.setAttribute('aria-hidden', 'true');
-            }
-          } catch (e) {}
-          // re-load using localStorage state that core saved
-          location.hash = '#read';
-          // soft reload of content without full page refresh:
-          var event = new Event('cog-bible-go');
-          window.dispatchEvent(event);
-        }, 30);
-      });
-    }, 800);
 
     function bindShare() {
       var btn = document.getElementById('mb-share');
       if (!btn || btn._bound) return;
       btn._bound = true;
       btn.addEventListener('click', shareSelectedVerses);
-      setLabels();
     }
     bindShare();
     setLabels();
-    setTimeout(bindShare, 600);
-    setTimeout(setLabels, 600);
-
+    setTimeout(function () { bindShare(); setLabels(); }, 500);
     var lt = document.getElementById('lang-toggle');
-    if (lt) {
-      lt.addEventListener('click', function () {
-        setTimeout(setLabels, 120);
-        setTimeout(setLabels, 400);
-      });
-    }
+    if (lt) lt.addEventListener('click', function () { setTimeout(setLabels, 150); });
     window.addEventListener('cog-lang-changed', setLabels);
   } catch (e) {
     console.error(e);
     var el = document.getElementById('mb-reader') || document.body;
-    if (el) el.insertAdjacentHTML('afterbegin', '<p style="color:#c00;padding:1rem">Bible failed to load. Refresh the page.</p>');
+    if (el) el.insertAdjacentHTML('afterbegin', '<p style="color:#c00;padding:1rem">Bible failed to load. Refresh.</p>');
   }
 })();
