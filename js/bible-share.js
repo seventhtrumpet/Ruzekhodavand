@@ -1,7 +1,5 @@
-/* Seventh Trumpet — Verse share + deep links */
+/* Seventh Trumpet — Deep links + daily verse share (Bible multi-share is in bible.js) */
 (function () {
-  var BASE = (location.origin || 'https://seventhtrumpet.org') + '/bible.html';
-
   function getParams() {
     try {
       var p = new URLSearchParams(location.search);
@@ -9,11 +7,12 @@
       var c = p.get('c') || p.get('chapter');
       var v = p.get('v') || p.get('verse');
       if (b && c) {
-        return {
-          bookId: Number(b),
-          chapter: Number(c),
-          verse: v ? Number(v) : 1
-        };
+        var verse = 1;
+        if (v) {
+          var m = String(v).match(/^(\d+)/);
+          if (m) verse = Number(m[1]);
+        }
+        return { bookId: Number(b), chapter: Number(c), verse: verse };
       }
     } catch (e) {}
     return null;
@@ -35,117 +34,26 @@
         setTimeout(function () { el.classList.remove('highlight'); }, 2500);
         return;
       }
-      if (tries < 40) setTimeout(tryScroll, 250);
+      if (tries < 50) setTimeout(tryScroll, 200);
     }
-    setTimeout(tryScroll, 600);
+    setTimeout(tryScroll, 500);
   }
 
-  function buildShareUrl(bookId, chapter, verse) {
-    return BASE + '?b=' + bookId + '&c=' + chapter + '&v=' + verse;
-  }
-
-  function getSelectedVerses() {
-    var selected = document.querySelectorAll('.mb-verse.selected');
-    if (selected.length) {
-      var first = selected[0];
-      return {
-        chapter: Number(first.getAttribute('data-chapter')),
-        verse: Number(first.getAttribute('data-verse')),
-        count: selected.length
-      };
-    }
-    var highlight = document.querySelector('.mb-verse.highlight');
-    if (highlight) {
-      return {
-        chapter: Number(highlight.getAttribute('data-chapter')),
-        verse: Number(highlight.getAttribute('data-verse')),
-        count: 1
-      };
-    }
-    try {
-      var s = JSON.parse(localStorage.getItem('cog_bible_state') || '{}');
-      if (s.bookId && s.chapter) {
-        return { chapter: Number(s.chapter), verse: Number(s.verse || 1), count: 1, bookId: Number(s.bookId) };
-      }
-    } catch (e) {}
-    return null;
-  }
-
-  function getCurrentBookId() {
-    try {
-      var s = JSON.parse(localStorage.getItem('cog_bible_state') || '{}');
-      if (s.bookId) return Number(s.bookId);
-    } catch (e) {}
-    return null;
-  }
-
-  function shareVerse() {
-    var sel = getSelectedVerses();
-    if (!sel) {
-      alert(document.documentElement.lang === 'en' ? 'Select a verse first' : 'ابتدا یک آیه را انتخاب کنید');
-      return;
-    }
-    var bookId = sel.bookId || getCurrentBookId();
-    if (!bookId) {
-      alert(document.documentElement.lang === 'en' ? 'Open a book first' : 'ابتدا یک کتاب باز کنید');
-      return;
-    }
-    var url = buildShareUrl(bookId, sel.chapter, sel.verse);
-    var refText = (document.getElementById('mb-ref') || {}).textContent || '';
-    var title = refText || ('Bible ' + sel.chapter + ':' + sel.verse);
-
-    if (navigator.share) {
-      navigator.share({ title: title, text: title, url: url }).catch(function () {
-        copyLink(url);
-      });
-    } else {
-      copyLink(url);
-    }
-  }
-
-  function copyLink(url) {
+  function copyText(t) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(function () {
-        flashShare(document.documentElement.lang === 'en' ? 'Link copied' : 'لینک کپی شد');
-      }).catch(function () {
-        fallbackCopy(url);
-      });
-    } else {
-      fallbackCopy(url);
+      return navigator.clipboard.writeText(t);
     }
-  }
-
-  function fallbackCopy(url) {
-    var ta = document.createElement('textarea');
-    ta.value = url;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand('copy'); flashShare(document.documentElement.lang === 'en' ? 'Link copied' : 'لینک کپی شد'); } catch (e) {}
-    document.body.removeChild(ta);
-  }
-
-  function flashShare(msg) {
-    var el = document.getElementById('mb-share') || document.getElementById('daily-share');
-    if (!el) return;
-    var old = el.textContent;
-    el.textContent = msg;
-    setTimeout(function () { el.textContent = old; }, 1800);
-  }
-
-  function ensureShareButton() {
-    var actions = document.getElementById('mb-actions');
-    if (!actions || document.getElementById('mb-share')) return;
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.id = 'mb-share';
-    btn.setAttribute('data-i18n', 'share');
-    btn.textContent = document.documentElement.lang === 'en' ? 'Share' : 'اشتراک';
-    var clearBtn = document.getElementById('mb-clear');
-    if (clearBtn) actions.insertBefore(btn, clearBtn);
-    else actions.appendChild(btn);
-    btn.addEventListener('click', shareVerse);
+    return new Promise(function (resolve) {
+      var ta = document.createElement('textarea');
+      ta.value = t;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      resolve();
+    });
   }
 
   function initDailyShare() {
@@ -171,19 +79,60 @@
       var shareText = (ref ? ref + '\n' : '') + text;
       if (navigator.share) {
         navigator.share({ title: ref || 'Daily Verse', text: shareText, url: url }).catch(function () {
-          copyLink(url);
+          copyText((ref ? ref + ' — ' : '') + url);
         });
       } else {
-        copyLink((ref ? ref + ' — ' : '') + url);
+        copyText((ref ? ref + '\n' : '') + text + '\n' + url).then(function () {
+          var old = btn.textContent;
+          btn.textContent = document.documentElement.lang === 'en' ? 'Copied' : 'کپی شد';
+          setTimeout(function () { btn.textContent = old; }, 1500);
+        });
+      }
+    });
+  }
+
+  function ensureShareClick() {
+    var btn = document.getElementById('mb-share');
+    if (!btn || btn._shareBound) return;
+    btn._shareBound = true;
+    btn.addEventListener('click', function () {
+      if (typeof window.shareSelected === 'function') {
+        window.shareSelected();
+        return;
+      }
+      var nodes = document.querySelectorAll('.mb-verse.selected');
+      if (!nodes.length) {
+        alert(document.documentElement.lang === 'en' ? 'Select one or more verses first' : 'ابتدا یک یا چند آیه را انتخاب کنید');
+        return;
+      }
+      var lines = [];
+      var firstCh = null, firstV = null, lastV = null;
+      nodes.forEach(function (el) {
+        var ch = el.getAttribute('data-chapter');
+        var vs = el.getAttribute('data-verse');
+        if (firstCh == null) { firstCh = ch; firstV = vs; }
+        lastV = vs;
+        var t = (el.textContent || '').replace(/^\d+\s*/, '').trim();
+        lines.push(ch + ':' + vs + ' — ' + t);
+      });
+      var state = {};
+      try { state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}'); } catch (e) {}
+      var bookId = state.bookId || '';
+      var url = (location.origin || 'https://seventhtrumpet.org') + '/bible.html?b=' + bookId + '&c=' + firstCh + '&v=' + firstV + (lastV !== firstV ? '-' + lastV : '');
+      var body = lines.join('\n') + '\n\n' + url;
+      if (navigator.share) {
+        navigator.share({ title: 'Bible', text: body, url: url }).catch(function () { copyText(body); });
+      } else {
+        copyText(body);
       }
     });
   }
 
   function boot() {
     applyDeepLink();
-    ensureShareButton();
     initDailyShare();
-    var obs = new MutationObserver(function () { ensureShareButton(); });
+    ensureShareClick();
+    var obs = new MutationObserver(function () { ensureShareClick(); });
     if (document.body) obs.observe(document.body, { childList: true, subtree: true });
   }
 
