@@ -24,13 +24,14 @@ body.dark .mb-bar { background: #152536; border-color: #2a3a4c; }
   line-height: 1;
   cursor: pointer;
   font-family: inherit;
+  flex-shrink: 0;
 }
 .mb-nav:active { transform: scale(0.94); }
 
 .mb-ref {
-  min-width: 10rem;
-  max-width: min(72vw, 24rem);
-  padding: 0.5rem 1rem;
+  min-width: 8rem;
+  max-width: min(68vw, 22rem);
+  padding: 0.5rem 0.9rem;
   border: none;
   border-radius: 8px;
   background: var(--primary, #0a2540);
@@ -181,7 +182,7 @@ body.dark .mb-cell.active { background: #2a6dad; color: #fff; }
 .mb-reader {
   max-width: 720px;
   margin: 0 auto;
-  padding: 0.6rem 1rem 4rem;
+  padding: 0.6rem 1rem 5rem;
   min-height: 70vh;
   touch-action: pan-y;
 }
@@ -244,6 +245,7 @@ body.lang-en .mb-reader { direction: ltr; }
 body.lang-en .mb-text { font-family: var(--font-en, Inter, system-ui, sans-serif); line-height: 1.85; }
 body.lang-en .mb-verse { text-align: left; }
 
+/* Action bar: prevent overlap on small screens */
 .mb-actions {
   position: fixed;
   bottom: 0;
@@ -251,17 +253,21 @@ body.lang-en .mb-verse { text-align: left; }
   right: 0;
   z-index: 50;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 0.85rem;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  padding: 0.5rem 0.7rem;
   background: var(--primary, #0a2540);
   color: #fff;
   box-shadow: 0 -4px 16px rgba(0,0,0,0.2);
 }
-.mb-actions.hidden { display: none; }
+.mb-actions.hidden { display: none !important; }
 .mb-sel-label {
-  flex: 1;
-  font-size: 0.85rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 0.8rem;
   font-weight: 600;
   direction: ltr;
   unicode-bidi: isolate;
@@ -270,19 +276,34 @@ body.lang-en .mb-verse { text-align: left; }
   white-space: nowrap;
 }
 .mb-actions button {
+  flex: 0 0 auto;
   border: 1px solid rgba(255,255,255,0.35);
   background: rgba(255,255,255,0.12);
   color: #fff;
-  padding: 0.4rem 0.75rem;
+  padding: 0.4rem 0.65rem;
   border-radius: 6px;
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
 }
 .mb-actions button:active { background: rgba(255,255,255,0.25); }
 
 @media (max-width: 480px) {
   .mb-text { font-size: 1.08rem; }
   .mb-books { grid-template-columns: repeat(auto-fill, minmax(5.8rem, 1fr)); }
+  .mb-actions {
+    gap: 0.35rem;
+    padding: 0.45rem 0.55rem;
+  }
+  .mb-sel-label {
+    flex: 1 1 100%;
+    order: -1;
+    margin-bottom: 0.15rem;
+  }
+  .mb-actions button {
+    padding: 0.38rem 0.55rem;
+    font-size: 0.78rem;
+  }
 }
