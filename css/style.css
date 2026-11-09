@@ -72,7 +72,7 @@ body.lang-en {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .logo {
@@ -362,7 +362,6 @@ body.dark .btn-accent { background: #4a90c8; color: #0a1520; }
 .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.85rem; }
 .btn-danger { background: var(--danger); color: white; }
 
-/* Larger media view buttons + video embed */
 .media-view-btn {
   padding: 0.7rem 1.35rem !important;
   font-size: 1.05rem !important;
@@ -769,7 +768,6 @@ input[type="number"],
   unicode-bidi: isolate;
 }
 
-/* Daily verse email subscribe */
 .subscribe-section { padding: 0 1rem 1.5rem; margin-top: 1rem; }
 .subscribe-card {
   max-width: 560px;
@@ -878,8 +876,15 @@ body.lang-en .subscribe-popup-close { left: auto; right: 0.7rem; }
 
 @media (max-width: 600px) {
   .form-row { grid-template-columns: 1fr; }
-  .header-inner { flex-direction: column; align-items: flex-start; }
-  .nav { width: 100%; }
+  /* Keep header in one row so logo, menu, lang do not stack/overlap */
+  .header-inner {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+  }
+  .nav { width: auto; flex: 1; min-width: 0; }
+  .header-actions { flex-shrink: 0; }
   .daily-verse { margin-top: -1rem; }
   .scroll-top { bottom: 1rem; left: 1rem; width: 2.5rem; height: 2.5rem; }
 }
