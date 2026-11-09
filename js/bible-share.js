@@ -1,12 +1,9 @@
-/* Seventh Trumpet — Deep links + daily verse share (lightweight, no observers) */
+/* Deep links + daily verse share as image (good for WhatsApp status) */
 (function () {
   function isEn() {
     try {
-      var L = localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa';
-      return L === 'en';
-    } catch (e) {
-      return false;
-    }
+      return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en';
+    } catch (e) { return false; }
   }
 
   function getParams() {
@@ -48,22 +45,6 @@
     setTimeout(tryScroll, 700);
   }
 
-  function copyText(t) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(t);
-    }
-    return new Promise(function (resolve) {
-      var ta = document.createElement('textarea');
-      ta.value = t;
-      ta.style.cssText = 'position:fixed;left:-9999px';
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); } catch (e) {}
-      document.body.removeChild(ta);
-      resolve();
-    });
-  }
-
   function setLabels() {
     var en = isEn();
     var share = document.getElementById('mb-share');
@@ -74,6 +55,116 @@
     if (copy) copy.textContent = en ? 'Copy' : '\u06a9\u067e\u06cc';
     if (clear) clear.textContent = en ? 'Clear' : '\u067e\u0627\u06a9';
     if (daily) daily.textContent = en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9';
+  }
+
+  /** Draw verse card for WhatsApp status / social — not the site profile photo */
+  function makeVerseCard(text, ref) {
+    var w = 1080, h = 1920; // status-friendly portrait
+    var canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext('2d');
+
+    // Soft navy gradient (brand colors, not logo photo)
+    var g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#0a2540');
+    g.addColorStop(0.55, '#163a5f');
+    g.addColorStop(1, '#0f1c2e');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+
+    // Gold accent line
+    ctx.strokeStyle = '#c9a227';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(120, 280);
+    ctx.lineTo(w - 120, 280);
+    ctx.stroke();
+
+    // Site name small at top
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.font = '600 36px Inter, Vazirmatn, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645', w / 2, 200);
+
+    // Verse text (wrapped)
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '500 52px Inter, Vazirmatn, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    var maxW = w - 160;
+    var words = String(text || '').split(/\s+/);
+    var lines = [];
+    var line = '';
+    for (var i = 0; i < words.length; i++) {
+      var test = line ? line + ' ' + words[i] : words[i];
+      if (ctx.measureText(test).width > maxW && line) {
+        lines.push(line);
+        line = words[i];
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+    if (lines.length > 14) lines = lines.slice(0, 14).concat(['…']);
+
+    var lineH = 72;
+    var startY = h / 2 - (lines.length * lineH) / 2;
+    lines.forEach(function (ln, idx) {
+      ctx.fillText(ln, w / 2, startY + idx * lineH);
+    });
+
+    // Reference
+    ctx.fillStyle = '#c9a227';
+    ctx.font = '600 40px Inter, Vazirmatn, system-ui, sans-serif';
+    ctx.fillText(String(ref || ''), w / 2, startY + lines.length * lineH + 80);
+
+    // Bottom URL
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.font = '400 32px Inter, system-ui, sans-serif';
+    ctx.fillText('seventhtrumpet.org', w / 2, h - 120);
+
+    return canvas;
+  }
+
+  function shareDaily() {
+    var text = (document.getElementById('verse-text') || {}).textContent || '';
+    var ref = (document.getElementById('verse-ref') || {}).textContent || '';
+    var url = (location.origin || 'https://seventhtrumpet.org') + '/';
+    var canvas = makeVerseCard(text, ref);
+
+    function shareBlob(blob) {
+      var file = new File([blob], 'daily-verse.png', { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        return navigator.share({
+          files: [file],
+          title: ref || 'Daily Verse',
+          text: (ref ? ref + '\n' : '') + text + '\n' + url
+        });
+      }
+      if (navigator.share) {
+        return navigator.share({
+          title: ref || 'Daily Verse',
+          text: (ref ? ref + '\n' : '') + text + '\n' + url,
+          url: url
+        });
+      }
+      // Fallback: download image
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'daily-verse.png';
+      a.click();
+      return Promise.resolve();
+    }
+
+    canvas.toBlob(function (blob) {
+      if (!blob) return;
+      shareBlob(blob).catch(function () {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'daily-verse.png';
+        a.click();
+      });
+    }, 'image/png');
   }
 
   function initDailyShare() {
@@ -92,19 +183,7 @@
       var inner = section.querySelector('.daily-verse-inner');
       if (inner) inner.appendChild(btn);
     }
-    btn.addEventListener('click', function () {
-      var text = (document.getElementById('verse-text') || {}).textContent || '';
-      var ref = (document.getElementById('verse-ref') || {}).textContent || '';
-      var url = (location.origin || 'https://seventhtrumpet.org') + '/';
-      var shareText = (ref ? ref + '\n' : '') + text;
-      if (navigator.share) {
-        navigator.share({ title: ref || 'Daily Verse', text: shareText, url: url }).catch(function () {
-          copyText(url);
-        });
-      } else {
-        copyText((ref ? ref + '\n' : '') + text + '\n' + url);
-      }
-    });
+    btn.addEventListener('click', shareDaily);
   }
 
   function bindBibleShare() {
@@ -112,35 +191,7 @@
     if (!btn || btn._shareBound) return;
     btn._shareBound = true;
     btn.addEventListener('click', function () {
-      if (typeof window.shareSelected === 'function') {
-        window.shareSelected();
-        return;
-      }
-      var nodes = document.querySelectorAll('.mb-verse.selected');
-      if (!nodes.length) {
-        alert(isEn() ? 'Select one or more verses first' : '\u0627\u0628\u062a\u062f\u0627 \u06cc\u06a9 \u06cc\u0627 \u0686\u0646\u062f \u0622\u06cc\u0647 \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f');
-        return;
-      }
-      var lines = [];
-      var firstCh = null, firstV = null, lastV = null;
-      nodes.forEach(function (el) {
-        var ch = el.getAttribute('data-chapter');
-        var vs = el.getAttribute('data-verse');
-        if (firstCh == null) { firstCh = ch; firstV = vs; }
-        lastV = vs;
-        var t = (el.textContent || '').replace(/^\d+\s*/, '').trim();
-        lines.push(ch + ':' + vs + ' \u2014 ' + t);
-      });
-      var state = {};
-      try { state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}'); } catch (e) {}
-      var bookId = state.bookId || '';
-      var url = (location.origin || 'https://seventhtrumpet.org') + '/bible.html?b=' + bookId + '&c=' + firstCh + '&v=' + firstV + (lastV !== firstV ? '-' + lastV : '');
-      var body = lines.join('\n') + '\n\n' + url;
-      if (navigator.share) {
-        navigator.share({ title: 'Bible', text: body, url: url }).catch(function () { copyText(body); });
-      } else {
-        copyText(body);
-      }
+      if (typeof window.shareSelected === 'function') window.shareSelected();
     });
   }
 
