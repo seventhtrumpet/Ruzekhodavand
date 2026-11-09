@@ -1,26 +1,12 @@
-/* Seventh Trumpet — Deep links + daily verse share + language-aware labels */
+/* Seventh Trumpet — Deep links + daily verse share (lightweight, no observers) */
 (function () {
   function isEn() {
     try {
       var L = localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa';
       return L === 'en';
     } catch (e) {
-      return document.documentElement.lang === 'en';
+      return false;
     }
-  }
-
-  function applyActionLabels() {
-    var en = isEn();
-    var map = {
-      'mb-share': en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9',
-      'mb-copy': en ? 'Copy' : '\u06a9\u067e\u06cc',
-      'mb-clear': en ? 'Clear' : '\u067e\u0627\u06a9',
-      'daily-share': en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9'
-    };
-    Object.keys(map).forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.textContent = map[id];
-    });
   }
 
   function getParams() {
@@ -57,9 +43,9 @@
         setTimeout(function () { el.classList.remove('highlight'); }, 2500);
         return;
       }
-      if (tries < 50) setTimeout(tryScroll, 200);
+      if (tries < 40) setTimeout(tryScroll, 250);
     }
-    setTimeout(tryScroll, 500);
+    setTimeout(tryScroll, 700);
   }
 
   function copyText(t) {
@@ -69,14 +55,25 @@
     return new Promise(function (resolve) {
       var ta = document.createElement('textarea');
       ta.value = t;
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
+      ta.style.cssText = 'position:fixed;left:-9999px';
       document.body.appendChild(ta);
       ta.select();
       try { document.execCommand('copy'); } catch (e) {}
       document.body.removeChild(ta);
       resolve();
     });
+  }
+
+  function setLabels() {
+    var en = isEn();
+    var share = document.getElementById('mb-share');
+    var copy = document.getElementById('mb-copy');
+    var clear = document.getElementById('mb-clear');
+    var daily = document.getElementById('daily-share');
+    if (share) share.textContent = en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9';
+    if (copy) copy.textContent = en ? 'Copy' : '\u06a9\u067e\u06cc';
+    if (clear) clear.textContent = en ? 'Clear' : '\u067e\u0627\u06a9';
+    if (daily) daily.textContent = en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9';
   }
 
   function initDailyShare() {
@@ -102,19 +99,15 @@
       var shareText = (ref ? ref + '\n' : '') + text;
       if (navigator.share) {
         navigator.share({ title: ref || 'Daily Verse', text: shareText, url: url }).catch(function () {
-          copyText((ref ? ref + ' — ' : '') + url);
+          copyText(url);
         });
       } else {
-        copyText((ref ? ref + '\n' : '') + text + '\n' + url).then(function () {
-          var old = btn.textContent;
-          btn.textContent = isEn() ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f';
-          setTimeout(function () { applyActionLabels(); }, 1500);
-        });
+        copyText((ref ? ref + '\n' : '') + text + '\n' + url);
       }
     });
   }
 
-  function ensureShareClick() {
+  function bindBibleShare() {
     var btn = document.getElementById('mb-share');
     if (!btn || btn._shareBound) return;
     btn._shareBound = true;
@@ -136,7 +129,7 @@
         if (firstCh == null) { firstCh = ch; firstV = vs; }
         lastV = vs;
         var t = (el.textContent || '').replace(/^\d+\s*/, '').trim();
-        lines.push(ch + ':' + vs + ' — ' + t);
+        lines.push(ch + ':' + vs + ' \u2014 ' + t);
       });
       var state = {};
       try { state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}'); } catch (e) {}
@@ -149,24 +142,21 @@
         copyText(body);
       }
     });
-    applyActionLabels();
   }
 
   function boot() {
     applyDeepLink();
     initDailyShare();
-    ensureShareClick();
-    applyActionLabels();
-    var obs = new MutationObserver(function () {
-      ensureShareClick();
-      applyActionLabels();
-    });
-    if (document.body) obs.observe(document.body, { childList: true, subtree: true });
-    window.addEventListener('cog-lang-changed', applyActionLabels);
-    document.getElementById('lang-toggle')?.addEventListener('click', function () {
-      setTimeout(applyActionLabels, 50);
-      setTimeout(applyActionLabels, 300);
-    });
+    bindBibleShare();
+    setLabels();
+    var lt = document.getElementById('lang-toggle');
+    if (lt) {
+      lt.addEventListener('click', function () {
+        setTimeout(setLabels, 100);
+        setTimeout(setLabels, 400);
+      });
+    }
+    window.addEventListener('cog-lang-changed', setLabels);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
