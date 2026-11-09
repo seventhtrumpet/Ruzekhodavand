@@ -1,5 +1,28 @@
-/* Seventh Trumpet — Deep links + daily verse share (Bible multi-share is in bible.js) */
+/* Seventh Trumpet — Deep links + daily verse share + language-aware labels */
 (function () {
+  function isEn() {
+    try {
+      var L = localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa';
+      return L === 'en';
+    } catch (e) {
+      return document.documentElement.lang === 'en';
+    }
+  }
+
+  function applyActionLabels() {
+    var en = isEn();
+    var map = {
+      'mb-share': en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9',
+      'mb-copy': en ? 'Copy' : '\u06a9\u067e\u06cc',
+      'mb-clear': en ? 'Clear' : '\u067e\u0627\u06a9',
+      'daily-share': en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9'
+    };
+    Object.keys(map).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = map[id];
+    });
+  }
+
   function getParams() {
     try {
       var p = new URLSearchParams(location.search);
@@ -64,7 +87,7 @@
     btn.id = 'daily-share';
     btn.className = 'verse-refresh';
     btn.style.marginInlineStart = '0.5rem';
-    btn.textContent = document.documentElement.lang === 'en' ? 'Share' : 'اشتراک';
+    btn.textContent = isEn() ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9';
     var refresh = document.getElementById('verse-refresh');
     if (refresh && refresh.parentNode) {
       refresh.parentNode.insertBefore(btn, refresh.nextSibling);
@@ -84,8 +107,8 @@
       } else {
         copyText((ref ? ref + '\n' : '') + text + '\n' + url).then(function () {
           var old = btn.textContent;
-          btn.textContent = document.documentElement.lang === 'en' ? 'Copied' : 'کپی شد';
-          setTimeout(function () { btn.textContent = old; }, 1500);
+          btn.textContent = isEn() ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f';
+          setTimeout(function () { applyActionLabels(); }, 1500);
         });
       }
     });
@@ -102,7 +125,7 @@
       }
       var nodes = document.querySelectorAll('.mb-verse.selected');
       if (!nodes.length) {
-        alert(document.documentElement.lang === 'en' ? 'Select one or more verses first' : 'ابتدا یک یا چند آیه را انتخاب کنید');
+        alert(isEn() ? 'Select one or more verses first' : '\u0627\u0628\u062a\u062f\u0627 \u06cc\u06a9 \u06cc\u0627 \u0686\u0646\u062f \u0622\u06cc\u0647 \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f');
         return;
       }
       var lines = [];
@@ -126,14 +149,24 @@
         copyText(body);
       }
     });
+    applyActionLabels();
   }
 
   function boot() {
     applyDeepLink();
     initDailyShare();
     ensureShareClick();
-    var obs = new MutationObserver(function () { ensureShareClick(); });
+    applyActionLabels();
+    var obs = new MutationObserver(function () {
+      ensureShareClick();
+      applyActionLabels();
+    });
     if (document.body) obs.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener('cog-lang-changed', applyActionLabels);
+    document.getElementById('lang-toggle')?.addEventListener('click', function () {
+      setTimeout(applyActionLabels, 50);
+      setTimeout(applyActionLabels, 300);
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
