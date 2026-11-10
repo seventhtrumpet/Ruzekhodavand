@@ -154,6 +154,7 @@
   loadScript('js/visits.js', 'data-visits');
   loadScript('js/text_size.js', 'data-text-size');
   loadScript('js/share.js', 'data-share');
+  loadScript('js/page_back.js', 'data-page-back');
   loadScript('js/loading.js', 'data-loading');
   loadScript('js/cloud_sync.js', 'data-cloud-sync');
   loadScript('js/media_public_fix.js', 'data-media-public-fix');
