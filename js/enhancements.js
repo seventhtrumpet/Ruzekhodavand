@@ -1,4 +1,4 @@
-/* Load media + auth + core fix + daily verse */
+/* Load media + auth + core fix + daily verse (auto by calendar day) */
 (function () {
   function loadScript(src, cb) {
     if (document.querySelector('script[src="' + src + '"]')) { if (cb) cb(); return; }
@@ -24,7 +24,17 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  function showVerse() {
+  /** Same verse for everyone on the same calendar day; changes automatically next day */
+  function dayIndex(len) {
+    if (!len) return 0;
+    var d = new Date();
+    var start = new Date(d.getFullYear(), 0, 0);
+    var day = Math.floor((d - start) / 86400000); // day of year 1–366
+    // include year so sequence shifts yearly
+    return Math.abs((d.getFullYear() * 366 + day)) % len;
+  }
+
+  function showVerse(forceRandom) {
     var el = document.getElementById('verse-text');
     var ref = document.getElementById('verse-ref');
     if (!el) return;
@@ -34,20 +44,27 @@
       if (ref) ref.textContent = '';
       return;
     }
-    var v = verses[Math.floor(Math.random() * verses.length)];
+    var v;
+    if (forceRandom) {
+      v = verses[Math.floor(Math.random() * verses.length)];
+    } else {
+      v = verses[dayIndex(verses.length)];
+    }
     var lang = (typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'fa';
     el.textContent = (lang === 'en' ? (v.en || v.fa) : (v.fa || v.en)) || '';
     if (ref) {
       ref.textContent = (lang === 'en' ? (v.ref_en || v.refEn || v.ref) : (v.ref_fa || v.refFa || v.ref)) || '';
     }
   }
+
   function initVerse() {
     function go() {
-      showVerse();
+      showVerse(false); // automatic daily verse
       var btn = document.getElementById('verse-refresh');
       if (btn && !btn._verseBound) {
         btn._verseBound = true;
-        btn.addEventListener('click', showVerse);
+        // "Another verse" still lets user pick a random one for this visit
+        btn.addEventListener('click', function () { showVerse(true); });
       }
     }
     if (window.DAILY_VERSES && window.DAILY_VERSES.length) go();
