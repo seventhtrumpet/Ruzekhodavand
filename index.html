@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a2540">
+  <title>شیپور هفتم | Seventh Trumpet</title>
+  <link rel="icon" type="image/jpeg" href="https://iili.io/n8M8tYF.jpg">
+  <style>
+    body{font-family:system-ui,sans-serif;background:#0a2540;color:#fff;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:1.5rem}
+    .box{max-width:420px}
+    a{color:#c9a227;font-weight:700}
+    .btn{display:inline-block;margin-top:1rem;padding:.85rem 1.4rem;background:#c9a227;color:#0a2540;text-decoration:none;border-radius:10px;font-weight:800}
+  </style>
+  <script>
+    /* Restore full homepage from known-good commit while permanent file is repaired */
+    (function () {
+      var urls = [
+        'https://cdn.jsdelivr.net/gh/seventhtrumpet/Ruzekhodavand@b016c722/index.html',
+        'https://raw.githubusercontent.com/seventhtrumpet/Ruzekhodavand/b016c722/index.html'
+      ];
+      function go(html) {
+        try {
+          document.open();
+          document.write(html);
+          document.close();
+        } catch (e) {}
+      }
+      function tryNext(i) {
+        if (i >= urls.length) return;
+        fetch(urls[i] + (urls[i].indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now())
+          .then(function (r) { if (!r.ok) throw new Error('x'); return r.text(); })
+          .then(function (t) { if (t && t.length > 500) go(t); else tryNext(i + 1); })
+          .catch(function () { tryNext(i + 1); });
+      }
+      tryNext(0);
+    })();
+  </script>
+</head>
+<body>
+  <div class="box">
+    <p>شیپور هفتم</p>
+    <p>Seventh Trumpet</p>
+    <p style="opacity:.85;font-size:.95rem">در حال بارگذاری…</p>
+    <p><a class="btn" href="bible.html">کتاب مقدس / Bible</a></p>
+    <p style="margin-top:1rem;font-size:.85rem"><a href="media.html">رسانه‌ها</a> · <a href="about.html">درباره ما</a></p>
+  </div>
+</body>
+</html>
