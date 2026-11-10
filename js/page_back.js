@@ -1,4 +1,4 @@
-/* Back button inside fixed header — always visible while scrolling */
+/* Clear back-to-home control — easy for older / less experienced users */
 (function () {
   function isHome() {
     var p = (location.pathname || '').toLowerCase();
@@ -11,8 +11,9 @@
     } catch (e) { return false; }
   }
 
+  // Very clear labels — not only an arrow
   function label() {
-    return isEn() ? 'Home' : '\u0635\u0641\u062d\u0647 \u0627\u0635\u0644\u06cc';
+    return isEn() ? 'Back to Home' : '\u0628\u0627\u0632\u06af\u0634\u062a \u0628\u0647 \u0635\u0641\u062d\u0647 \u0627\u0635\u0644\u06cc';
   }
 
   function applyLabel() {
@@ -40,20 +41,22 @@
       st.id = 'page-back-css';
       st.textContent =
         '.page-back{' +
-        'display:inline-flex;align-items:center;justify-content:center;gap:0.3rem;' +
-        'height:2.25rem;min-width:2.25rem;padding:0 0.55rem 0 0.4rem;' +
+        'display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;' +
+        'height:2.4rem;min-width:2.4rem;padding:0 0.75rem 0 0.5rem;' +
         'border-radius:999px;' +
-        'background:rgba(255,255,255,0.16);' +
-        'border:1px solid rgba(255,255,255,0.3);' +
+        'background:rgba(255,255,255,0.2);' +
+        'border:1px solid rgba(255,255,255,0.4);' +
         'color:#fff;text-decoration:none;flex-shrink:0;' +
-        'font-family:inherit;font-weight:600;font-size:0.78rem;' +
+        'font-family:inherit;font-weight:700;font-size:0.82rem;' +
         'backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);' +
+        'box-shadow:0 2px 10px rgba(0,0,0,0.15);' +
         '}' +
-        '.page-back:active{transform:scale(0.96)}' +
-        '.page-back-icon{font-size:1.15rem;line-height:1;font-weight:700}' +
+        '.page-back:active{transform:scale(0.97)}' +
+        '.page-back-icon{font-size:1.2rem;line-height:1;font-weight:700}' +
         'html[dir="rtl"] .page-back-icon{transform:scaleX(-1)}' +
-        '.page-back-text{white-space:nowrap}' +
-        '@media (max-width:420px){.page-back-text{display:none}.page-back{padding:0;width:2.25rem}}';
+        '.page-back-text{white-space:nowrap;max-width:11rem;overflow:hidden;text-overflow:ellipsis}' +
+        /* On very small screens keep short clear text, not icon-only */
+        '@media (max-width:360px){.page-back{padding:0 0.55rem;font-size:0.75rem}.page-back-text{max-width:7.5rem}}';
       document.head.appendChild(st);
     }
 
