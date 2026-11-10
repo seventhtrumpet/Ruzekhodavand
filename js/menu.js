@@ -158,6 +158,7 @@
   loadScript('js/fixed_header.js', 'data-fixed-header');
   loadScript('js/bible_bar_fix.js', 'data-bible-bar-fix');
   loadScript('js/bible_search.js', 'data-bible-search');
+  loadScript('js/home_polish.js', 'data-home-polish');
   loadScript('js/loading.js', 'data-loading');
   loadScript('js/cloud_sync.js', 'data-cloud-sync');
   loadScript('js/media_public_fix.js', 'data-media-public-fix');
