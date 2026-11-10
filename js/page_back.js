@@ -1,4 +1,4 @@
-/* Back / Home control on every page except homepage */
+/* Back button — header style (circular chevron, like profile apps) */
 (function () {
   function isHome() {
     var p = (location.pathname || '').toLowerCase();
@@ -12,52 +12,101 @@
   }
 
   function label() {
-    // Persian: صفحه اصلی (not a bad translation of Home)
-    return isEn() ? 'Home page' : '\u0635\u0641\u062d\u0647 \u0627\u0635\u0644\u06cc';
+    return isEn() ? 'Home' : '\u0635\u0641\u062d\u0647 \u0627\u0635\u0644\u06cc';
   }
 
   function applyLabel() {
     var a = document.getElementById('page-back');
-    if (a) a.textContent = '\u2190 ' + label();
+    if (!a) return;
+    var text = a.querySelector('.page-back-text');
+    if (text) text.textContent = label();
+    a.setAttribute('aria-label', label());
+    a.setAttribute('title', label());
   }
 
   function inject() {
-    if (isHome()) return;
+    if (isHome()) {
+      var existing = document.getElementById('page-back');
+      if (existing) existing.remove();
+      return;
+    }
     if (document.getElementById('page-back')) {
       applyLabel();
       return;
     }
+
     if (!document.getElementById('page-back-css')) {
       var st = document.createElement('style');
       st.id = 'page-back-css';
       st.textContent =
-        '.page-back-bar{max-width:1200px;margin:0 auto;padding:.55rem 1rem 0}' +
-        '.page-back{display:inline-flex;align-items:center;gap:.35rem;padding:.4rem .85rem;border-radius:8px;background:var(--bg-card,#fff);border:1px solid var(--border,#e0dcd3);color:var(--primary,#0a2540);text-decoration:none;font-weight:600;font-size:.9rem;font-family:inherit}' +
-        '.page-back:hover{border-color:var(--primary,#0a2540)}' +
-        'body.dark .page-back{background:#1a2332;border-color:#2a3544;color:#e8eef5}';
+        /* Circular back — sits in header, profile-app style */
+        '.page-back{' +
+        'display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;' +
+        'height:2.35rem;min-width:2.35rem;padding:0 0.65rem 0 0.45rem;' +
+        'border-radius:999px;' +
+        'background:rgba(255,255,255,0.14);' +
+        'border:1px solid rgba(255,255,255,0.28);' +
+        'color:#fff;text-decoration:none;flex-shrink:0;' +
+        'font-family:inherit;font-weight:600;font-size:0.82rem;' +
+        'backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);' +
+        'transition:background .15s ease, transform .15s ease;' +
+        '}' +
+        '.page-back:hover{background:rgba(255,255,255,0.24);}' +
+        '.page-back:active{transform:scale(0.96);}' +
+        '.page-back-icon{' +
+        'display:inline-flex;align-items:center;justify-content:center;' +
+        'width:1.35rem;height:1.35rem;flex-shrink:0;' +
+        'font-size:1.15rem;line-height:1;font-weight:700;' +
+        '}' +
+        'html[dir="rtl"] .page-back-icon{transform:scaleX(-1);}' +
+        '.page-back-text{white-space:nowrap;max-width:7.5rem;overflow:hidden;text-overflow:ellipsis;}' +
+        '@media (max-width:380px){.page-back-text{display:none;}.page-back{padding:0;width:2.35rem;}}' +
+        /* If header not found, floating fallback */
+        '.page-back.page-back-float{' +
+        'position:fixed;top:0.7rem;z-index:1100;' +
+        'left:0.7rem;' +
+        'box-shadow:0 4px 16px rgba(0,0,0,0.25);' +
+        'background:rgba(10,37,64,0.88);' +
+        '}' +
+        'html[dir="rtl"] .page-back.page-back-float{left:auto;right:0.7rem;}';
       document.head.appendChild(st);
     }
 
-    var bar = document.createElement('div');
-    bar.className = 'page-back-bar';
-    bar.id = 'page-back-bar';
     var a = document.createElement('a');
     a.id = 'page-back';
     a.className = 'page-back';
     a.href = 'index.html';
-    a.textContent = '\u2190 ' + label();
-    bar.appendChild(a);
+    a.innerHTML =
+      '<span class="page-back-icon" aria-hidden="true">\u2039</span>' +
+      '<span class="page-back-text"></span>';
 
-    var header = document.querySelector('.header');
-    if (header && header.parentNode) {
-      header.parentNode.insertBefore(bar, header.nextSibling);
+    var headerInner = document.querySelector('.header-inner');
+    var headerActions = document.querySelector('.header-actions');
+    var menuBtn = document.getElementById('menu-btn');
+
+    if (headerInner) {
+      // Place after hamburger (or at start of header) — profile-style top control
+      if (menuBtn && menuBtn.parentNode === headerInner) {
+        if (menuBtn.nextSibling) headerInner.insertBefore(a, menuBtn.nextSibling);
+        else headerInner.appendChild(a);
+      } else if (headerActions) {
+        headerActions.insertBefore(a, headerActions.firstChild);
+      } else {
+        headerInner.insertBefore(a, headerInner.firstChild);
+      }
     } else {
-      document.body.insertBefore(bar, document.body.firstChild);
+      a.classList.add('page-back-float');
+      document.body.appendChild(a);
     }
+
+    applyLabel();
   }
 
   function boot() {
     inject();
+    // Re-run after menu injects hamburger
+    setTimeout(inject, 200);
+    setTimeout(inject, 600);
     window.addEventListener('cog-lang-changed', applyLabel);
     var lt = document.getElementById('lang-toggle');
     if (lt) lt.addEventListener('click', function () {
