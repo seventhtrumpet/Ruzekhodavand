@@ -1,5 +1,7 @@
-/* Deep links + daily verse share as image (good for WhatsApp status) */
+/* Deep links + daily verse share image using site profile picture */
 (function () {
+  var PROFILE_IMG = 'https://iili.io/n8MSJBp.jpg';
+
   function isEn() {
     try {
       return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en';
@@ -57,41 +59,17 @@
     if (daily) daily.textContent = en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9';
   }
 
-  /** Draw verse card for WhatsApp status / social — not the site profile photo */
-  function makeVerseCard(text, ref) {
-    var w = 1080, h = 1920; // status-friendly portrait
-    var canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    var ctx = canvas.getContext('2d');
+  function loadImage(src) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { reject(new Error('img')); };
+      img.src = src;
+    });
+  }
 
-    // Soft navy gradient (brand colors, not logo photo)
-    var g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, '#0a2540');
-    g.addColorStop(0.55, '#163a5f');
-    g.addColorStop(1, '#0f1c2e');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
-
-    // Gold accent line
-    ctx.strokeStyle = '#c9a227';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(120, 280);
-    ctx.lineTo(w - 120, 280);
-    ctx.stroke();
-
-    // Site name small at top
-    ctx.fillStyle = 'rgba(255,255,255,0.75)';
-    ctx.font = '600 36px Inter, Vazirmatn, system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645', w / 2, 200);
-
-    // Verse text (wrapped)
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '500 52px Inter, Vazirmatn, system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    var maxW = w - 160;
+  function wrapText(ctx, text, maxW) {
     var words = String(text || '').split(/\s+/);
     var lines = [];
     var line = '';
@@ -100,71 +78,128 @@
       if (ctx.measureText(test).width > maxW && line) {
         lines.push(line);
         line = words[i];
-      } else {
-        line = test;
-      }
+      } else line = test;
     }
     if (line) lines.push(line);
-    if (lines.length > 14) lines = lines.slice(0, 14).concat(['…']);
+    return lines;
+  }
 
-    var lineH = 72;
-    var startY = h / 2 - (lines.length * lineH) / 2;
-    lines.forEach(function (ln, idx) {
-      ctx.fillText(ln, w / 2, startY + idx * lineH);
+  function drawVerseCard(img, text, ref) {
+    var w = 1080, h = 1920;
+    var canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext('2d');
+
+    // Draw profile image covering full canvas (cover)
+    if (img) {
+      var scale = Math.max(w / img.width, h / img.height);
+      var dw = img.width * scale;
+      var dh = img.height * scale;
+      var dx = (w - dw) / 2;
+      var dy = (h - dh) / 2;
+      ctx.drawImage(img, dx, dy, dw, dh);
+    } else {
+      var g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, '#0a2540');
+      g.addColorStop(1, '#0f1c2e');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    // Dark overlay so text is readable
+    ctx.fillStyle = 'rgba(8, 18, 32, 0.55)';
+    ctx.fillRect(0, 0, w, h);
+
+    // Soft card in center
+    ctx.fillStyle = 'rgba(10, 37, 64, 0.72)';
+    roundRect(ctx, 80, h * 0.28, w - 160, h * 0.42, 28);
+    ctx.fill();
+
+    ctx.strokeStyle = '#c9a227';
+    ctx.lineWidth = 3;
+    roundRect(ctx, 80, h * 0.28, w - 160, h * 0.42, 28);
+    ctx.stroke();
+
+    // Site name
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.font = '600 34px Inter, Vazirmatn, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645', w / 2, h * 0.28 + 70);
+
+    // Verse
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '500 46px Inter, Vazirmatn, system-ui, sans-serif';
+    var lines = wrapText(ctx, text, w - 240);
+    if (lines.length > 12) lines = lines.slice(0, 12).concat(['…']);
+    var lineH = 64;
+    var startY = h * 0.42 - (lines.length * lineH) / 2 + 40;
+    lines.forEach(function (ln, i) {
+      ctx.fillText(ln, w / 2, startY + i * lineH);
     });
 
     // Reference
     ctx.fillStyle = '#c9a227';
-    ctx.font = '600 40px Inter, Vazirmatn, system-ui, sans-serif';
-    ctx.fillText(String(ref || ''), w / 2, startY + lines.length * lineH + 80);
+    ctx.font = '700 38px Inter, Vazirmatn, system-ui, sans-serif';
+    ctx.fillText(String(ref || ''), w / 2, startY + lines.length * lineH + 70);
 
-    // Bottom URL
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.font = '400 32px Inter, system-ui, sans-serif';
-    ctx.fillText('seventhtrumpet.org', w / 2, h - 120);
+    // URL
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = '400 30px Inter, system-ui, sans-serif';
+    ctx.fillText('seventhtrumpet.org', w / 2, h - 100);
 
     return canvas;
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
   }
 
   function shareDaily() {
     var text = (document.getElementById('verse-text') || {}).textContent || '';
     var ref = (document.getElementById('verse-ref') || {}).textContent || '';
     var url = (location.origin || 'https://seventhtrumpet.org') + '/';
-    var canvas = makeVerseCard(text, ref);
 
-    function shareBlob(blob) {
-      var file = new File([blob], 'daily-verse.png', { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        return navigator.share({
-          files: [file],
-          title: ref || 'Daily Verse',
-          text: (ref ? ref + '\n' : '') + text + '\n' + url
-        });
-      }
-      if (navigator.share) {
-        return navigator.share({
-          title: ref || 'Daily Verse',
-          text: (ref ? ref + '\n' : '') + text + '\n' + url,
-          url: url
-        });
-      }
-      // Fallback: download image
+    function finish(canvas) {
+      canvas.toBlob(function (blob) {
+        if (!blob) return;
+        var file = new File([blob], 'daily-verse.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({
+            files: [file],
+            title: ref || 'Daily Verse',
+            text: (ref ? ref + '\n' : '') + text + '\n' + url
+          }).catch(function () {
+            downloadBlob(blob);
+          });
+        } else if (navigator.share) {
+          navigator.share({
+            title: ref || 'Daily Verse',
+            text: (ref ? ref + '\n' : '') + text + '\n' + url,
+            url: url
+          }).catch(function () { downloadBlob(blob); });
+        } else {
+          downloadBlob(blob);
+        }
+      }, 'image/png');
+    }
+
+    function downloadBlob(blob) {
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = 'daily-verse.png';
       a.click();
-      return Promise.resolve();
     }
 
-    canvas.toBlob(function (blob) {
-      if (!blob) return;
-      shareBlob(blob).catch(function () {
-        var a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'daily-verse.png';
-        a.click();
-      });
-    }, 'image/png');
+    loadImage(PROFILE_IMG)
+      .then(function (img) { finish(drawVerseCard(img, text, ref)); })
+      .catch(function () { finish(drawVerseCard(null, text, ref)); });
   }
 
   function initDailyShare() {
@@ -177,36 +212,23 @@
     btn.style.marginInlineStart = '0.5rem';
     btn.textContent = isEn() ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9';
     var refresh = document.getElementById('verse-refresh');
-    if (refresh && refresh.parentNode) {
-      refresh.parentNode.insertBefore(btn, refresh.nextSibling);
-    } else {
+    if (refresh && refresh.parentNode) refresh.parentNode.insertBefore(btn, refresh.nextSibling);
+    else {
       var inner = section.querySelector('.daily-verse-inner');
       if (inner) inner.appendChild(btn);
     }
     btn.addEventListener('click', shareDaily);
   }
 
-  function bindBibleShare() {
-    var btn = document.getElementById('mb-share');
-    if (!btn || btn._shareBound) return;
-    btn._shareBound = true;
-    btn.addEventListener('click', function () {
-      if (typeof window.shareSelected === 'function') window.shareSelected();
-    });
-  }
-
   function boot() {
     applyDeepLink();
     initDailyShare();
-    bindBibleShare();
     setLabels();
     var lt = document.getElementById('lang-toggle');
-    if (lt) {
-      lt.addEventListener('click', function () {
-        setTimeout(setLabels, 100);
-        setTimeout(setLabels, 400);
-      });
-    }
+    if (lt) lt.addEventListener('click', function () {
+      setTimeout(setLabels, 100);
+      setTimeout(setLabels, 400);
+    });
     window.addEventListener('cog-lang-changed', setLabels);
   }
 
