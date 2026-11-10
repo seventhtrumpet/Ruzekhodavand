@@ -1,43 +1,53 @@
-/* MyBible-style UI */
+/* MyBible-style UI — fixed book/chapter/verse bar always visible */
 .mb-bar {
-  position: sticky;
-  top: 0;
-  z-index: 40;
+  position: fixed;
+  top: 3.4rem; /* under site header */
+  left: 0;
+  right: 0;
+  z-index: 900;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.6rem;
+  gap: 0.45rem;
+  padding: 0.45rem 0.65rem;
   background: var(--bg-card, #fff);
   border-bottom: 1px solid var(--border, #d8dee6);
+  box-shadow: 0 4px 14px rgba(10, 37, 64, 0.1);
 }
 body.dark .mb-bar { background: #152536; border-color: #2a3a4c; }
 
+/* Spacer so text is not hidden under fixed bar */
+.mb-bar-spacer {
+  height: 3.4rem;
+  flex-shrink: 0;
+}
+
 .mb-nav {
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 2.35rem;
+  height: 2.35rem;
   border-radius: 50%;
   border: 1px solid var(--border, #d8dee6);
   background: var(--bg, #f5f7fa);
   color: var(--primary, #0a2540);
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   line-height: 1;
   cursor: pointer;
   font-family: inherit;
   flex-shrink: 0;
 }
 .mb-nav:active { transform: scale(0.94); }
+body.dark .mb-nav { background: #1a2b3c; border-color: #2a3a4c; color: #e4ebf2; }
 
 .mb-ref {
-  min-width: 8rem;
-  max-width: min(68vw, 22rem);
-  padding: 0.5rem 0.9rem;
+  min-width: 9rem;
+  max-width: min(72vw, 24rem);
+  padding: 0.55rem 1rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--primary, #0a2540);
   color: #fff;
   font-weight: 700;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-family: inherit;
   cursor: pointer;
   direction: ltr;
@@ -45,8 +55,10 @@ body.dark .mb-bar { background: #152536; border-color: #2a3a4c; }
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  box-shadow: 0 2px 10px rgba(10, 37, 64, 0.25);
 }
-body.dark .mb-ref { background: #1e4568; }
+.mb-ref:active { transform: scale(0.98); }
+body.dark .mb-ref { background: #2a6dad; }
 
 .mb-sel {
   position: fixed;
@@ -196,7 +208,7 @@ body.dark .mb-cell.active { background: #2a6dad; color: #fff; }
 }
 .mb-chapter {
   margin-bottom: 1.6rem;
-  scroll-margin-top: 6rem;
+  scroll-margin-top: 7.5rem;
 }
 .mb-ch-title {
   font-size: 0.95rem;
@@ -213,7 +225,7 @@ body.dark .mb-cell.active { background: #2a6dad; color: #fff; }
   margin: 0 0 0.3rem;
   padding: 0.12rem 0.2rem;
   border-radius: 4px;
-  scroll-margin-top: 6rem;
+  scroll-margin-top: 7.5rem;
   cursor: pointer;
   text-align: justify;
   transition: background 0.15s;
@@ -245,7 +257,6 @@ body.lang-en .mb-reader { direction: ltr; }
 body.lang-en .mb-text { font-family: var(--font-en, Inter, system-ui, sans-serif); line-height: 1.85; }
 body.lang-en .mb-verse { text-align: left; }
 
-/* Action bar: prevent overlap on small screens */
 .mb-actions {
   position: fixed;
   bottom: 0;
@@ -293,6 +304,7 @@ body.lang-en .mb-verse { text-align: left; }
 @media (max-width: 480px) {
   .mb-text { font-size: 1.08rem; }
   .mb-books { grid-template-columns: repeat(auto-fill, minmax(5.8rem, 1fr)); }
+  .mb-bar { top: 3.2rem; }
   .mb-actions {
     gap: 0.35rem;
     padding: 0.45rem 0.55rem;
