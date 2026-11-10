@@ -1,4 +1,4 @@
-/* Seventh Trumpet Bible — load core + safe fixes */
+/* Seventh Trumpet Bible — load core + safe fixes + flat JSON support */
 (async function () {
   try {
     var urls = [
@@ -14,12 +14,11 @@
     }
     if (!code) throw new Error('Could not load bible core');
 
-    // Safe fixes only (no await in non-async callbacks)
     code = code.replace(/mb-sel-actions/g, 'mb-actions');
     code = code.replace(/mb-book-btn/g, 'mb-cell');
     code = code.replace(/mb-num-btn/g, 'mb-cell');
 
-    // Discover chapter JSON files from manifest + CHAPTER_COUNTS
+    // Discover chapter files
     code = code.replace(
       "const files = man[String(id)] || ['b' + id + '.json'];",
       "let files = (man[String(id)] || []).slice();" +
@@ -28,25 +27,31 @@
       "if (!files.length) files = ['b' + id + '.json'];"
     );
 
-    // Book tap → show chapters (do not jump straight into book)
+    // CRITICAL: accept both {\"30\":{chapters}} and {id:30, chapters} formats
+    code = code.replace(
+      "const data = pack[String(id)] || pack[id];\n        if (!data) return;",
+      "let data = pack[String(id)] || pack[id];\n        if (!data && pack.chapters) data = pack;\n        if (!data && pack.id != null && Number(pack.id) === Number(id) && pack.chapters) data = pack;\n        if (!data) return;"
+    );
+
+    // Book tap → chapters (not jump in)
     code = code.replace(
       "bookId = Number(btn.getAttribute('data-book'));\n        chapter = 1; verse = 1;\n        closeSel();\n        await renderBook(true);",
       "bookId = Number(btn.getAttribute('data-book'));\n        chapter = 1; verse = 1;\n        updateRef(); saveState();\n        showTab('chapters');\n        renderChapterGrid();"
     );
 
-    // Chapter tap → show verses only (no scroll under picker)
+    // Chapter → verses only
     code = code.replace(
       "showTab('verses');\n        renderVerseGrid();\n        scrollToRef(chapter, verse, true);",
       "showTab('verses');\n        renderVerseGrid();"
     );
 
-    // Verse tap → close + load book then scroll (use .then, NOT await in non-async)
+    // Verse → load then scroll (no await in non-async)
     code = code.replace(
       "verse = Number(btn.getAttribute('data-vs'));\n        updateRef();\n        saveState();\n        closeSel();\n        scrollToRef(chapter, verse, true);",
       "verse = Number(btn.getAttribute('data-vs'));\n        updateRef();\n        saveState();\n        closeSel();\n        Promise.resolve(renderBook(true)).then(function(){ scrollToRef(chapter, verse, true); });"
     );
 
-    // Read/Done button loads current selection
+    // Read button
     code = code.replace(
       "document.getElementById('mb-close')?.addEventListener('click', closeSel);",
       "document.getElementById('mb-close')?.addEventListener('click', function(){ closeSel(); Promise.resolve(renderBook(true)).then(function(){ scrollToRef(chapter, verse, true); }); });"
@@ -54,7 +59,6 @@
 
     (0, eval)(code);
 
-    // Labels + multi-verse share
     function isEn() {
       try { return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en'; }
       catch (e) { return false; }
@@ -94,7 +98,6 @@
       else if (navigator.clipboard) navigator.clipboard.writeText(body);
     }
     window.shareSelected = shareSelectedVerses;
-
     function bindShare() {
       var btn = document.getElementById('mb-share');
       if (!btn || btn._bound) return;
