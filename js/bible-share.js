@@ -1,4 +1,4 @@
-/* Simple share for visitors: text + link, easy apps. Optional small logo image. */
+/* Share: WhatsApp/Telegram + nice picture with logo watermark + website link */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -101,93 +101,165 @@
   }
 
   function getLogoImg(cb) {
-    try {
-      if (window.ST_LP && window.ST_LP[0] && window.ST_LP[1]) {
-        var img = new Image();
-        img.onload = function () { cb(img); };
-        img.onerror = function () { cb(null); };
-        img.src = 'data:image/jpeg;base64,' + window.ST_LP[0] + window.ST_LP[1];
-        return;
-      }
-    } catch (e) {}
-    cb(null);
+    var tries = 0;
+    function attempt() {
+      try {
+        if (window.ST_LP && window.ST_LP[0] && window.ST_LP[1]) {
+          var img = new Image();
+          img.onload = function () { cb(img); };
+          img.onerror = function () { cb(null); };
+          img.src = 'data:image/jpeg;base64,' + window.ST_LP[0] + window.ST_LP[1];
+          return;
+        }
+        if (window.ST_PE1 && window.ST_PE2 && window.ST_PE1.length > 100) {
+          var img2 = new Image();
+          img2.onload = function () { cb(img2); };
+          img2.onerror = function () { cb(null); };
+          img2.src = 'data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2;
+          return;
+        }
+      } catch (e) {}
+      tries++;
+      if (tries < 40) setTimeout(attempt, 80);
+      else cb(null);
+    }
+    attempt();
   }
 
-  function shareSimpleImage() {
+  function wrapLines(ctx, text, maxW, maxLines) {
+    var words = String(text || '').split(/\s+/);
+    var lines = [], line = '';
+    for (var i = 0; i < words.length; i++) {
+      var test = line ? line + ' ' + words[i] : words[i];
+      if (ctx.measureText(test).width > maxW && line) {
+        lines.push(line);
+        line = words[i];
+      } else line = test;
+    }
+    if (line) lines.push(line);
+    if (lines.length > maxLines) {
+      lines = lines.slice(0, maxLines);
+      var last = lines[lines.length - 1];
+      if (last.length > 2) lines[lines.length - 1] = last.replace(/\s+\S*$/, '') + '\u2026';
+    }
+    return lines;
+  }
+
+  function makeShareImage(done) {
     var p = versePayload();
     var url = sharePageUrl();
     var en = isEn();
     var brand = en ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
+
     getLogoImg(function (logo) {
       var w = 1080, h = 1080;
       var canvas = document.createElement('canvas');
       canvas.width = w;
       canvas.height = h;
       var ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#0a2540';
+
+      var g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, '#0c2d4a');
+      g.addColorStop(0.55, '#0a2540');
+      g.addColorStop(1, '#061828');
+      ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
+
       ctx.fillStyle = '#c9a227';
-      ctx.fillRect(0, 0, w, 12);
-      ctx.fillRect(0, h - 12, w, 12);
+      ctx.fillRect(0, 0, w, 10);
+      ctx.fillRect(0, h - 10, w, 10);
+
+      ctx.strokeStyle = 'rgba(201,162,39,0.35)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(36, 36, w - 72, h - 72);
 
       if (logo) {
-        var s = 120;
-        ctx.globalAlpha = 0.9;
-        ctx.drawImage(logo, w - s - 40, 40, s, s);
-        ctx.globalAlpha = 1;
-      }
-
-      ctx.fillStyle = '#c9a227';
-      ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(brand, w / 2, 90);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '500 40px Inter, Vazirmatn, system-ui, sans-serif';
-      var words = String(p.text || '').split(/\s+/);
-      var lines = [], line = '';
-      for (var i = 0; i < words.length; i++) {
-        var test = line ? line + ' ' + words[i] : words[i];
-        if (ctx.measureText(test).width > w - 120 && line) {
-          lines.push(line);
-          line = words[i];
-        } else line = test;
-      }
-      if (line) lines.push(line);
-      if (lines.length > 10) lines = lines.slice(0, 10).concat(['\u2026']);
-      var startY = 200;
-      lines.forEach(function (ln, idx) {
-        ctx.fillText(ln, w / 2, startY + idx * 52);
-      });
-
-      if (p.ref) {
-        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
-        ctx.fillText(p.ref, w / 2, startY + lines.length * 52 + 40);
+        var s = 100;
+        ctx.save();
+        ctx.globalAlpha = 0.92;
+        ctx.beginPath();
+        ctx.arc(w - 70, 90, s / 2 + 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.12)';
+        ctx.fill();
+        ctx.drawImage(logo, w - 70 - s / 2, 90 - s / 2, s, s);
+        ctx.restore();
       }
 
       ctx.fillStyle = '#c9a227';
       ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.fillText('seventhtrumpet.org', w / 2, h - 80);
+      ctx.textAlign = 'center';
+      ctx.fillText(brand, w / 2, 100);
+
+      ctx.strokeStyle = 'rgba(201,162,39,0.7)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - 80, 122);
+      ctx.lineTo(w / 2 + 80, 122);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '500 42px Inter, Vazirmatn, system-ui, sans-serif';
+      var lines = wrapLines(ctx, p.text, w - 140, 9);
+      var lineH = 54;
+      var blockH = lines.length * lineH;
+      var startY = (h - blockH) / 2 - 20;
+      if (startY < 180) startY = 180;
+      lines.forEach(function (ln, i) {
+        ctx.fillText(ln, w / 2, startY + i * lineH);
+      });
+
+      if (p.ref) {
+        ctx.fillStyle = 'rgba(255,255,255,0.78)';
+        ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
+        ctx.fillText(p.ref, w / 2, startY + lines.length * lineH + 48);
+      }
+
+      var boxW = 480, boxH = 56;
+      var boxX = (w - boxW) / 2;
+      var boxY = h - 130;
+      ctx.fillStyle = '#c9a227';
+      roundRect(ctx, boxX, boxY, boxW, boxH, 14);
+      ctx.fill();
+      ctx.fillStyle = '#0a2540';
+      ctx.font = '700 30px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 38);
 
       canvas.toBlob(function (blob) {
-        if (!blob) return;
-        var file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand, text: url, url: url }).catch(function () {
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'seventh-trumpet.png';
-            a.click();
-          });
-        } else {
-          var a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
-          a.download = 'seventh-trumpet.png';
-          a.click();
-        }
+        done(blob, url, brand);
       }, 'image/png');
     });
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function sharePicture() {
+    makeShareImage(function (blob, url, brand) {
+      if (!blob) return;
+      var file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' });
+      var data = { files: [file], title: brand, text: url, url: url };
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share(data).catch(function () {
+          downloadBlob(blob);
+        });
+      } else {
+        downloadBlob(blob);
+      }
+    });
+  }
+
+  function downloadBlob(blob) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'seventh-trumpet.png';
+    a.click();
   }
 
   function ensureCss() {
@@ -203,6 +275,7 @@
       '.vshare-hint{font-size:0.8rem;text-align:center;color:#6b7785;margin:0 0 0.85rem;line-height:1.4}' +
       '.vshare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}' +
       '.vshare-btn{display:flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.85rem 0.4rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:0.9rem;cursor:pointer;color:#fff}' +
+      '.vshare-btn.pic{background:#c9a227;color:#0a2540;grid-column:1/-1;font-size:0.95rem;padding:1rem}' +
       '.vshare-btn.wa{background:#25D366}' +
       '.vshare-btn.tg{background:#0088cc}' +
       '.vshare-btn.ig{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}' +
@@ -210,7 +283,6 @@
       '.vshare-btn.tt{background:#111}' +
       '.vshare-btn.yt{background:#FF0000}' +
       '.vshare-btn.copy{background:#555}' +
-      '.vshare-btn.img{background:#c9a227;color:#0a2540}' +
       '.vshare-btn.site{background:#0a2540;grid-column:1/-1}' +
       '.vshare-close{display:block;width:100%;margin-top:0.6rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
     document.head.appendChild(st);
@@ -233,14 +305,16 @@
       '<p class="vshare-title">' + (en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9') + '</p>' +
       '<p class="vshare-hint">' +
       (en
-        ? 'One tap: text + website link. Logo is on the optional image.'
-        : '\u06cc\u06a9 \u0644\u0645\u0633: \u0645\u062a\u0646 + \u0644\u06cc\u0646\u06a9 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a. \u0644\u0648\u06af\u0648 \u0631\u0648\u06cc \u0639\u06a9\u0633 \u0627\u062e\u062a\u06cc\u0627\u0631\u06cc.') +
+        ? 'Picture includes logo + seventhtrumpet.org link.'
+        : '\u0639\u06a9\u0633 \u0628\u0627 \u0644\u0648\u06af\u0648 + \u0644\u06cc\u0646\u06a9 seventhtrumpet.org') +
       '</p>' +
       '<div class="vshare-grid">' +
+      '<button type="button" class="vshare-btn pic" data-go="pic">' +
+      (en ? 'Share picture (logo + link)' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0639\u06a9\u0633 (\u0644\u0648\u06af\u0648 + \u0644\u06cc\u0646\u06a9)') +
+      '</button>' +
       '<button type="button" class="vshare-btn wa" data-go="wa">WhatsApp</button>' +
       '<button type="button" class="vshare-btn tg" data-go="tg">Telegram</button>' +
       '<button type="button" class="vshare-btn copy" data-go="copy">' + (en ? 'Copy link' : '\u06a9\u067e\u06cc \u0644\u06cc\u0646\u06a9') + '</button>' +
-      '<button type="button" class="vshare-btn img" data-go="img">' + (en ? 'Image + logo' : '\u0639\u06a9\u0633 + \u0644\u0648\u06af\u0648') + '</button>' +
       '<button type="button" class="vshare-btn ig" data-go="ig">Instagram</button>' +
       '<button type="button" class="vshare-btn fb" data-go="fb">Facebook</button>' +
       '<button type="button" class="vshare-btn tt" data-go="tt">TikTok</button>' +
@@ -261,6 +335,11 @@
     overlay.querySelectorAll('[data-go]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var go = btn.getAttribute('data-go');
+        if (go === 'pic') {
+          close();
+          setTimeout(sharePicture, 120);
+          return;
+        }
         if (go === 'wa') {
           window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
         } else if (go === 'tg') {
@@ -272,10 +351,6 @@
           } catch (e) {
             prompt(en ? 'Copy:' : '\u06a9\u067e\u06cc:', msg);
           }
-        } else if (go === 'img') {
-          close();
-          setTimeout(shareSimpleImage, 100);
-          return;
         } else if (go === 'ig') {
           try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
           window.open(SOCIAL.instagram, '_blank', 'noopener');
@@ -326,8 +401,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._shareBound4) return;
-    btn._shareBound4 = true;
+    if (!btn || btn._shareBound5) return;
+    btn._shareBound5 = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -337,8 +412,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._shareBound4) return;
-    textEl._shareBound4 = true;
+    if (!textEl || textEl._shareBound5) return;
+    textEl._shareBound5 = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
