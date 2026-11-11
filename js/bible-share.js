@@ -1,4 +1,4 @@
-/* Share: WhatsApp/Telegram + nice picture with logo watermark + website link */
+/* Simple share: apps list. Each share = image with big profile + verse + website link */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -100,28 +100,36 @@
     return parts.join('\n\n');
   }
 
-  function getLogoImg(cb) {
+  function getProfileImg(cb) {
     var tries = 0;
     function attempt() {
       try {
-        if (window.ST_LP && window.ST_LP[0] && window.ST_LP[1]) {
+        if (window.ST_PE1 && window.ST_PE2 && window.ST_PE1.length > 100) {
           var img = new Image();
           img.onload = function () { cb(img); };
-          img.onerror = function () { cb(null); };
-          img.src = 'data:image/jpeg;base64,' + window.ST_LP[0] + window.ST_LP[1];
+          img.onerror = function () { tryLp(); };
+          img.src = 'data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2;
           return;
         }
-        if (window.ST_PE1 && window.ST_PE2 && window.ST_PE1.length > 100) {
-          var img2 = new Image();
-          img2.onload = function () { cb(img2); };
-          img2.onerror = function () { cb(null); };
-          img2.src = 'data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2;
-          return;
-        }
-      } catch (e) {}
-      tries++;
-      if (tries < 40) setTimeout(attempt, 80);
-      else cb(null);
+        tryLp();
+      } catch (e) { tryLp(); }
+      function tryLp() {
+        try {
+          if (window.ST_LP && window.ST_LP[0] && window.ST_LP[1]) {
+            var img2 = new Image();
+            img2.onload = function () { cb(img2); };
+            img2.onerror = function () { nextTry(); };
+            img2.src = 'data:image/jpeg;base64,' + window.ST_LP[0] + window.ST_LP[1];
+            return;
+          }
+        } catch (e2) {}
+        nextTry();
+      }
+      function nextTry() {
+        tries++;
+        if (tries < 50) setTimeout(attempt, 80);
+        else cb(null);
+      }
     }
     attempt();
   }
@@ -145,91 +153,6 @@
     return lines;
   }
 
-  function makeShareImage(done) {
-    var p = versePayload();
-    var url = sharePageUrl();
-    var en = isEn();
-    var brand = en ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
-
-    getLogoImg(function (logo) {
-      var w = 1080, h = 1080;
-      var canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      var ctx = canvas.getContext('2d');
-
-      var g = ctx.createLinearGradient(0, 0, 0, h);
-      g.addColorStop(0, '#0c2d4a');
-      g.addColorStop(0.55, '#0a2540');
-      g.addColorStop(1, '#061828');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, w, h);
-
-      ctx.fillStyle = '#c9a227';
-      ctx.fillRect(0, 0, w, 10);
-      ctx.fillRect(0, h - 10, w, 10);
-
-      ctx.strokeStyle = 'rgba(201,162,39,0.35)';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(36, 36, w - 72, h - 72);
-
-      if (logo) {
-        var s = 100;
-        ctx.save();
-        ctx.globalAlpha = 0.92;
-        ctx.beginPath();
-        ctx.arc(w - 70, 90, s / 2 + 4, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,0.12)';
-        ctx.fill();
-        ctx.drawImage(logo, w - 70 - s / 2, 90 - s / 2, s, s);
-        ctx.restore();
-      }
-
-      ctx.fillStyle = '#c9a227';
-      ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(brand, w / 2, 100);
-
-      ctx.strokeStyle = 'rgba(201,162,39,0.7)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(w / 2 - 80, 122);
-      ctx.lineTo(w / 2 + 80, 122);
-      ctx.stroke();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '500 42px Inter, Vazirmatn, system-ui, sans-serif';
-      var lines = wrapLines(ctx, p.text, w - 140, 9);
-      var lineH = 54;
-      var blockH = lines.length * lineH;
-      var startY = (h - blockH) / 2 - 20;
-      if (startY < 180) startY = 180;
-      lines.forEach(function (ln, i) {
-        ctx.fillText(ln, w / 2, startY + i * lineH);
-      });
-
-      if (p.ref) {
-        ctx.fillStyle = 'rgba(255,255,255,0.78)';
-        ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
-        ctx.fillText(p.ref, w / 2, startY + lines.length * lineH + 48);
-      }
-
-      var boxW = 480, boxH = 56;
-      var boxX = (w - boxW) / 2;
-      var boxY = h - 130;
-      ctx.fillStyle = '#c9a227';
-      roundRect(ctx, boxX, boxY, boxW, boxH, 14);
-      ctx.fill();
-      ctx.fillStyle = '#0a2540';
-      ctx.font = '700 30px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 38);
-
-      canvas.toBlob(function (blob) {
-        done(blob, url, brand);
-      }, 'image/png');
-    });
-  }
-
   function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -240,18 +163,91 @@
     ctx.closePath();
   }
 
-  function sharePicture() {
-    makeShareImage(function (blob, url, brand) {
-      if (!blob) return;
-      var file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' });
-      var data = { files: [file], title: brand, text: url, url: url };
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share(data).catch(function () {
-          downloadBlob(blob);
-        });
+  function makeImage(done) {
+    var p = versePayload();
+    var url = sharePageUrl();
+    var en = isEn();
+    var brand = en ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
+
+    getProfileImg(function (profile) {
+      var w = 1080, h = 1920;
+      var canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext('2d');
+
+      if (profile) {
+        var scale = Math.max(w / profile.width, h / profile.height);
+        var dw = profile.width * scale;
+        var dh = profile.height * scale;
+        ctx.drawImage(profile, (w - dw) / 2, (h - dh) / 2, dw, dh);
       } else {
-        downloadBlob(blob);
+        var g0 = ctx.createLinearGradient(0, 0, 0, h);
+        g0.addColorStop(0, '#0a2540');
+        g0.addColorStop(1, '#061828');
+        ctx.fillStyle = g0;
+        ctx.fillRect(0, 0, w, h);
       }
+
+      var g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, 'rgba(5,15,30,0.35)');
+      g.addColorStop(0.4, 'rgba(5,15,30,0.45)');
+      g.addColorStop(1, 'rgba(5,15,30,0.7)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#c9a227';
+      ctx.fillRect(0, 0, w, 12);
+
+      var cardX = 50, cardY = h * 0.22, cardW = w - 100, cardH = h * 0.48;
+      ctx.fillStyle = 'rgba(8, 28, 48, 0.75)';
+      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+      ctx.fill();
+      ctx.strokeStyle = '#c9a227';
+      ctx.lineWidth = 4;
+      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+      ctx.stroke();
+
+      ctx.fillStyle = '#c9a227';
+      ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(brand, w / 2, cardY + 58);
+
+      ctx.strokeStyle = 'rgba(201,162,39,0.8)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - 90, cardY + 78);
+      ctx.lineTo(w / 2 + 90, cardY + 78);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '500 40px Inter, Vazirmatn, system-ui, sans-serif';
+      var lines = wrapLines(ctx, p.text, cardW - 80, 10);
+      var lineH = 52;
+      var startY = cardY + 130;
+      lines.forEach(function (ln, i) {
+        ctx.fillText(ln, w / 2, startY + i * lineH);
+      });
+
+      if (p.ref) {
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
+        ctx.fillText(p.ref, w / 2, cardY + cardH - 90);
+      }
+
+      var boxW = 500, boxH = 58;
+      var boxX = (w - boxW) / 2;
+      var boxY = cardY + cardH - 68;
+      ctx.fillStyle = '#c9a227';
+      roundRect(ctx, boxX, boxY, boxW, boxH, 14);
+      ctx.fill();
+      ctx.fillStyle = '#0a2540';
+      ctx.font = '700 30px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 40);
+
+      canvas.toBlob(function (blob) {
+        done(blob, url, brand);
+      }, 'image/png');
     });
   }
 
@@ -262,27 +258,64 @@
     a.click();
   }
 
+  function shareImageThen(app) {
+    makeImage(function (blob, url, brand) {
+      if (!blob) return;
+      var file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' });
+      var msg = buildMessage();
+
+      if (app === 'wa') {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: brand, text: url, url: url }).catch(function () {
+            downloadBlob(blob);
+            window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+          });
+        } else {
+          downloadBlob(blob);
+          window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+        }
+        return;
+      }
+      if (app === 'tg') {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: brand, text: url, url: url }).catch(function () {
+            downloadBlob(blob);
+            window.open(SOCIAL.telegram + encodeURIComponent(url) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+          });
+        } else {
+          downloadBlob(blob);
+          window.open(SOCIAL.telegram + encodeURIComponent(url) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+        }
+        return;
+      }
+      downloadBlob(blob);
+      try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
+      if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
+      else if (app === 'fb') window.open(SOCIAL.facebook + encodeURIComponent(url), '_blank', 'noopener');
+      else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
+      else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
+    });
+  }
+
   function ensureCss() {
     if (document.getElementById('vshare-icons-css')) return;
     var st = document.createElement('style');
     st.id = 'vshare-icons-css';
     st.textContent =
       '.vshare-overlay{position:fixed;inset:0;z-index:5000;background:rgba(8,16,28,0.55);display:flex;align-items:flex-end;justify-content:center;padding:0.75rem}' +
-      '.vshare-panel{width:100%;max-width:420px;background:#fff;border-radius:16px;padding:1.1rem 1rem 1rem;box-shadow:0 -8px 32px rgba(0,0,0,0.25)}' +
+      '.vshare-panel{width:100%;max-width:400px;background:#fff;border-radius:16px;padding:1.1rem 1rem 1rem;box-shadow:0 -8px 32px rgba(0,0,0,0.25)}' +
       'body.dark .vshare-panel{background:#152536;color:#e8eef5}' +
-      '.vshare-title{font-weight:800;font-size:1.1rem;margin:0 0 0.25rem;text-align:center;color:#0a2540}' +
+      '.vshare-title{font-weight:800;font-size:1.15rem;margin:0 0 0.85rem;text-align:center;color:#0a2540}' +
       'body.dark .vshare-title{color:#9ec5ea}' +
-      '.vshare-hint{font-size:0.8rem;text-align:center;color:#6b7785;margin:0 0 0.85rem;line-height:1.4}' +
       '.vshare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}' +
-      '.vshare-btn{display:flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.85rem 0.4rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:0.9rem;cursor:pointer;color:#fff}' +
-      '.vshare-btn.pic{background:#c9a227;color:#0a2540;grid-column:1/-1;font-size:0.95rem;padding:1rem}' +
+      '.vshare-btn{display:flex;align-items:center;justify-content:center;padding:0.9rem 0.4rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:0.95rem;cursor:pointer;color:#fff}' +
       '.vshare-btn.wa{background:#25D366}' +
       '.vshare-btn.tg{background:#0088cc}' +
       '.vshare-btn.ig{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}' +
       '.vshare-btn.fb{background:#1877F2}' +
       '.vshare-btn.tt{background:#111}' +
       '.vshare-btn.yt{background:#FF0000}' +
-      '.vshare-btn.copy{background:#555}' +
+      '.vshare-btn.save{background:#c9a227;color:#0a2540;grid-column:1/-1}' +
       '.vshare-btn.site{background:#0a2540;grid-column:1/-1}' +
       '.vshare-close{display:block;width:100%;margin-top:0.6rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
     document.head.appendChild(st);
@@ -292,9 +325,7 @@
     ensureCss();
     var old = document.getElementById('vshare-overlay');
     if (old) old.remove();
-
     var en = isEn();
-    var msg = buildMessage();
     var pageUrl = sharePageUrl();
 
     var overlay = document.createElement('div');
@@ -303,31 +334,22 @@
     overlay.innerHTML =
       '<div class="vshare-panel" role="dialog">' +
       '<p class="vshare-title">' + (en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9') + '</p>' +
-      '<p class="vshare-hint">' +
-      (en
-        ? 'Picture includes logo + seventhtrumpet.org link.'
-        : '\u0639\u06a9\u0633 \u0628\u0627 \u0644\u0648\u06af\u0648 + \u0644\u06cc\u0646\u06a9 seventhtrumpet.org') +
-      '</p>' +
       '<div class="vshare-grid">' +
-      '<button type="button" class="vshare-btn pic" data-go="pic">' +
-      (en ? 'Share picture (logo + link)' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0639\u06a9\u0633 (\u0644\u0648\u06af\u0648 + \u0644\u06cc\u0646\u06a9)') +
-      '</button>' +
       '<button type="button" class="vshare-btn wa" data-go="wa">WhatsApp</button>' +
       '<button type="button" class="vshare-btn tg" data-go="tg">Telegram</button>' +
-      '<button type="button" class="vshare-btn copy" data-go="copy">' + (en ? 'Copy link' : '\u06a9\u067e\u06cc \u0644\u06cc\u0646\u06a9') + '</button>' +
       '<button type="button" class="vshare-btn ig" data-go="ig">Instagram</button>' +
       '<button type="button" class="vshare-btn fb" data-go="fb">Facebook</button>' +
       '<button type="button" class="vshare-btn tt" data-go="tt">TikTok</button>' +
       '<button type="button" class="vshare-btn yt" data-go="yt">YouTube</button>' +
+      '<button type="button" class="vshare-btn save" data-go="save">' +
+      (en ? 'Save picture' : '\u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633') + '</button>' +
       '<button type="button" class="vshare-btn site" data-go="site">' +
-      (en ? 'Open website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a') +
-      '</button>' +
+      (en ? 'Open website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a') + '</button>' +
       '</div>' +
       '<button type="button" class="vshare-close" id="vs-close">' +
       (en ? 'Close' : '\u0628\u0633\u062a\u0646') + '</button></div>';
 
     document.body.appendChild(overlay);
-
     function close() { overlay.remove(); }
     document.getElementById('vs-close').onclick = close;
     overlay.onclick = function (e) { if (e.target === overlay) close(); };
@@ -335,36 +357,13 @@
     overlay.querySelectorAll('[data-go]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var go = btn.getAttribute('data-go');
-        if (go === 'pic') {
-          close();
-          setTimeout(sharePicture, 120);
+        if (go === 'site') {
+          window.open(pageUrl, '_blank', 'noopener');
+          setTimeout(close, 200);
           return;
         }
-        if (go === 'wa') {
-          window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-        } else if (go === 'tg') {
-          window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
-        } else if (go === 'copy') {
-          try {
-            if (navigator.clipboard) navigator.clipboard.writeText(msg);
-            alert(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f');
-          } catch (e) {
-            prompt(en ? 'Copy:' : '\u06a9\u067e\u06cc:', msg);
-          }
-        } else if (go === 'ig') {
-          try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
-          window.open(SOCIAL.instagram, '_blank', 'noopener');
-        } else if (go === 'fb') {
-          window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
-        } else if (go === 'tt') {
-          try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
-          window.open(SOCIAL.tiktok, '_blank', 'noopener');
-        } else if (go === 'yt') {
-          window.open(SOCIAL.youtube, '_blank', 'noopener');
-        } else if (go === 'site') {
-          window.open(pageUrl, '_blank', 'noopener');
-        }
-        setTimeout(close, 250);
+        close();
+        setTimeout(function () { shareImageThen(go); }, 100);
       });
     });
   }
@@ -401,8 +400,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._shareBound5) return;
-    btn._shareBound5 = true;
+    if (!btn || btn._shareBound6) return;
+    btn._shareBound6 = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -412,8 +411,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._shareBound5) return;
-    textEl._shareBound5 = true;
+    if (!textEl || textEl._shareBound6) return;
+    textEl._shareBound6 = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
