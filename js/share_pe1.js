@@ -1,1 +1,1 @@
-PLACEHOLDER2
+window.ST_PE1='placeholder_will_replace';
