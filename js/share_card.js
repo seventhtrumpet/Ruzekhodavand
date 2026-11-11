@@ -1,4 +1,4 @@
-/* Share card: profile/website picture background + verse + link near verse */
+/* Branded share card for every visitor — profile picture + verse + website ON the image. One tap. */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SITE_NAME_FA = '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
@@ -20,7 +20,7 @@
       img.crossOrigin = 'anonymous';
       img.onload = function () { resolve(img); };
       img.onerror = function () { reject(new Error('fail')); };
-      img.src = src + (src.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
+      img.src = src + (src.indexOf('?') >= 0 ? '&' : '?') + 't=1';
     });
   }
 
@@ -66,7 +66,6 @@
     canvas.height = h;
     var ctx = canvas.getContext('2d');
 
-    // Background = profile / website picture
     if (bgImg) {
       try {
         var scale = Math.max(w / bgImg.width, h / bgImg.height);
@@ -130,7 +129,7 @@
       afterVerse += 50;
     }
 
-    // Link ON the picture, near the verse
+    // Website ON the picture — near verse (no caption needed)
     var btnW = Math.min(cardW - 80, 720);
     var btnH = 110;
     var btnX = (w - btnW) / 2;
@@ -142,7 +141,7 @@
     ctx.font = '800 40px Inter, system-ui, sans-serif';
     ctx.fillText('seventhtrumpet.org', w / 2, btnY + 48);
     ctx.font = '600 26px Inter, Vazirmatn, system-ui, sans-serif';
-    ctx.fillText(en ? 'Open website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a', w / 2, btnY + 88);
+    ctx.fillText(en ? 'seventhtrumpet.org' : 'seventhtrumpet.org', w / 2, btnY + 88);
 
     ctx.fillStyle = 'rgba(0,0,0,0.45)';
     ctx.fillRect(0, h - 150, w, 150);
@@ -151,12 +150,12 @@
     ctx.fillText('seventhtrumpet.org', w / 2, h - 78);
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
     ctx.font = '500 26px Inter, Vazirmatn, system-ui, sans-serif';
-    ctx.fillText(en ? 'Three Angels Message \u00b7 Revelation 14' : '\u067e\u06cc\u0627\u0645 \u0633\u0647 \u0641\u0631\u0634\u062a\u0647 \u00b7 \u0645\u06a9\u0627\u0634\u0641\u0647 \u06f1\u06f4', w / 2, h - 40);
+    ctx.fillText(en ? 'Three Angels Message' : '\u067e\u06cc\u0627\u0645 \u0633\u0647 \u0641\u0631\u0634\u062a\u0647', w / 2, h - 40);
 
     return canvas;
   }
 
-  function showPreview(canvas, opts) {
+  function showEasyShare(canvas, opts) {
     opts = opts || {};
     var url = opts.url || SITE;
     var en = isEn();
@@ -168,35 +167,43 @@
       var st = document.createElement('style');
       st.id = 'st-card-preview-css';
       st.textContent =
-        '#st-card-preview{position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;gap:.75rem}' +
-        '#st-card-preview img{max-width:min(92vw,360px);max-height:50vh;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5)}' +
-        '#st-card-preview .acts{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center}' +
-        '#st-card-preview button{font-family:inherit;font-weight:800;font-size:.95rem;padding:.75rem 1.1rem;border:none;border-radius:10px;cursor:pointer}' +
-        '#st-card-preview .save{background:#c9a227;color:#0a2540}' +
+        '#st-card-preview{position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;gap:0.7rem}' +
+        '#st-card-preview img{max-width:min(92vw,340px);max-height:48vh;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5)}' +
+        '#st-card-preview .acts{display:flex;flex-direction:column;gap:0.55rem;width:min(92vw,340px)}' +
+        '#st-card-preview button{font-family:inherit;font-weight:800;font-size:1.05rem;padding:0.95rem 1.1rem;border:none;border-radius:12px;cursor:pointer;width:100%}' +
         '#st-card-preview .share{background:#25D366;color:#fff}' +
-        '#st-card-preview .close{background:#fff;color:#222}' +
-        '#st-card-preview p{color:#fff;font-size:.85rem;text-align:center;max-width:320px;margin:0;line-height:1.45}';
+        '#st-card-preview .save{background:#c9a227;color:#0a2540}' +
+        '#st-card-preview .close{background:#fff;color:#333;font-size:0.95rem;font-weight:600}' +
+        '#st-card-preview p{color:#fff;font-size:0.9rem;text-align:center;max-width:320px;margin:0;line-height:1.45}';
       document.head.appendChild(st);
     }
 
     var box = document.createElement('div');
     box.id = 'st-card-preview';
     box.innerHTML =
-      '<img alt="share" src="' + dataUrl + '">' +
-      '<div class="acts">' +
-      '<button type="button" class="share" id="st-sh">' + (en ? 'Share this card' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0627\u06cc\u0646 \u06a9\u0627\u0631\u062a') + '</button>' +
-      '<button type="button" class="save" id="st-sv">' + (en ? 'Save' : '\u0630\u062e\u06cc\u0631\u0647') + '</button>' +
-      '<button type="button" class="close" id="st-cl">' + (en ? 'Close' : '\u0628\u0633\u062a\u0646') + '</button></div>' +
+      '<img alt="" src="' + dataUrl + '">' +
       '<p>' + (en
-        ? 'Profile picture + verse + seventhtrumpet.org on the card.'
-        : '\u0639\u06a9\u0633 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0622\u06cc\u0647 + seventhtrumpet.org \u0631\u0648\u06cc \u06a9\u0627\u0631\u062a.') +
-      '</p>';
+        ? 'Your logo, verse, and website are already on this image. No caption needed.'
+        : '\u0644\u0648\u06af\u0648\u060c \u0622\u06cc\u0647 \u0648 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a \u0631\u0648\u06cc \u0639\u06a9\u0633 \u0647\u0633\u062a. \u0646\u06cc\u0627\u0632\u06cc \u0628\u0647 \u0646\u0648\u0634\u062a\u0646 \u06a9\u067e\u0634\u0646 \u0646\u06cc\u0633\u062a.') +
+      '</p>' +
+      '<div class="acts">' +
+      '<button type="button" class="share" id="st-sh">' +
+      (en ? 'Share now (WhatsApp, Instagram…)' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u06a9\u0646\u06cc\u062f (\u0648\u0627\u062a\u0633\u0627\u067e\u060c \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645\u2026)') +
+      '</button>' +
+      '<button type="button" class="save" id="st-sv">' +
+      (en ? 'Save to phone' : '\u0630\u062e\u06cc\u0631\u0647 \u062f\u0631 \u06af\u0648\u0634\u06cc') +
+      '</button>' +
+      '<button type="button" class="close" id="st-cl">' +
+      (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
+      '</button></div>';
     document.body.appendChild(box);
 
     function toBlob(cb) {
       canvas.toBlob(function (b) { cb(b); }, 'image/png');
     }
+
     document.getElementById('st-cl').onclick = function () { box.remove(); };
+
     document.getElementById('st-sv').onclick = function () {
       toBlob(function (blob) {
         if (!blob) return;
@@ -206,23 +213,32 @@
         a.click();
       });
     };
+
+    // Big green button: phone share sheet → WhatsApp / Instagram / etc.
     document.getElementById('st-sh').onclick = function () {
       toBlob(function (blob) {
         if (!blob) return;
         var file = new File([blob], opts.filename || 'seventh-trumpet.png', { type: 'image/png' });
-        var text = [opts.ref, opts.body, url].filter(Boolean).join('\n\n');
+        // Prefer sharing the IMAGE only — branding is already on it (no caption required)
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: opts.title || SITE_NAME_EN, text: text, url: url }).catch(function () {
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = opts.filename || 'seventh-trumpet.png';
-            a.click();
-          });
+          navigator.share({ files: [file], title: opts.title || SITE_NAME_EN })
+            .catch(function () {
+              var a = document.createElement('a');
+              a.href = URL.createObjectURL(blob);
+              a.download = opts.filename || 'seventh-trumpet.png';
+              a.click();
+              alert(en
+                ? 'Saved. Open WhatsApp or Instagram and choose this image from Gallery.'
+                : '\u0630\u062e\u06cc\u0631\u0647 \u0634\u062f. \u0648\u0627\u062a\u0633\u0627\u067e \u06cc\u0627 \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645 \u0631\u0627 \u0628\u0627\u0632 \u06a9\u0646\u06cc\u062f \u0648 \u0627\u06cc\u0646 \u0639\u06a9\u0633 \u0631\u0627 \u0627\u0632 \u06af\u0627\u0644\u0631\u06cc \u0628\u06af\u06cc\u0631\u06cc\u062f.');
+            });
         } else {
           var a = document.createElement('a');
           a.href = URL.createObjectURL(blob);
           a.download = opts.filename || 'seventh-trumpet.png';
           a.click();
+          alert(en
+            ? 'Saved to phone. Open WhatsApp or Instagram → pick this image. No caption needed.'
+            : '\u0631\u0648\u06cc \u06af\u0648\u0634\u06cc \u0630\u062e\u06cc\u0631\u0647 \u0634\u062f. \u0648\u0627\u062a\u0633\u0627\u067e \u06cc\u0627 \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645 \u2192 \u0627\u06cc\u0646 \u0639\u06a9\u0633. \u0646\u06cc\u0627\u0632\u06cc \u0628\u0647 \u06a9\u067e\u0634\u0646 \u0646\u06cc\u0633\u062a.');
         }
       });
     };
@@ -231,7 +247,7 @@
   window.ST_shareBeautifulCard = function (opts) {
     opts = opts || {};
     loadProfile().then(function (img) {
-      showPreview(drawCard(img, opts), opts);
+      showEasyShare(drawCard(img, opts), opts);
     });
   };
   window.ST_SITE = SITE;
