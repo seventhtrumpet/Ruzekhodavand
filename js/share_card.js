@@ -1,4 +1,4 @@
-/* Share card — profile photo background from ST_PE1+ST_PE2 */
+/* Share card — profile photo background from ST_PE1+ST_PE2 or ST_PROFILE_B64 */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SITE_NAME_FA = '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
@@ -14,6 +14,9 @@
     try {
       if (window.ST_PE1 && window.ST_PE2 && window.ST_PE1.length > 20) {
         return 'data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2;
+      }
+      if (window.ST_PROFILE_B64 && window.ST_PROFILE_B64.length > 20) {
+        return 'data:image/jpeg;base64,' + window.ST_PROFILE_B64;
       }
     } catch (e) {}
     return '';

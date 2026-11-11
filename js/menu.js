@@ -153,7 +153,8 @@
   loadScript('js/logo_data.js', 'data-logo-data');
   loadScript('js/visits.js', 'data-visits');
   loadScript('js/text_size.js', 'data-text-size');
-  /* Profile photo pieces MUST load before share_card */
+  /* Profile photo MUST load before share_card */
+  loadScript('js/profile_bg.js', 'data-profile-bg');
   loadScript('js/share_pe1.js', 'data-share-pe1');
   loadScript('js/share_pe2.js', 'data-share-pe2');
   loadScript('js/share_card.js', 'data-share-card');
