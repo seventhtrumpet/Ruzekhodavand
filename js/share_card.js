@@ -1,4 +1,4 @@
-/* Share always creates a real picture — preview + Save / Share */
+/* Share picture: verse + website written on the image (near the verse) */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SITE_NAME_FA = '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
@@ -59,6 +59,7 @@
     var title = opts.title || (isEn() ? SITE_NAME_EN : SITE_NAME_FA);
     var body = opts.body || '';
     var ref = opts.ref || '';
+    var en = isEn();
     var w = 1080, h = 1920;
     var canvas = document.createElement('canvas');
     canvas.width = w; canvas.height = h;
@@ -85,41 +86,65 @@
     ctx.fillStyle = g1; ctx.fillRect(0, 0, w, h);
     ctx.fillStyle = '#c9a227'; ctx.fillRect(0, 0, w, 10);
 
-    var cardX = 70, cardY = h * 0.26, cardW = w - 140, cardH = h * 0.44;
-    ctx.fillStyle = 'rgba(10,37,64,0.84)';
-    roundRect(ctx, cardX, cardY, cardW, cardH, 32); ctx.fill();
-    ctx.strokeStyle = '#c9a227'; ctx.lineWidth = 4;
-    roundRect(ctx, cardX, cardY, cardW, cardH, 32); ctx.stroke();
+    // Main card — taller so verse + link fit together
+    var cardX = 60, cardY = h * 0.22, cardW = w - 120, cardH = h * 0.52;
+    ctx.fillStyle = 'rgba(10,37,64,0.88)';
+    roundRect(ctx, cardX, cardY, cardW, cardH, 36); ctx.fill();
+    ctx.strokeStyle = '#c9a227'; ctx.lineWidth = 5;
+    roundRect(ctx, cardX, cardY, cardW, cardH, 36); ctx.stroke();
 
-    ctx.fillStyle = 'rgba(255,255,255,0.92)';
-    ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(title, w / 2, cardY + 72);
+    ctx.fillText(title, w / 2, cardY + 64);
 
-    ctx.strokeStyle = 'rgba(201,162,39,0.75)'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(w/2-80, cardY+95); ctx.lineTo(w/2+80, cardY+95); ctx.stroke();
+    ctx.strokeStyle = 'rgba(201,162,39,0.8)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(w/2-90, cardY+88); ctx.lineTo(w/2+90, cardY+88); ctx.stroke();
 
-    ctx.fillStyle = '#fff';
-    ctx.font = '500 44px Inter, Vazirmatn, system-ui, sans-serif';
-    var lines = wrapText(ctx, body, cardW - 80);
-    if (lines.length > 11) lines = lines.slice(0, 11).concat(['\u2026']);
-    var lineH = 58;
-    var startY = Math.max(cardY + 120, cardY + cardH/2 - (lines.length*lineH)/2 + 40);
+    // Verse text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '500 42px Inter, Vazirmatn, system-ui, sans-serif';
+    var lines = wrapText(ctx, body, cardW - 100);
+    if (lines.length > 9) lines = lines.slice(0, 9).concat(['\u2026']);
+    var lineH = 54;
+    var startY = cardY + 140;
     lines.forEach(function (ln, i) { ctx.fillText(ln, w/2, startY + i*lineH); });
 
+    var afterVerse = startY + lines.length * lineH + 28;
     if (ref) {
       ctx.fillStyle = '#c9a227';
-      ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.fillText(String(ref), w/2, Math.min(startY + lines.length*lineH + 56, cardY + cardH - 36));
+      ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.fillText(String(ref), w/2, afterVerse);
+      afterVerse += 50;
     }
 
-    ctx.fillStyle = 'rgba(0,0,0,0.42)'; ctx.fillRect(0, h-170, w, 170);
+    // ===== WEBSITE ON THE PICTURE, RIGHT UNDER THE VERSE =====
+    var btnW = Math.min(cardW - 80, 720);
+    var btnH = 110;
+    var btnX = (w - btnW) / 2;
+    var btnY = Math.min(afterVerse + 20, cardY + cardH - btnH - 40);
+
+    // Gold button shape
     ctx.fillStyle = '#c9a227';
-    ctx.font = '700 36px Inter, system-ui, sans-serif';
-    ctx.fillText('seventhtrumpet.org', w/2, h-95);
-    ctx.fillStyle = 'rgba(255,255,255,0.82)';
-    ctx.font = '500 28px Inter, Vazirmatn, system-ui, sans-serif';
-    ctx.fillText(isEn() ? 'Three Angels Message \u00b7 Revelation 14' : '\u067e\u06cc\u0627\u0645 \u0633\u0647 \u0641\u0631\u0634\u062a\u0647 \u00b7 \u0645\u06a9\u0627\u0634\u0641\u0647 \u06f1\u06f4', w/2, h-48);
+    roundRect(ctx, btnX, btnY, btnW, btnH, 20);
+    ctx.fill();
+
+    ctx.fillStyle = '#0a2540';
+    ctx.font = '800 40px Inter, system-ui, sans-serif';
+    ctx.fillText('seventhtrumpet.org', w / 2, btnY + 48);
+
+    ctx.font = '600 26px Inter, Vazirmatn, system-ui, sans-serif';
+    ctx.fillText(en ? 'Open our website' : '\u0648\u0628\u200c\u0633\u0627\u06cc\u062a \u0631\u0627 \u0628\u0627\u0632 \u06a9\u0646\u06cc\u062f', w / 2, btnY + 88);
+
+    // Bottom bar also shows site (second place)
+    ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0, h-150, w, 150);
+    ctx.fillStyle = '#c9a227';
+    ctx.font = '700 38px Inter, system-ui, sans-serif';
+    ctx.fillText('seventhtrumpet.org', w/2, h-78);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.font = '500 26px Inter, Vazirmatn, system-ui, sans-serif';
+    ctx.fillText(en ? 'Three Angels Message \u00b7 Revelation 14' : '\u067e\u06cc\u0627\u0645 \u0633\u0647 \u0641\u0631\u0634\u062a\u0647 \u00b7 \u0645\u06a9\u0627\u0634\u0641\u0647 \u06f1\u06f4', w/2, h-40);
+
     return canvas;
   }
 
@@ -153,8 +178,8 @@
       '<button type="button" class="save" id="st-sv">' + (en ? 'Save picture' : '\u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633') + '</button>' +
       '<button type="button" class="close" id="st-cl">' + (en ? 'Close' : '\u0628\u0633\u062a\u0646') + '</button></div>' +
       '<p>' + (en
-        ? 'Save this picture, then open WhatsApp Status / Instagram Story and choose it from Gallery. Write seventhtrumpet.org in the caption.'
-        : '\u0639\u06a9\u0633 \u0631\u0627 \u0630\u062e\u06cc\u0631\u0647 \u06a9\u0646\u06cc\u062f\u060c \u0628\u0639\u062f Status \u06cc\u0627 Story \u0631\u0627 \u0628\u0627\u0632 \u06a9\u0646\u06cc\u062f \u0648 \u0627\u06cc\u0646 \u0639\u06a9\u0633 \u0631\u0627 \u0627\u0632 \u06af\u0627\u0644\u0631\u06cc \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f. \u062f\u0631 \u06a9\u067e\u0634\u0646: seventhtrumpet.org') +
+        ? 'The website is written on the picture under the verse. Save → Status/Story → pick this photo.'
+        : '\u0622\u062f\u0631\u0633 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a \u0631\u0648\u06cc \u0639\u06a9\u0633\u060c \u0632\u06cc\u0631 \u0622\u06cc\u0647 \u0646\u0648\u0634\u062a\u0647 \u0634\u062f\u0647. \u0630\u062e\u06cc\u0631\u0647 \u2192 Status/Story \u2192 \u0627\u06cc\u0646 \u0639\u06a9\u0633.') +
       '</p>';
     document.body.appendChild(box);
 
@@ -180,7 +205,6 @@
           });
         } else {
           var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = opts.filename || 'seventh-trumpet.png'; a.click();
-          alert(en ? 'Picture saved — add it to Status from Gallery' : '\u0639\u06a9\u0633 \u0630\u062e\u06cc\u0631\u0647 \u0634\u062f \u2014 \u0627\u0632 \u06af\u0627\u0644\u0631\u06cc \u0628\u0647 Status \u0627\u0636\u0627\u0641\u0647 \u06a9\u0646\u06cc\u062f');
         }
       });
     };
