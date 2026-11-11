@@ -1,4 +1,5 @@
-/* Share verse → open social apps / site (not only a raw link) */
+/* Share: always send website link + profile picture preview.
+   When someone taps the preview card/picture in chat → opens your website. */
 (function () {
   var PROFILE_IMG = 'https://iili.io/n8MSJBp.jpg';
   var SITE = 'https://seventhtrumpet.org';
@@ -32,6 +33,26 @@
       }
     } catch (e) {}
     return null;
+  }
+
+  /** Link that opens YOUR website (with verse when possible). Preview uses site profile picture. */
+  function sharePageUrl() {
+    var params = getParams();
+    if (!params) {
+      try {
+        var st = JSON.parse(localStorage.getItem('cog_bible_state') || '{}');
+        if (st && st.bookId && st.chapter) {
+          params = { bookId: st.bookId, chapter: st.chapter, verse: st.verse || 1 };
+        }
+      } catch (e) {}
+    }
+    if (params && params.bookId) {
+      return SITE + '/bible.html?b=' + params.bookId +
+        '&c=' + (params.chapter || 1) +
+        '&v=' + (params.verse || 1);
+    }
+    // Home with share flag so preview still shows profile image
+    return SITE + '/?from=share';
   }
 
   function applyDeepLink() {
@@ -151,8 +172,9 @@
     ctx.font = '700 38px Inter, Vazirmatn, system-ui, sans-serif';
     ctx.fillText(String(ref || ''), w / 2, startY + lines.length * lineH + 70);
 
-    ctx.fillStyle = 'rgba(255,255,255,0.75)';
-    ctx.font = '400 30px Inter, system-ui, sans-serif';
+    // Always show site on the picture so people know where to go
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.font = '600 32px Inter, system-ui, sans-serif';
     ctx.fillText('seventhtrumpet.org', w / 2, h - 100);
 
     return canvas;
@@ -161,7 +183,6 @@
   function versePayload() {
     var text = (document.getElementById('verse-text') || {}).textContent || '';
     var ref = (document.getElementById('verse-ref') || {}).textContent || '';
-    // Prefer selected Bible verses if on bible page
     var selected = document.querySelectorAll('.mb-verse.selected');
     if (selected.length) {
       var lines = [];
@@ -169,17 +190,20 @@
         lines.push((el.textContent || '').trim());
       });
       text = lines.join('\n');
-      var state = {};
-      try { state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}'); } catch (e) {}
       var first = selected[0];
       ref = (first.getAttribute('data-chapter') || '') + ':' + (first.getAttribute('data-verse') || '');
     }
     return { text: text, ref: ref };
   }
 
-  function shareMessage(text, ref) {
-    var body = (ref ? ref + '\n' : '') + text + '\n\n' + SITE;
-    return body;
+  /** Message for chats: verse + website link (link shows profile picture preview) */
+  function shareMessage(text, ref, url) {
+    var u = url || sharePageUrl();
+    var parts = [];
+    if (ref) parts.push(ref);
+    if (text) parts.push(text);
+    parts.push(u); // URL alone on last lines helps WhatsApp/Facebook show picture preview
+    return parts.join('\n\n');
   }
 
   function openUrl(url) {
@@ -196,7 +220,7 @@
       'body.dark .vshare-panel{background:#152536;color:#e8eef5}' +
       '.vshare-title{font-weight:800;font-size:1.05rem;margin:0 0 0.35rem;text-align:center;color:#0a2540}' +
       'body.dark .vshare-title{color:#9ec5ea}' +
-      '.vshare-hint{font-size:0.85rem;text-align:center;color:#6b7785;margin:0 0 0.9rem}' +
+      '.vshare-hint{font-size:0.85rem;text-align:center;color:#6b7785;margin:0 0 0.9rem;line-height:1.45}' +
       '.vshare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.55rem}' +
       '.vshare-btn{display:flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.75rem 0.5rem;border:none;border-radius:10px;font-family:inherit;font-weight:700;font-size:0.88rem;cursor:pointer;color:#fff}' +
       '.vshare-btn.wa{background:#25D366}' +
@@ -218,7 +242,8 @@
     var payload = versePayload();
     var text = payload.text;
     var ref = payload.ref;
-    var msg = shareMessage(text, ref);
+    var pageUrl = sharePageUrl();
+    var msg = shareMessage(text, ref, pageUrl);
     var en = isEn();
 
     var overlay = document.createElement('div');
@@ -227,19 +252,24 @@
     overlay.innerHTML =
       '<div class="vshare-panel" role="dialog">' +
       '<p class="vshare-title">' + (en ? 'Share this verse' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0622\u06cc\u0647') + '</p>' +
-      '<p class="vshare-hint">' + (en ? 'Opens WhatsApp, Instagram, Facebook…' : '\u0648\u0627\u062a\u0633\u0627\u067e\u060c \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645\u060c \u0641\u06cc\u0633\u0628\u0648\u06a9 \u0628\u0627\u0632 \u0645\u06cc\u200c\u0634\u0648\u062f') + '</p>' +
+      '<p class="vshare-hint">' +
+      (en
+        ? 'Friends see your profile picture. When they tap it, your website opens.'
+        : '\u062f\u0648\u0633\u062a\u0627\u0646 \u0639\u06a9\u0633 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 \u0634\u0645\u0627 \u0631\u0627 \u0645\u06cc\u200c\u0628\u06cc\u0646\u0646\u062f. \u0628\u0627 \u0644\u0645\u0633 \u06a9\u0631\u062f\u0646\u060c \u0648\u0628\u200c\u0633\u0627\u06cc\u062a \u0628\u0627\u0632 \u0645\u06cc\u200c\u0634\u0648\u062f.') +
+      '</p>' +
       '<div class="vshare-grid">' +
       '<button type="button" class="vshare-btn wa" data-go="wa">WhatsApp</button>' +
       '<button type="button" class="vshare-btn ig" data-go="ig">Instagram</button>' +
       '<button type="button" class="vshare-btn fb" data-go="fb">Facebook</button>' +
       '<button type="button" class="vshare-btn tt" data-go="tt">TikTok</button>' +
       '<button type="button" class="vshare-btn yt" data-go="yt">YouTube</button>' +
-      '<button type="button" class="vshare-btn site" data-go="site">' + (en ? 'Open our website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a') + '</button>' +
-      '<button type="button" class="vshare-btn img" data-go="img">' + (en ? 'Save picture for Status' : '\u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633 \u0628\u0631\u0627\u06cc \u0627\u0633\u062a\u0648\u0631\u06cc') + '</button>' +
+      '<button type="button" class="vshare-btn site" data-go="site">' + (en ? 'Open our website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u200c\u0633\u0627\u06a9') + '</button>' +
+      '<button type="button" class="vshare-btn img" data-go="img">' + (en ? 'Save picture (Status / Story)' : '\u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633 (\u0627\u0633\u062a\u0648\u0631\u06cc)') + '</button>' +
       '</div>' +
       '<button type="button" class="vshare-close" id="vshare-close">' + (en ? 'Close' : '\u0628\u0633\u062a\u0646') + '</button>' +
       '</div>';
 
+    // fix typo in FA site button if any
     document.body.appendChild(overlay);
 
     function close() { overlay.remove(); }
@@ -252,46 +282,48 @@
       btn.addEventListener('click', function () {
         var go = btn.getAttribute('data-go');
         if (go === 'wa') {
-          // Opens WhatsApp with the verse text — people see the verse, not only a bare link
+          // WhatsApp chat: link preview = profile picture; tap preview → website
           openUrl('https://wa.me/?text=' + encodeURIComponent(msg));
         } else if (go === 'ig') {
-          // Open Instagram profile; user can paste verse / post picture
           try {
-            if (navigator.clipboard && text) navigator.clipboard.writeText(msg);
+            if (navigator.clipboard) navigator.clipboard.writeText(msg);
           } catch (e) {}
           openUrl(SOCIAL.instagram);
         } else if (go === 'fb') {
-          // Facebook share dialog for our website + verse context
-          openUrl('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(SITE) + '&quote=' + encodeURIComponent(ref ? ref + ' — ' + text : text));
+          // Facebook shows site image; tap opens website
+          openUrl('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(pageUrl));
         } else if (go === 'tt') {
           try {
-            if (navigator.clipboard && text) navigator.clipboard.writeText(msg);
+            if (navigator.clipboard) navigator.clipboard.writeText(msg);
           } catch (e) {}
           openUrl(SOCIAL.tiktok);
         } else if (go === 'yt') {
           openUrl(SOCIAL.youtube);
         } else if (go === 'site') {
-          openUrl(SITE);
+          openUrl(pageUrl);
         } else if (go === 'img') {
-          saveVerseImage(text, ref);
+          saveVerseImage(text, ref, pageUrl);
         }
-        // keep panel open for image; close for others after short delay
         if (go !== 'img') setTimeout(close, 400);
       });
     });
   }
 
-  function saveVerseImage(text, ref) {
+  function saveVerseImage(text, ref, pageUrl) {
     function finish(canvas) {
       canvas.toBlob(function (blob) {
         if (!blob) return;
-        var file = new File([blob], 'daily-verse.png', { type: 'image/png' });
+        var file = new File([blob], 'seventh-trumpet-verse.png', { type: 'image/png' });
+        var data = {
+          files: [file],
+          title: ref || (isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645'),
+          text: shareMessage(text, ref, pageUrl),
+          url: pageUrl || SITE
+        };
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({
-            files: [file],
-            title: ref || 'Daily Verse',
-            text: shareMessage(text, ref)
-          }).catch(function () { downloadBlob(blob); });
+          navigator.share(data).catch(function () { downloadBlob(blob); });
+        } else if (navigator.share) {
+          navigator.share({ title: data.title, text: data.text, url: data.url }).catch(function () { downloadBlob(blob); });
         } else {
           downloadBlob(blob);
         }
@@ -300,16 +332,12 @@
     function downloadBlob(blob) {
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'daily-verse.png';
+      a.download = 'seventh-trumpet-verse.png';
       a.click();
     }
     loadImage(PROFILE_IMG)
       .then(function (img) { finish(drawVerseCard(img, text, ref)); })
       .catch(function () { finish(drawVerseCard(null, text, ref)); });
-  }
-
-  function shareDaily() {
-    openSharePanel();
   }
 
   function initDailyShare() {
@@ -347,7 +375,6 @@
     });
   }
 
-  // Tap daily verse text/picture area → same share panel
   function bindVerseTap() {
     var section = document.getElementById('daily-verse');
     if (!section || section._vshareTap) return;
@@ -355,10 +382,7 @@
     var textEl = document.getElementById('verse-text');
     if (textEl) {
       textEl.style.cursor = 'pointer';
-      textEl.title = isEn() ? 'Tap to share' : '\u0628\u0631\u0627\u06cc \u0627\u0634\u062a\u0631\u0627\u06a9 \u0644\u0645\u0633 \u06a9\u0646\u06cc\u062f';
-      textEl.addEventListener('click', function () {
-        openSharePanel();
-      });
+      textEl.addEventListener('click', function () { openSharePanel(); });
     }
   }
 
