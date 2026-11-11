@@ -1,4 +1,4 @@
-/* Share card — profile photo background from ST_PE1+ST_PE2 or ST_PROFILE_B64 or ST_LP */
+/* Share card — always profile background + website link */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SITE_NAME_FA = '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
@@ -12,10 +12,10 @@
 
   function getProfileDataUrl() {
     try {
-      if (window.ST_PE1 && window.ST_PE2 && window.ST_PE1.length > 20) {
+      if (window.ST_PE1 && window.ST_PE2 && window.ST_PE1.length > 100) {
         return 'data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2;
       }
-      if (window.ST_PROFILE_B64 && window.ST_PROFILE_B64.length > 20) {
+      if (window.ST_PROFILE_B64 && window.ST_PROFILE_B64.length > 100) {
         return 'data:image/jpeg;base64,' + window.ST_PROFILE_B64;
       }
       if (window.ST_LP && window.ST_LP[0] && window.ST_LP[1]) {
@@ -27,29 +27,21 @@
 
   function loadEmbed() {
     return new Promise(function (resolve) {
-      var src = getProfileDataUrl();
-      if (!src) {
-        var tries = 0;
-        function wait() {
-          src = getProfileDataUrl();
-          if (src) {
-            var img = new Image();
-            img.onload = function () { resolve(img); };
-            img.onerror = function () { resolve(null); };
-            img.src = src;
-            return;
-          }
-          tries++;
-          if (tries < 50) setTimeout(wait, 80);
-          else resolve(null);
+      var tries = 0;
+      function attempt() {
+        var src = getProfileDataUrl();
+        if (src) {
+          var img = new Image();
+          img.onload = function () { resolve(img); };
+          img.onerror = function () { resolve(null); };
+          img.src = src;
+          return;
         }
-        setTimeout(wait, 50);
-        return;
+        tries++;
+        if (tries < 60) setTimeout(attempt, 100);
+        else resolve(null);
       }
-      var img = new Image();
-      img.onload = function () { resolve(img); };
-      img.onerror = function () { resolve(null); };
-      img.src = src;
+      attempt();
     });
   }
 
@@ -80,6 +72,7 @@
     var title = opts.title || (isEn() ? SITE_NAME_EN : SITE_NAME_FA);
     var body = opts.body || '';
     var ref = opts.ref || '';
+    var url = opts.url || SITE;
     var en = isEn();
     var w = 1080, h = 1920;
     var canvas = document.createElement('canvas');
@@ -144,24 +137,27 @@
     if (ref) {
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
       ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.fillText(ref, w / 2, cardY + cardH - 90);
+      ctx.fillText(ref, w / 2, cardY + cardH - 100);
     }
 
-    var boxW = 420, boxH = 58;
+    var boxW = 520, boxH = 64;
     var boxX = (w - boxW) / 2;
-    var boxY = cardY + cardH - 70;
+    var boxY = cardY + cardH - 72;
     ctx.fillStyle = '#c9a227';
     roundRect(ctx, boxX, boxY, boxW, boxH, 16);
     ctx.fill();
     ctx.fillStyle = '#0a2540';
-    ctx.font = '700 30px Inter, Vazirmatn, system-ui, sans-serif';
-    ctx.fillText('seventhtrumpet.org', w / 2, boxY + 38);
+    ctx.font = '700 32px Inter, Vazirmatn, system-ui, sans-serif';
+    ctx.fillText('seventhtrumpet.org', w / 2, boxY + 42);
 
-    ctx.fillStyle = 'rgba(8, 28, 48, 0.85)';
-    ctx.fillRect(0, h - 110, w, 110);
+    ctx.fillStyle = 'rgba(8, 28, 48, 0.9)';
+    ctx.fillRect(0, h - 120, w, 120);
     ctx.fillStyle = '#c9a227';
-    ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
-    ctx.fillText(en ? 'Share the picture — link is on the card' : '\u0639\u06a9\u0633 \u0631\u0627 \u0627\u0634\u062a\u0631\u0627\u06a9 \u06a9\u0646\u06cc\u062f — \u0644\u06cc\u0646\u06a9 \u0631\u0648\u06cc \u06a9\u0627\u0631\u062a \u0627\u0633\u062a', w / 2, h - 55);
+    ctx.font = '600 26px Inter, Vazirmatn, system-ui, sans-serif';
+    ctx.fillText(url, w / 2, h - 70);
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.font = '500 22px Inter, Vazirmatn, system-ui, sans-serif';
+    ctx.fillText(en ? 'Tap the link to open the website' : '\u0631\u0648\u06cc \u0644\u06cc\u0646\u06a9 \u0628\u0632\u0646\u06cc\u062f \u0648 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a \u0628\u0627\u0632 \u0645\u06cc\u200c\u0634\u0648\u062f', w / 2, h - 35);
 
     return canvas;
   }
@@ -169,6 +165,7 @@
   function showPreview(canvas, opts) {
     opts = opts || {};
     var en = isEn();
+    var url = opts.url || SITE;
     var old = document.getElementById('st-card-preview');
     if (old) old.remove();
     var dataUrl = canvas.toDataURL('image/png');
@@ -176,17 +173,19 @@
     box.id = 'st-card-preview';
     box.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;font-family:Inter,Vazirmatn,system-ui,sans-serif;';
     box.innerHTML =
-      '<img alt="" src="' + dataUrl + '" style="max-width:min(92vw,360px);max-height:62vh;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);border:2px solid #c9a227;">' +
-      '<p style="color:#fff;text-align:center;margin:14px 12px 8px;font-size:15px;line-height:1.5;max-width:340px;">' + (en
-        ? 'This is the PICTURE. Save it, then put it on WhatsApp Status from Gallery (not text).'
-        : '\u0627\u06cc\u0646 \u0639\u06a9\u0633 \u0627\u0633\u062a. \u0630\u062e\u06cc\u0631\u0647 \u06a9\u0646\u06cc\u062f\u060c \u0628\u0639\u062f \u0627\u0632 \u06af\u0627\u0644\u0631\u06cc \u062f\u0631 Status \u0628\u06af\u0630\u0627\u0631\u06cc\u062f (\u0646\u0647 \u0645\u062a\u0646).') +
+      '<img alt="" src="' + dataUrl + '" style="max-width:min(92vw,360px);max-height:58vh;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);border:2px solid #c9a227;">' +
+      '<p style="color:#fff;text-align:center;margin:12px 12px 6px;font-size:14px;line-height:1.5;max-width:340px;">' + (en
+        ? 'Picture with your profile photo + link. Save, then Status from Gallery.'
+        : '\u0639\u06a9\u0633 \u0628\u0627 \u0639\u06a9\u0633 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0644\u06cc\u0646\u06a9. \u0630\u062e\u06cc\u0631\u0647 \u06a9\u0646\u06cc\u062f\u060c \u0628\u0639\u062f Status \u0627\u0632 \u06af\u0627\u0644\u0631\u06cc.') +
       '</p>' +
-      '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px;">' +
-      '<button type="button" id="st-sv" style="background:#c9a227;color:#0a2540;border:0;padding:12px 20px;border-radius:12px;font-weight:700;font-size:16px;cursor:pointer;">' + (en ? '1) Save picture' : '\u06f1) \u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633') + '</button>' +
-      '<button type="button" id="st-sh" style="background:#25D366;color:#fff;border:0;padding:12px 20px;border-radius:12px;font-weight:700;font-size:16px;cursor:pointer;">' + (en ? '2) Share picture' : '\u06f2) \u0627\u0634\u062a\u0631\u0627\u06a9 \u0639\u06a9\u0633') + '</button>' +
-      '<button type="button" id="st-cl" style="background:#444;color:#fff;border:0;padding:12px 20px;border-radius:12px;font-weight:600;font-size:16px;cursor:pointer;">' + (en ? 'Close' : '\u0628\u0633\u062a\u0646') + '</button></div>';
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px;">' +
+      '<button type="button" id="st-sv" style="background:#c9a227;color:#0a2540;border:0;padding:12px 18px;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;">' + (en ? '1) Save picture' : '\u06f1) \u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633') + '</button>' +
+      '<button type="button" id="st-sh" style="background:#25D366;color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;">' + (en ? '2) Share picture + link' : '\u06f2) \u0627\u0634\u062a\u0631\u0627\u06a9 \u0639\u06a9\u0633 + \u0644\u06cc\u0646\u06a9') + '</button>' +
+      '<button type="button" id="st-cl" style="background:#444;color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:600;font-size:15px;cursor:pointer;">' + (en ? 'Close' : '\u0628\u0633\u062a\u0646') + '</button></div>';
     document.body.appendChild(box);
+
     function toBlob(cb) { canvas.toBlob(function (b) { cb(b); }, 'image/png'); }
+
     document.getElementById('st-cl').onclick = function () { box.remove(); };
     document.getElementById('st-sv').onclick = function () {
       toBlob(function (blob) {
@@ -201,14 +200,16 @@
       toBlob(function (blob) {
         if (!blob) return;
         var file = new File([blob], opts.filename || 'seventh-trumpet.png', { type: 'image/png' });
+        var shareData = { files: [file], title: opts.title || SITE_NAME_EN, text: url, url: url };
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: opts.title || SITE_NAME_EN }).catch(function () {
+          navigator.share(shareData).catch(function () {
             var a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = opts.filename || 'seventh-trumpet.png';
             a.click();
           });
         } else {
+          try { if (navigator.clipboard) navigator.clipboard.writeText(url); } catch (e) {}
           var a = document.createElement('a');
           a.href = URL.createObjectURL(blob);
           a.download = opts.filename || 'seventh-trumpet.png';
@@ -220,6 +221,7 @@
 
   window.ST_shareBeautifulCard = function (opts) {
     opts = opts || {};
+    if (!opts.url) opts.url = SITE;
     loadEmbed().then(function (img) {
       showPreview(drawCard(img, opts), opts);
     });
