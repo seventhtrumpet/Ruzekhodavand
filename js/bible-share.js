@@ -1,4 +1,4 @@
-/* Share like before: apps → image with profile background + verse + seventhtrumpet.org */
+/* Share: big square profile + verse + website link on the picture */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -169,7 +169,6 @@
 
   function makeCardImage(done) {
     var p = versePayload();
-    var url = sharePageUrl();
     var en = isEn();
     var brand = en ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
 
@@ -180,77 +179,88 @@
       canvas.height = h;
       var ctx = canvas.getContext('2d');
 
-      if (profile) {
-        var scale = Math.max(w / profile.width, h / profile.height);
-        var dw = profile.width * scale;
-        var dh = profile.height * scale;
-        ctx.drawImage(profile, (w - dw) / 2, (h - dh) / 2, dw, dh);
-      } else {
-        var g0 = ctx.createLinearGradient(0, 0, 0, h);
-        g0.addColorStop(0, '#0a2540');
-        g0.addColorStop(1, '#061828');
-        ctx.fillStyle = g0;
-        ctx.fillRect(0, 0, w, h);
-      }
-
-      var g = ctx.createLinearGradient(0, 0, 0, h);
-      g.addColorStop(0, 'rgba(5,15,30,0.25)');
-      g.addColorStop(0.45, 'rgba(5,15,30,0.4)');
-      g.addColorStop(1, 'rgba(5,15,30,0.65)');
-      ctx.fillStyle = g;
+      var g0 = ctx.createLinearGradient(0, 0, 0, h);
+      g0.addColorStop(0, '#0c2d4a');
+      g0.addColorStop(1, '#061828');
+      ctx.fillStyle = g0;
       ctx.fillRect(0, 0, w, h);
 
       ctx.fillStyle = '#c9a227';
-      ctx.fillRect(0, 0, w, 14);
+      ctx.fillRect(0, 0, w, 16);
 
-      var cardX = 55, cardY = h * 0.2, cardW = w - 110, cardH = h * 0.52;
-      ctx.fillStyle = 'rgba(8, 28, 48, 0.72)';
-      roundRect(ctx, cardX, cardY, cardW, cardH, 32);
-      ctx.fill();
-      ctx.strokeStyle = '#c9a227';
-      ctx.lineWidth = 5;
-      roundRect(ctx, cardX, cardY, cardW, cardH, 32);
-      ctx.stroke();
+      var sq = 420;
+      var sqX = (w - sq) / 2;
+      var sqY = 120;
+      if (profile) {
+        ctx.save();
+        roundRect(ctx, sqX, sqY, sq, sq, 28);
+        ctx.clip();
+        var scale = Math.max(sq / profile.width, sq / profile.height);
+        var dw = profile.width * scale;
+        var dh = profile.height * scale;
+        ctx.drawImage(profile, sqX + (sq - dw) / 2, sqY + (sq - dh) / 2, dw, dh);
+        ctx.restore();
+        ctx.strokeStyle = '#c9a227';
+        ctx.lineWidth = 8;
+        roundRect(ctx, sqX, sqY, sq, sq, 28);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = 'rgba(201,162,39,0.25)';
+        roundRect(ctx, sqX, sqY, sq, sq, 28);
+        ctx.fill();
+        ctx.strokeStyle = '#c9a227';
+        ctx.lineWidth = 8;
+        roundRect(ctx, sqX, sqY, sq, sq, 28);
+        ctx.stroke();
+      }
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(brand, w / 2, cardY + 55);
+      ctx.fillText(brand, w / 2, sqY + sq + 55);
 
-      ctx.strokeStyle = 'rgba(201,162,39,0.9)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(w / 2 - 100, cardY + 78);
-      ctx.lineTo(w / 2 + 100, cardY + 78);
+      var cardX = 55;
+      var cardY = sqY + sq + 90;
+      var cardW = w - 110;
+      var cardH = 720;
+      ctx.fillStyle = 'rgba(8, 28, 48, 0.78)';
+      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(201,162,39,0.85)';
+      ctx.lineWidth = 4;
+      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
       ctx.stroke();
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = '500 42px Inter, Vazirmatn, system-ui, sans-serif';
-      var lines = wrapLines(ctx, p.text, cardW - 90, 10);
-      var lineH = 54;
-      var startY = cardY + 130;
+      ctx.font = '500 40px Inter, Vazirmatn, system-ui, sans-serif';
+      var lines = wrapLines(ctx, p.text, cardW - 80, 11);
+      var lineH = 52;
+      var startY = cardY + 70;
       lines.forEach(function (ln, i) {
         ctx.fillText(ln, w / 2, startY + i * lineH);
       });
 
       if (p.ref) {
-        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
         ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
-        ctx.fillText(p.ref, w / 2, cardY + cardH - 95);
+        ctx.fillText(p.ref, w / 2, cardY + cardH - 100);
       }
 
-      var boxW = 460, boxH = 58;
+      var boxW = 520, boxH = 64;
       var boxX = (w - boxW) / 2;
-      var boxY = cardY + cardH - 70;
+      var boxY = cardY + cardH - 78;
       ctx.fillStyle = '#c9a227';
-      roundRect(ctx, boxX, boxY, boxW, boxH, 16);
+      roundRect(ctx, boxX, boxY, boxW, boxH, 18);
       ctx.fill();
       ctx.fillStyle = '#0a2540';
-      ctx.font = '700 30px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 40);
+      ctx.font = '700 32px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 44);
+
+      ctx.fillStyle = '#c9a227';
+      ctx.fillRect(0, h - 16, w, 16);
 
       canvas.toBlob(function (blob) {
-        done(blob, url, brand);
+        done(blob, sharePageUrl(), brand);
       }, 'image/png');
     });
   }
