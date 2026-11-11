@@ -1,4 +1,4 @@
-/* Simple share: apps list. Each share = image with big profile + verse + website link */
+/* Share like before: apps → image with profile background + verse + seventhtrumpet.org */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -85,6 +85,10 @@
       var first = selected[0];
       ref = (first.getAttribute('data-chapter') || '') + ':' + (first.getAttribute('data-verse') || '');
     }
+    if (!text) {
+      var main = document.querySelector('.angel-text, .daily-verse-text, #daily-verse .verse-body, article p');
+      if (main) text = (main.textContent || '').trim().slice(0, 500);
+    }
     return { text: (text || '').trim(), ref: (ref || '').trim() };
   }
 
@@ -118,14 +122,14 @@
           if (window.ST_LP && window.ST_LP[0] && window.ST_LP[1]) {
             var img2 = new Image();
             img2.onload = function () { cb(img2); };
-            img2.onerror = function () { nextTry(); };
+            img2.onerror = function () { next(); };
             img2.src = 'data:image/jpeg;base64,' + window.ST_LP[0] + window.ST_LP[1];
             return;
           }
         } catch (e2) {}
-        nextTry();
+        next();
       }
-      function nextTry() {
+      function next() {
         tries++;
         if (tries < 50) setTimeout(attempt, 80);
         else cb(null);
@@ -163,7 +167,7 @@
     ctx.closePath();
   }
 
-  function makeImage(done) {
+  function makeCardImage(done) {
     var p = versePayload();
     var url = sharePageUrl();
     var en = isEn();
@@ -190,40 +194,40 @@
       }
 
       var g = ctx.createLinearGradient(0, 0, 0, h);
-      g.addColorStop(0, 'rgba(5,15,30,0.35)');
-      g.addColorStop(0.4, 'rgba(5,15,30,0.45)');
-      g.addColorStop(1, 'rgba(5,15,30,0.7)');
+      g.addColorStop(0, 'rgba(5,15,30,0.25)');
+      g.addColorStop(0.45, 'rgba(5,15,30,0.4)');
+      g.addColorStop(1, 'rgba(5,15,30,0.65)');
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
 
       ctx.fillStyle = '#c9a227';
-      ctx.fillRect(0, 0, w, 12);
+      ctx.fillRect(0, 0, w, 14);
 
-      var cardX = 50, cardY = h * 0.22, cardW = w - 100, cardH = h * 0.48;
-      ctx.fillStyle = 'rgba(8, 28, 48, 0.75)';
-      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+      var cardX = 55, cardY = h * 0.2, cardW = w - 110, cardH = h * 0.52;
+      ctx.fillStyle = 'rgba(8, 28, 48, 0.72)';
+      roundRect(ctx, cardX, cardY, cardW, cardH, 32);
       ctx.fill();
       ctx.strokeStyle = '#c9a227';
-      ctx.lineWidth = 4;
-      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
-      ctx.stroke();
-
-      ctx.fillStyle = '#c9a227';
-      ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(brand, w / 2, cardY + 58);
-
-      ctx.strokeStyle = 'rgba(201,162,39,0.8)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(w / 2 - 90, cardY + 78);
-      ctx.lineTo(w / 2 + 90, cardY + 78);
+      ctx.lineWidth = 5;
+      roundRect(ctx, cardX, cardY, cardW, cardH, 32);
       ctx.stroke();
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = '500 40px Inter, Vazirmatn, system-ui, sans-serif';
-      var lines = wrapLines(ctx, p.text, cardW - 80, 10);
-      var lineH = 52;
+      ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(brand, w / 2, cardY + 55);
+
+      ctx.strokeStyle = 'rgba(201,162,39,0.9)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - 100, cardY + 78);
+      ctx.lineTo(w / 2 + 100, cardY + 78);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '500 42px Inter, Vazirmatn, system-ui, sans-serif';
+      var lines = wrapLines(ctx, p.text, cardW - 90, 10);
+      var lineH = 54;
       var startY = cardY + 130;
       lines.forEach(function (ln, i) {
         ctx.fillText(ln, w / 2, startY + i * lineH);
@@ -232,14 +236,14 @@
       if (p.ref) {
         ctx.fillStyle = 'rgba(255,255,255,0.85)';
         ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
-        ctx.fillText(p.ref, w / 2, cardY + cardH - 90);
+        ctx.fillText(p.ref, w / 2, cardY + cardH - 95);
       }
 
-      var boxW = 500, boxH = 58;
+      var boxW = 460, boxH = 58;
       var boxX = (w - boxW) / 2;
-      var boxY = cardY + cardH - 68;
+      var boxY = cardY + cardH - 70;
       ctx.fillStyle = '#c9a227';
-      roundRect(ctx, boxX, boxY, boxW, boxH, 14);
+      roundRect(ctx, boxX, boxY, boxW, boxH, 16);
       ctx.fill();
       ctx.fillStyle = '#0a2540';
       ctx.font = '700 30px Inter, Vazirmatn, system-ui, sans-serif';
@@ -251,50 +255,48 @@
     });
   }
 
-  function downloadBlob(blob) {
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'seventh-trumpet.png';
-    a.click();
+  function doShare(app) {
+    var msg = buildMessage();
+    var pageUrl = sharePageUrl();
+
+    makeCardImage(function (blob, url, brand) {
+      if (!blob) {
+        if (app === 'wa') window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+        else if (app === 'tg') window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+        return;
+      }
+      var file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' });
+
+      if (app === 'wa' || app === 'tg') {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: brand, text: url, url: url }).catch(function () {
+            if (app === 'wa') window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+            else window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+          });
+        } else {
+          if (app === 'wa') window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+          else window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+        }
+        return;
+      }
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: brand, text: url, url: url }).catch(function () {
+          try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
+          openSocial(app, pageUrl);
+        });
+      } else {
+        try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
+        openSocial(app, pageUrl);
+      }
+    });
   }
 
-  function shareImageThen(app) {
-    makeImage(function (blob, url, brand) {
-      if (!blob) return;
-      var file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' });
-      var msg = buildMessage();
-
-      if (app === 'wa') {
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand, text: url, url: url }).catch(function () {
-            downloadBlob(blob);
-            window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-          });
-        } else {
-          downloadBlob(blob);
-          window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-        }
-        return;
-      }
-      if (app === 'tg') {
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand, text: url, url: url }).catch(function () {
-            downloadBlob(blob);
-            window.open(SOCIAL.telegram + encodeURIComponent(url) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
-          });
-        } else {
-          downloadBlob(blob);
-          window.open(SOCIAL.telegram + encodeURIComponent(url) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
-        }
-        return;
-      }
-      downloadBlob(blob);
-      try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
-      if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
-      else if (app === 'fb') window.open(SOCIAL.facebook + encodeURIComponent(url), '_blank', 'noopener');
-      else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
-      else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
-    });
+  function openSocial(app, pageUrl) {
+    if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
+    else if (app === 'fb') window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
+    else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
+    else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
   }
 
   function ensureCss() {
@@ -303,9 +305,9 @@
     st.id = 'vshare-icons-css';
     st.textContent =
       '.vshare-overlay{position:fixed;inset:0;z-index:5000;background:rgba(8,16,28,0.55);display:flex;align-items:flex-end;justify-content:center;padding:0.75rem}' +
-      '.vshare-panel{width:100%;max-width:400px;background:#fff;border-radius:16px;padding:1.1rem 1rem 1rem;box-shadow:0 -8px 32px rgba(0,0,0,0.25)}' +
+      '.vshare-panel{width:100%;max-width:400px;background:#fff;border-radius:16px;padding:1.15rem 1rem 1rem;box-shadow:0 -8px 32px rgba(0,0,0,0.25)}' +
       'body.dark .vshare-panel{background:#152536;color:#e8eef5}' +
-      '.vshare-title{font-weight:800;font-size:1.15rem;margin:0 0 0.85rem;text-align:center;color:#0a2540}' +
+      '.vshare-title{font-weight:800;font-size:1.15rem;margin:0 0 0.9rem;text-align:center;color:#0a2540}' +
       'body.dark .vshare-title{color:#9ec5ea}' +
       '.vshare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}' +
       '.vshare-btn{display:flex;align-items:center;justify-content:center;padding:0.9rem 0.4rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:0.95rem;cursor:pointer;color:#fff}' +
@@ -315,9 +317,8 @@
       '.vshare-btn.fb{background:#1877F2}' +
       '.vshare-btn.tt{background:#111}' +
       '.vshare-btn.yt{background:#FF0000}' +
-      '.vshare-btn.save{background:#c9a227;color:#0a2540;grid-column:1/-1}' +
       '.vshare-btn.site{background:#0a2540;grid-column:1/-1}' +
-      '.vshare-close{display:block;width:100%;margin-top:0.6rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
+      '.vshare-close{display:block;width:100%;margin-top:0.65rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
     document.head.appendChild(st);
   }
 
@@ -341,8 +342,6 @@
       '<button type="button" class="vshare-btn fb" data-go="fb">Facebook</button>' +
       '<button type="button" class="vshare-btn tt" data-go="tt">TikTok</button>' +
       '<button type="button" class="vshare-btn yt" data-go="yt">YouTube</button>' +
-      '<button type="button" class="vshare-btn save" data-go="save">' +
-      (en ? 'Save picture' : '\u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633') + '</button>' +
       '<button type="button" class="vshare-btn site" data-go="site">' +
       (en ? 'Open website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a') + '</button>' +
       '</div>' +
@@ -363,7 +362,7 @@
           return;
         }
         close();
-        setTimeout(function () { shareImageThen(go); }, 100);
+        setTimeout(function () { doShare(go); }, 80);
       });
     });
   }
@@ -400,8 +399,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._shareBound6) return;
-    btn._shareBound6 = true;
+    if (!btn || btn._shareBound7) return;
+    btn._shareBound7 = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -411,8 +410,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._shareBound6) return;
-    textEl._shareBound6 = true;
+    if (!textEl || textEl._shareBound7) return;
+    textEl._shareBound7 = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
