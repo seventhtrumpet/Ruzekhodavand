@@ -1,14 +1,8 @@
-/* Rebuild profile photo then draw share card WITH background */
-(function () {
-  if (window.ST_PE1 && window.ST_PE2 && !window.ST_PROFILE_EMBED) {
-    window.ST_PROFILE_EMBED = 'data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2;
-  }
-})();
+/* Share card — profile photo background (rebuild PE1+PE2 when sharing) */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SITE_NAME_FA = '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
   var SITE_NAME_EN = 'Seventh Trumpet';
-  var PROFILE_EMBED = (typeof window.ST_PROFILE_EMBED === 'string' ? window.ST_PROFILE_EMBED : '');
 
   function isEn() {
     try {
@@ -16,13 +10,44 @@
     } catch (e) { return false; }
   }
 
+  function getProfileDataUrl() {
+    try {
+      if (window.ST_PE1 && window.ST_PE2) {
+        return 'data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2;
+      }
+      if (typeof window.ST_PROFILE_EMBED === 'string' && window.ST_PROFILE_EMBED.indexOf('data:image') === 0) {
+        return window.ST_PROFILE_EMBED;
+      }
+    } catch (e) {}
+    return '';
+  }
+
   function loadEmbed() {
     return new Promise(function (resolve) {
-      if (!PROFILE_EMBED) { resolve(null); return; }
+      var src = getProfileDataUrl();
+      if (!src) {
+        // Wait briefly for pe1/pe2 scripts to finish loading
+        var tries = 0;
+        function wait() {
+          src = getProfileDataUrl();
+          if (src) {
+            var img = new Image();
+            img.onload = function () { resolve(img); };
+            img.onerror = function () { resolve(null); };
+            img.src = src;
+            return;
+          }
+          tries++;
+          if (tries < 40) setTimeout(wait, 100);
+          else resolve(null);
+        }
+        setTimeout(wait, 50);
+        return;
+      }
       var img = new Image();
       img.onload = function () { resolve(img); };
       img.onerror = function () { resolve(null); };
-      img.src = PROFILE_EMBED;
+      img.src = src;
     });
   }
 
@@ -60,20 +85,31 @@
     canvas.height = h;
     var ctx = canvas.getContext('2d');
 
+    // BACKGROUND PHOTO
     if (bgImg) {
       var scale = Math.max(w / bgImg.width, h / bgImg.height);
       var dw = bgImg.width * scale;
       var dh = bgImg.height * scale;
       ctx.drawImage(bgImg, (w - dw) / 2, (h - dh) / 2, dw, dh);
     } else {
-      ctx.fillStyle = '#0a2540';
+      // Strong fallback so something is always visible
+      var g0 = ctx.createLinearGradient(0, 0, 0, h);
+      g0.addColorStop(0, '#0a2540');
+      g0.addColorStop(0.5, '#1a4a6c');
+      g0.addColorStop(1, '#0a2540');
+      ctx.fillStyle = g0;
+      ctx.fillRect(0, 0, w, h);
+      var g2 = ctx.createRadialGradient(w/2, h*0.3, 20, w/2, h*0.3, 500);
+      g2.addColorStop(0, 'rgba(201,162,39,0.35)');
+      g2.addColorStop(1, 'rgba(201,162,39,0)');
+      ctx.fillStyle = g2;
       ctx.fillRect(0, 0, w, h);
     }
 
     var g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, 'rgba(5,15,30,0.12)');
-    g.addColorStop(0.45, 'rgba(5,15,30,0.22)');
-    g.addColorStop(1, 'rgba(5,15,30,0.5)');
+    g.addColorStop(0, 'rgba(5,15,30,0.15)');
+    g.addColorStop(0.4, 'rgba(5,15,30,0.25)');
+    g.addColorStop(1, 'rgba(5,15,30,0.55)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
 
@@ -81,7 +117,7 @@
     ctx.fillRect(0, 0, w, 12);
 
     var cardX = 55, cardY = h * 0.18, cardW = w - 110, cardH = h * 0.56;
-    ctx.fillStyle = 'rgba(8, 28, 48, 0.7)';
+    ctx.fillStyle = 'rgba(8, 28, 48, 0.72)';
     roundRect(ctx, cardX, cardY, cardW, cardH, 36);
     ctx.fill();
     ctx.strokeStyle = '#c9a227';
@@ -171,12 +207,12 @@
     box.innerHTML =
       '<img alt="" src="' + dataUrl + '">' +
       '<p>' + (en
-        ? 'Background photo + verse + website on the image.'
-        : '\u0639\u06a9\u0633 \u067e\u0633\u200c\u0632\u0645\u06cc\u0646\u0647 + \u0622\u06cc\u0647 + \u0646\u0627\u0645 \u0633\u0627\u06cc\u062a \u0631\u0648\u06cc \u0639\u06a9\u0633.') +
+        ? 'Save this PICTURE, then put it on WhatsApp Status from Gallery (not text).'
+        : '\u0627\u06cc\u0646 \u0639\u06a9\u0633 \u0631\u0627 \u0630\u062e\u06cc\u0631\u0647 \u06a9\u0646\u06cc\u062f\u060c \u0628\u0639\u062f \u0627\u0632 \u06af\u0627\u0644\u0631\u06cc \u062f\u0631 Status \u0628\u06af\u0630\u0627\u0631\u06cc\u062f (\u0646\u0647 \u0645\u062a\u0646).') +
       '</p>' +
       '<div class="acts">' +
-      '<button type="button" class="share" id="st-sh">' + (en ? 'Share this picture' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0627\u06cc\u0646 \u0639\u06a9\u0633') + '</button>' +
-      '<button type="button" class="save" id="st-sv">' + (en ? 'Save picture' : '\u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633') + '</button>' +
+      '<button type="button" class="save" id="st-sv">' + (en ? '1) Save picture' : '\u06f1) \u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633') + '</button>' +
+      '<button type="button" class="share" id="st-sh">' + (en ? '2) Share picture' : '\u06f2) \u0627\u0634\u062a\u0631\u0627\u06a9 \u0639\u06a9\u0633') + '</button>' +
       '<button type="button" class="close" id="st-cl">' + (en ? 'Close' : '\u0628\u0633\u062a\u0646') + '</button></div>';
     document.body.appendChild(box);
 

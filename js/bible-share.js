@@ -1,8 +1,7 @@
-/* Share panel: choose app icons + card with profile background and website written on the picture */
+/* Share: show app list; Card = picture WITH background photo */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
-    whatsapp: 'https://wa.me/?text=',
     instagram: 'https://www.instagram.com/seventhtrumpet.media',
     facebook: 'https://www.facebook.com/sharer/sharer.php?u=',
     tiktok: 'https://www.tiktok.com/@seventhtrumpet.me',
@@ -97,16 +96,25 @@
 
   function openPictureCard() {
     var p = versePayload();
-    if (typeof window.ST_shareBeautifulCard === 'function') {
-      window.ST_shareBeautifulCard({
-        title: isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645',
-        body: p.text,
-        ref: p.ref,
-        url: sharePageUrl(),
-        filename: 'seventh-trumpet.png'
-      });
-    } else {
-      alert(isEn() ? 'Please wait and try again' : '\u0644\u0637\u0641\u0627 \u06a9\u0645\u06cc \u0635\u0628\u0631 \u06a9\u0646\u06cc\u062f');
+    function tryOpen() {
+      if (typeof window.ST_shareBeautifulCard === 'function') {
+        window.ST_shareBeautifulCard({
+          title: isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645',
+          body: p.text,
+          ref: p.ref,
+          url: sharePageUrl(),
+          filename: 'seventh-trumpet.png'
+        });
+        return true;
+      }
+      return false;
+    }
+    if (!tryOpen()) {
+      setTimeout(function () {
+        if (!tryOpen()) {
+          alert(isEn() ? 'Please wait 2 seconds and try again' : '\u0644\u0637\u0641\u0627 \u06f2 \u062b\u0627\u0646\u06cc\u0647 \u0635\u0628\u0631 \u06a9\u0646\u06cc\u062f');
+        }
+      }, 600);
     }
   }
 
@@ -123,7 +131,7 @@
       '.vshare-hint{font-size:0.85rem;text-align:center;color:#6b7785;margin:0 0 0.9rem;line-height:1.45}' +
       '.vshare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}' +
       '.vshare-btn{display:flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.85rem 0.4rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:0.9rem;cursor:pointer;color:#fff}' +
-      '.vshare-btn.pic{background:#c9a227;color:#0a2540;grid-column:1/-1;font-size:0.95rem}' +
+      '.vshare-btn.pic{background:#c9a227;color:#0a2540;grid-column:1/-1;font-size:0.95rem;padding:1rem}' +
       '.vshare-btn.wa{background:#25D366}' +
       '.vshare-btn.ig{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}' +
       '.vshare-btn.fb{background:#1877F2}' +
@@ -151,12 +159,12 @@
       '<p class="vshare-title">' + (en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9') + '</p>' +
       '<p class="vshare-hint">' +
       (en
-        ? 'Choose WhatsApp, Instagram, Facebook, TikTok… or the card with your website picture.'
-        : '\u0648\u0627\u062a\u0633\u0627\u067e\u060c \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645\u060c \u0641\u06cc\u0633\u0628\u0648\u06a9\u060c \u062a\u06cc\u06a9\u200c\u062a\u0627\u06a9 \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f \u06cc\u0627 \u06a9\u0627\u0631\u062a \u0628\u0627 \u0639\u06a9\u0633 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a.') +
+        ? 'For photo background: use the gold button, Save picture, then Status from Gallery.'
+        : '\u0628\u0631\u0627\u06cc \u0639\u06a9\u0633 \u067e\u0633\u200c\u0632\u0645\u06cc\u0646\u0647: \u062f\u06a9\u0645\u0647 \u0637\u0644\u0627\u06cc\u06cc \u2192 \u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633 \u2192 Status \u0627\u0632 \u06af\u0627\u0644\u0631\u06cc.') +
       '</p>' +
       '<div class="vshare-grid">' +
       '<button type="button" class="vshare-btn pic" data-go="pic">' +
-      (en ? 'Card: picture + verse + website on image' : '\u06a9\u0627\u0631\u062a: \u0639\u06a9\u0633 + \u0622\u06cc\u0647 + \u0646\u0627\u0645 \u0633\u0627\u06cc\u062a \u0631\u0648\u06cc \u0639\u06a9\u0633') +
+      (en ? 'PICTURE with background (recommended)' : '\u0639\u06a9\u0633 \u0628\u0627 \u067e\u0633\u200c\u0632\u0645\u06cc\u0646\u0647 (\u067e\u06cc\u0634\u0646\u0647\u0627\u062f)') +
       '</button>' +
       '<button type="button" class="vshare-btn wa" data-go="wa">WhatsApp</button>' +
       '<button type="button" class="vshare-btn ig" data-go="ig">Instagram</button>' +
@@ -181,7 +189,7 @@
         var go = btn.getAttribute('data-go');
         if (go === 'pic') {
           close();
-          setTimeout(openPictureCard, 120);
+          setTimeout(openPictureCard, 150);
           return;
         }
         if (go === 'wa') {
@@ -236,8 +244,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._shareBound2) return;
-    btn._shareBound2 = true;
+    if (!btn || btn._shareBound3) return;
+    btn._shareBound3 = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -247,8 +255,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._shareBound2) return;
-    textEl._shareBound2 = true;
+    if (!textEl || textEl._shareBound3) return;
+    textEl._shareBound3 = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
