@@ -153,7 +153,9 @@
   loadScript('js/logo_data.js', 'data-logo-data');
   loadScript('js/visits.js', 'data-visits');
   loadScript('js/text_size.js', 'data-text-size');
+  loadScript('js/share_card.js', 'data-share-card');
   loadScript('js/share.js', 'data-share');
+  loadScript('js/bible-share.js', 'data-bible-share');
   loadScript('js/page_back.js', 'data-page-back');
   loadScript('js/fixed_header.js', 'data-fixed-header');
   loadScript('js/bible_bar_fix.js', 'data-bible-bar-fix');
