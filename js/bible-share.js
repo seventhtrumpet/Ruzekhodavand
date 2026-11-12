@@ -108,7 +108,10 @@
     if (p.ref) parts.push(p.ref);
     if (p.text) parts.push(p.text);
     parts.push(brandLine());
-    parts.push(url);
+    parts.push('https://seventhtrumpet.org');
+    if (url && url.indexOf('bible.html') !== -1) parts.push(url);
+    parts.push('Instagram: https://www.instagram.com/seventhtrumpet.media');
+    parts.push('Facebook: https://www.facebook.com/share/1Ev7nyyXVu/');
     return parts.join('\n\n');
   }
 
@@ -230,15 +233,18 @@
         ctx.fillText(p.ref, w / 2, h - 150);
       }
 
-      var boxW = 560, boxH = 72;
+      var boxW = 620, boxH = 78;
       var boxX = (w - boxW) / 2;
-      var boxY = h - 115;
+      var boxY = h - 145;
       ctx.fillStyle = '#c9a227';
-      roundRect(ctx, boxX, boxY, boxW, boxH, 20);
+      roundRect(ctx, boxX, boxY, boxW, boxH, 22);
       ctx.fill();
       ctx.fillStyle = '#0a2540';
-      ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 48);
+      ctx.font = '700 38px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 52);
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.font = '600 26px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.fillText('https://seventhtrumpet.org', w / 2, h - 40);
 
       canvas.toBlob(function (blob) {
         done(blob);
@@ -260,10 +266,10 @@
 
       function shareNative() {
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          return navigator.share({ files: [file], title: brand, text: msg, url: pageUrl });
+          return navigator.share({ files: [file], title: brand, text: msg, url: 'https://seventhtrumpet.org' });
         }
         if (navigator.share) {
-          return navigator.share({ title: brand, text: msg, url: pageUrl });
+          return navigator.share({ title: brand, text: msg, url: 'https://seventhtrumpet.org' });
         }
         return Promise.reject();
       }
