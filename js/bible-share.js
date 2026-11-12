@@ -1,4 +1,4 @@
-/* Bible.com style: one picture (OG) + separate white link card (tappable) */
+/* Profile picture + connected tappable link card + verse (last working style) */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -78,11 +78,19 @@
     return { text: (text || '').trim(), ref: (ref || '').trim() };
   }
 
+  /*
+   * Structure (same as last working):
+   * 1) Profile picture  = OG logo from website
+   * 2) Connected white card = title + tappable seventhtrumpet.org
+   * 3) Bottom text = verse (bigger) + brand EN|FA + link again
+   */
   function buildMessage() {
     var p = versePayload();
     var parts = [];
     if (p.text) parts.push('"' + p.text + '"');
     if (p.ref) parts.push(p.ref);
+    parts.push('Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645');
+    parts.push('https://seventhtrumpet.org');
     return parts.join('\n\n');
   }
 
@@ -98,10 +106,10 @@
           text: msg,
           url: pageUrl
         }).catch(function () {
-          window.open('https://wa.me/?text=' + encodeURIComponent(msg + '\n\n' + pageUrl), '_blank', 'noopener');
+          window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
         });
       } else {
-        window.open('https://wa.me/?text=' + encodeURIComponent(msg + '\n\n' + pageUrl), '_blank', 'noopener');
+        window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
       }
       return;
     }
@@ -118,7 +126,7 @@
 
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(msg + '\n\n' + pageUrl);
+        navigator.clipboard.writeText(msg);
       }
     } catch (e) {}
 
@@ -226,8 +234,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._stShareCard) return;
-    btn._stShareCard = true;
+    if (!btn || btn._stShareOk) return;
+    btn._stShareOk = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -237,8 +245,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._stShareCard) return;
-    textEl._stShareCard = true;
+    if (!textEl || textEl._stShareOk) return;
+    textEl._stShareOk = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
