@@ -153,7 +153,7 @@
   loadScript('js/logo_data.js', 'data-logo-data');
   loadScript('js/visits.js', 'data-visits');
   loadScript('js/text_size.js', 'data-text-size');
-  /* Simple share only — verse + website link (logo preview in WhatsApp) */
+  loadScript('js/profile_bg.js', 'data-profile-bg');
   loadScript('js/share.js', 'data-share');
   loadScript('js/bible-share.js', 'data-bible-share');
   loadScript('js/page_back.js', 'data-page-back');
