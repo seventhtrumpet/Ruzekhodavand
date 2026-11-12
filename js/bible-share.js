@@ -235,7 +235,14 @@
         try { file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' }); } catch (e) {}
       }
 
-      function shareImage() {
+      function shareImageOnly() {
+        if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+          return navigator.share({ files: [file], title: brand });
+        }
+        return Promise.reject();
+      }
+
+      function shareImageWithCaption() {
         if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
           return navigator.share({ files: [file], title: brand, text: caption });
         }
@@ -246,13 +253,15 @@
       }
 
       if (app === 'wa') {
-        shareImage().catch(function () {
+        shareImageOnly().catch(function () {
+          return shareImageWithCaption();
+        }).catch(function () {
           window.open('https://wa.me/?text=' + encodeURIComponent(caption), '_blank', 'noopener');
         });
         return;
       }
       if (app === 'tg') {
-        shareImage().catch(function () {
+        shareImageWithCaption().catch(function () {
           window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
         });
         return;
@@ -261,7 +270,7 @@
         window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
         return;
       }
-      shareImage().catch(function () {
+      shareImageWithCaption().catch(function () {
         try { if (navigator.clipboard) navigator.clipboard.writeText(caption); } catch (e) {}
         if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
         else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
