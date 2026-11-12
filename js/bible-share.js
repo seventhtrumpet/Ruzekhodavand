@@ -1,6 +1,7 @@
-/* Share like your WhatsApp status: verse + logo preview + tappable website link */
+/* Share IMAGE: big profile/logo + verse + website link (like 3 days ago) */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
+  var LOGO_URL = 'https://iili.io/n8MSJBp.jpg';
   var SOCIAL = {
     instagram: 'https://www.instagram.com/seventhtrumpet.media',
     facebook: 'https://www.facebook.com/sharer/sharer.php?u=',
@@ -33,7 +34,7 @@
     return null;
   }
 
-  function verseDeepUrl() {
+  function sharePageUrl() {
     var params = getParams();
     if (!params) {
       try {
@@ -48,7 +49,7 @@
         '&c=' + (params.chapter || 1) +
         '&v=' + (params.verse || 1);
     }
-    return '';
+    return SITE + '/';
   }
 
   function applyDeepLink() {
@@ -98,6 +99,7 @@
 
   function buildMessage() {
     var p = versePayload();
+    var url = sharePageUrl();
     var brand = isEn()
       ? 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645'
       : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645 | Seventh Trumpet';
@@ -105,40 +107,200 @@
     if (p.ref) parts.push(p.ref);
     if (p.text) parts.push(p.text);
     parts.push(brand);
-    parts.push(SITE + '/');
-    var deep = verseDeepUrl();
-    if (deep) parts.push(deep);
+    parts.push(url);
     return parts.join('\n\n');
+  }
+
+  function getProfileImg(cb) {
+    var sources = [];
+    try {
+      if (window.ST_PE1 && window.ST_PE2 && window.ST_PE1.length > 100) {
+        sources.push('data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2);
+      }
+    } catch (e) {}
+    try {
+      if (window.ST_PROFILE_B64 && window.ST_PROFILE_B64.length > 100) {
+        sources.push('data:image/jpeg;base64,' + window.ST_PROFILE_B64);
+      }
+    } catch (e) {}
+    try {
+      if (window.ST_LP && window.ST_LP[0] && window.ST_LP[1]) {
+        sources.push('data:image/jpeg;base64,' + window.ST_LP[0] + window.ST_LP[1]);
+      }
+    } catch (e) {}
+    sources.push(LOGO_URL);
+    sources.push('https://iili.io/n8M8tYF.jpg');
+
+    var i = 0;
+    function tryNext() {
+      if (i >= sources.length) { cb(null); return; }
+      var src = sources[i++];
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () { cb(img); };
+      img.onerror = function () { tryNext(); };
+      img.src = src;
+    }
+    tryNext();
+  }
+
+  function wrapLines(ctx, text, maxW, maxLines) {
+    var words = String(text || '').split(/\s+/);
+    var lines = [], line = '';
+    for (var j = 0; j < words.length; j++) {
+      var test = line ? line + ' ' + words[j] : words[j];
+      if (ctx.measureText(test).width > maxW && line) {
+        lines.push(line);
+        line = words[j];
+      } else line = test;
+    }
+    if (line) lines.push(line);
+    if (lines.length > maxLines) {
+      lines = lines.slice(0, maxLines);
+      var last = lines[lines.length - 1];
+      if (last.length > 2) lines[lines.length - 1] = last.replace(/\s+\S*$/, '') + '\u2026';
+    }
+    return lines;
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function makeCardImage(done) {
+    var p = versePayload();
+    var en = isEn();
+    var brand = en ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
+
+    getProfileImg(function (profile) {
+      var w = 1080, h = 1920;
+      var canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext('2d');
+
+      var g0 = ctx.createLinearGradient(0, 0, 0, h);
+      g0.addColorStop(0, '#0c2d4a');
+      g0.addColorStop(1, '#061828');
+      ctx.fillStyle = g0;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#c9a227';
+      ctx.fillRect(0, 0, w, 16);
+
+      var sq = 480;
+      var sqX = (w - sq) / 2;
+      var sqY = 100;
+      if (profile) {
+        ctx.save();
+        roundRect(ctx, sqX, sqY, sq, sq, 32);
+        ctx.clip();
+        var scale = Math.max(sq / profile.width, sq / profile.height);
+        var dw = profile.width * scale;
+        var dh = profile.height * scale;
+        ctx.drawImage(profile, sqX + (sq - dw) / 2, sqY + (sq - dh) / 2, dw, dh);
+        ctx.restore();
+        ctx.strokeStyle = '#c9a227';
+        ctx.lineWidth = 10;
+        roundRect(ctx, sqX, sqY, sq, sq, 32);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '700 38px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(brand, w / 2, sqY + sq + 58);
+
+      var cardX = 50;
+      var cardY = sqY + sq + 90;
+      var cardW = w - 100;
+      var cardH = 700;
+      ctx.fillStyle = 'rgba(8, 28, 48, 0.82)';
+      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(201,162,39,0.9)';
+      ctx.lineWidth = 4;
+      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '500 40px Inter, Vazirmatn, system-ui, sans-serif';
+      var lines = wrapLines(ctx, p.text || (en ? 'Share the everlasting gospel' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u067e\u06cc\u0627\u0645'), cardW - 80, 11);
+      var lineH = 52;
+      var startY = cardY + 70;
+      lines.forEach(function (ln, idx) {
+        ctx.fillText(ln, w / 2, startY + idx * lineH);
+      });
+
+      if (p.ref) {
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
+        ctx.fillText(p.ref, w / 2, cardY + cardH - 100);
+      }
+
+      var boxW = 540, boxH = 68;
+      var boxX = (w - boxW) / 2;
+      var boxY = cardY + cardH - 80;
+      ctx.fillStyle = '#c9a227';
+      roundRect(ctx, boxX, boxY, boxW, boxH, 18);
+      ctx.fill();
+      ctx.fillStyle = '#0a2540';
+      ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 46);
+
+      ctx.fillStyle = '#c9a227';
+      ctx.fillRect(0, h - 16, w, 16);
+
+      canvas.toBlob(function (blob) {
+        done(blob);
+      }, 'image/png');
+    });
   }
 
   function doShare(app) {
     var msg = buildMessage();
-    var pageUrl = SITE + '/';
+    var pageUrl = sharePageUrl();
+    var brand = isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
 
-    if (app === 'wa') {
-      if (navigator.share) {
-        navigator.share({ title: 'Seventh Trumpet', text: msg, url: pageUrl }).catch(function () {
-          window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-        });
-      } else {
+    makeCardImage(function (blob) {
+      if (!blob) {
         window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+        return;
       }
-      return;
-    }
-    if (app === 'tg') {
-      window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
-      return;
-    }
-    if (app === 'fb') {
-      window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
-      return;
-    }
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(msg);
-    } catch (e) {}
-    if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
-    else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
-    else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
+      var file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' });
+
+      function shareNative() {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          return navigator.share({ files: [file], title: brand, text: msg, url: pageUrl });
+        }
+        if (navigator.share) {
+          return navigator.share({ title: brand, text: msg, url: pageUrl });
+        }
+        return Promise.reject();
+      }
+
+      if (app === 'wa' || app === 'tg') {
+        shareNative().catch(function () {
+          if (app === 'wa') window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+          else window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+        });
+        return;
+      }
+
+      shareNative().catch(function () {
+        try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
+        if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
+        else if (app === 'fb') window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
+        else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
+        else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
+      });
+    });
   }
 
   function ensureCss() {
@@ -169,6 +331,7 @@
     var old = document.getElementById('vshare-overlay');
     if (old) old.remove();
     var en = isEn();
+    var pageUrl = sharePageUrl();
 
     var overlay = document.createElement('div');
     overlay.id = 'vshare-overlay';
@@ -198,7 +361,7 @@
       btn.addEventListener('click', function () {
         var go = btn.getAttribute('data-go');
         if (go === 'site') {
-          window.open(SITE + '/', '_blank', 'noopener');
+          window.open(pageUrl, '_blank', 'noopener');
           setTimeout(close, 200);
           return;
         }
@@ -240,9 +403,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn) return;
-    if (btn._stShareBound) return;
-    btn._stShareBound = true;
+    if (!btn || btn._stShareImg) return;
+    btn._stShareImg = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -252,8 +414,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._stShareBound) return;
-    textEl._stShareBound = true;
+    if (!textEl || textEl._stShareImg) return;
+    textEl._stShareImg = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
@@ -266,7 +428,6 @@
     setLabels();
     setTimeout(bindBibleShare, 400);
     setTimeout(bindBibleShare, 1200);
-    setTimeout(bindBibleShare, 2500);
     var lt = document.getElementById('lang-toggle');
     if (lt) lt.addEventListener('click', function () { setTimeout(setLabels, 150); });
   }
