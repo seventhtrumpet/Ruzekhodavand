@@ -227,7 +227,7 @@
     var msg = buildMessage();
     var pageUrl = 'https://seventhtrumpet.org';
     var brand = brandLine();
-    var caption = msg + '\n\n' + pageUrl;
+    var caption = pageUrl + '\n\n' + msg;
 
     makeCardImage(function (blob) {
       var file = null;
