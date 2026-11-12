@@ -1,4 +1,4 @@
-/* Share IMAGE: profile picture + verse + website link near verse (design kept) */
+/* Share IMAGE design + real tappable URL like Bible.com */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var LOGO_HQ = 'https://iili.io/n8MSJBp.jpg';
@@ -172,7 +172,6 @@
 
   function makeCardImage(done) {
     var p = versePayload();
-
     getProfileImg(function (profile) {
       var w = 1080, h = 1920;
       var canvas = document.createElement('canvas');
@@ -244,9 +243,7 @@
       ctx.font = '600 26px Inter, Vazirmatn, system-ui, sans-serif';
       ctx.fillText('https://seventhtrumpet.org', w / 2, boxY + boxH + 36);
 
-      canvas.toBlob(function (blob) {
-        done(blob);
-      }, 'image/png');
+      canvas.toBlob(function (blob) { done(blob); }, 'image/png');
     });
   }
 
@@ -256,14 +253,13 @@
     var brand = brandLine();
 
     makeCardImage(function (blob) {
-      if (!blob) {
-        window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-        return;
+      var file = null;
+      if (blob) {
+        try { file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' }); } catch (e) {}
       }
-      var file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' });
 
-      function shareNative() {
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      function shareBoth() {
+        if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
           return navigator.share({ files: [file], title: brand, text: msg, url: pageUrl });
         }
         if (navigator.share) {
@@ -272,18 +268,25 @@
         return Promise.reject();
       }
 
-      if (app === 'wa' || app === 'tg') {
-        shareNative().catch(function () {
-          if (app === 'wa') window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-          else window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+      if (app === 'wa') {
+        shareBoth().catch(function () {
+          window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
         });
         return;
       }
-
-      shareNative().catch(function () {
+      if (app === 'tg') {
+        shareBoth().catch(function () {
+          window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+        });
+        return;
+      }
+      if (app === 'fb') {
+        window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
+        return;
+      }
+      shareBoth().catch(function () {
         try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
         if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
-        else if (app === 'fb') window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
         else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
         else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
       });
@@ -390,8 +393,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._stShareKeep) return;
-    btn._stShareKeep = true;
+    if (!btn || btn._stShareKeep2) return;
+    btn._stShareKeep2 = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -401,8 +404,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._stShareKeep) return;
-    textEl._stShareKeep = true;
+    if (!textEl || textEl._stShareKeep2) return;
+    textEl._stShareKeep2 = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
