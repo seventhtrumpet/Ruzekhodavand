@@ -1,7 +1,7 @@
-/* Share IMAGE — big profile photo full quality + verse + link at bottom */
+/* Share IMAGE — HQ logo + bilingual EN/FA + verse + link */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
-  var LOGO_URL = 'https://iili.io/n8MSJBp.jpg';
+  var LOGO_HQ = 'https://iili.io/n8MSJBp.jpg';
   var SOCIAL = {
     instagram: 'https://www.instagram.com/seventhtrumpet.media',
     facebook: 'https://www.facebook.com/sharer/sharer.php?u=',
@@ -97,30 +97,31 @@
     return { text: (text || '').trim(), ref: (ref || '').trim() };
   }
 
+  function brandLine() {
+    return 'Seventh Trumpet  |  \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
+  }
+
   function buildMessage() {
     var p = versePayload();
     var url = sharePageUrl();
-    var brand = isEn()
-      ? 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645'
-      : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645 | Seventh Trumpet';
     var parts = [];
     if (p.ref) parts.push(p.ref);
     if (p.text) parts.push(p.text);
-    parts.push(brand);
+    parts.push(brandLine());
     parts.push(url);
     return parts.join('\n\n');
   }
 
   function getProfileImg(cb) {
-    var sources = [];
-    try {
-      if (window.ST_PE1 && window.ST_PE2 && window.ST_PE1.length > 100) {
-        sources.push('data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2);
-      }
-    } catch (e) {}
+    var sources = [LOGO_HQ, 'https://iili.io/n8M8tYF.jpg'];
     try {
       if (window.ST_PROFILE_B64 && window.ST_PROFILE_B64.length > 100) {
         sources.push('data:image/jpeg;base64,' + window.ST_PROFILE_B64);
+      }
+    } catch (e) {}
+    try {
+      if (window.ST_PE1 && window.ST_PE2 && window.ST_PE1.length > 100) {
+        sources.push('data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2);
       }
     } catch (e) {}
     try {
@@ -128,8 +129,6 @@
         sources.push('data:image/jpeg;base64,' + window.ST_LP[0] + window.ST_LP[1]);
       }
     } catch (e) {}
-    sources.push(LOGO_URL);
-    sources.push('https://iili.io/n8M8tYF.jpg');
 
     var i = 0;
     function tryNext() {
@@ -175,8 +174,6 @@
 
   function makeCardImage(done) {
     var p = versePayload();
-    var en = isEn();
-    var brand = en ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
 
     getProfileImg(function (profile) {
       var w = 1080, h = 1920;
@@ -184,61 +181,58 @@
       canvas.width = w;
       canvas.height = h;
       var ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      try { ctx.imageSmoothingQuality = 'high'; } catch (e) {}
 
       ctx.fillStyle = '#061828';
       ctx.fillRect(0, 0, w, h);
 
-      var photoH = Math.floor(h * 0.58);
+      var sq = 900;
+      var sqX = (w - sq) / 2;
+      var sqY = 80;
+
       if (profile) {
-        var scale = Math.max(w / profile.width, photoH / profile.height);
+        ctx.save();
+        roundRect(ctx, sqX, sqY, sq, sq, 36);
+        ctx.clip();
+        var scale = Math.max(sq / profile.width, sq / profile.height);
         var dw = profile.width * scale;
         var dh = profile.height * scale;
-        ctx.drawImage(profile, (w - dw) / 2, (photoH - dh) / 2, dw, dh);
-        var fade = ctx.createLinearGradient(0, photoH - 120, 0, photoH);
-        fade.addColorStop(0, 'rgba(6,24,40,0)');
-        fade.addColorStop(1, 'rgba(6,24,40,1)');
-        ctx.fillStyle = fade;
-        ctx.fillRect(0, photoH - 120, w, 120);
-      } else {
-        var g0 = ctx.createLinearGradient(0, 0, 0, photoH);
-        g0.addColorStop(0, '#0c2d4a');
-        g0.addColorStop(1, '#061828');
-        ctx.fillStyle = g0;
-        ctx.fillRect(0, 0, w, photoH);
+        ctx.drawImage(profile, sqX + (sq - dw) / 2, sqY + (sq - dh) / 2, dw, dh);
+        ctx.restore();
+        ctx.strokeStyle = '#c9a227';
+        ctx.lineWidth = 10;
+        roundRect(ctx, sqX, sqY, sq, sq, 36);
+        ctx.stroke();
       }
 
-      ctx.fillStyle = '#c9a227';
-      ctx.fillRect(0, photoH, w, 8);
-
-      var bottomY = photoH + 8;
-      var bottomH = h - bottomY;
+      var bottomY = sqY + sq + 40;
       ctx.fillStyle = '#0a2540';
-      ctx.fillRect(0, bottomY, w, bottomH);
+      ctx.fillRect(0, bottomY - 20, w, h - (bottomY - 20));
 
       ctx.fillStyle = '#c9a227';
-      ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(brand, w / 2, bottomY + 55);
+      ctx.fillText(brandLine(), w / 2, bottomY + 40);
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = '500 42px Inter, Vazirmatn, system-ui, sans-serif';
-      var maxW = w - 100;
-      var lines = wrapLines(ctx, p.text || '', maxW, 8);
-      var lineH = 56;
-      var startY = bottomY + 120;
+      ctx.font = '500 40px Inter, Vazirmatn, system-ui, sans-serif';
+      var lines = wrapLines(ctx, p.text || '', w - 100, 7);
+      var lineH = 52;
+      var startY = bottomY + 110;
       lines.forEach(function (ln, idx) {
         ctx.fillText(ln, w / 2, startY + idx * lineH);
       });
 
       if (p.ref) {
-        ctx.fillStyle = 'rgba(255,255,255,0.75)';
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
         ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
-        ctx.fillText(p.ref, w / 2, h - 160);
+        ctx.fillText(p.ref, w / 2, h - 150);
       }
 
       var boxW = 560, boxH = 72;
       var boxX = (w - boxW) / 2;
-      var boxY = h - 120;
+      var boxY = h - 115;
       ctx.fillStyle = '#c9a227';
       roundRect(ctx, boxX, boxY, boxW, boxH, 20);
       ctx.fill();
@@ -248,14 +242,14 @@
 
       canvas.toBlob(function (blob) {
         done(blob);
-      }, 'image/png', 1.0);
+      }, 'image/png');
     });
   }
 
   function doShare(app) {
     var msg = buildMessage();
     var pageUrl = sharePageUrl();
-    var brand = isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
+    var brand = brandLine();
 
     makeCardImage(function (blob) {
       if (!blob) {
@@ -392,8 +386,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._stShareImg2) return;
-    btn._stShareImg2 = true;
+    if (!btn || btn._stShareImg3) return;
+    btn._stShareImg3 = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -403,8 +397,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._stShareImg2) return;
-    textEl._stShareImg2 = true;
+    if (!textEl || textEl._stShareImg3) return;
+    textEl._stShareImg3 = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
