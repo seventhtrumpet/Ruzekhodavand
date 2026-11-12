@@ -1,4 +1,4 @@
-/* Share: big square profile + verse + website link on the picture */
+/* Share like the good WhatsApp status: verse + website link → logo preview + tappable link */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -95,7 +95,7 @@
   function buildMessage() {
     var p = versePayload();
     var url = sharePageUrl();
-    var brand = isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
+    var brand = isEn() ? 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645 | Seventh Trumpet';
     var parts = [];
     if (p.ref) parts.push(p.ref);
     if (p.text) parts.push(p.text);
@@ -104,207 +104,28 @@
     return parts.join('\n\n');
   }
 
-  function getProfileImg(cb) {
-    var tries = 0;
-    function attempt() {
-      try {
-        if (window.ST_PE1 && window.ST_PE2 && window.ST_PE1.length > 100) {
-          var img = new Image();
-          img.onload = function () { cb(img); };
-          img.onerror = function () { tryLp(); };
-          img.src = 'data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2;
-          return;
-        }
-        tryLp();
-      } catch (e) { tryLp(); }
-      function tryLp() {
-        try {
-          if (window.ST_LP && window.ST_LP[0] && window.ST_LP[1]) {
-            var img2 = new Image();
-            img2.onload = function () { cb(img2); };
-            img2.onerror = function () { next(); };
-            img2.src = 'data:image/jpeg;base64,' + window.ST_LP[0] + window.ST_LP[1];
-            return;
-          }
-        } catch (e2) {}
-        next();
-      }
-      function next() {
-        tries++;
-        if (tries < 50) setTimeout(attempt, 80);
-        else cb(null);
-      }
-    }
-    attempt();
-  }
-
-  function wrapLines(ctx, text, maxW, maxLines) {
-    var words = String(text || '').split(/\s+/);
-    var lines = [], line = '';
-    for (var i = 0; i < words.length; i++) {
-      var test = line ? line + ' ' + words[i] : words[i];
-      if (ctx.measureText(test).width > maxW && line) {
-        lines.push(line);
-        line = words[i];
-      } else line = test;
-    }
-    if (line) lines.push(line);
-    if (lines.length > maxLines) {
-      lines = lines.slice(0, maxLines);
-      var last = lines[lines.length - 1];
-      if (last.length > 2) lines[lines.length - 1] = last.replace(/\s+\S*$/, '') + '\u2026';
-    }
-    return lines;
-  }
-
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-  }
-
-  function makeCardImage(done) {
-    var p = versePayload();
-    var en = isEn();
-    var brand = en ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
-
-    getProfileImg(function (profile) {
-      var w = 1080, h = 1920;
-      var canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      var ctx = canvas.getContext('2d');
-
-      var g0 = ctx.createLinearGradient(0, 0, 0, h);
-      g0.addColorStop(0, '#0c2d4a');
-      g0.addColorStop(1, '#061828');
-      ctx.fillStyle = g0;
-      ctx.fillRect(0, 0, w, h);
-
-      ctx.fillStyle = '#c9a227';
-      ctx.fillRect(0, 0, w, 16);
-
-      var sq = 420;
-      var sqX = (w - sq) / 2;
-      var sqY = 120;
-      if (profile) {
-        ctx.save();
-        roundRect(ctx, sqX, sqY, sq, sq, 28);
-        ctx.clip();
-        var scale = Math.max(sq / profile.width, sq / profile.height);
-        var dw = profile.width * scale;
-        var dh = profile.height * scale;
-        ctx.drawImage(profile, sqX + (sq - dw) / 2, sqY + (sq - dh) / 2, dw, dh);
-        ctx.restore();
-        ctx.strokeStyle = '#c9a227';
-        ctx.lineWidth = 8;
-        roundRect(ctx, sqX, sqY, sq, sq, 28);
-        ctx.stroke();
-      } else {
-        ctx.fillStyle = 'rgba(201,162,39,0.25)';
-        roundRect(ctx, sqX, sqY, sq, sq, 28);
-        ctx.fill();
-        ctx.strokeStyle = '#c9a227';
-        ctx.lineWidth = 8;
-        roundRect(ctx, sqX, sqY, sq, sq, 28);
-        ctx.stroke();
-      }
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(brand, w / 2, sqY + sq + 55);
-
-      var cardX = 55;
-      var cardY = sqY + sq + 90;
-      var cardW = w - 110;
-      var cardH = 720;
-      ctx.fillStyle = 'rgba(8, 28, 48, 0.78)';
-      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(201,162,39,0.85)';
-      ctx.lineWidth = 4;
-      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
-      ctx.stroke();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '500 40px Inter, Vazirmatn, system-ui, sans-serif';
-      var lines = wrapLines(ctx, p.text, cardW - 80, 11);
-      var lineH = 52;
-      var startY = cardY + 70;
-      lines.forEach(function (ln, i) {
-        ctx.fillText(ln, w / 2, startY + i * lineH);
-      });
-
-      if (p.ref) {
-        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
-        ctx.fillText(p.ref, w / 2, cardY + cardH - 100);
-      }
-
-      var boxW = 520, boxH = 64;
-      var boxX = (w - boxW) / 2;
-      var boxY = cardY + cardH - 78;
-      ctx.fillStyle = '#c9a227';
-      roundRect(ctx, boxX, boxY, boxW, boxH, 18);
-      ctx.fill();
-      ctx.fillStyle = '#0a2540';
-      ctx.font = '700 32px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 44);
-
-      ctx.fillStyle = '#c9a227';
-      ctx.fillRect(0, h - 16, w, 16);
-
-      canvas.toBlob(function (blob) {
-        done(blob, sharePageUrl(), brand);
-      }, 'image/png');
-    });
-  }
-
   function doShare(app) {
     var msg = buildMessage();
     var pageUrl = sharePageUrl();
 
-    makeCardImage(function (blob, url, brand) {
-      if (!blob) {
-        if (app === 'wa') window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-        else if (app === 'tg') window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
-        return;
+    if (app === 'wa') {
+      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+      return;
+    }
+    if (app === 'tg') {
+      window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+      return;
+    }
+    if (app === 'fb') {
+      window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
+      return;
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(msg);
       }
-      var file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' });
-
-      if (app === 'wa' || app === 'tg') {
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand, text: url, url: url }).catch(function () {
-            if (app === 'wa') window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-            else window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
-          });
-        } else {
-          if (app === 'wa') window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-          else window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
-        }
-        return;
-      }
-
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: brand, text: url, url: url }).catch(function () {
-          try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
-          openSocial(app, pageUrl);
-        });
-      } else {
-        try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
-        openSocial(app, pageUrl);
-      }
-    });
-  }
-
-  function openSocial(app, pageUrl) {
+    } catch (e) {}
     if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
-    else if (app === 'fb') window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
     else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
     else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
   }
@@ -409,8 +230,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._shareBound7) return;
-    btn._shareBound7 = true;
+    if (!btn || btn._shareBound8) return;
+    btn._shareBound8 = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -420,8 +241,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._shareBound7) return;
-    textEl._shareBound7 = true;
+    if (!textEl || textEl._shareBound8) return;
+    textEl._shareBound8 = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
