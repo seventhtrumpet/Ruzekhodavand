@@ -1,4 +1,4 @@
-/* Share like the good WhatsApp status: verse + website link → logo preview + tappable link */
+/* Share like your WhatsApp status: verse + logo preview + tappable website link */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -33,7 +33,7 @@
     return null;
   }
 
-  function sharePageUrl() {
+  function verseDeepUrl() {
     var params = getParams();
     if (!params) {
       try {
@@ -48,11 +48,7 @@
         '&c=' + (params.chapter || 1) +
         '&v=' + (params.verse || 1);
     }
-    try {
-      var href = location.href.split('#')[0];
-      if (href && href.indexOf('http') === 0) return href;
-    } catch (e) {}
-    return SITE + '/';
+    return '';
   }
 
   function applyDeepLink() {
@@ -75,41 +71,58 @@
   }
 
   function versePayload() {
-    var text = (document.getElementById('verse-text') || {}).textContent || '';
-    var ref = (document.getElementById('verse-ref') || {}).textContent || '';
+    var text = '';
+    var ref = '';
+    try {
+      var vt = document.getElementById('verse-text');
+      if (vt) text = (vt.textContent || '').trim();
+      var vr = document.getElementById('verse-ref');
+      if (vr) ref = (vr.textContent || '').trim();
+    } catch (e) {}
     var selected = document.querySelectorAll('.mb-verse.selected');
     if (selected.length) {
       var lines = [];
       selected.forEach(function (el) { lines.push((el.textContent || '').trim()); });
       text = lines.join('\n');
       var first = selected[0];
-      ref = (first.getAttribute('data-chapter') || '') + ':' + (first.getAttribute('data-verse') || '');
+      var ch = first.getAttribute('data-chapter') || '';
+      var vs = first.getAttribute('data-verse') || '';
+      if (ch || vs) ref = ch + ':' + vs;
     }
     if (!text) {
-      var main = document.querySelector('.angel-text, .daily-verse-text, #daily-verse .verse-body, article p');
-      if (main) text = (main.textContent || '').trim().slice(0, 500);
+      var main = document.querySelector('.angel-text, .daily-verse-text, #daily-verse .verse-body, article p, .mb-verse.active');
+      if (main) text = (main.textContent || '').trim().slice(0, 600);
     }
     return { text: (text || '').trim(), ref: (ref || '').trim() };
   }
 
   function buildMessage() {
     var p = versePayload();
-    var url = sharePageUrl();
-    var brand = isEn() ? 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645 | Seventh Trumpet';
+    var brand = isEn()
+      ? 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645'
+      : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645 | Seventh Trumpet';
     var parts = [];
     if (p.ref) parts.push(p.ref);
     if (p.text) parts.push(p.text);
     parts.push(brand);
-    parts.push(url);
+    parts.push(SITE + '/');
+    var deep = verseDeepUrl();
+    if (deep) parts.push(deep);
     return parts.join('\n\n');
   }
 
   function doShare(app) {
     var msg = buildMessage();
-    var pageUrl = sharePageUrl();
+    var pageUrl = SITE + '/';
 
     if (app === 'wa') {
-      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+      if (navigator.share) {
+        navigator.share({ title: 'Seventh Trumpet', text: msg, url: pageUrl }).catch(function () {
+          window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+        });
+      } else {
+        window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+      }
       return;
     }
     if (app === 'tg') {
@@ -121,9 +134,7 @@
       return;
     }
     try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(msg);
-      }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(msg);
     } catch (e) {}
     if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
     else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
@@ -158,7 +169,6 @@
     var old = document.getElementById('vshare-overlay');
     if (old) old.remove();
     var en = isEn();
-    var pageUrl = sharePageUrl();
 
     var overlay = document.createElement('div');
     overlay.id = 'vshare-overlay';
@@ -188,7 +198,7 @@
       btn.addEventListener('click', function () {
         var go = btn.getAttribute('data-go');
         if (go === 'site') {
-          window.open(pageUrl, '_blank', 'noopener');
+          window.open(SITE + '/', '_blank', 'noopener');
           setTimeout(close, 200);
           return;
         }
@@ -230,19 +240,20 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._shareBound8) return;
-    btn._shareBound8 = true;
+    if (!btn) return;
+    if (btn._stShareBound) return;
+    btn._stShareBound = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
       openSharePanel();
-    });
+    }, true);
   }
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._shareBound8) return;
-    textEl._shareBound8 = true;
+    if (!textEl || textEl._stShareBound) return;
+    textEl._stShareBound = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
@@ -253,8 +264,9 @@
     bindBibleShare();
     bindVerseTap();
     setLabels();
-    setTimeout(bindBibleShare, 500);
-    setTimeout(bindBibleShare, 1500);
+    setTimeout(bindBibleShare, 400);
+    setTimeout(bindBibleShare, 1200);
+    setTimeout(bindBibleShare, 2500);
     var lt = document.getElementById('lang-toggle');
     if (lt) lt.addEventListener('click', function () { setTimeout(setLabels, 150); });
   }
