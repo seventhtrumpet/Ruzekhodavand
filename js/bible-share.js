@@ -1,4 +1,4 @@
-/* Share IMAGE: big profile/logo + verse + website link (like 3 days ago) */
+/* Share IMAGE — big profile photo full quality + verse + link at bottom */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var LOGO_URL = 'https://iili.io/n8MSJBp.jpg';
@@ -185,81 +185,70 @@
       canvas.height = h;
       var ctx = canvas.getContext('2d');
 
-      var g0 = ctx.createLinearGradient(0, 0, 0, h);
-      g0.addColorStop(0, '#0c2d4a');
-      g0.addColorStop(1, '#061828');
-      ctx.fillStyle = g0;
+      ctx.fillStyle = '#061828';
       ctx.fillRect(0, 0, w, h);
 
-      ctx.fillStyle = '#c9a227';
-      ctx.fillRect(0, 0, w, 16);
-
-      var sq = 480;
-      var sqX = (w - sq) / 2;
-      var sqY = 100;
+      var photoH = Math.floor(h * 0.58);
       if (profile) {
-        ctx.save();
-        roundRect(ctx, sqX, sqY, sq, sq, 32);
-        ctx.clip();
-        var scale = Math.max(sq / profile.width, sq / profile.height);
+        var scale = Math.max(w / profile.width, photoH / profile.height);
         var dw = profile.width * scale;
         var dh = profile.height * scale;
-        ctx.drawImage(profile, sqX + (sq - dw) / 2, sqY + (sq - dh) / 2, dw, dh);
-        ctx.restore();
-        ctx.strokeStyle = '#c9a227';
-        ctx.lineWidth = 10;
-        roundRect(ctx, sqX, sqY, sq, sq, 32);
-        ctx.stroke();
+        ctx.drawImage(profile, (w - dw) / 2, (photoH - dh) / 2, dw, dh);
+        var fade = ctx.createLinearGradient(0, photoH - 120, 0, photoH);
+        fade.addColorStop(0, 'rgba(6,24,40,0)');
+        fade.addColorStop(1, 'rgba(6,24,40,1)');
+        ctx.fillStyle = fade;
+        ctx.fillRect(0, photoH - 120, w, 120);
+      } else {
+        var g0 = ctx.createLinearGradient(0, 0, 0, photoH);
+        g0.addColorStop(0, '#0c2d4a');
+        g0.addColorStop(1, '#061828');
+        ctx.fillStyle = g0;
+        ctx.fillRect(0, 0, w, photoH);
       }
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '700 38px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.fillStyle = '#c9a227';
+      ctx.fillRect(0, photoH, w, 8);
+
+      var bottomY = photoH + 8;
+      var bottomH = h - bottomY;
+      ctx.fillStyle = '#0a2540';
+      ctx.fillRect(0, bottomY, w, bottomH);
+
+      ctx.fillStyle = '#c9a227';
+      ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(brand, w / 2, sqY + sq + 58);
-
-      var cardX = 50;
-      var cardY = sqY + sq + 90;
-      var cardW = w - 100;
-      var cardH = 700;
-      ctx.fillStyle = 'rgba(8, 28, 48, 0.82)';
-      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(201,162,39,0.9)';
-      ctx.lineWidth = 4;
-      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
-      ctx.stroke();
+      ctx.fillText(brand, w / 2, bottomY + 55);
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = '500 40px Inter, Vazirmatn, system-ui, sans-serif';
-      var lines = wrapLines(ctx, p.text || (en ? 'Share the everlasting gospel' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u067e\u06cc\u0627\u0645'), cardW - 80, 11);
-      var lineH = 52;
-      var startY = cardY + 70;
+      ctx.font = '500 42px Inter, Vazirmatn, system-ui, sans-serif';
+      var maxW = w - 100;
+      var lines = wrapLines(ctx, p.text || '', maxW, 8);
+      var lineH = 56;
+      var startY = bottomY + 120;
       lines.forEach(function (ln, idx) {
         ctx.fillText(ln, w / 2, startY + idx * lineH);
       });
 
       if (p.ref) {
-        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.fillStyle = 'rgba(255,255,255,0.75)';
         ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
-        ctx.fillText(p.ref, w / 2, cardY + cardH - 100);
+        ctx.fillText(p.ref, w / 2, h - 160);
       }
 
-      var boxW = 540, boxH = 68;
+      var boxW = 560, boxH = 72;
       var boxX = (w - boxW) / 2;
-      var boxY = cardY + cardH - 80;
+      var boxY = h - 120;
       ctx.fillStyle = '#c9a227';
-      roundRect(ctx, boxX, boxY, boxW, boxH, 18);
+      roundRect(ctx, boxX, boxY, boxW, boxH, 20);
       ctx.fill();
       ctx.fillStyle = '#0a2540';
-      ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 46);
-
-      ctx.fillStyle = '#c9a227';
-      ctx.fillRect(0, h - 16, w, 16);
+      ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 48);
 
       canvas.toBlob(function (blob) {
         done(blob);
-      }, 'image/png');
+      }, 'image/png', 1.0);
     });
   }
 
@@ -403,8 +392,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._stShareImg) return;
-    btn._stShareImg = true;
+    if (!btn || btn._stShareImg2) return;
+    btn._stShareImg2 = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -414,8 +403,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._stShareImg) return;
-    textEl._stShareImg = true;
+    if (!textEl || textEl._stShareImg2) return;
+    textEl._stShareImg2 = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
