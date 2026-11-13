@@ -1,4 +1,4 @@
-/* Fast full-Bible search — parallel loads, cache, no sequential chapter crawl */
+/* Fast full-Bible search — parallel FA + in-memory KJV for English */
 (function () {
   var path = (location.pathname || '').toLowerCase();
   if (document.body && document.body.getAttribute('data-page') !== 'bible' && path.indexOf('bible') < 0) return;
@@ -82,6 +82,7 @@
         var b = document.getElementById('mb-search-btn');
         if (inp) inp.placeholder = placeholder();
         if (b && !b.disabled) b.textContent = isEn() ? 'Search' : '\u062c\u0633\u062a\u062c\u0648';
+        if (isEn()) loadKjv();
       }, 200);
     });
   }
@@ -259,52 +260,84 @@
     return items.slice(0, 50);
   }
 
+  var kjvPromise = null;
+  var kjvList = null;
+
+  function loadKjv() {
+    if (kjvList) return Promise.resolve(kjvList);
+    if (!kjvPromise) {
+      kjvPromise = fetch('https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json')
+        .then(function (r) {
+          if (!r.ok) throw new Error('KJV load failed');
+          return r.json();
+        })
+        .then(function (list) {
+          kjvList = list;
+          return list;
+        })
+        .catch(function (e) {
+          console.warn(e);
+          kjvPromise = null;
+          return null;
+        });
+    }
+    return kjvPromise;
+  }
+
   async function searchEnglishFast(query, token) {
     await ensureMetaManifest();
     var nq = normalize(query);
     var items = [];
-    var meta = (window.__bibleMeta || []).slice();
-    meta.sort(function (a, b) {
-      return ((Number(a.id) >= 470 ? 0 : 1) - (Number(b.id) >= 470 ? 0 : 1)) || (Number(a.id) - Number(b.id));
+    var meta = window.__bibleMeta || [];
+    var IDS = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,190,220,230,240,250,260,290,300,310,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730];
+
+    renderItems(items, 'Loading English Bible…');
+    var list = await loadKjv();
+    if (token !== abortToken) return items;
+    if (!list || !list.length) {
+      renderItems(items, 'English Bible could not load — try again');
+      return items;
+    }
+
+    var order = [];
+    for (var i = 0; i < list.length; i++) order.push(i);
+    order.sort(function (a, b) {
+      var ida = IDS[a] || 0, idb = IDS[b] || 0;
+      var pa = ida >= 470 ? 0 : 1, pb = idb >= 470 ? 0 : 1;
+      return pa - pb || a - b;
     });
-    var jobs = [];
-    meta.forEach(function (b) {
-      var id = Number(b.id);
-      var maxCh = CHAPTER_COUNTS[id] || 1;
-      var refName = (b.en || '').replace(/\s+/g, '+');
-      if (!refName) return;
-      for (var ch = 1; ch <= maxCh; ch++) jobs.push({ id: id, ch: ch, label: b.en || b.fa, refName: refName });
-    });
-    var checked = 0, total = jobs.length;
-    await mapPool(jobs, 10, async function (job) {
-      if (token !== abortToken || items.length >= 50) return;
-      var key = job.refName + ':' + job.ch;
-      var data = CACHE.en[key];
-      if (!data) {
-        try {
-          var res = await fetch('https://bible-api.com/' + encodeURIComponent(job.refName + '+' + job.ch) + '?translation=kjv');
-          if (res.ok) { data = await res.json(); CACHE.en[key] = data; }
-        } catch (e) {}
-      }
-      checked++;
-      if (!data) return;
-      var verses = data.verses || [];
-      for (var i = 0; i < verses.length; i++) {
+
+    for (var oi = 0; oi < order.length; oi++) {
+      if (token !== abortToken || items.length >= 50) break;
+      var idx = order[oi];
+      var book = list[idx];
+      if (!book) continue;
+      var id = IDS[idx];
+      var label = book.name || (meta[idx] && (meta[idx].en || meta[idx].fa)) || ('Book ' + id);
+      var chapters = book.chapters || [];
+      for (var ci = 0; ci < chapters.length; ci++) {
         if (items.length >= 50) break;
-        var vv = verses[i];
-        var text = vv.text || '';
-        if (normalize(text).indexOf(nq) >= 0) {
+        var verses = chapters[ci] || [];
+        for (var vi = 0; vi < verses.length; vi++) {
+          if (items.length >= 50) break;
+          var text = verses[vi] || '';
+          if (normalize(text).indexOf(nq) < 0) continue;
           var snip = text.length > 100 ? text.slice(0, 100).trim() + '\u2026' : text.trim();
           items.push({
-            html: '<strong>' + escapeHtml(job.label) + ' ' + job.ch + ':' + vv.verse + '</strong><br>' + escapeHtml(snip),
-            action: (function (bid, c, v) { return function () { goTo(bid, c, v); }; })(job.id, job.ch, vv.verse)
+            html: '<strong>' + escapeHtml(label) + ' ' + (ci + 1) + ':' + (vi + 1) + '</strong><br>' + escapeHtml(snip),
+            action: (function (bid, c, v) {
+              return function () { goTo(bid, c, v); };
+            })(id, ci + 1, vi + 1)
           });
         }
       }
-      if (checked % 15 === 0 || items.length >= 50) {
-        renderItems(items.slice(0, 50), 'Searching… ' + Math.min(checked, total) + '/' + total + (items.length ? ' — ' + items.length + ' found' : ''));
+      if (oi % 5 === 0 || items.length >= 50) {
+        renderItems(items.slice(0, 50),
+          'Searching… ' + (oi + 1) + '/' + order.length +
+          (items.length ? ' — ' + items.length + ' found' : '')
+        );
       }
-    });
+    }
     return items.slice(0, 50);
   }
 
@@ -357,6 +390,7 @@
 
   function boot() {
     inject();
+    if (isEn()) setTimeout(function () { loadKjv(); }, 800);
     placeSearch();
     window.addEventListener('resize', placeSearch);
     setTimeout(placeSearch, 300);
