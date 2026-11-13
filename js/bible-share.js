@@ -1,4 +1,4 @@
-/* Picture (profile + verse) + separate tappable website under it — link NOT painted on image */
+/* Profile photo on image; verse + website link in separate card under photo (not part of image) */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var LOGO_HQ = 'https://iili.io/n8MSJBp.jpg';
@@ -89,6 +89,7 @@
     if (p.text) parts.push(p.text);
     if (p.ref) parts.push(p.ref);
     parts.push(brandLine());
+    parts.push('https://seventhtrumpet.org');
     return parts.join('\n\n');
   }
 
@@ -153,15 +154,13 @@
   }
 
   function makeCardImage(done) {
-    var p = versePayload();
-
+    /* Profile photo only — verse + link are in the card under the photo */
     getProfileImg(function (profile) {
       var w = 1080;
-      var sq = 820;
-      var topPad = 48;
-      var gap = 28;
-      var verseArea = 420;
-      var h = topPad + sq + gap + verseArea + 40;
+      var sq = 900;
+      var pad = 60;
+      var brandH = 70;
+      var h = pad + sq + brandH + pad;
 
       var canvas = document.createElement('canvas');
       canvas.width = w;
@@ -174,11 +173,11 @@
       ctx.fillRect(0, 0, w, h);
 
       var sqX = (w - sq) / 2;
-      var sqY = topPad;
+      var sqY = pad;
 
       if (profile) {
         ctx.save();
-        roundRect(ctx, sqX, sqY, sq, sq, 28);
+        roundRect(ctx, sqX, sqY, sq, sq, 36);
         ctx.clip();
         var scale = Math.max(sq / profile.width, sq / profile.height);
         var dw = profile.width * scale;
@@ -186,34 +185,15 @@
         ctx.drawImage(profile, sqX + (sq - dw) / 2, sqY + (sq - dh) / 2, dw, dh);
         ctx.restore();
         ctx.strokeStyle = '#c9a227';
-        ctx.lineWidth = 8;
-        roundRect(ctx, sqX, sqY, sq, sq, 28);
+        ctx.lineWidth = 10;
+        roundRect(ctx, sqX, sqY, sq, sq, 36);
         ctx.stroke();
       }
 
-      var bottomY = sqY + sq + gap;
-      ctx.fillStyle = '#0a2540';
-      ctx.fillRect(0, bottomY - 8, w, h - (bottomY - 8));
-
       ctx.fillStyle = '#c9a227';
-      ctx.font = '700 32px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(brandLine(), w / 2, bottomY + 36);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '600 44px Inter, Vazirmatn, system-ui, sans-serif';
-      var lines = wrapLines(ctx, p.text || '', w - 100, 6);
-      var lineH = 56;
-      var startY = bottomY + 96;
-      lines.forEach(function (ln, idx) {
-        ctx.fillText(ln, w / 2, startY + idx * lineH);
-      });
-
-      if (p.ref) {
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.font = '600 30px Inter, Vazirmatn, system-ui, sans-serif';
-        ctx.fillText(p.ref, w / 2, startY + lines.length * lineH + 36);
-      }
+      ctx.fillText(brandLine(), w / 2, sqY + sq + 48);
 
       canvas.toBlob(function (blob) { done(blob); }, 'image/png');
     });
@@ -232,14 +212,20 @@
 
       if (app === 'wa') {
         /*
-         * Picture = image file only (verse on photo is OK).
-         * Card under picture = real URL in caption (NOT drawn on the image).
-         * Always starts with https://seventhtrumpet.org so it sticks under the photo and opens the site.
+         * 1) Image = profile photo only (not the link).
+         * 2) Card under photo = verse + https://seventhtrumpet.org (tappable, not part of image).
          */
-        var cardText = 'https://seventhtrumpet.org\n\n' + msg.replace(/^https:\/\/seventhtrumpet\.org\n\n/, '');
+        var p = versePayload();
+        var cardLines = [];
+        if (p.text) cardLines.push(p.text);
+        if (p.ref) cardLines.push(p.ref);
+        cardLines.push(brandLine());
+        cardLines.push('https://seventhtrumpet.org');
+        var cardText = cardLines.join('\n\n');
+
         if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand, text: cardText }).catch(function () {
-            navigator.share({ files: [file], title: brand, text: cardText, url: pageUrl }).catch(function () {
+          navigator.share({ files: [file], title: brand, text: cardText, url: pageUrl }).catch(function () {
+            navigator.share({ files: [file], title: brand, text: cardText }).catch(function () {
               navigator.share({ title: brand, text: cardText, url: pageUrl }).catch(function () {
                 window.open('https://wa.me/?text=' + encodeURIComponent(cardText), '_blank', 'noopener');
               });
@@ -256,7 +242,7 @@
       }
       if (app === 'tg') {
         if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand, text: 'https://seventhtrumpet.org\n\n' + msg }).catch(function () {
+          navigator.share({ files: [file], title: brand, text: msg }).catch(function () {
             window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
           });
         } else {
@@ -269,14 +255,14 @@
         return;
       }
       if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: brand, text: 'https://seventhtrumpet.org\n\n' + msg }).catch(function () {
-          try { if (navigator.clipboard) navigator.clipboard.writeText('https://seventhtrumpet.org\n\n' + msg); } catch (e) {}
+        navigator.share({ files: [file], title: brand, text: msg }).catch(function () {
+          try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
           if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
           else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
           else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
         });
       } else {
-        try { if (navigator.clipboard) navigator.clipboard.writeText('https://seventhtrumpet.org\n\n' + msg); } catch (e) {}
+        try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
         if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
         else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
         else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
