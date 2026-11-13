@@ -1,4 +1,4 @@
-/* Share: (1) profile picture  (2) card under it with verse + website link — link is real, not painted on photo */
+/* Profile picture + real link CARD under it (not caption, not painted on the image) */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var LOGO_HQ = 'https://iili.io/n8MSJBp.jpg';
@@ -45,21 +45,19 @@
     return 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
   }
 
-  /* Card under the picture: verse + website (this is NOT part of the image) */
-  function cardUnderPhoto() {
+  function shareTitle() {
+    var p = versePayload();
+    if (p.ref) return p.ref + ' — ' + brandLine();
+    return brandLine();
+  }
+
+  function cardWords() {
     var p = versePayload();
     var lines = [];
     if (p.text) lines.push(p.text);
     if (p.ref) lines.push(p.ref);
     lines.push(brandLine());
-    lines.push(SITE);
     return lines.join('\n\n');
-  }
-
-  function shareTitle() {
-    var p = versePayload();
-    if (p.ref) return p.ref + ' — ' + brandLine();
-    return brandLine();
   }
 
   function getProfileImg(cb) {
@@ -97,7 +95,6 @@
     ctx.closePath();
   }
 
-  /* Only the profile picture — no website link drawn on it */
   function makeProfileImage(done) {
     getProfileImg(function (profile) {
       var w = 1080, sq = 920, pad = 50, footer = 80;
@@ -137,8 +134,8 @@
   }
 
   function doShare(app) {
-    var card = cardUnderPhoto();
     var title = shareTitle();
+    var words = cardWords();
     var pageUrl = SITE;
 
     makeProfileImage(function (blob) {
@@ -148,31 +145,50 @@
       }
 
       if (app === 'wa') {
-        if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: title, text: card, url: pageUrl }).catch(function () {
-            navigator.share({ files: [file], title: title, text: card }).catch(function () {
-              navigator.share({ title: title, text: card, url: pageUrl }).catch(function () {
-                window.open('https://wa.me/?text=' + encodeURIComponent(card), '_blank', 'noopener');
+        function shareLinkCard() {
+          return navigator.share({ title: title, text: words, url: pageUrl });
+        }
+        function sharePictureAndCard() {
+          return navigator.share({ files: [file], title: title, text: words, url: pageUrl });
+        }
+
+        if (file && navigator.canShare) {
+          var both = { files: [file], title: title, text: words, url: pageUrl };
+          if (navigator.canShare(both)) {
+            sharePictureAndCard().catch(function () {
+              shareLinkCard().catch(function () {
+                window.open('https://wa.me/?text=' + encodeURIComponent(words + '\n\n' + pageUrl), '_blank', 'noopener');
               });
             });
-          });
-        } else if (navigator.share) {
-          navigator.share({ title: title, text: card, url: pageUrl }).catch(function () {
-            window.open('https://wa.me/?text=' + encodeURIComponent(card), '_blank', 'noopener');
+            return;
+          }
+          if (navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file], title: title, text: words }).catch(function () {
+              shareLinkCard().catch(function () {
+                window.open('https://wa.me/?text=' + encodeURIComponent(words + '\n\n' + pageUrl), '_blank', 'noopener');
+              });
+            });
+            return;
+          }
+        }
+
+        if (navigator.share) {
+          shareLinkCard().catch(function () {
+            window.open('https://wa.me/?text=' + encodeURIComponent(words + '\n\n' + pageUrl), '_blank', 'noopener');
           });
         } else {
-          window.open('https://wa.me/?text=' + encodeURIComponent(card), '_blank', 'noopener');
+          window.open('https://wa.me/?text=' + encodeURIComponent(words + '\n\n' + pageUrl), '_blank', 'noopener');
         }
         return;
       }
 
       if (app === 'tg') {
         if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: title, text: card }).catch(function () {
-            window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(card), '_blank', 'noopener');
+          navigator.share({ files: [file], title: title, text: words, url: pageUrl }).catch(function () {
+            window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(words), '_blank', 'noopener');
           });
         } else {
-          window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(card), '_blank', 'noopener');
+          window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(words), '_blank', 'noopener');
         }
         return;
       }
@@ -183,14 +199,18 @@
       }
 
       if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: title, text: card }).catch(function () {
-          try { if (navigator.clipboard) navigator.clipboard.writeText(card); } catch (e) {}
+        navigator.share({ files: [file], title: title, text: words, url: pageUrl }).catch(function () {
+          try { if (navigator.clipboard) navigator.clipboard.writeText(words + '\n\n' + pageUrl); } catch (e) {}
           if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
           else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
           else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
         });
+      } else if (navigator.share) {
+        navigator.share({ title: title, text: words, url: pageUrl }).catch(function () {
+          try { if (navigator.clipboard) navigator.clipboard.writeText(words + '\n\n' + pageUrl); } catch (e) {}
+        });
       } else {
-        try { if (navigator.clipboard) navigator.clipboard.writeText(card); } catch (e) {}
+        try { if (navigator.clipboard) navigator.clipboard.writeText(words + '\n\n' + pageUrl); } catch (e) {}
         if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
         else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
         else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
