@@ -1,4 +1,4 @@
-/* Profile picture + separate card stuck below (verse + tappable link) */
+/* Profile picture + stuck card: verse near tappable link, bigger preview, EN|FA */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -78,31 +78,34 @@
     return { text: (text || '').trim(), ref: (ref || '').trim() };
   }
 
-  /*
-   * WhatsApp builds:
-   *  [profile picture from og:image]
-   *  [separate white card stuck under it — TAPPABLE link]
-   *  [verse text below]
-   * Link is NOT pixels on the photo.
-   */
+  function brandLine() {
+    return 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
+  }
+
   function buildMessage() {
     var p = versePayload();
     var parts = [];
-    if (p.text) parts.push('"' + p.text + '"');
     if (p.ref) parts.push(p.ref);
-    parts.push('Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645');
+    if (p.text) parts.push(p.text);
+    parts.push(brandLine());
     return parts.join('\n\n');
+  }
+
+  function shareTitle() {
+    var p = versePayload();
+    if (p.ref) return p.ref + ' — ' + brandLine();
+    return brandLine();
   }
 
   function doShare(app) {
     var msg = buildMessage();
     var pageUrl = SITE + '/';
-    var brand = 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
+    var title = shareTitle();
 
     if (app === 'wa') {
       if (navigator.share) {
         navigator.share({
-          title: brand,
+          title: title,
           text: msg,
           url: pageUrl
         }).catch(function () {
@@ -234,8 +237,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._stShareTapCard) return;
-    btn._stShareTapCard = true;
+    if (!btn || btn._stShareV2) return;
+    btn._stShareV2 = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -245,8 +248,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._stShareTapCard) return;
-    textEl._stShareTapCard = true;
+    if (!textEl || textEl._stShareV2) return;
+    textEl._stShareV2 = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
