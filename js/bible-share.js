@@ -1,4 +1,4 @@
-/* Profile picture + big verse (EN/FA if possible) + website link */
+/* Profile picture + verse on image; real tappable website card stuck under picture */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var LOGO_HQ = 'https://iili.io/n8MSJBp.jpg';
@@ -86,10 +86,9 @@
   function buildMessage() {
     var p = versePayload();
     var parts = [];
-    if (p.ref) parts.push(p.ref);
     if (p.text) parts.push(p.text);
+    if (p.ref) parts.push(p.ref);
     parts.push(brandLine());
-    parts.push('https://seventhtrumpet.org');
     return parts.join('\n\n');
   }
 
@@ -181,45 +180,31 @@
         ctx.stroke();
       }
 
+      /* Verse on picture only — do NOT paint website link on the image */
       var bottomY = sqY + sq + 40;
       ctx.fillStyle = '#0a2540';
       ctx.fillRect(0, bottomY - 16, w, h - (bottomY - 16));
 
       ctx.fillStyle = '#c9a227';
-      ctx.font = '700 36px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(brandLine(), w / 2, bottomY + 42);
+      ctx.fillText(brandLine(), w / 2, bottomY + 40);
 
       ctx.fillStyle = '#ffffff';
       ctx.font = '600 48px Inter, Vazirmatn, system-ui, sans-serif';
-      var lines = wrapLines(ctx, p.text || '', w - 90, 7);
+      var lines = wrapLines(ctx, p.text || '', w - 90, 8);
       var lineH = 62;
-      var startY = bottomY + 115;
+      var startY = bottomY + 110;
       lines.forEach(function (ln, idx) {
         ctx.fillText(ln, w / 2, startY + idx * lineH);
       });
 
       var after = startY + lines.length * lineH + 28;
       if (p.ref) {
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.font = '600 32px Inter, Vazirmatn, system-ui, sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.92)';
+        ctx.font = '600 34px Inter, Vazirmatn, system-ui, sans-serif';
         ctx.fillText(p.ref, w / 2, after);
-        after += 50;
       }
-
-      var boxW = 640, boxH = 80;
-      var boxX = (w - boxW) / 2;
-      var boxY = Math.min(after + 24, h - 140);
-      ctx.fillStyle = '#c9a227';
-      roundRect(ctx, boxX, boxY, boxW, boxH, 22);
-      ctx.fill();
-      ctx.fillStyle = '#0a2540';
-      ctx.font = '700 40px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.fillText('seventhtrumpet.org', w / 2, boxY + 54);
-
-      ctx.fillStyle = 'rgba(255,255,255,0.95)';
-      ctx.font = '600 28px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.fillText('https://seventhtrumpet.org', w / 2, boxY + boxH + 40);
 
       canvas.toBlob(function (blob) { done(blob); }, 'image/png');
     });
@@ -237,9 +222,14 @@
       }
 
       if (app === 'wa') {
+        /* Picture + stuck card: real url = tappable website under the image */
         if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand, text: msg + '\n\n' + pageUrl }).catch(function () {
-            navigator.share({ files: [file], title: brand }).catch(function () {
+          var payload = { files: [file], title: brand, text: msg, url: pageUrl };
+          if (!navigator.canShare(payload)) {
+            payload = { files: [file], title: brand, text: msg + '\n\n' + pageUrl };
+          }
+          navigator.share(payload).catch(function () {
+            navigator.share({ files: [file], title: brand, text: msg + '\n\n' + pageUrl }).catch(function () {
               window.open('https://wa.me/?text=' + encodeURIComponent(msg + '\n\n' + pageUrl), '_blank', 'noopener');
             });
           });
@@ -254,7 +244,7 @@
       }
       if (app === 'tg') {
         if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand, text: msg }).catch(function () {
+          navigator.share({ files: [file], title: brand, text: msg + '\n\n' + pageUrl }).catch(function () {
             window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
           });
         } else {
@@ -267,14 +257,14 @@
         return;
       }
       if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: brand, text: msg }).catch(function () {
-          try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
+        navigator.share({ files: [file], title: brand, text: msg + '\n\n' + pageUrl }).catch(function () {
+          try { if (navigator.clipboard) navigator.clipboard.writeText(msg + '\n\n' + pageUrl); } catch (e) {}
           if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
           else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
           else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
         });
       } else {
-        try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
+        try { if (navigator.clipboard) navigator.clipboard.writeText(msg + '\n\n' + pageUrl); } catch (e) {}
         if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
         else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
         else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
