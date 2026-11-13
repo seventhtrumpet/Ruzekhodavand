@@ -41,6 +41,20 @@
     return m ? Number(m[1]) : null;
   }
 
+  function opcbResponse(id) {
+    return loadOpcb().then(function (list) {
+      if (!list) return null;
+      var index = IDS.indexOf(id);
+      if (index < 0) return null;
+      if (!converted[id]) converted[id] = convertBook(list, index, id);
+      if (!converted[id]) return null;
+      return new Response(JSON.stringify(converted[id]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    });
+  }
+
   window.fetch = function (input, init) {
     var url = typeof input === 'string' ? input : (input && input.url) || '';
     var p = origFetch(input, init);
@@ -67,19 +81,32 @@
 
     if (url.indexOf('/data/bible-fa/') >= 0 && url.indexOf('manifest') < 0 && url.indexOf('meta') < 0) {
       return p.then(function (res) {
-        if (res && res.ok) return res;
         var id = bookIdFromUrl(url);
         if (!id) return res;
-        return loadOpcb().then(function (list) {
-          if (!list) return res;
-          var index = IDS.indexOf(id);
-          if (index < 0) return res;
-          if (!converted[id]) converted[id] = convertBook(list, index, id);
-          if (!converted[id]) return res;
-          return new Response(JSON.stringify(converted[id]), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
-          });
+
+        if (!res || !res.ok) {
+          return opcbResponse(id).then(function (r) { return r || res; });
+        }
+
+        /* 200 but empty/invalid JSON (e.g. placeholder) → still use OPCB */
+        return res.clone().text().then(function (txt) {
+          var t = (txt || '').trim();
+          if (!t || t === 'PLACEHOLDER' || t === '{}') {
+            return opcbResponse(id).then(function (r) { return r || res; });
+          }
+          try {
+            var parsed = JSON.parse(t);
+            if (!parsed || typeof parsed !== 'object') {
+              return opcbResponse(id).then(function (r) { return r || res; });
+            }
+            var data = parsed[String(id)] || parsed[id];
+            if (!data || !data.chapters || !Object.keys(data.chapters).length) {
+              return opcbResponse(id).then(function (r) { return r || res; });
+            }
+          } catch (e) {
+            return opcbResponse(id).then(function (r) { return r || res; });
+          }
+          return res;
         });
       });
     }
