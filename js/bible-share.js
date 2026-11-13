@@ -1,4 +1,4 @@
-/* Profile picture + stuck card: verse near tappable link, bigger preview, EN|FA */
+/* Profile picture + connected tappable link card + verse (last working style) */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -85,27 +85,22 @@
   function buildMessage() {
     var p = versePayload();
     var parts = [];
-    if (p.text) parts.push(p.text);
     if (p.ref) parts.push(p.ref);
+    if (p.text) parts.push(p.text);
     parts.push(brandLine());
+    parts.push('https://seventhtrumpet.org');
     return parts.join('\n\n');
-  }
-
-  function shareTitle() {
-    var p = versePayload();
-    if (p.ref) return p.ref + ' — ' + brandLine();
-    return brandLine();
   }
 
   function doShare(app) {
     var msg = buildMessage();
     var pageUrl = SITE + '/';
-    var title = shareTitle();
+    var brand = brandLine();
 
     if (app === 'wa') {
       if (navigator.share) {
         navigator.share({
-          title: title,
+          title: brand,
           text: msg,
           url: pageUrl
         }).catch(function () {
@@ -237,8 +232,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._stShareV2) return;
-    btn._stShareV2 = true;
+    if (!btn || btn._stShareTapCard) return;
+    btn._stShareTapCard = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -248,8 +243,8 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._stShareV2) return;
-    textEl._stShareV2 = true;
+    if (!textEl || textEl._stShareTapCard) return;
+    textEl._stShareTapCard = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
   }
