@@ -27,7 +27,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
   <title>خانه | شیپور هفتم</title>
-  <meta name="description" content="Home — Seventh Trumpet — Three angels message, Revelation 14">
+  <meta name="description" content="خانه — شیپور هفتم — پیام سه فرشته، مکاشفه ۱۴">
   <script>
     (function () {
       try {
@@ -38,15 +38,6 @@
       } catch (e) {}
     })();
   </script>
-  <style>
-    .mission-section { max-width: 720px; margin: 0.5rem auto 2rem; padding: 0 1rem; }
-    .mission-card {
-      background: var(--bg-card, #fff); border: 1px solid var(--border, #e0dcd3);
-      border-radius: 16px; padding: 1.6rem 1.4rem 1.5rem;
-      box-shadow: var(--shadow, 0 4px 20px rgba(10,37,64,.08)); line-height: 1.8;
-    }
-    body.dark .mission-card { background: var(--bg-card); border-color: var(--border); }
-  </style>
 </head>
 <body data-page="home">
   <header class="header">
@@ -57,7 +48,7 @@
         <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
         <a href="bible.html" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
         <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
-        <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
+        <button type="button" id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
       </nav>
     </div>
   </header>
@@ -70,6 +61,16 @@
         <a href="bible.html" class="btn btn-primary" data-i18n="bibleNav">کتاب مقدس</a>
         <a href="media.html" class="btn btn-secondary" data-i18n="media">رسانه‌ها</a>
       </div>
+    </div>
+  </section>
+
+  <section id="media-rotator" class="media-rotator-section" style="max-width:920px;margin:1rem auto;padding:0 1rem;">
+    <div id="media-rotator-card" class="media-rotator-card">
+      <div id="media-rotator-type" class="media-rotator-type"></div>
+      <div id="media-rotator-title" class="media-rotator-title"></div>
+      <div id="media-rotator-text" class="media-rotator-text"></div>
+      <div id="media-rotator-media" class="media-rotator-media"></div>
+      <div id="media-rotator-dots" class="media-rotator-dots"></div>
     </div>
   </section>
 
