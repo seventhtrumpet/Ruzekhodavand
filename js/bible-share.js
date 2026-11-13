@@ -1,4 +1,4 @@
-/* Picture (profile + verse) + separate tappable website card under it — link not painted on image */
+/* Picture (profile + verse) + separate tappable website under it — link NOT painted on image */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var LOGO_HQ = 'https://iili.io/n8MSJBp.jpg';
@@ -86,8 +86,6 @@
   function buildMessage() {
     var p = versePayload();
     var parts = [];
-    /* URL first = separate tappable website under the picture (not painted on image) */
-    parts.push('https://seventhtrumpet.org');
     if (p.text) parts.push(p.text);
     if (p.ref) parts.push(p.ref);
     parts.push(brandLine());
@@ -159,7 +157,6 @@
 
     getProfileImg(function (profile) {
       var w = 1080;
-      /* Compact: big photo + verse, cut empty bottom — NO website painted on image */
       var sq = 820;
       var topPad = 48;
       var gap = 28;
@@ -234,30 +231,32 @@
       }
 
       if (app === 'wa') {
-        /* Image = photo only. Card under it = caption with real https link (tappable) + verse */
+        /*
+         * Picture = image file only (verse on photo is OK).
+         * Card under picture = real URL in caption (NOT drawn on the image).
+         * Always starts with https://seventhtrumpet.org so it sticks under the photo and opens the site.
+         */
+        var cardText = 'https://seventhtrumpet.org\n\n' + msg.replace(/^https:\/\/seventhtrumpet\.org\n\n/, '');
         if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({
-            files: [file],
-            title: brand,
-            text: msg,
-            url: pageUrl
-          }).catch(function () {
-            navigator.share({ files: [file], title: brand, text: msg }).catch(function () {
-              window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+          navigator.share({ files: [file], title: brand, text: cardText }).catch(function () {
+            navigator.share({ files: [file], title: brand, text: cardText, url: pageUrl }).catch(function () {
+              navigator.share({ title: brand, text: cardText, url: pageUrl }).catch(function () {
+                window.open('https://wa.me/?text=' + encodeURIComponent(cardText), '_blank', 'noopener');
+              });
             });
           });
         } else if (navigator.share) {
-          navigator.share({ title: brand, text: msg, url: pageUrl }).catch(function () {
-            window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+          navigator.share({ title: brand, text: cardText, url: pageUrl }).catch(function () {
+            window.open('https://wa.me/?text=' + encodeURIComponent(cardText), '_blank', 'noopener');
           });
         } else {
-          window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+          window.open('https://wa.me/?text=' + encodeURIComponent(cardText), '_blank', 'noopener');
         }
         return;
       }
       if (app === 'tg') {
         if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand, text: msg }).catch(function () {
+          navigator.share({ files: [file], title: brand, text: 'https://seventhtrumpet.org\n\n' + msg }).catch(function () {
             window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
           });
         } else {
@@ -270,14 +269,14 @@
         return;
       }
       if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: brand, text: msg }).catch(function () {
-          try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
+        navigator.share({ files: [file], title: brand, text: 'https://seventhtrumpet.org\n\n' + msg }).catch(function () {
+          try { if (navigator.clipboard) navigator.clipboard.writeText('https://seventhtrumpet.org\n\n' + msg); } catch (e) {}
           if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
           else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
           else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
         });
       } else {
-        try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
+        try { if (navigator.clipboard) navigator.clipboard.writeText('https://seventhtrumpet.org\n\n' + msg); } catch (e) {}
         if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
         else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
         else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
