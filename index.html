@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a2540">
+  <meta name="robots" content="index, follow">
+  <link rel="icon" type="image/jpeg" href="https://iili.io/n8M8tYF.jpg">
+  <link rel="apple-touch-icon" href="https://iili.io/n8M8tYF.jpg">
+  <meta property="og:title" content="Seventh Trumpet | شیپور هفتم">
+  <meta property="og:description" content="Seventh Trumpet | شیپور هفتم — The everlasting gospel · انجیل جاودانی — Revelation 14">
+  <meta property="og:image" content="https://iili.io/n8MSJBp.jpg">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:url" content="https://seventhtrumpet.org/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://iili.io/n8MSJBp.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/menu.css">
+  <link rel="stylesheet" href="css/media_rotator.css">
+  <link rel="stylesheet" href="css/polish.css">
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
+  <title>خانه | شیپور هفتم</title>
+  <meta name="description" content="Home — Seventh Trumpet — Three angels message, Revelation 14">
+  <script>
+    (function () {
+      try {
+        var L = localStorage.getItem('cog_lang');
+        if (L !== 'en' && L !== 'fa') { localStorage.setItem('cog_lang', 'fa'); L = 'fa'; }
+        document.documentElement.lang = L;
+        document.documentElement.dir = L === 'fa' ? 'rtl' : 'ltr';
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    .mission-section { max-width: 720px; margin: 0.5rem auto 2rem; padding: 0 1rem; }
+    .mission-card {
+      background: var(--bg-card, #fff); border: 1px solid var(--border, #e0dcd3);
+      border-radius: 16px; padding: 1.6rem 1.4rem 1.5rem;
+      box-shadow: var(--shadow, 0 4px 20px rgba(10,37,64,.08)); line-height: 1.8;
+    }
+    body.dark .mission-card { background: var(--bg-card); border-color: var(--border); }
+  </style>
+</head>
+<body data-page="home">
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span data-i18n="siteName">شیپور هفتم</span></a>
+      <nav class="nav nav-main">
+        <a href="index.html" class="active" data-i18n="home" data-nav="home">خانه</a>
+        <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
+        <a href="bible.html" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
+        <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
+        <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <h1 data-i18n="heroTitle">شیپور هفتم</h1>
+      <p class="hero-sub" data-i18n="heroSub">پیام جاودانی انجیل برای تمام قوم‌ها، زبان‌ها و ملت‌ها</p>
+      <div class="hero-actions">
+        <a href="bible.html" class="btn btn-primary" data-i18n="bibleNav">کتاب مقدس</a>
+        <a href="media.html" class="btn btn-secondary" data-i18n="media">رسانه‌ها</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="angels-section">
+    <div class="angels-heading">
+      <h2 class="angels-heading-title" data-i18n="threeAngels">پیام سه فرشته</h2>
+      <p class="angels-heading-hint" data-i18n="threeAngelsHint">مکاشفه ۱۴:۶–۱۲</p>
+    </div>
+    <div class="angels-row">
+      <a class="angel-card" href="angel.html?n=1">
+        <div class="angel-num">1</div>
+        <div class="angel-title" data-i18n="angel1">فرشته اول</div>
+        <div class="angel-text" data-i18n="angel1Short">ساعت داوری</div>
+        <div class="angel-cta" data-i18n="angelOpen">باز کردن</div>
+      </a>
+      <a class="angel-card" href="angel.html?n=2">
+        <div class="angel-num">2</div>
+        <div class="angel-title" data-i18n="angel2">فرشته دوم</div>
+        <div class="angel-text" data-i18n="angel2Short">بابل سقوط کرد</div>
+        <div class="angel-cta" data-i18n="angelOpen">باز کردن</div>
+      </a>
+      <a class="angel-card" href="angel.html?n=3">
+        <div class="angel-num">3</div>
+        <div class="angel-title" data-i18n="angel3">فرشته سوم</div>
+        <div class="angel-text" data-i18n="angel3Short">هشدار وحش</div>
+        <div class="angel-cta" data-i18n="angelOpen">باز کردن</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="daily-verse" id="daily-verse">
+    <div class="daily-verse-inner">
+      <div class="daily-verse-label" data-i18n="verseOfDay">خوراک روزانه</div>
+      <blockquote id="verse-text" class="daily-verse-text"></blockquote>
+      <cite id="verse-ref" class="daily-verse-ref"></cite>
+      <div class="daily-verse-actions">
+        <button type="button" id="verse-refresh" class="verse-refresh" data-i18n="newVerse">خوراک دیگر</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="mission-section">
+    <div class="mission-card">
+      <h2 data-i18n="missionTitle">ماموریت ما</h2>
+      <p data-i18n="missionBody">اعلام انجیل جاودانی و پیام سه فرشته مکاشفه ۱۴ به همه قوم‌ها.</p>
+    </div>
+  </section>
+
+  <main class="container" style="padding-bottom:2.5rem;">
+    <section id="home-contact" class="home-contact">
+      <h2 class="section-title" style="font-size:1.2rem;justify-content:center;" data-i18n="homeContactTitle">تماس با ما</h2>
+      <div class="contact-card" style="margin:0 auto;">
+        <div class="contact-item"><span>📱</span><div><div data-i18n="whatsapp">واتساپ</div><a href="https://wa.me/442081333076" target="_blank" rel="noopener" dir="ltr" class="num-ltr">+44 208 133 3076</a></div></div>
+        <div class="contact-item"><span>📞</span><div><div data-i18n="phone">تلفن</div><a href="tel:+37433222450" dir="ltr" class="num-ltr">+374 33 222 450</a></div></div>
+        <div class="contact-item"><span>✉️</span><div><div data-i18n="email">ایمیل</div><a href="mailto:info.seventhtrumpet@gmail.com">info.seventhtrumpet@gmail.com</a><br><a href="mailto:seventh.trumpet@yahoo.com">seventh.trumpet@yahoo.com</a></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand" data-i18n="siteName">شیپور هفتم</div>
+      <div class="footer-tag" data-i18n="footerSub">شیپور هفتم · مکاشفه ۱۴:۶–۱۲</div>
+      <div id="footer-social"></div>
+      <div class="footer-links">
+        <a href="privacy.html" data-i18n="privacyNav">حریم خصوصی</a>
+        <a href="terms.html" data-i18n="termsNav">شرایط</a>
+        <a href="contact.html" data-i18n="contact">تماس</a>
+      </div>
+    </div>
+  </footer>
+
+  <button type="button" id="scroll-top" class="scroll-top" aria-label="Top">↑</button>
+
+  <script src="js/visits.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/app_core.js"></script>
+  <script src="js/i18n_extra.js"></script>
+  <script src="js/about_i18n.js"></script>
+  <script src="js/legal_i18n.js"></script>
+  <script src="js/cloud_sync.js"></script>
+  <script src="js/media_rotator.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/footer_legal.js"></script>
+  <script src="js/enhancements.js"></script>
+  <script src="js/auth_ui.js"></script>
+  <script src="js/bugfixes.js"></script>
+  <script src="js/subscribe.js"></script>
+  <script src="js/social.js"></script>
+  <script src="js/hero_bg.js"></script>
+  <script src="js/start_here.js"></script>
+  <script src="js/text_size.js"></script>
+  <script src="js/lang_fix.js"></script>
+  <script src="js/bible-share.js"></script>
+  <script src="js/home_polish.js"></script>
+</body>
+</html>
