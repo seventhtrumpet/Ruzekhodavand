@@ -1,7 +1,6 @@
-/* Profile picture + real link CARD under it (not caption, not painted on the image) */
+/* Bible.com style: profile picture + connected tappable link card under it (not caption, not part of the image) */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
-  var LOGO_HQ = 'https://iili.io/n8MSJBp.jpg';
   var SOCIAL = {
     instagram: 'https://www.instagram.com/seventhtrumpet.media',
     facebook: 'https://www.facebook.com/sharer/sharer.php?u=',
@@ -16,8 +15,46 @@
     } catch (e) { return false; }
   }
 
+  function getParams() {
+    try {
+      var p = new URLSearchParams(location.search);
+      var b = p.get('b') || p.get('book');
+      var c = p.get('c') || p.get('chapter');
+      var v = p.get('v') || p.get('verse');
+      if (b && c) {
+        var verse = 1;
+        if (v) {
+          var m = String(v).match(/^(\d+)/);
+          if (m) verse = Number(m[1]);
+        }
+        return { bookId: Number(b), chapter: Number(c), verse: verse };
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function applyDeepLink() {
+    var params = getParams();
+    if (!params) return;
+    try { localStorage.setItem('cog_bible_state', JSON.stringify(params)); } catch (e) {}
+    var tries = 0;
+    function tryScroll() {
+      tries++;
+      var el = document.getElementById('v-' + params.chapter + '-' + params.verse);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('highlight');
+        setTimeout(function () { el.classList.remove('highlight'); }, 2500);
+        return;
+      }
+      if (tries < 40) setTimeout(tryScroll, 250);
+    }
+    setTimeout(tryScroll, 700);
+  }
+
   function versePayload() {
-    var text = '', ref = '';
+    var text = '';
+    var ref = '';
     try {
       var vt = document.getElementById('verse-text');
       if (vt) text = (vt.textContent || '').trim();
@@ -45,177 +82,68 @@
     return 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
   }
 
-  function shareTitle() {
+  function buildMessage() {
     var p = versePayload();
-    if (p.ref) return p.ref + ' — ' + brandLine();
-    return brandLine();
-  }
-
-  function cardWords() {
-    var p = versePayload();
-    var lines = [];
-    if (p.text) lines.push(p.text);
-    if (p.ref) lines.push(p.ref);
-    lines.push(brandLine());
-    return lines.join('\n\n');
-  }
-
-  function getProfileImg(cb) {
-    var sources = [LOGO_HQ, 'https://iili.io/n8M8tYF.jpg'];
-    try {
-      if (window.ST_PROFILE_B64 && window.ST_PROFILE_B64.length > 100) {
-        sources.unshift('data:image/jpeg;base64,' + window.ST_PROFILE_B64);
-      }
-    } catch (e) {}
-    try {
-      if (window.ST_PE1 && window.ST_PE2 && window.ST_PE1.length > 100) {
-        sources.unshift('data:image/jpeg;base64,' + window.ST_PE1 + window.ST_PE2);
-      }
-    } catch (e2) {}
-    var i = 0;
-    function tryNext() {
-      if (i >= sources.length) { cb(null); return; }
-      var src = sources[i++];
-      var img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = function () { cb(img); };
-      img.onerror = function () { tryNext(); };
-      img.src = src;
-    }
-    tryNext();
-  }
-
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-  }
-
-  function makeProfileImage(done) {
-    getProfileImg(function (profile) {
-      var w = 1080, sq = 920, pad = 50, footer = 80;
-      var h = pad + sq + footer;
-      var canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      var ctx = canvas.getContext('2d');
-      ctx.imageSmoothingEnabled = true;
-      try { ctx.imageSmoothingQuality = 'high'; } catch (e) {}
-
-      ctx.fillStyle = '#061828';
-      ctx.fillRect(0, 0, w, h);
-
-      var sqX = (w - sq) / 2, sqY = pad;
-      if (profile) {
-        ctx.save();
-        roundRect(ctx, sqX, sqY, sq, sq, 40);
-        ctx.clip();
-        var scale = Math.max(sq / profile.width, sq / profile.height);
-        var dw = profile.width * scale, dh = profile.height * scale;
-        ctx.drawImage(profile, sqX + (sq - dw) / 2, sqY + (sq - dh) / 2, dw, dh);
-        ctx.restore();
-        ctx.strokeStyle = '#c9a227';
-        ctx.lineWidth = 10;
-        roundRect(ctx, sqX, sqY, sq, sq, 40);
-        ctx.stroke();
-      }
-
-      ctx.fillStyle = '#c9a227';
-      ctx.font = '700 32px Inter, Vazirmatn, system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(brandLine(), w / 2, sqY + sq + 48);
-
-      canvas.toBlob(function (blob) { done(blob); }, 'image/png');
-    });
+    var parts = [];
+    if (p.text) parts.push(p.text);
+    if (p.ref) parts.push(p.ref);
+    parts.push(brandLine());
+    parts.push(SITE + '/');
+    return parts.join('\n\n');
   }
 
   function doShare(app) {
-    var title = shareTitle();
-    var words = cardWords();
-    var pageUrl = SITE;
+    var msg = buildMessage();
+    var pageUrl = SITE + '/';
+    var brand = brandLine();
 
-    makeProfileImage(function (blob) {
-      var file = null;
-      if (blob) {
-        try { file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' }); } catch (e) {}
-      }
+    if (app === 'wa') {
+      /*
+       * Bible.com style (same as last night working version):
+       * Share the real website URL — not an image file, not a caption under a photo.
+       * WhatsApp builds: profile picture (from website OG image) + white CARD under it.
+       * The card has the link and is tappable. Connected under the picture, not part of it.
+       */
+      var p = versePayload();
+      var cardTitle = (p.ref ? (p.ref + ' — ') : '') + brand;
+      var cardText = '';
+      if (p.text) cardText += p.text + '\n\n';
+      if (p.ref) cardText += p.ref + '\n\n';
+      cardText += brand;
 
-      if (app === 'wa') {
-        function shareLinkCard() {
-          return navigator.share({ title: title, text: words, url: pageUrl });
-        }
-        function sharePictureAndCard() {
-          return navigator.share({ files: [file], title: title, text: words, url: pageUrl });
-        }
-
-        if (file && navigator.canShare) {
-          var both = { files: [file], title: title, text: words, url: pageUrl };
-          if (navigator.canShare(both)) {
-            sharePictureAndCard().catch(function () {
-              shareLinkCard().catch(function () {
-                window.open('https://wa.me/?text=' + encodeURIComponent(words + '\n\n' + pageUrl), '_blank', 'noopener');
-              });
-            });
-            return;
-          }
-          if (navigator.canShare({ files: [file] })) {
-            navigator.share({ files: [file], title: title, text: words }).catch(function () {
-              shareLinkCard().catch(function () {
-                window.open('https://wa.me/?text=' + encodeURIComponent(words + '\n\n' + pageUrl), '_blank', 'noopener');
-              });
-            });
-            return;
-          }
-        }
-
-        if (navigator.share) {
-          shareLinkCard().catch(function () {
-            window.open('https://wa.me/?text=' + encodeURIComponent(words + '\n\n' + pageUrl), '_blank', 'noopener');
-          });
-        } else {
-          window.open('https://wa.me/?text=' + encodeURIComponent(words + '\n\n' + pageUrl), '_blank', 'noopener');
-        }
-        return;
-      }
-
-      if (app === 'tg') {
-        if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: title, text: words, url: pageUrl }).catch(function () {
-            window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(words), '_blank', 'noopener');
-          });
-        } else {
-          window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(words), '_blank', 'noopener');
-        }
-        return;
-      }
-
-      if (app === 'fb') {
-        window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
-        return;
-      }
-
-      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: title, text: words, url: pageUrl }).catch(function () {
-          try { if (navigator.clipboard) navigator.clipboard.writeText(words + '\n\n' + pageUrl); } catch (e) {}
-          if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
-          else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
-          else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
-        });
-      } else if (navigator.share) {
-        navigator.share({ title: title, text: words, url: pageUrl }).catch(function () {
-          try { if (navigator.clipboard) navigator.clipboard.writeText(words + '\n\n' + pageUrl); } catch (e) {}
+      if (navigator.share) {
+        navigator.share({
+          title: cardTitle,
+          text: cardText,
+          url: pageUrl
+        }).catch(function () {
+          window.open('https://wa.me/?text=' + encodeURIComponent(cardText + '\n\n' + pageUrl), '_blank', 'noopener');
         });
       } else {
-        try { if (navigator.clipboard) navigator.clipboard.writeText(words + '\n\n' + pageUrl); } catch (e) {}
-        if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
-        else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
-        else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
+        window.open('https://wa.me/?text=' + encodeURIComponent(cardText + '\n\n' + pageUrl), '_blank', 'noopener');
       }
-    });
+      return;
+    }
+
+    if (app === 'tg') {
+      window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+      return;
+    }
+
+    if (app === 'fb') {
+      window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
+      return;
+    }
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(msg);
+      }
+    } catch (e) {}
+
+    if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
+    else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
+    else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
   }
 
   function ensureCss() {
@@ -317,8 +245,8 @@
 
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._stShareImg) return;
-    btn._stShareImg = true;
+    if (!btn || btn._stShareBound) return;
+    btn._stShareBound = true;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -328,47 +256,10 @@
 
   function bindVerseTap() {
     var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._stShareImg) return;
-    textEl._stShareImg = true;
+    if (!textEl || textEl._stShareBound) return;
+    textEl._stShareBound = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
-  }
-
-  function getParams() {
-    try {
-      var p = new URLSearchParams(location.search);
-      var b = p.get('b') || p.get('book');
-      var c = p.get('c') || p.get('chapter');
-      var v = p.get('v') || p.get('verse');
-      if (b && c) {
-        var verse = 1;
-        if (v) {
-          var m = String(v).match(/^(\d+)/);
-          if (m) verse = Number(m[1]);
-        }
-        return { bookId: Number(b), chapter: Number(c), verse: verse };
-      }
-    } catch (e) {}
-    return null;
-  }
-
-  function applyDeepLink() {
-    var params = getParams();
-    if (!params) return;
-    try { localStorage.setItem('cog_bible_state', JSON.stringify(params)); } catch (e) {}
-    var tries = 0;
-    function tryScroll() {
-      tries++;
-      var el = document.getElementById('v-' + params.chapter + '-' + params.verse);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('highlight');
-        setTimeout(function () { el.classList.remove('highlight'); }, 2500);
-        return;
-      }
-      if (tries < 40) setTimeout(tryScroll, 250);
-    }
-    setTimeout(tryScroll, 700);
   }
 
   function boot() {
