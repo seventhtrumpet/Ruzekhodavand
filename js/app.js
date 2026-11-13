@@ -26,37 +26,31 @@ const BIBLE_BOOKS = {
 const T = {
   fa: {
     pageTitle: 'شیپور هفتم — پیام سه فرشته', siteName: 'شیپور هفتم', tagline: 'پیام سه فرشته — مکاشفه ۱۴',
-    home: 'خانه', media: 'رسانه‌ها', live: 'پخش زنده', contact: 'تماس', admin: 'مدیریت', langBtn: 'English',
+    home: 'خانه', media: 'رسانه‌ها', live: 'پخش زنده', contact: 'تماس', admin: 'مدیریت',
+    missionBody: 'اعلام انجیل جاودانی و پیام سه فرشته مکاشفه ۱۴ به همه قوم‌ها.',
+    langBtn: 'English',
     heroTitle: 'شیپور هفتم', heroSub: 'پیام جاودانی انجیل برای تمام قوم‌ها، زبان‌ها و ملت‌ها',
+    threeAngels: 'پیام سه فرشته', threeAngelsHint: 'مکاشفه ۱۴:۶–۱۲',
     angel1: 'فرشته اول', angel1Text: 'از خدا بترسید و او را جلال دهید، زیرا ساعت داوری او رسیده است',
-    angel2: 'فرشته دوم', angel2Text: 'بابل سقوط کرده است! سقوط کرده است!',
-    angel3: 'فرشته سوم', angel3Text: 'اگر کسی وحش و تصویرش را بپرستد...',
-    all: 'همه', photo: 'عکس', video: 'ویدیو', file: 'فایل', text: 'متن', audio: 'صوت', search: 'جستجو...',
-    download: 'دانلود', view: 'مشاهده', comments: 'نظرات', noPosts: 'هنوز محتوایی منتشر نشده است.',
-    writeComment: 'نظر خود را بنویسید...', yourName: 'نام شما', send: 'ارسال',
-    liveNow: 'در حال پخش زنده', liveBadge: 'زنده', contactTitle: 'تماس با ما',
-    questionsTitle: 'پرسش و پاسخ', questionsIntro: 'سوال خود را بنویسید. پاسخ از طریق ایمیل برای شما ارسال می‌شود.', questionsNav: 'سوالات',
-    qName: 'نام شما', qEmail: 'ایمیل شما (برای پاسخ)', qQuestion: 'سوال شما', qSend: 'ارسال سوال', qThanks: 'سوال شما ارسال شد. متشکریم!',
+    angel2: 'فرشته دوم', angel2Text: 'بابل بزرگ سقوط کرده است',
+    angel3: 'فرشته سوم', angel3Text: 'اگر کسی وحش و تصویر او را پرستش کند',
     whatsapp: 'واتساپ', phone: 'تلفن', email: 'ایمیل',
     footer: 'شیپور هفتم — پیام سه فرشته مکاشفه ۱۴', close: 'بستن', untitled: 'بدون عنوان',
     guestText: 'مهمان', signOut: 'خروج', welcome: 'خوش آمدید',
     signInGoogle: 'ورود با گوگل', signInEmail: 'ورود با ایمیل',
     emailLoginTitle: 'ورود با ایمیل', emailLabel: 'ایمیل', passwordLabel: 'رمز عبور',
-    loginBtn: 'ورود', registerBtn: 'ثبت‌نام', resumeHint: 'ویدیو از جایی که قبلاً متوقف کردید ادامه پیدا می‌کند'
+    loginBtn: 'ورود', registerBtn: 'ثبت‌نام', resumeHint: 'ویدیو از جایی که رها کردید ادامه می‌یابد'
   },
   en: {
     pageTitle: 'Seventh Trumpet — Three Angels Message', siteName: 'Seventh Trumpet', tagline: 'Three Angels Message — Revelation 14',
-    home: 'Home', media: 'Media', live: 'Live', contact: 'Contact', admin: 'Admin', langBtn: 'Persian',
-    heroTitle: 'Seventh Trumpet', heroSub: 'The everlasting gospel to every nation, tribe, language and people',
+    home: 'Home', media: 'Media', live: 'Live', contact: 'Contact', admin: 'Admin',
+    missionBody: 'Proclaim the everlasting gospel and the three angels messages of Revelation 14 to all nations.',
+    langBtn: 'فارسی',
+    heroTitle: 'Seventh Trumpet', heroSub: 'The everlasting gospel for every nation, tribe, language and people',
+    threeAngels: 'Three Angels Message', threeAngelsHint: 'Revelation 14:6–12',
     angel1: 'First Angel', angel1Text: 'Fear God and give Him glory, for the hour of His judgment has come',
-    angel2: 'Second Angel', angel2Text: 'Babylon is fallen, is fallen!',
-    angel3: 'Third Angel', angel3Text: 'If anyone worships the beast and his image...',
-    all: 'All', photo: 'Photo', video: 'Video', file: 'File', text: 'Text', audio: 'Audio', search: 'Search...',
-    download: 'Download', view: 'View', comments: 'Comments', noPosts: 'No content has been published yet.',
-    writeComment: 'Write your comment...', yourName: 'Your name', send: 'Send',
-    liveNow: 'LIVE NOW', liveBadge: 'LIVE', contactTitle: 'Contact Us',
-    questionsTitle: 'Ask a Question', questionsIntro: 'Write your question. We will reply by email.', questionsNav: 'Questions',
-    qName: 'Your name', qEmail: 'Your email (for reply)', qQuestion: 'Your question', qSend: 'Send question', qThanks: 'Your question was sent. Thank you!',
+    angel2: 'Second Angel', angel2Text: 'Babylon the great is fallen',
+    angel3: 'Third Angel', angel3Text: 'If anyone worships the beast and his image',
     whatsapp: 'WhatsApp', phone: 'Phone', email: 'Email',
     footer: 'Seventh Trumpet — Three Angels Message of Revelation 14', close: 'Close', untitled: 'Untitled',
     guestText: 'Guest', signOut: 'Sign out', welcome: 'Welcome',
@@ -105,3 +99,18 @@ function toggleLanguage() {
   try { if (typeof renderMedia === 'function') renderMedia(); } catch (e) {}
   try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  try { if (typeof loadData === 'function') loadData(); } catch (e) {}
+  try { applyLanguage(); } catch (e) { console.warn(e); }
+  try { if (typeof renderAll === 'function') renderAll(); } catch (e) { console.warn(e); }
+  try { if (typeof setupEventListeners === 'function') setupEventListeners(); } catch (e) { console.warn(e); }
+  var lt = document.getElementById('lang-toggle');
+  if (lt && !lt._stLangBound) {
+    lt._stLangBound = true;
+    lt.addEventListener('click', function (e) {
+      e.preventDefault();
+      toggleLanguage();
+    });
+  }
+});
