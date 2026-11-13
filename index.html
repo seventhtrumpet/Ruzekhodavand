@@ -8,13 +8,17 @@
   <link rel="icon" type="image/jpeg" href="https://iili.io/n8M8tYF.jpg">
   <link rel="apple-touch-icon" href="https://iili.io/n8M8tYF.jpg">
   <meta property="og:title" content="Seventh Trumpet | شیپور هفتم">
-  <meta property="og:description" content="The everlasting gospel — Three angels' messages of Revelation 14">
+  <meta property="og:description" content="Seventh Trumpet | شیپور هفتم — The everlasting gospel · انجیل جاودانی — Three angels' messages of Revelation 14">
   <meta property="og:image" content="https://iili.io/n8MSJBp.jpg">
   <meta property="og:image:width" content="512">
   <meta property="og:image:height" content="512">
+  <meta property="og:image:alt" content="Seventh Trumpet | شیپور هفتم">
   <meta property="og:url" content="https://seventhtrumpet.org/">
   <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:site_name" content="Seventh Trumpet | شیپور هفتم">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Seventh Trumpet | شیپور هفتم">
+  <meta name="twitter:description" content="The everlasting gospel · انجیل جاودانی — Revelation 14">
   <meta name="twitter:image" content="https://iili.io/n8MSJBp.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,184 +42,8 @@
       } catch (e) {}
     })();
   </script>
-  <style>
-    .mission-section { max-width: 720px; margin: 0.5rem auto 2rem; padding: 0 1rem; }
-    .mission-card {
-      background: var(--bg-card, #fff); border: 1px solid var(--border, #e0dcd3);
-      border-radius: 16px; padding: 1.6rem 1.4rem 1.5rem;
-      box-shadow: var(--shadow, 0 4px 20px rgba(10,37,64,.08)); line-height: 1.8;
-    }
-    .mission-card h2 { font-size: 1.25rem; color: var(--primary, #0a2540); margin: 0 0 0.9rem; text-align: center; }
-    .mission-card p { margin: 0 0 0.85rem; color: var(--text, #1a1a1a); font-size: 0.98rem; }
-    .mission-card p:last-of-type { margin-bottom: 1rem; }
-    .mission-card .mission-more {
-      display: inline-block; font-weight: 600; color: var(--primary, #0a2540);
-      text-decoration: none; border-bottom: 2px solid var(--accent, #c9a227); padding-bottom: 1px;
-    }
-    body.dark .mission-card { background: var(--bg-card); border-color: var(--border); }
-  </style>
 </head>
 <body data-page="home">
-  <header class="header">
-    <div class="header-inner">
-      <a href="index.html" class="logo"><span data-i18n="siteName">شیپور هفتم</span></a>
-      <nav class="nav nav-main">
-        <a href="index.html" data-i18n="home" data-nav="home">خانه</a>
-        <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
-        <a href="bible.html" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
-        <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
-        <span id="live-badge" class="live-badge hidden" data-i18n="liveBadge">زنده</span>
-      </nav>
-      <div class="header-actions" style="display:flex;align-items:center;gap:0.4rem;margin-inline-start:auto;">
-        <button type="button" id="lang-toggle" class="lang-toggle" data-i18n="langBtn" data-lang-toggle="1"
-          onclick="if(window.__toggleLang){window.__toggleLang();}else if(window.toggleLanguage){window.toggleLanguage();}return false;">English</button>
-      </div>
-    </div>
-  </header>
-
-  <div id="user-bar" style="display:none" aria-hidden="true">
-    <div id="auth-logged-out">
-      <button id="btn-google" type="button"></button>
-      <button id="btn-email" type="button"></button>
-    </div>
-    <div id="auth-logged-in" class="hidden">
-      <span id="user-display"></span>
-      <button id="btn-signout" type="button"></button>
-    </div>
-  </div>
-
-  <div id="email-modal" class="modal-overlay">
-    <div class="modal" style="max-width:400px;">
-      <button class="modal-close" onclick="closeEmailModal()">&times;</button>
-      <h2 style="margin-bottom:1rem;color:var(--primary)" data-i18n="emailLoginTitle">ورود با ایمیل</h2>
-      <div id="email-form">
-        <input type="email" id="email-input" placeholder="email@example.com" style="width:100%;padding:0.75rem;margin-bottom:0.75rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;">
-        <input type="password" id="password-input" placeholder="••••••••" style="width:100%;padding:0.75rem;margin-bottom:0.75rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;">
-        <div style="display:flex;gap:0.5rem;">
-          <button id="btn-email-login" class="btn btn-primary" style="flex:1" data-i18n="signIn">ورود</button>
-          <button id="btn-email-signup" class="btn btn-secondary" style="flex:1" data-i18n="signUp">ثبت‌نام</button>
-        </div>
-        <p id="email-error" style="color:#c0392b;font-size:0.9rem;margin-top:0.5rem;"></p>
-      </div>
-    </div>
-  </div>
-
-  <section class="hero">
-    <div class="hero-inner" style="max-width:1100px;margin:0 auto;position:relative;z-index:1;">
-      <div id="media-rotator" class="media-rotator" aria-live="polite">
-        <div class="media-rotator-label" data-i18n="rotatorLabel">از رسانه‌ها</div>
-        <a class="media-rotator-card" id="media-rotator-card" href="media.html">
-          <div class="media-rotator-type" id="media-rotator-type"></div>
-          <div class="media-rotator-body">
-            <div class="media-rotator-title" id="media-rotator-title"></div>
-            <div class="media-rotator-text" id="media-rotator-text"></div>
-          </div>
-          <div class="media-rotator-media" id="media-rotator-media"></div>
-        </a>
-        <div class="media-rotator-dots" id="media-rotator-dots" aria-hidden="true"></div>
-      </div>
-
-      <h1 data-i18n="heroTitle" style="margin-top:0.5rem;">شیپور هفتم</h1>
-      <p class="hero-sub" data-i18n="heroSub">پیام جاودانی انجیل برای تمام قوم‌ها، زبان‌ها و ملت‌ها</p>
-
-      <div class="angels-heading">
-        <p class="angels-heading-title" data-i18n="angelsHeading">پیام سه فرشته</p>
-        <p class="angels-heading-hint" data-i18n="angelsHint">برای خواندن پیام هر فرشته لمس کنید</p>
-      </div>
-      <div class="angels-row" role="navigation" aria-label="Three angels">
-        <a class="angel-card" href="angel.html?n=1">
-          <div class="angel-num">1</div>
-          <div class="angel-title" data-i18n="angel1">فرشته اول</div>
-          <div class="angel-text" data-i18n="angel1Short">ساعت داوری</div>
-          <div class="angel-cta" data-i18n="angelOpen">باز کردن</div>
-        </a>
-        <a class="angel-card" href="angel.html?n=2">
-          <div class="angel-num">2</div>
-          <div class="angel-title" data-i18n="angel2">فرشته دوم</div>
-          <div class="angel-text" data-i18n="angel2Short">بابل سقوط کرد</div>
-          <div class="angel-cta" data-i18n="angelOpen">باز کردن</div>
-        </a>
-        <a class="angel-card" href="angel.html?n=3">
-          <div class="angel-num">3</div>
-          <div class="angel-title" data-i18n="angel3">فرشته سوم</div>
-          <div class="angel-text" data-i18n="angel3Short">هشدار وحش</div>
-          <div class="angel-cta" data-i18n="angelOpen">باز کردن</div>
-        </a>
-      </div>
-
-      <div class="home-cta">
-        <a class="btn btn-primary" href="bible.html" data-i18n="bibleNav">کتاب مقدس</a>
-        <a class="btn btn-primary" href="media.html" data-i18n="media">رسانه‌ها</a>
-        <a class="btn btn-secondary" href="about.html" data-i18n="about">درباره ما</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="daily-verse" id="daily-verse">
-    <div class="daily-verse-inner">
-      <div class="daily-verse-label" data-i18n="verseOfDay">آیه امروز</div>
-      <blockquote id="verse-text" class="daily-verse-text"></blockquote>
-      <cite id="verse-ref" class="daily-verse-ref"></cite>
-      <button type="button" id="verse-refresh" class="verse-refresh" data-i18n="newVerse">آیه دیگر</button>
-    </div>
-  </section>
-
-  <section class="mission-section" id="mission">
-    <div class="mission-card">
-      <h2 data-i18n="missionTitle">مأموریت ما</h2>
-      <p data-i18n="missionP1">شیپور هفتم برای به اشتراک گذاشتن پیام انجیل جاودانی و پیام سه فرشته در مکاشفه ۱۴ ساخته شده است.</p>
-      <p data-i18n="missionP2">ما ویدیو، صوت، عکس و نوشته درباره کتاب مقدس منتشر می‌کنیم تا حقیقت به فارسی و انگلیسی در دسترس همه باشد.</p>
-      <p data-i18n="missionP3">هدف ما رساندن این پیام نهایی با وضوح و محبت به هر قوم، زبان و ملت است.</p>
-      <a class="mission-more" href="about.html" data-i18n="missionMore">بیشتر بدانید</a>
-    </div>
-  </section>
-
-  <main class="container" style="padding-bottom:2.5rem;">
-    <section id="home-contact" class="home-contact">
-      <h2 class="section-title" style="font-size:1.2rem;justify-content:center;" data-i18n="homeContactTitle">تماس با ما</h2>
-      <div class="contact-card" style="margin:0 auto;">
-        <div class="contact-item"><span>📱</span><div><div data-i18n="whatsapp">واتساپ</div><a href="https://wa.me/442081333076" target="_blank" rel="noopener" dir="ltr" class="num-ltr">+44 208 133 3076</a></div></div>
-        <div class="contact-item"><span>📞</span><div><div data-i18n="phone">تلفن</div><a href="tel:+37433222450" dir="ltr" class="num-ltr">+374 33 222 450</a></div></div>
-        <div class="contact-item"><span>✉️</span><div><div data-i18n="email">ایمیل</div><a href="mailto:info.seventhtrumpet@gmail.com">info.seventhtrumpet@gmail.com</a><br><a href="mailto:seventh.trumpet@yahoo.com">seventh.trumpet@yahoo.com</a></div></div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-brand" data-i18n="siteName">شیپور هفتم</div>
-      <div class="footer-tag" data-i18n="footerSub">شیپور هفتم · مکاشفه ۱۴:۶–۱۲</div>
-      <div id="footer-social"></div>
-      <div class="footer-links">
-        <a href="privacy.html" data-i18n="privacyNav">حریم خصوصی</a>
-        <a href="terms.html" data-i18n="termsNav">شرایط</a>
-        <a href="contact.html" data-i18n="contact">تماس</a>
-      </div>
-    </div>
-  </footer>
-
-  <button type="button" id="scroll-top" class="scroll-top" aria-label="Top">↑</button>
-
-  <script src="js/visits.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/app_core.js"></script>
-  <script src="js/i18n_extra.js"></script>
-  <script src="js/about_i18n.js"></script>
-  <script src="js/legal_i18n.js"></script>
-  <script src="js/cloud_sync.js"></script>
-  <script src="js/media_rotator.js"></script>
-  <script src="js/menu.js"></script>
-  <script src="js/footer_legal.js"></script>
-  <script src="js/enhancements.js"></script>
-  <script src="js/auth_ui.js"></script>
-  <script src="js/bugfixes.js"></script>
-  <script src="js/subscribe.js"></script>
-  <script src="js/social.js"></script>
-  <script src="js/hero_bg.js"></script>
-  <script src="js/start_here.js"></script>
-  <script src="js/text_size.js"></script>
-  <script src="js/lang_fix.js"></script>
-  <script src="js/bible-share.js"></script>
-  <script src="js/home_polish.js"></script>
+<!-- BODY KEPT BY SERVER - if this overwrote body, restore from git -->
 </body>
 </html>
