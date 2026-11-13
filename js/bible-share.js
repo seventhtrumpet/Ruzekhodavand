@@ -1,4 +1,4 @@
-/* Profile photo on image; verse + website link in separate card under photo (not part of image) */
+/* Share: (1) profile picture  (2) card under it with verse + website link — link is real, not painted on photo */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var LOGO_HQ = 'https://iili.io/n8MSJBp.jpg';
@@ -16,46 +16,8 @@
     } catch (e) { return false; }
   }
 
-  function getParams() {
-    try {
-      var p = new URLSearchParams(location.search);
-      var b = p.get('b') || p.get('book');
-      var c = p.get('c') || p.get('chapter');
-      var v = p.get('v') || p.get('verse');
-      if (b && c) {
-        var verse = 1;
-        if (v) {
-          var m = String(v).match(/^(\d+)/);
-          if (m) verse = Number(m[1]);
-        }
-        return { bookId: Number(b), chapter: Number(c), verse: verse };
-      }
-    } catch (e) {}
-    return null;
-  }
-
-  function applyDeepLink() {
-    var params = getParams();
-    if (!params) return;
-    try { localStorage.setItem('cog_bible_state', JSON.stringify(params)); } catch (e) {}
-    var tries = 0;
-    function tryScroll() {
-      tries++;
-      var el = document.getElementById('v-' + params.chapter + '-' + params.verse);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('highlight');
-        setTimeout(function () { el.classList.remove('highlight'); }, 2500);
-        return;
-      }
-      if (tries < 40) setTimeout(tryScroll, 250);
-    }
-    setTimeout(tryScroll, 700);
-  }
-
   function versePayload() {
-    var text = '';
-    var ref = '';
+    var text = '', ref = '';
     try {
       var vt = document.getElementById('verse-text');
       if (vt) text = (vt.textContent || '').trim();
@@ -83,14 +45,15 @@
     return 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
   }
 
-  function buildMessage() {
+  /* Card under the picture: verse + website (this is NOT part of the image) */
+  function cardUnderPhoto() {
     var p = versePayload();
-    var parts = [];
-    if (p.text) parts.push(p.text);
-    if (p.ref) parts.push(p.ref);
-    parts.push(brandLine());
-    parts.push('https://seventhtrumpet.org');
-    return parts.join('\n\n');
+    var lines = [];
+    if (p.text) lines.push(p.text);
+    if (p.ref) lines.push(p.ref);
+    lines.push(brandLine());
+    lines.push(SITE);
+    return lines.join('\n\n');
   }
 
   function shareTitle() {
@@ -124,25 +87,6 @@
     tryNext();
   }
 
-  function wrapLines(ctx, text, maxW, maxLines) {
-    var words = String(text || '').split(/\s+/);
-    var lines = [], line = '';
-    for (var j = 0; j < words.length; j++) {
-      var test = line ? line + ' ' + words[j] : words[j];
-      if (ctx.measureText(test).width > maxW && line) {
-        lines.push(line);
-        line = words[j];
-      } else line = test;
-    }
-    if (line) lines.push(line);
-    if (lines.length > maxLines) {
-      lines = lines.slice(0, maxLines);
-      var last = lines[lines.length - 1];
-      if (last.length > 2) lines[lines.length - 1] = last.replace(/\s+\S*$/, '') + '\u2026';
-    }
-    return lines;
-  }
-
   function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -153,15 +97,11 @@
     ctx.closePath();
   }
 
-  function makeCardImage(done) {
-    /* Profile photo only — verse + link are in the card under the photo */
+  /* Only the profile picture — no website link drawn on it */
+  function makeProfileImage(done) {
     getProfileImg(function (profile) {
-      var w = 1080;
-      var sq = 900;
-      var pad = 60;
-      var brandH = 70;
-      var h = pad + sq + brandH + pad;
-
+      var w = 1080, sq = 920, pad = 50, footer = 80;
+      var h = pad + sq + footer;
       var canvas = document.createElement('canvas');
       canvas.width = w;
       canvas.height = h;
@@ -172,26 +112,23 @@
       ctx.fillStyle = '#061828';
       ctx.fillRect(0, 0, w, h);
 
-      var sqX = (w - sq) / 2;
-      var sqY = pad;
-
+      var sqX = (w - sq) / 2, sqY = pad;
       if (profile) {
         ctx.save();
-        roundRect(ctx, sqX, sqY, sq, sq, 36);
+        roundRect(ctx, sqX, sqY, sq, sq, 40);
         ctx.clip();
         var scale = Math.max(sq / profile.width, sq / profile.height);
-        var dw = profile.width * scale;
-        var dh = profile.height * scale;
+        var dw = profile.width * scale, dh = profile.height * scale;
         ctx.drawImage(profile, sqX + (sq - dw) / 2, sqY + (sq - dh) / 2, dw, dh);
         ctx.restore();
         ctx.strokeStyle = '#c9a227';
         ctx.lineWidth = 10;
-        roundRect(ctx, sqX, sqY, sq, sq, 36);
+        roundRect(ctx, sqX, sqY, sq, sq, 40);
         ctx.stroke();
       }
 
       ctx.fillStyle = '#c9a227';
-      ctx.font = '700 34px Inter, Vazirmatn, system-ui, sans-serif';
+      ctx.font = '700 32px Inter, Vazirmatn, system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(brandLine(), w / 2, sqY + sq + 48);
 
@@ -200,69 +137,60 @@
   }
 
   function doShare(app) {
-    var msg = buildMessage();
-    var pageUrl = 'https://seventhtrumpet.org';
-    var brand = shareTitle();
+    var card = cardUnderPhoto();
+    var title = shareTitle();
+    var pageUrl = SITE;
 
-    makeCardImage(function (blob) {
+    makeProfileImage(function (blob) {
       var file = null;
       if (blob) {
         try { file = new File([blob], 'seventh-trumpet.png', { type: 'image/png' }); } catch (e) {}
       }
 
       if (app === 'wa') {
-        /*
-         * 1) Image = profile photo only (not the link).
-         * 2) Card under photo = verse + https://seventhtrumpet.org (tappable, not part of image).
-         */
-        var p = versePayload();
-        var cardLines = [];
-        if (p.text) cardLines.push(p.text);
-        if (p.ref) cardLines.push(p.ref);
-        cardLines.push(brandLine());
-        cardLines.push('https://seventhtrumpet.org');
-        var cardText = cardLines.join('\n\n');
-
         if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand, text: cardText, url: pageUrl }).catch(function () {
-            navigator.share({ files: [file], title: brand, text: cardText }).catch(function () {
-              navigator.share({ title: brand, text: cardText, url: pageUrl }).catch(function () {
-                window.open('https://wa.me/?text=' + encodeURIComponent(cardText), '_blank', 'noopener');
+          navigator.share({ files: [file], title: title, text: card, url: pageUrl }).catch(function () {
+            navigator.share({ files: [file], title: title, text: card }).catch(function () {
+              navigator.share({ title: title, text: card, url: pageUrl }).catch(function () {
+                window.open('https://wa.me/?text=' + encodeURIComponent(card), '_blank', 'noopener');
               });
             });
           });
         } else if (navigator.share) {
-          navigator.share({ title: brand, text: cardText, url: pageUrl }).catch(function () {
-            window.open('https://wa.me/?text=' + encodeURIComponent(cardText), '_blank', 'noopener');
+          navigator.share({ title: title, text: card, url: pageUrl }).catch(function () {
+            window.open('https://wa.me/?text=' + encodeURIComponent(card), '_blank', 'noopener');
           });
         } else {
-          window.open('https://wa.me/?text=' + encodeURIComponent(cardText), '_blank', 'noopener');
+          window.open('https://wa.me/?text=' + encodeURIComponent(card), '_blank', 'noopener');
         }
         return;
       }
+
       if (app === 'tg') {
         if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand, text: msg }).catch(function () {
-            window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+          navigator.share({ files: [file], title: title, text: card }).catch(function () {
+            window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(card), '_blank', 'noopener');
           });
         } else {
-          window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
+          window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(card), '_blank', 'noopener');
         }
         return;
       }
+
       if (app === 'fb') {
         window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
         return;
       }
+
       if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: brand, text: msg }).catch(function () {
-          try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
+        navigator.share({ files: [file], title: title, text: card }).catch(function () {
+          try { if (navigator.clipboard) navigator.clipboard.writeText(card); } catch (e) {}
           if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
           else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
           else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
         });
       } else {
-        try { if (navigator.clipboard) navigator.clipboard.writeText(msg); } catch (e) {}
+        try { if (navigator.clipboard) navigator.clipboard.writeText(card); } catch (e) {}
         if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
         else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
         else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
@@ -384,6 +312,43 @@
     textEl._stShareImg = true;
     textEl.style.cursor = 'pointer';
     textEl.addEventListener('click', openSharePanel);
+  }
+
+  function getParams() {
+    try {
+      var p = new URLSearchParams(location.search);
+      var b = p.get('b') || p.get('book');
+      var c = p.get('c') || p.get('chapter');
+      var v = p.get('v') || p.get('verse');
+      if (b && c) {
+        var verse = 1;
+        if (v) {
+          var m = String(v).match(/^(\d+)/);
+          if (m) verse = Number(m[1]);
+        }
+        return { bookId: Number(b), chapter: Number(c), verse: verse };
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function applyDeepLink() {
+    var params = getParams();
+    if (!params) return;
+    try { localStorage.setItem('cog_bible_state', JSON.stringify(params)); } catch (e) {}
+    var tries = 0;
+    function tryScroll() {
+      tries++;
+      var el = document.getElementById('v-' + params.chapter + '-' + params.verse);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('highlight');
+        setTimeout(function () { el.classList.remove('highlight'); }, 2500);
+        return;
+      }
+      if (tries < 40) setTimeout(tryScroll, 250);
+    }
+    setTimeout(tryScroll, 700);
   }
 
   function boot() {
