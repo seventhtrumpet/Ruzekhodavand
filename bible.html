@@ -10,7 +10,7 @@
   <meta property="og:image:height" content="512">
   <meta property="og:url" content="https://seventhtrumpet.org/">
   <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://iili.io/n8MSJBp.jpg">
   <title>کتاب مقدس — شیپور هفتم</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,7 +29,7 @@
         <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
         <a href="bible.html" class="active" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
         <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
-        <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
+        <button type="button" id="lang-toggle" class="lang-toggle" data-i18n="langBtn" data-lang-toggle="1" onclick="if(window.__toggleLang){window.__toggleLang();}else if(window.toggleLanguage){window.toggleLanguage();}return false;">English</button>
       </nav>
     </div>
   </header>
@@ -78,7 +78,9 @@
     <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه ۱۴</p>
   </footer>
 
+  <script src="js/lang_fix.js"></script>
   <script src="js/bible.js"></script>
+  <script src="js/bible_search.js"></script>
   <script src="js/bible-share.js"></script>
   <script src="js/menu.js"></script>
 </body>
