@@ -38,9 +38,112 @@
       } catch (e) {}
     })();
   </script>
+  <style>
+    .mission-section { max-width: 720px; margin: 0.5rem auto 2rem; padding: 0 1rem; }
+    .mission-card {
+      background: var(--bg-card, #fff); border: 1px solid var(--border, #e0dcd3);
+      border-radius: 16px; padding: 1.6rem 1.4rem 1.5rem;
+      box-shadow: var(--shadow, 0 4px 20px rgba(10,37,64,.08)); line-height: 1.8;
+    }
+    body.dark .mission-card { background: var(--bg-card); border-color: var(--border); }
+  </style>
 </head>
 <body data-page="home">
-  <script src="js/home_restore.js"></script>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span data-i18n="siteName">شیپور هفتم</span></a>
+      <nav class="nav nav-main">
+        <a href="index.html" class="active" data-i18n="home" data-nav="home">خانه</a>
+        <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
+        <a href="bible.html" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
+        <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
+        <button id="lang-toggle" class="lang-toggle" data-i18n="langBtn">English</button>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <h1 data-i18n="heroTitle">شیپور هفتم</h1>
+      <p class="hero-sub" data-i18n="heroSub">پیام جاودانی انجیل برای تمام قوم‌ها، زبان‌ها و ملت‌ها</p>
+      <div class="hero-actions">
+        <a href="bible.html" class="btn btn-primary" data-i18n="bibleNav">کتاب مقدس</a>
+        <a href="media.html" class="btn btn-secondary" data-i18n="media">رسانه‌ها</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="angels-section">
+    <div class="angels-heading">
+      <h2 class="angels-heading-title" data-i18n="threeAngels">پیام سه فرشته</h2>
+      <p class="angels-heading-hint" data-i18n="threeAngelsHint">مکاشفه ۱۴:۶–۱۲</p>
+    </div>
+    <div class="angels-row">
+      <a class="angel-card" href="angel.html?n=1">
+        <div class="angel-num">1</div>
+        <div class="angel-title" data-i18n="angel1">فرشته اول</div>
+        <div class="angel-text" data-i18n="angel1Short">ساعت داوری</div>
+        <div class="angel-cta" data-i18n="angelOpen">باز کردن</div>
+      </a>
+      <a class="angel-card" href="angel.html?n=2">
+        <div class="angel-num">2</div>
+        <div class="angel-title" data-i18n="angel2">فرشته دوم</div>
+        <div class="angel-text" data-i18n="angel2Short">بابل سقوط کرد</div>
+        <div class="angel-cta" data-i18n="angelOpen">باز کردن</div>
+      </a>
+      <a class="angel-card" href="angel.html?n=3">
+        <div class="angel-num">3</div>
+        <div class="angel-title" data-i18n="angel3">فرشته سوم</div>
+        <div class="angel-text" data-i18n="angel3Short">هشدار وحش</div>
+        <div class="angel-cta" data-i18n="angelOpen">باز کردن</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="daily-verse" id="daily-verse">
+    <div class="daily-verse-inner">
+      <div class="daily-verse-label" data-i18n="verseOfDay">آیه امروز</div>
+      <blockquote id="verse-text" class="daily-verse-text"></blockquote>
+      <cite id="verse-ref" class="daily-verse-ref"></cite>
+      <div class="daily-verse-actions">
+        <button type="button" id="verse-refresh" class="verse-refresh" data-i18n="newVerse">آیه دیگر</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="mission-section">
+    <div class="mission-card">
+      <h2 data-i18n="missionTitle">ماموریت ما</h2>
+      <p data-i18n="missionBody">اعلام انجیل جاودانی و پیام سه فرشته مکاشفه ۱۴ به همه قوم‌ها.</p>
+    </div>
+  </section>
+
+  <main class="container" style="padding-bottom:2.5rem;">
+    <section id="home-contact" class="home-contact">
+      <h2 class="section-title" style="font-size:1.2rem;justify-content:center;" data-i18n="homeContactTitle">تماس با ما</h2>
+      <div class="contact-card" style="margin:0 auto;">
+        <div class="contact-item"><span>📱</span><div><div data-i18n="whatsapp">واتساپ</div><a href="https://wa.me/442081333076" target="_blank" rel="noopener" dir="ltr" class="num-ltr">+44 208 133 3076</a></div></div>
+        <div class="contact-item"><span>📞</span><div><div data-i18n="phone">تلفن</div><a href="tel:+37433222450" dir="ltr" class="num-ltr">+374 33 222 450</a></div></div>
+        <div class="contact-item"><span>✉️</span><div><div data-i18n="email">ایمیل</div><a href="mailto:info.seventhtrumpet@gmail.com">info.seventhtrumpet@gmail.com</a><br><a href="mailto:seventh.trumpet@yahoo.com">seventh.trumpet@yahoo.com</a></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand" data-i18n="siteName">شیپور هفتم</div>
+      <div class="footer-tag" data-i18n="footerSub">شیپور هفتم · مکاشفه ۱۴:۶–۱۲</div>
+      <div id="footer-social"></div>
+      <div class="footer-links">
+        <a href="privacy.html" data-i18n="privacyNav">حریم خصوصی</a>
+        <a href="terms.html" data-i18n="termsNav">شرایط</a>
+        <a href="contact.html" data-i18n="contact">تماس</a>
+      </div>
+    </div>
+  </footer>
+
+  <button type="button" id="scroll-top" class="scroll-top" aria-label="Top">↑</button>
+
   <script src="js/visits.js"></script>
   <script src="js/app.js"></script>
   <script src="js/app_core.js"></script>
