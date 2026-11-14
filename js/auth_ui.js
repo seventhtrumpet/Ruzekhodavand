@@ -1,4 +1,4 @@
-/* Sign-in UI — unique IDs, works on mobile + desktop */
+/* Sign-in UI — compact Login at end of header (does not cover WhatsApp/Facebook) */
 (function () {
   function isFa() {
     try {
@@ -14,7 +14,6 @@
         el.textContent = isFa() ? fa : en;
       });
     }
-    /* Header button uses short EN label so it fits next to flags */
     set('#btn-signin-top, [data-i18n-signin]', '\u0648\u0631\u0648\u062F', 'Login');
     set('#btn-signout-top, [data-i18n-signout]', '\u062E\u0631\u0648\u062C', 'Out');
     set('[data-i18n-signin-title]', '\u0648\u0631\u0648\u062F', 'Sign in');
@@ -43,17 +42,21 @@
     var st = document.createElement('style');
     st.id = 'st-auth-compact-css';
     st.textContent =
-      '#btn-signin-top,#btn-signout-top{padding:0.2rem 0.45rem!important;font-size:0.72rem!important;line-height:1.15!important;font-weight:700!important;border-radius:6px!important;white-space:nowrap!important;flex-shrink:0!important;}' +
-      '#btn-signin-top{background:#c9a227!important;color:#0a2540!important;border:none!important;max-width:5rem!important;}' +
-      '#auth-header-wrap{display:flex!important;align-items:center!important;gap:0.35rem!important;flex-shrink:0!important;}' +
-      '.header-actions{display:flex!important;align-items:center!important;gap:0.35rem!important;flex-shrink:0!important;}' +
-      '@media (max-width:520px){#btn-signin-top{font-size:0.68rem!important;padding:0.18rem 0.38rem!important;max-width:4.2rem!important;}}';
+      '#btn-signin-top,#btn-signout-top{padding:0.18rem 0.4rem!important;font-size:0.68rem!important;line-height:1.1!important;font-weight:700!important;border-radius:6px!important;white-space:nowrap!important;flex-shrink:0!important;}' +
+      '#btn-signin-top{background:#c9a227!important;color:#0a2540!important;border:none!important;max-width:3.6rem!important;}' +
+      '#auth-header-wrap{margin-inline-start:0.25rem!important;order:99!important;display:flex!important;align-items:center!important;gap:0.25rem!important;flex-shrink:0!important;}' +
+      '.header-actions{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:0.25rem!important;margin-inline-start:auto!important;flex-shrink:1!important;min-width:0!important;}' +
+      '.header-social{display:flex!important;flex-wrap:nowrap!important;gap:0.25rem!important;flex-shrink:0!important;}' +
+      '.header-social a{width:1.7rem!important;height:1.7rem!important;}' +
+      '.header-social a svg{width:0.95rem!important;height:0.95rem!important;}' +
+      '#lang-flags-wrap,#lang-flags{flex-shrink:0!important;}' +
+      '#lang-flags-wrap button,#lang-flags button{padding:0.15rem 0.3rem!important;font-size:0.7rem!important;min-width:0!important;}' +
+      '@media (max-width:520px){.header-social a{width:1.55rem!important;height:1.55rem!important;}#btn-signin-top{max-width:3.2rem!important;font-size:0.65rem!important;}}';
     document.head.appendChild(st);
   }
 
   function ensureHeaderAuth() {
     ensureAuthCss();
-    // Hide the old full-width user bar (we use header button instead)
     var bar = document.getElementById('user-bar');
     if (bar) bar.style.display = 'none';
 
@@ -91,23 +94,20 @@
     if (actions && !document.getElementById('btn-signin-top')) {
       var wrap = document.createElement('div');
       wrap.id = 'auth-header-wrap';
-      wrap.style.cssText = 'display:flex;align-items:center;gap:0.5rem;';
+      wrap.style.cssText = 'display:flex;align-items:center;gap:0.35rem;order:99;';
       wrap.innerHTML =
-        '<button type="button" id="btn-signin-top" class="btn btn-primary btn-sm" data-i18n-signin style="background:#c9a227;color:#0a2540;border:none;font-weight:700;padding:0.2rem 0.45rem;font-size:0.72rem;line-height:1.15;border-radius:6px;max-width:4.5rem;white-space:nowrap;">\u0648\u0631\u0648\u062F</button>' +
-        '<div id="auth-header-user" class="hidden" style="display:none;align-items:center;gap:0.5rem;">' +
-        '<span id="user-display-top" style="font-size:0.85rem;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;"></span>' +
-        '<button type="button" id="btn-signout-top" class="btn btn-outline btn-sm" data-i18n-signout style="color:#fff;border-color:rgba(255,255,255,.5);padding:0.2rem 0.45rem;font-size:0.72rem;white-space:nowrap;">\u062E\u0631\u0648\u062C</button></div>';
-      actions.insertBefore(wrap, actions.firstChild);
+        '<button type="button" id="btn-signin-top" class="btn btn-primary btn-sm" data-i18n-signin style="background:#c9a227;color:#0a2540;border:none;font-weight:700;padding:0.18rem 0.4rem;font-size:0.68rem;line-height:1.1;border-radius:6px;max-width:3.6rem;white-space:nowrap;">\u0648\u0631\u0648\u062F</button>' +
+        '<div id="auth-header-user" class="hidden" style="display:none;align-items:center;gap:0.35rem;">' +
+        '<span id="user-display-top" style="font-size:0.75rem;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;"></span>' +
+        '<button type="button" id="btn-signout-top" class="btn btn-outline btn-sm" data-i18n-signout style="color:#fff;border-color:rgba(255,255,255,.5);padding:0.18rem 0.4rem;font-size:0.68rem;white-space:nowrap;">\u062E\u0631\u0648\u062C</button></div>';
+      actions.appendChild(wrap);
     }
     applySignInLabels();
   }
 
   function showSignInError(msg) {
     var el = document.getElementById('signin-error');
-    if (!el) {
-      alert(msg);
-      return;
-    }
+    if (!el) { alert(msg); return; }
     el.style.display = 'block';
     el.textContent = msg;
   }
@@ -119,21 +119,18 @@
     }
     var provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-
     var useRedirect = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
     function fail(err) {
       console.warn('Google sign-in error', err);
       var code = err && err.code ? err.code : '';
       var msg = (err && err.message) || 'Sign-in failed';
       if (code.indexOf('unauthorized-domain') >= 0) {
         msg = isFa()
-          ? '\u062F\u0627\u0645\u0646\u0647 \u0633\u0627\u06CC\u062A \u062F\u0631 Firebase \u062B\u0628\u062A \u0646\u0634\u062F\u0647. \u062F\u0631 Firebase Console \u2192 Authentication \u2192 Settings \u2192 Authorized domains \u060C seventhtrumpet.org \u0648 www.seventhtrumpet.org \u0631\u0627 \u0627\u0636\u0627\u0641\u0647 \u06A9\u0646\u06CC\u062F.'
-          : 'This domain is not authorized in Firebase. In Firebase Console \u2192 Authentication \u2192 Settings \u2192 Authorized domains, add seventhtrumpet.org and www.seventhtrumpet.org';
+          ? '\u062F\u0627\u0645\u0646\u0647 \u0633\u0627\u06CC\u062A \u062F\u0631 Firebase \u062B\u0628\u062A \u0646\u0634\u062F\u0647.'
+          : 'This domain is not authorized in Firebase.';
       }
       showSignInError(msg);
     }
-
     if (useRedirect) {
       auth.signInWithRedirect(provider).catch(fail);
       return;
@@ -159,18 +156,12 @@
     var g = document.getElementById('btn-google-modal');
     if (g && !g._bound) {
       g._bound = true;
-      g.addEventListener('click', function (e) {
-        e.preventDefault();
-        googleSignIn();
-      });
+      g.addEventListener('click', function (e) { e.preventDefault(); googleSignIn(); });
     }
     var em = document.getElementById('btn-email-modal');
     if (em && !em._bound) {
       em._bound = true;
-      em.addEventListener('click', function (e) {
-        e.preventDefault();
-        openEmailModal();
-      });
+      em.addEventListener('click', function (e) { e.preventDefault(); openEmailModal(); });
     }
   }
 
@@ -197,10 +188,7 @@
     var top = document.getElementById('btn-signin-top');
     if (top && !top._bound) {
       top._bound = true;
-      top.addEventListener('click', function (e) {
-        e.preventDefault();
-        openSignInModal();
-      });
+      top.addEventListener('click', function (e) { e.preventDefault(); openSignInModal(); });
     }
     var so = document.getElementById('btn-signout-top');
     if (so && !so._bound) {
@@ -218,13 +206,8 @@
     bindHeaderButtons();
     applySignInLabels();
     if (typeof auth !== 'undefined' && auth && auth.onAuthStateChanged) {
-      auth.onAuthStateChanged(function (user) {
-        updateAuthHeader(user);
-      });
+      auth.onAuthStateChanged(function (user) { updateAuthHeader(user); });
     }
-    document.addEventListener('click', function () {
-      setTimeout(applySignInLabels, 50);
-    }, true);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
