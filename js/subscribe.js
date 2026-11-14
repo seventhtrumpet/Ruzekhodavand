@@ -1,119 +1,138 @@
-/* Daily verse email subscribe — NO auto popup (too many windows) */
+/* Fresh Bread — small inline subscribe under daily verse (EN + FA, no auto popup) */
 (function () {
-  var style = document.createElement('style');
-  style.textContent = '.subscribe-popup{position:fixed!important;inset:0!important;background:rgba(0,0,0,.55)!important;z-index:99999!important;display:none;align-items:center;justify-content:center;padding:1rem}.subscribe-popup.is-open{display:flex!important}.subscribe-popup[hidden],.subscribe-popup.hidden{display:none!important}.subscribe-popup-card{background:var(--bg-card,#fff);color:var(--text,#222);border-radius:12px;padding:0.85rem 0.8rem 0.75rem;max-width:280px;width:100%;position:relative;box-shadow:0 12px 32px rgba(0,0,0,.28);text-align:center}.subscribe-popup-later{display:block!important;width:100%;margin-top:.55rem!important;padding:.45rem 0.75rem!important;background:transparent!important;border:1px solid var(--border,#ccc)!important;border-radius:8px!important;color:var(--text,#333)!important;font-family:inherit!important;font-size:.85rem!important;cursor:pointer!important}.subscribe-popup-close{position:absolute;top:.4rem;inset-inline-start:.55rem;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#888}';
-  document.head.appendChild(style);
-
   var SUB_KEY = 'cog_verse_subscribed';
-  var SUB_POPUP_KEY = 'cog_verse_popup_dismissed_v2';
 
   function lang() {
     try {
-      return (typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'fa';
-    } catch (e) { return 'fa'; }
+      return (typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'en';
+    } catch (e) { return 'en'; }
   }
-  function t(key) {
-    var fa = {
-      popupTitle: '\u0647\u0631 \u0631\u0648\u0632 \u06cc\u06a9 \u0622\u06cc\u0647',
-      popupText: '\u0622\u06cc\u0647 \u0631\u0648\u0632\u0627\u0646\u0647 \u062f\u0631 \u0627\u06cc\u0645\u06cc\u0644.',
-      popupLater: '\u0627\u0644\u0627\u0646 \u0646\u0647',
-      popupSubscribe: '\u0639\u0636\u0648\u06cc\u062a'
+
+  function isEn() { return lang() === 'en'; }
+
+  function labels() {
+    if (isEn()) {
+      return {
+        title: 'Fresh Bread / \u0646\u0627\u0646 \u062a\u0627\u0632\u0647',
+        text: 'One free verse in your email each day.',
+        placeholder: 'you@email.com',
+        btn: 'Subscribe',
+        thanks: 'Thank you \u2014 you are on the list.',
+        support: 'Support this work',
+        supportHref: 'about.html'
+      };
+    }
+    return {
+      title: '\u0646\u0627\u0646 \u062a\u0627\u0632\u0647 / Fresh Bread',
+      text: '\u0647\u0631 \u0631\u0648\u0632 \u06cc\u06a9 \u0622\u06cc\u0647 \u0631\u0627\u06cc\u06af\u0627\u0646 \u062f\u0631 \u0627\u06cc\u0645\u06cc\u0644 \u0634\u0645\u0627.',
+      placeholder: 'you@email.com',
+      btn: '\u0639\u0636\u0648\u06cc\u062a',
+      thanks: '\u0633\u067e\u0627\u0633 \u2014 \u0646\u0627\u0645 \u0634\u0645\u0627 \u062b\u0628\u062a \u0634\u062f.',
+      support: '\u062d\u0645\u0627\u06cc\u062a \u0627\u0632 \u0627\u06cc\u0646 \u06a9\u0627\u0631',
+      supportHref: 'about.html'
     };
-    var en = {
-      popupTitle: 'Daily verse by email',
-      popupText: 'A free verse reminder each day.',
-      popupLater: 'Not now',
-      popupSubscribe: 'Subscribe'
-    };
-    return (lang() === 'en' ? en : fa)[key] || key;
   }
+
+  function ensureCss() {
+    if (document.getElementById('fresh-bread-css')) return;
+    var st = document.createElement('style');
+    st.id = 'fresh-bread-css';
+    st.textContent =
+      '#fresh-bread-box{max-width:520px;margin:0.75rem auto 0;padding:0.75rem 0.9rem;border-radius:12px;border:1px solid var(--border,#e0dcd3);background:var(--bg-card,#fff);text-align:center}' +
+      'body.dark #fresh-bread-box{background:var(--bg-card,#152536);border-color:var(--border,#243447)}' +
+      '#fresh-bread-box .fb-title{font-weight:800;font-size:0.95rem;color:var(--primary,#0a2540);margin:0 0 0.25rem}' +
+      'body.dark #fresh-bread-box .fb-title{color:#9ec5ea}' +
+      '#fresh-bread-box .fb-text{font-size:0.8rem;line-height:1.4;color:#556;margin:0 0 0.55rem}' +
+      'body.dark #fresh-bread-box .fb-text{color:#b8c4d0}' +
+      '#fresh-bread-box form{display:flex;flex-wrap:wrap;gap:0.4rem;justify-content:center;align-items:center}' +
+      '#fresh-bread-box input[type=email]{flex:1;min-width:160px;padding:0.45rem 0.65rem;border:1px solid var(--border,#ccc);border-radius:8px;font-family:inherit;font-size:0.88rem;direction:ltr}' +
+      '#fresh-bread-box button[type=submit]{padding:0.45rem 0.9rem;border:none;border-radius:8px;background:#c9a227;color:#0a2540;font-weight:700;font-family:inherit;font-size:0.88rem;cursor:pointer}' +
+      '#fresh-bread-box button[type=submit]:hover{filter:brightness(1.05)}' +
+      '#fresh-bread-box .fb-support{display:inline-block;margin-top:0.5rem;font-size:0.72rem;color:#6b7785;text-decoration:none}' +
+      '#fresh-bread-box .fb-support:hover{text-decoration:underline;color:var(--primary,#0a2540)}' +
+      '#fresh-bread-box.fb-done .fb-form-row{display:none}' +
+      '#fresh-bread-box .fb-thanks{display:none;font-size:0.88rem;font-weight:600;color:var(--primary,#0a2540);margin:0.35rem 0}' +
+      '#fresh-bread-box.fb-done .fb-thanks{display:block}';
+    document.head.appendChild(st);
+  }
+
   function isSubscribed() {
     try { return localStorage.getItem(SUB_KEY) === '1'; } catch (e) { return false; }
   }
+
   function markSubscribed() {
     try { localStorage.setItem(SUB_KEY, '1'); } catch (e) {}
   }
-  function wasDismissedThisSession() {
-    try { return sessionStorage.getItem(SUB_POPUP_KEY) === '1'; } catch (e) { return false; }
-  }
-  function markDismissedThisSession() {
-    try { sessionStorage.setItem(SUB_POPUP_KEY, '1'); } catch (e) {}
-  }
+
   function applyLabels() {
-    document.querySelectorAll('#subscribe-popup [data-i18n]').forEach(function (el) {
-      var k = el.getAttribute('data-i18n');
-      if (k) el.textContent = t(k);
-    });
-  }
-  function injectHTML() {
-    var pm = document.getElementById('subscribe-popup-mount');
-    if (!pm) {
-      pm = document.createElement('div');
-      pm.id = 'subscribe-popup-mount';
-      document.body.appendChild(pm);
-    }
-    if (!document.getElementById('subscribe-popup')) {
-      pm.innerHTML =
-        '<div id="subscribe-popup" class="subscribe-popup" hidden role="dialog" aria-modal="true">' +
-        '<div class="subscribe-popup-card">' +
-        '<button type="button" class="subscribe-popup-close" id="subscribe-popup-close" aria-label="Close">&times;</button>' +
-        '<h3 data-i18n="popupTitle" style="font-size:1rem;margin:0.4rem 0 0.35rem">' + t('popupTitle') + '</h3>' +
-        '<p data-i18n="popupText" style="font-size:0.82rem;color:#666;margin:0.35rem 0 0.75rem;">' + t('popupText') + '</p>' +
-        '<form id="subscribe-popup-form" action="https://formsubmit.co/info.seventhtrumpet@gmail.com" method="POST">' +
-        '<input type="hidden" name="_subject" value="New daily verse subscriber (popup)">' +
-        '<input type="hidden" name="_captcha" value="false">' +
-        '<input type="hidden" name="source" value="popup">' +
-        '<input type="email" name="email" id="popup-email" required placeholder="you@email.com" autocomplete="email" style="width:100%;padding:0.5rem;margin-bottom:0.45rem;border:1px solid #ccc;border-radius:8px;direction:ltr;box-sizing:border-box;font-size:0.9rem;">' +
-        '<button type="submit" class="btn btn-primary" style="width:100%;padding:0.55rem;font-size:0.9rem;" data-i18n="popupSubscribe">' + t('popupSubscribe') + '</button>' +
-        '</form>' +
-        '<button type="button" class="subscribe-popup-later" id="subscribe-popup-later" data-i18n="popupLater">' + t('popupLater') + '</button>' +
-        '</div></div>';
+    var box = document.getElementById('fresh-bread-box');
+    if (!box) return;
+    var L = labels();
+    var title = box.querySelector('.fb-title');
+    var text = box.querySelector('.fb-text');
+    var input = box.querySelector('input[type=email]');
+    var btn = box.querySelector('button[type=submit]');
+    var thanks = box.querySelector('.fb-thanks');
+    var support = box.querySelector('.fb-support');
+    if (title) title.textContent = L.title;
+    if (text) text.textContent = L.text;
+    if (input) input.placeholder = L.placeholder;
+    if (btn) btn.textContent = L.btn;
+    if (thanks) thanks.textContent = L.thanks;
+    if (support) {
+      support.textContent = L.support;
+      support.href = L.supportHref;
     }
   }
-  function openPopup() {
-    var popup = document.getElementById('subscribe-popup');
-    if (!popup) return;
-    popup.hidden = false;
-    popup.classList.add('is-open');
-    popup.classList.remove('hidden');
-    applyLabels();
-  }
-  function closePopup() {
-    var popup = document.getElementById('subscribe-popup');
-    if (popup) {
-      popup.hidden = true;
-      popup.classList.remove('is-open');
-      popup.classList.add('hidden');
+
+  function injectInline() {
+    ensureCss();
+    var daily = document.getElementById('daily-verse');
+    if (!daily) return;
+    if (document.getElementById('fresh-bread-box')) {
+      applyLabels();
+      return;
     }
-    markDismissedThisSession();
-  }
-  function schedulePopup() {
-    /* No auto popup — daily verse is on the page; no big window */
-    return;
-  }
-  function init() {
-    injectHTML();
-    applyLabels();
-    var popupForm = document.getElementById('subscribe-popup-form');
-    if (popupForm) {
-      popupForm.addEventListener('submit', function () {
-        var emailInput = popupForm.querySelector('input[type="email"]');
-        markSubscribed(emailInput ? emailInput.value.trim() : '1');
-        closePopup();
+    var L = labels();
+    var box = document.createElement('div');
+    box.id = 'fresh-bread-box';
+    if (isSubscribed()) box.className = 'fb-done';
+    box.innerHTML =
+      '<div class="fb-title">' + L.title + '</div>' +
+      '<p class="fb-text">' + L.text + '</p>' +
+      '<p class="fb-thanks">' + L.thanks + '</p>' +
+      '<div class="fb-form-row">' +
+      '<form id="fresh-bread-form" action="https://formsubmit.co/info.seventhtrumpet@gmail.com" method="POST">' +
+      '<input type="hidden" name="_subject" value="Fresh Bread subscriber">' +
+      '<input type="hidden" name="_captcha" value="false">' +
+      '<input type="hidden" name="_template" value="table">' +
+      '<input type="hidden" name="source" value="fresh-bread-inline">' +
+      '<input type="email" name="email" required placeholder="' + L.placeholder + '" autocomplete="email">' +
+      '<button type="submit">' + L.btn + '</button>' +
+      '</form>' +
+      '</div>' +
+      '<a class="fb-support" href="' + L.supportHref + '">' + L.support + '</a>';
+
+    var inner = daily.querySelector('.daily-verse-inner');
+    if (inner) inner.appendChild(box);
+    else daily.appendChild(box);
+
+    var form = document.getElementById('fresh-bread-form');
+    if (form) {
+      form.addEventListener('submit', function () {
+        markSubscribed();
+        box.classList.add('fb-done');
       });
     }
-    var later = document.getElementById('subscribe-popup-later');
-    var closeBtn = document.getElementById('subscribe-popup-close');
-    var popup = document.getElementById('subscribe-popup');
-    if (later) later.addEventListener('click', function (e) { e.preventDefault(); closePopup(); });
-    if (closeBtn) closeBtn.addEventListener('click', function (e) { e.preventDefault(); closePopup(); });
-    if (popup) popup.addEventListener('click', function (e) { if (e.target === popup) closePopup(); });
-    schedulePopup();
   }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 50); });
-  } else {
-    setTimeout(init, 50);
+
+  function boot() {
+    injectInline();
+    var lt = document.getElementById('lang-toggle');
+    if (lt) lt.addEventListener('click', function () { setTimeout(applyLabels, 100); });
+    window.addEventListener('cog-lang-changed', function () { setTimeout(applyLabels, 50); });
   }
-  window.openVerseSubscribePopup = openPopup;
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(boot, 300); });
+  else setTimeout(boot, 300);
 })();
