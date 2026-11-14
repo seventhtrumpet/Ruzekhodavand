@@ -1,6 +1,10 @@
 /* Fill missing Persian books from Open Persian Contemporary Bible (Biblica, CC BY-SA 4.0) */
 (function () {
-  var OPCB_URL = 'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/fa_opcb.json';
+  var OPCB_URLS = [
+    'https://cdn.jsdelivr.net/gh/thiagobodruk/bible/json/fa_opcb.json',
+    'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/fa_opcb.json',
+    'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/fa_opcb.json'
+  ];
   var IDS = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,190,220,230,240,250,260,290,300,310,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730];
   var opcbPromise = null;
   var converted = {};
@@ -8,14 +12,17 @@
 
   function loadOpcb() {
     if (!opcbPromise) {
-      opcbPromise = origFetch(OPCB_URL).then(function (r) {
-        if (!r.ok) throw new Error('OPCB fetch failed');
-        return r.json();
-      }).catch(function (e) {
-        console.warn('Persian OPCB fallback unavailable', e);
+      opcbPromise = (async function () {
+        for (var i = 0; i < OPCB_URLS.length; i++) {
+          try {
+            var r = await origFetch(OPCB_URLS[i]);
+            if (r.ok) return await r.json();
+          } catch (e) {}
+        }
+        console.warn('Persian OPCB fallback unavailable');
         opcbPromise = null;
         return null;
-      });
+      })();
     }
     return opcbPromise;
   }
@@ -88,7 +95,6 @@
           return opcbResponse(id).then(function (r) { return r || res; });
         }
 
-        /* 200 but empty/invalid JSON (e.g. placeholder) → still use OPCB */
         return res.clone().text().then(function (txt) {
           var t = (txt || '').trim();
           if (!t || t === 'PLACEHOLDER' || t === '{}') {
