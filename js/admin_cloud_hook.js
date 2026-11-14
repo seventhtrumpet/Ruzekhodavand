@@ -1,9 +1,17 @@
 /* Admin: load Firebase + push after publish + Sync button */
 (function () {
+
+  // Load post title editor
+  if (!document.querySelector('script[data-admin-edit]')) {
+    var ed = document.createElement('script');
+    ed.src = 'js/admin_edit_hook.js';
+    ed.setAttribute('data-admin-edit', '1');
+    document.body.appendChild(ed);
+  }
+
   function ensureFirebase() {
     if (window.firebase && firebase.apps && firebase.apps.length) return Promise.resolve();
     return new Promise(function (resolve) {
-      // config matches app.js
       var cfg = {
         apiKey: "AIzaSyACmzOLWCtIBboDBTu8IbnjeS9NG-5Z87E",
         authDomain: "lalala-9a4b6.firebaseapp.com",
@@ -37,21 +45,21 @@
     var box = document.createElement('div');
     box.style.cssText = 'margin-top:1.5rem;padding:1rem;background:#e3f2fd;border-radius:10px;border:1px solid #90caf9;';
     box.innerHTML =
-      '<p style="margin:0 0 0.6rem;font-weight:600;" data-cloud-note="1">☁️ همگام‌سازی با همه گوشی‌ها / Sync to all phones</p>' +
+      '<p style="margin:0 0 0.6rem;font-weight:600;" data-cloud-note="1">\u2601\ufe0f \u0647\u0645\u06af\u0627\u0645\u200c\u0633\u0627\u0632\u06cc \u0628\u0627 \u0647\u0645\u0647 \u06af\u0648\u0634\u06cc\u200c\u0647\u0627 / Sync to all phones</p>' +
       '<p style="margin:0 0 0.8rem;font-size:0.85rem;color:#555;">After you publish, click this so other phones can see the videos. YouTube links work on every device.</p>' +
-      '<button type="button" id="cloud-sync-btn" class="btn btn-primary">Sync now / همگام‌سازی</button>' +
+      '<button type="button" id="cloud-sync-btn" class="btn btn-primary">Sync now / \u0647\u0645\u06af\u0627\u0645\u200c\u0633\u0627\u0632\u06cc</button>' +
       '<span id="cloud-sync-status" style="margin-inline-start:0.75rem;font-size:0.9rem;"></span>';
     backup.appendChild(box);
     document.getElementById('cloud-sync-btn').addEventListener('click', function () {
       var st = document.getElementById('cloud-sync-status');
-      st.textContent = '…';
+      st.textContent = '\u2026';
       ensureFirebase().then(function () {
         if (typeof window.pushMediaToCloud !== 'function') {
           st.textContent = 'Script missing';
           return;
         }
         return window.pushMediaToCloud().then(function (ok) {
-          st.textContent = ok ? '✓ OK' : 'Failed — enable Firestore (see instructions)';
+          st.textContent = ok ? '\u2713 OK' : 'Failed \u2014 enable Firestore (see instructions)';
           st.style.color = ok ? '#2e7d32' : '#c62828';
         });
       });
@@ -61,7 +69,6 @@
   document.addEventListener('DOMContentLoaded', function () {
     addSyncButton();
     ensureFirebase().then(function () {
-      // load cloud_sync if needed
       if (typeof window.pushMediaToCloud !== 'function') {
         var s = document.createElement('script');
         s.src = 'js/cloud_sync.js';
