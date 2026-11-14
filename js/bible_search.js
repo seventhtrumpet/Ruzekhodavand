@@ -1,4 +1,4 @@
-/* Full Bible search: OT+NT, gold highlight on matched words */
+/* Full Bible search: OT+NT, gold highlight, always show book name */
 (function () {
   if (window.__mbSearchBooted) return;
   window.__mbSearchBooted = true;
@@ -45,16 +45,27 @@
       btn.setAttribute('data-hi', q);
       var html = btn.innerHTML;
       var parts = html.split(/<br\s*\/?>/i);
-      if (parts.length < 2) {
-        var tmp0 = document.createElement('div');
-        tmp0.innerHTML = html;
-        var t0 = tmp0.textContent || '';
-        if (t0 && q) btn.innerHTML = highlightMatch(t0, q);
+      if (parts.length >= 2) {
+        var head = parts[0];
+        var tmp = document.createElement('div');
+        tmp.innerHTML = parts.slice(1).join('<br>');
+        btn.innerHTML = head + '<br>' + highlightMatch(tmp.textContent || '', q);
         return;
       }
-      var tmp = document.createElement('div');
-      tmp.innerHTML = parts.slice(1).join('<br>');
-      btn.innerHTML = parts[0] + '<br>' + highlightMatch(tmp.textContent || '', q);
+      var strong = btn.querySelector('strong');
+      if (strong) {
+        var rest = '';
+        var node = strong.nextSibling;
+        while (node) {
+          rest += node.textContent || '';
+          node = node.nextSibling;
+        }
+        rest = rest.trim();
+        if (rest) {
+          while (strong.nextSibling) strong.parentNode.removeChild(strong.nextSibling);
+          strong.insertAdjacentHTML('afterend', ' — ' + highlightMatch(rest, q));
+        }
+      }
     });
   }
   function observe() {
@@ -93,6 +104,7 @@
   ];
 
   function patchSource(src) {
+    // Whole Bible: Old Testament first, then New Testament
     src = src.replace(
       /return \(\(na >= 470 \? 0 : 1\) - \(nb >= 470 \? 0 : 1\)\) \|\| \(na - nb\);/g,
       'return ((na >= 470 ? 1 : 0) - (nb >= 470 ? 1 : 0)) || (na - nb);'
@@ -103,6 +115,12 @@
     );
     src = src.replace(/items\.length >= 50/g, 'items.length >= 100');
     src = src.replace(/slice\(0, 50\)/g, 'slice(0, 100)');
+
+    // Always include current book name for on-page hits that only showed chapter:verse
+    src = src.replace(
+      "html: '<strong>' + ch + ':' + vs + '</strong> — ' + escapeHtml(snip)",
+      "html: '<strong>' + ((document.querySelector('.mb-book-title,.mb-title,#mb-book-name')||{}).textContent||'').trim() + ' ' + ch + ':' + vs + '</strong> — ' + escapeHtml(snip)"
+    );
     return src;
   }
 
