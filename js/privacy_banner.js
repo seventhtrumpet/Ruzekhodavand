@@ -10,6 +10,18 @@
   }
 
   function t() {
+    var chosen = false;
+    try { chosen = localStorage.getItem('cog_lang_chosen') === '1'; } catch (e) {}
+    /* First visit before language pick: show English / Persian together */
+    if (!chosen) {
+      return {
+        title: 'Privacy / \u062d\u0631\u06cc\u0645 \u062e\u0635\u0648\u0635\u06cc',
+        text: 'We use cookies for language and settings. / \u0645\u0627 \u0627\u0632 \u06a9\u0648\u06a9\u06cc \u0628\u0631\u0627\u06cc \u0632\u0628\u0627\u0646 \u0648 \u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0627\u0633\u062a\u0641\u0627\u062f\u0647 \u0645\u06cc\u200c\u06a9\u0646\u06cc\u0645.',
+        link: 'Privacy Policy / \u062d\u0631\u06cc\u0645 \u062e\u0635\u0648\u0635\u06cc',
+        ok: 'Got it / \u0645\u062a\u0648\u062c\u0647 \u0634\u062f\u0645',
+        later: 'Not now / \u0627\u0644\u0627\u0646 \u0646\u0647'
+      };
+    }
     if (lang() === 'en') {
       return {
         title: 'Privacy',
@@ -55,7 +67,6 @@
       '<button type="button" class="privacy-banner-later" id="privacy-banner-later">' + L.later + '</button>' +
       '</div></div>';
     document.body.appendChild(el);
-
     document.getElementById('privacy-banner-ok').addEventListener('click', function () {
       try { localStorage.setItem(KEY_ACCEPT, '1'); } catch (e) {}
       hide();
@@ -68,10 +79,9 @@
 
   function hide() {
     var el = document.getElementById('privacy-banner');
-    if (el) {
-      el.classList.add('privacy-banner-hide');
-      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 280);
-    }
+    if (!el) return;
+    el.classList.add('privacy-banner-hide');
+    setTimeout(function () { el.remove(); }, 300);
   }
 
   function refreshLang() {
