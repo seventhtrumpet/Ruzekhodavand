@@ -1,25 +1,19 @@
-/* Load media + auth + core fix + daily verse (auto by calendar day) */
+/* Homepage enhancements + daily verse (bilingual on first visit) */
 (function () {
   function loadScript(src, cb) {
-    if (document.querySelector('script[src="' + src + '"]')) { if (cb) cb(); return; }
     var s = document.createElement('script');
     s.src = src;
     s.onload = function () { if (cb) cb(); };
     s.onerror = function () { if (cb) cb(); };
-    document.body.appendChild(s);
+    document.head.appendChild(s);
   }
+
   function boot() {
-    loadScript('js/app_core_fix.js', function () {
-      loadScript('js/app_media.js', function () {
-        loadScript('js/auth_ui.js', function () {
-          try {
-            if (typeof applyLanguage === 'function') applyLanguage();
-            if (typeof renderAll === 'function') renderAll();
-            if (typeof setupEventListeners === 'function') setupEventListeners();
-          } catch (e) { console.log(e); }
-        });
-      });
-    });
+    /* existing homepage hooks kept minimal */
+    try {
+      if (typeof renderAll === 'function') renderAll();
+      if (typeof setupEventListeners === 'function') setupEventListeners();
+    } catch (e) {}
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
@@ -29,8 +23,7 @@
     if (!len) return 0;
     var d = new Date();
     var start = new Date(d.getFullYear(), 0, 0);
-    var day = Math.floor((d - start) / 86400000); // day of year 1–366
-    // include year so sequence shifts yearly
+    var day = Math.floor((d - start) / 86400000);
     return Math.abs((d.getFullYear() * 366 + day)) % len;
   }
 
@@ -50,20 +43,40 @@
     } else {
       v = verses[dayIndex(verses.length)];
     }
+    var chosen = false;
+    try { chosen = localStorage.getItem('cog_lang_chosen') === '1'; } catch (e0) {}
+    var enText = (v.en || v.fa || '').trim();
+    var faText = (v.fa || v.en || '').trim();
+    var enRef = (v.ref_en || v.refEn || v.ref || '').trim();
+    var faRef = (v.ref_fa || v.refFa || v.ref || '').trim();
+    /* First visit: English / Persian together */
+    if (!chosen) {
+      if (enText && faText && enText !== faText) {
+        el.textContent = enText + '\n\n' + faText;
+        el.style.whiteSpace = 'pre-line';
+      } else {
+        el.textContent = enText || faText;
+      }
+      if (ref) {
+        if (enRef && faRef && enRef !== faRef) ref.textContent = enRef + ' / ' + faRef;
+        else ref.textContent = enRef || faRef;
+      }
+      return;
+    }
     var lang = (typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'fa';
-    el.textContent = (lang === 'en' ? (v.en || v.fa) : (v.fa || v.en)) || '';
+    el.textContent = (lang === 'en' ? enText : faText) || '';
+    el.style.whiteSpace = '';
     if (ref) {
-      ref.textContent = (lang === 'en' ? (v.ref_en || v.refEn || v.ref) : (v.ref_fa || v.refFa || v.ref)) || '';
+      ref.textContent = (lang === 'en' ? enRef : faRef) || '';
     }
   }
 
   function initVerse() {
     function go() {
-      showVerse(false); // automatic daily verse
+      showVerse(false);
       var btn = document.getElementById('verse-refresh');
       if (btn && !btn._verseBound) {
         btn._verseBound = true;
-        // "Another verse" still lets user pick a random one for this visit
         btn.addEventListener('click', function () { showVerse(true); });
       }
     }
