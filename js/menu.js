@@ -30,27 +30,27 @@
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.id = 'nav-burger';
-    btn.className = 'nav-burger';
+    btn.className = 'menu-btn';
     btn.setAttribute('aria-label', 'Menu');
     btn.innerHTML = '<span></span><span></span><span></span>';
 
     var overlay = document.createElement('div');
     overlay.id = 'nav-overlay';
-    overlay.className = 'nav-overlay';
+    overlay.className = 'menu-overlay';
 
     var panel = document.createElement('div');
     panel.id = 'nav-panel';
-    panel.className = 'nav-panel';
+    panel.className = 'menu-panel';
     panel.innerHTML =
-      '<div class="nav-panel-head">' +
-      '<span class="nav-panel-title" data-i18n="menuTitle">\u0645\u0646\u0648</span>' +
+      '<div class="menu-panel-head">' +
+      '<span class="menu-panel-title" style="font-weight:700;flex:1" data-i18n="menuTitle">\u0645\u0646\u0648</span>' +
       '<button type="button" id="theme-toggle" class="theme-toggle" aria-label="Theme">\u263E</button>' +
-      '<button type="button" id="nav-close" class="nav-close" aria-label="Close">\u00d7</button>' +
+      '<button type="button" id="nav-close" class="menu-close" aria-label="Close">\u00d7</button>' +
       '</div>' +
-      '<nav class="nav-panel-links"></nav>';
+      '<nav class="menu-nav menu-panel-links"></nav>';
 
     var nav = header.querySelector('.nav-main') || header.querySelector('nav');
-    var linksHost = panel.querySelector('.nav-panel-links');
+    var linksHost = panel.querySelector('.menu-panel-links');
     if (nav) {
       nav.querySelectorAll('a').forEach(function (a) {
         var c = a.cloneNode(true);
@@ -65,12 +65,12 @@
     else header.appendChild(btn);
 
     function openMenu() {
-      document.body.classList.add('nav-open');
+      document.body.classList.add('menu-open');
       overlay.classList.add('open');
       panel.classList.add('open');
     }
     function closeMenu() {
-      document.body.classList.remove('nav-open');
+      document.body.classList.remove('menu-open');
       overlay.classList.remove('open');
       panel.classList.remove('open');
     }
