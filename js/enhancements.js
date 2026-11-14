@@ -24,7 +24,6 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  /** Same verse for everyone on the same calendar day; changes automatically next day */
   function dayIndex(len) {
     if (!len) return 0;
     var d = new Date();
@@ -43,35 +42,17 @@
       if (ref) ref.textContent = '';
       return;
     }
-    var v;
-    if (forceRandom) {
-      v = verses[Math.floor(Math.random() * verses.length)];
-    } else {
-      v = verses[dayIndex(verses.length)];
-    }
-    var chosen = false;
-    try { chosen = localStorage.getItem('cog_lang_chosen') === '1'; } catch (e0) {}
+    var v = forceRandom
+      ? verses[Math.floor(Math.random() * verses.length)]
+      : verses[dayIndex(verses.length)];
     var enText = (v.en || v.fa || '').trim();
     var faText = (v.fa || v.en || '').trim();
     var enRef = (v.ref_en || v.refEn || v.ref || '').trim();
     var faRef = (v.ref_fa || v.refFa || v.ref || '').trim();
-    if (!chosen) {
-      if (enText && faText && enText !== faText) {
-        el.textContent = enText + '\n\n' + faText;
-        el.style.whiteSpace = 'pre-line';
-      } else el.textContent = enText || faText;
-      if (ref) {
-        if (enRef && faRef && enRef !== faRef) ref.textContent = enRef + ' / ' + faRef;
-        else ref.textContent = enRef || faRef;
-      }
-      return;
-    }
-    var lang = (typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'fa';
+    var lang = (typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'en';
     el.textContent = (lang === 'en' ? enText : faText) || '';
     el.style.whiteSpace = '';
-    if (ref) {
-      ref.textContent = (lang === 'en' ? enRef : faRef) || '';
-    }
+    if (ref) ref.textContent = (lang === 'en' ? enRef : faRef) || '';
   }
 
   function initVerse() {
