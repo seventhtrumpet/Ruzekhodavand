@@ -1,4 +1,4 @@
-/* Full Bible search: OT+NT, gold highlight, always show book name */
+/* Full Bible search: OT+NT, gold highlight, always show book name when possible */
 (function () {
   if (window.__mbSearchBooted) return;
   window.__mbSearchBooted = true;
@@ -32,6 +32,23 @@
       '.mb-search-item mark.mb-hit,.mb-hit{background:#ffd54f;color:#6b1a1a;font-weight:700;padding:0 0.15em;border-radius:3px}' +
       'body.dark .mb-hit{background:#c9a227;color:#1a1200}';
     document.head.appendChild(st);
+  }
+  function ensureBookNames() {
+    var box = document.getElementById('mb-search-results');
+    if (!box) return;
+    var currentBook = '';
+    try {
+      var t = document.querySelector('.mb-book-title, .mb-title, #mb-book-name, .mb-bar-title');
+      if (t) currentBook = (t.textContent || '').trim();
+    } catch (e) {}
+    box.querySelectorAll('.mb-search-item').forEach(function (btn) {
+      var strong = btn.querySelector('strong');
+      if (!strong) return;
+      var label = (strong.textContent || '').trim();
+      if (/^\d+:\d+$/.test(label) && currentBook) {
+        strong.textContent = currentBook + ' ' + label;
+      }
+    });
   }
   function patchResults() {
     injectCss();
@@ -67,33 +84,33 @@
         }
       }
     });
+    ensureBookNames();
   }
   function observe() {
     injectCss();
     var box = document.getElementById('mb-search-results');
     if (box && !box._hiObs) {
       box._hiObs = true;
-      new MutationObserver(function () { setTimeout(patchResults, 20); }).observe(box, { childList: true, subtree: true });
+      new MutationObserver(function () {
+        setTimeout(function () { patchResults(); ensureBookNames(); }, 20);
+      }).observe(box, { childList: true, subtree: true });
+    }
+    function run() {
+      setTimeout(function () { patchResults(); ensureBookNames(); }, 300);
+      setTimeout(function () { patchResults(); ensureBookNames(); }, 1000);
+      setTimeout(function () { patchResults(); ensureBookNames(); }, 2500);
+      setTimeout(function () { patchResults(); ensureBookNames(); }, 5000);
     }
     var btn = document.getElementById('mb-search-btn');
     if (btn && !btn._hiBound) {
       btn._hiBound = true;
-      btn.addEventListener('click', function () {
-        setTimeout(patchResults, 300);
-        setTimeout(patchResults, 1000);
-        setTimeout(patchResults, 2500);
-        setTimeout(patchResults, 5000);
-      });
+      btn.addEventListener('click', run);
     }
     var input = document.getElementById('mb-search');
     if (input && !input._hiBound) {
       input._hiBound = true;
       input.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-          setTimeout(patchResults, 300);
-          setTimeout(patchResults, 1200);
-          setTimeout(patchResults, 3000);
-        }
+        if (e.key === 'Enter') run();
       });
     }
   }
@@ -104,7 +121,6 @@
   ];
 
   function patchSource(src) {
-    // Whole Bible: Old Testament first, then New Testament
     src = src.replace(
       /return \(\(na >= 470 \? 0 : 1\) - \(nb >= 470 \? 0 : 1\)\) \|\| \(na - nb\);/g,
       'return ((na >= 470 ? 1 : 0) - (nb >= 470 ? 1 : 0)) || (na - nb);'
@@ -115,11 +131,9 @@
     );
     src = src.replace(/items\.length >= 50/g, 'items.length >= 100');
     src = src.replace(/slice\(0, 50\)/g, 'slice(0, 100)');
-
-    // Always include current book name for on-page hits that only showed chapter:verse
     src = src.replace(
       "html: '<strong>' + ch + ':' + vs + '</strong> — ' + escapeHtml(snip)",
-      "html: '<strong>' + ((document.querySelector('.mb-book-title,.mb-title,#mb-book-name')||{}).textContent||'').trim() + ' ' + ch + ':' + vs + '</strong> — ' + escapeHtml(snip)"
+      "html: '<strong>' + ((document.querySelector('.mb-book-title,.mb-title,#mb-book-name,.mb-bar-title')||{}).textContent||'').trim() + ' ' + ch + ':' + vs + '</strong> — ' + escapeHtml(snip)"
     );
     return src;
   }
