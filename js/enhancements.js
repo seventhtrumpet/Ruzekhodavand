@@ -1,19 +1,25 @@
-/* Homepage enhancements + daily verse (bilingual on first visit) */
+/* Load media + auth + core fix + daily verse (auto by calendar day) */
 (function () {
   function loadScript(src, cb) {
+    if (document.querySelector('script[src="' + src + '"]')) { if (cb) cb(); return; }
     var s = document.createElement('script');
     s.src = src;
     s.onload = function () { if (cb) cb(); };
     s.onerror = function () { if (cb) cb(); };
-    document.head.appendChild(s);
+    document.body.appendChild(s);
   }
-
   function boot() {
-    /* existing homepage hooks kept minimal */
-    try {
-      if (typeof renderAll === 'function') renderAll();
-      if (typeof setupEventListeners === 'function') setupEventListeners();
-    } catch (e) {}
+    loadScript('js/app_core_fix.js', function () {
+      loadScript('js/app_media.js', function () {
+        loadScript('js/auth_ui.js', function () {
+          try {
+            if (typeof applyLanguage === 'function') applyLanguage();
+            if (typeof renderAll === 'function') renderAll();
+            if (typeof setupEventListeners === 'function') setupEventListeners();
+          } catch (e) { console.log(e); }
+        });
+      });
+    });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
@@ -49,14 +55,11 @@
     var faText = (v.fa || v.en || '').trim();
     var enRef = (v.ref_en || v.refEn || v.ref || '').trim();
     var faRef = (v.ref_fa || v.refFa || v.ref || '').trim();
-    /* First visit: English / Persian together */
     if (!chosen) {
       if (enText && faText && enText !== faText) {
         el.textContent = enText + '\n\n' + faText;
         el.style.whiteSpace = 'pre-line';
-      } else {
-        el.textContent = enText || faText;
-      }
+      } else el.textContent = enText || faText;
       if (ref) {
         if (enRef && faRef && enRef !== faRef) ref.textContent = enRef + ' / ' + faRef;
         else ref.textContent = enRef || faRef;
