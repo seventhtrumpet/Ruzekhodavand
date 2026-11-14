@@ -14,8 +14,9 @@
         el.textContent = isFa() ? fa : en;
       });
     }
-    set('[data-i18n-signin]', '\u0648\u0631\u0648\u062F', 'Sign in');
-    set('[data-i18n-signout]', '\u062E\u0631\u0648\u062C', 'Sign out');
+    /* Header button uses short EN label so it fits next to flags */
+    set('#btn-signin-top, [data-i18n-signin]', '\u0648\u0631\u0648\u062F', 'Login');
+    set('#btn-signout-top, [data-i18n-signout]', '\u062E\u0631\u0648\u062C', 'Out');
     set('[data-i18n-signin-title]', '\u0648\u0631\u0648\u062F', 'Sign in');
     set('[data-i18n-signin-google]', '\u0648\u0631\u0648\u062F \u0628\u0627 \u06AF\u0648\u06AF\u0644', 'Sign in with Google');
     set('[data-i18n-signin-email]', '\u0648\u0631\u0648\u062F \u0628\u0627 \u0627\u06CC\u0645\u06CC\u0644', 'Sign in with Email');
@@ -37,7 +38,21 @@
   }
   window.openSignInModal = openSignInModal;
 
+  function ensureAuthCss() {
+    if (document.getElementById('st-auth-compact-css')) return;
+    var st = document.createElement('style');
+    st.id = 'st-auth-compact-css';
+    st.textContent =
+      '#btn-signin-top,#btn-signout-top{padding:0.2rem 0.45rem!important;font-size:0.72rem!important;line-height:1.15!important;font-weight:700!important;border-radius:6px!important;white-space:nowrap!important;flex-shrink:0!important;}' +
+      '#btn-signin-top{background:#c9a227!important;color:#0a2540!important;border:none!important;max-width:5rem!important;}' +
+      '#auth-header-wrap{display:flex!important;align-items:center!important;gap:0.35rem!important;flex-shrink:0!important;}' +
+      '.header-actions{display:flex!important;align-items:center!important;gap:0.35rem!important;flex-shrink:0!important;}' +
+      '@media (max-width:520px){#btn-signin-top{font-size:0.68rem!important;padding:0.18rem 0.38rem!important;max-width:4.2rem!important;}}';
+    document.head.appendChild(st);
+  }
+
   function ensureHeaderAuth() {
+    ensureAuthCss();
     // Hide the old full-width user bar (we use header button instead)
     var bar = document.getElementById('user-bar');
     if (bar) bar.style.display = 'none';
@@ -78,10 +93,10 @@
       wrap.id = 'auth-header-wrap';
       wrap.style.cssText = 'display:flex;align-items:center;gap:0.5rem;';
       wrap.innerHTML =
-        '<button type="button" id="btn-signin-top" class="btn btn-primary btn-sm" data-i18n-signin style="background:#c9a227;color:#0a2540;border:none;font-weight:700;padding:0.25rem 0.55rem;font-size:0.78rem;line-height:1.2;border-radius:6px;">\u0648\u0631\u0648\u062F</button>' +
+        '<button type="button" id="btn-signin-top" class="btn btn-primary btn-sm" data-i18n-signin style="background:#c9a227;color:#0a2540;border:none;font-weight:700;padding:0.2rem 0.45rem;font-size:0.72rem;line-height:1.15;border-radius:6px;max-width:4.5rem;white-space:nowrap;">\u0648\u0631\u0648\u062F</button>' +
         '<div id="auth-header-user" class="hidden" style="display:none;align-items:center;gap:0.5rem;">' +
         '<span id="user-display-top" style="font-size:0.85rem;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;"></span>' +
-        '<button type="button" id="btn-signout-top" class="btn btn-outline btn-sm" data-i18n-signout style="color:#fff;border-color:rgba(255,255,255,.5);padding:0.25rem 0.55rem;font-size:0.78rem;">\u062E\u0631\u0648\u062C</button></div>';
+        '<button type="button" id="btn-signout-top" class="btn btn-outline btn-sm" data-i18n-signout style="color:#fff;border-color:rgba(255,255,255,.5);padding:0.2rem 0.45rem;font-size:0.72rem;white-space:nowrap;">\u062E\u0631\u0648\u062C</button></div>';
       actions.insertBefore(wrap, actions.firstChild);
     }
     applySignInLabels();
