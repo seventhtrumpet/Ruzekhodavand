@@ -1,10 +1,10 @@
-/* Full Bible search: OT+NT, gold highlight, always show book name when possible */
+/* Bible search: whole Bible, gold highlight, always Book + chapter:verse */
 (function () {
   if (window.__mbSearchBooted) return;
   window.__mbSearchBooted = true;
 
   function escapeHtml(s) {
-    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
   function escapeRegex(s) {
     return String(s || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -29,62 +29,92 @@
     var st = document.createElement('style');
     st.id = 'mb-hit-css';
     st.textContent =
+      '.mb-search-item{text-align:start}' +
+      '.mb-search-item .mb-ref-line{display:block;font-weight:800;color:#5b9fd4;margin-bottom:0.2rem;font-size:0.9rem}' +
       '.mb-search-item mark.mb-hit,.mb-hit{background:#ffd54f;color:#6b1a1a;font-weight:700;padding:0 0.15em;border-radius:3px}' +
       'body.dark .mb-hit{background:#c9a227;color:#1a1200}';
     document.head.appendChild(st);
   }
-  function ensureBookNames() {
-    var box = document.getElementById('mb-search-results');
-    if (!box) return;
-    var currentBook = '';
+  function currentBookName() {
     try {
-      var t = document.querySelector('.mb-book-title, .mb-title, #mb-book-name, .mb-bar-title');
-      if (t) currentBook = (t.textContent || '').trim();
-    } catch (e) {}
-    box.querySelectorAll('.mb-search-item').forEach(function (btn) {
-      var strong = btn.querySelector('strong');
-      if (!strong) return;
-      var label = (strong.textContent || '').trim();
-      if (/^\d+:\d+$/.test(label) && currentBook) {
-        strong.textContent = currentBook + ' ' + label;
-      }
-    });
+      var t = document.querySelector('#mb-ref, .mb-ref, .mb-book-title, .mb-title, #mb-book-name, .mb-bar-title');
+      if (!t) return '';
+      var s = (t.textContent || '').trim();
+      var m = s.match(/^(.+?)\s+\d+/);
+      return m ? m[1].trim() : s;
+    } catch (e) { return ''; }
   }
-  function patchResults() {
+  function cleanVerseText(text, verseNum) {
+    var t = String(text || '').replace(/\s+/g, ' ').trim();
+    if (verseNum) {
+      t = t.replace(new RegExp('^' + verseNum + '\\s*'), '');
+      t = t.replace(new RegExp('^' + verseNum + '(?=[A-Za-z\\u0600-\\u06FF])'), '');
+    }
+    return t.trim();
+  }
+  function polishResults() {
     injectCss();
     var input = document.getElementById('mb-search');
     var q = input ? (input.value || '').trim() : '';
     if (!q) return;
+    var book = currentBookName();
     var box = document.getElementById('mb-search-results');
     if (!box) return;
     box.querySelectorAll('.mb-search-item').forEach(function (btn) {
-      if (btn.getAttribute('data-hi') === q) return;
-      btn.setAttribute('data-hi', q);
-      var html = btn.innerHTML;
-      var parts = html.split(/<br\s*\/?>/i);
-      if (parts.length >= 2) {
-        var head = parts[0];
-        var tmp = document.createElement('div');
-        tmp.innerHTML = parts.slice(1).join('<br>');
-        btn.innerHTML = head + '<br>' + highlightMatch(tmp.textContent || '', q);
-        return;
-      }
+      if (btn.getAttribute('data-polished') === q) return;
+      btn.setAttribute('data-polished', q);
+
       var strong = btn.querySelector('strong');
+      var rawLabel = strong ? (strong.textContent || '').trim() : '';
+      var bodyText = '';
       if (strong) {
-        var rest = '';
-        var node = strong.nextSibling;
-        while (node) {
-          rest += node.textContent || '';
-          node = node.nextSibling;
-        }
-        rest = rest.trim();
-        if (rest) {
-          while (strong.nextSibling) strong.parentNode.removeChild(strong.nextSibling);
-          strong.insertAdjacentHTML('afterend', ' — ' + highlightMatch(rest, q));
+        var n = strong.nextSibling;
+        while (n) {
+          bodyText += n.textContent || '';
+          n = n.nextSibling;
         }
       }
+      if (!bodyText) {
+        var html = btn.innerHTML;
+        var parts = html.split(/<br\s*\/?>/i);
+        if (parts.length >= 2) {
+          var tmp = document.createElement('div');
+          tmp.innerHTML = parts[0];
+          rawLabel = (tmp.textContent || '').trim();
+          tmp.innerHTML = parts.slice(1).join(' ');
+          bodyText = (tmp.textContent || '').trim();
+        } else {
+          bodyText = (btn.textContent || '').trim();
+        }
+      }
+      bodyText = bodyText.replace(/^[\s—–\-]+/, '').trim();
+
+      var bookName = book;
+      var ch = '';
+      var vs = '';
+      var m = rawLabel.match(/^(.+?)\s+(\d+):(\d+)\s*$/);
+      if (m) {
+        bookName = m[1].trim() || book;
+        ch = m[2];
+        vs = m[3];
+      } else {
+        m = rawLabel.match(/^(\d+):(\d+)\s*$/);
+        if (m) {
+          ch = m[1];
+          vs = m[2];
+        }
+      }
+      bodyText = cleanVerseText(bodyText, vs);
+
+      if (!bookName) bookName = book || '';
+      var refLine = (bookName ? bookName + ' ' : '') + (ch && vs ? ch + ':' + vs : rawLabel);
+      refLine = refLine.replace(/\s+/g, ' ').trim();
+      if (!refLine) return;
+
+      btn.innerHTML =
+        '<span class="mb-ref-line">' + escapeHtml(refLine) + '</span>' +
+        highlightMatch(bodyText, q);
     });
-    ensureBookNames();
   }
   function observe() {
     injectCss();
@@ -92,14 +122,14 @@
     if (box && !box._hiObs) {
       box._hiObs = true;
       new MutationObserver(function () {
-        setTimeout(function () { patchResults(); ensureBookNames(); }, 20);
+        setTimeout(polishResults, 30);
       }).observe(box, { childList: true, subtree: true });
     }
     function run() {
-      setTimeout(function () { patchResults(); ensureBookNames(); }, 300);
-      setTimeout(function () { patchResults(); ensureBookNames(); }, 1000);
-      setTimeout(function () { patchResults(); ensureBookNames(); }, 2500);
-      setTimeout(function () { patchResults(); ensureBookNames(); }, 5000);
+      setTimeout(polishResults, 200);
+      setTimeout(polishResults, 800);
+      setTimeout(polishResults, 2000);
+      setTimeout(polishResults, 4500);
     }
     var btn = document.getElementById('mb-search-btn');
     if (btn && !btn._hiBound) {
@@ -133,7 +163,7 @@
     src = src.replace(/slice\(0, 50\)/g, 'slice(0, 100)');
     src = src.replace(
       "html: '<strong>' + ch + ':' + vs + '</strong> — ' + escapeHtml(snip)",
-      "html: '<strong>' + ((document.querySelector('.mb-book-title,.mb-title,#mb-book-name,.mb-bar-title')||{}).textContent||'').trim() + ' ' + ch + ':' + vs + '</strong> — ' + escapeHtml(snip)"
+      "html: '<strong>' + (function(){var t=document.getElementById('mb-ref');var s=t?(t.textContent||'').trim():'';var m=s.match(/^(.+?)\\s+\\d+/);return (m?m[1]:s)||'';})() + ' ' + ch + ':' + vs + '</strong><br>' + escapeHtml(snip)"
     );
     return src;
   }
@@ -146,7 +176,6 @@
     }
     setTimeout(observe, 200);
     setTimeout(observe, 800);
-    setTimeout(observe, 1500);
   }
 
   function load() {

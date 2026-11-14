@@ -1,4 +1,4 @@
-/* Language flags — medium size with FA / EN labels */
+/* Language flags — medium FA/EN, ordered so social stays visible */
 (function () {
   if (window.__stFlagsInit) return;
   window.__stFlagsInit = true;
@@ -40,16 +40,14 @@
   }
 
   var IRAN_SVG =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 6" width="22" height="14" aria-hidden="true">' +
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 6" width="20" height="13" aria-hidden="true">' +
     '<rect width="9" height="2" y="0" fill="#239f40"/>' +
     '<rect width="9" height="2" y="2" fill="#fff"/>' +
     '<rect width="9" height="2" y="4" fill="#da0000"/>' +
-    '<g stroke="#c9a227" stroke-width="0.15">' +
-    '<circle cx="4.5" cy="3" r="0.9" fill="none"/>' +
-    '</g></svg>';
+    '<g stroke="#c9a227" stroke-width="0.15"><circle cx="4.5" cy="3" r="0.9" fill="none"/></g></svg>';
 
   var US_SVG =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 10" width="22" height="12" aria-hidden="true">' +
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 10" width="20" height="11" aria-hidden="true">' +
     '<rect width="19" height="10" fill="#bf0a30"/>' +
     '<rect y="0.77" width="19" height="0.77" fill="#fff"/>' +
     '<rect y="2.31" width="19" height="0.77" fill="#fff"/>' +
@@ -57,36 +55,40 @@
     '<rect y="5.38" width="19" height="0.77" fill="#fff"/>' +
     '<rect y="6.92" width="19" height="0.77" fill="#fff"/>' +
     '<rect y="8.46" width="19" height="0.77" fill="#fff"/>' +
-    '<rect width="7.6" height="5.38" fill="#002868"/>' +
-    '</svg>';
+    '<rect width="7.6" height="5.38" fill="#002868"/></svg>';
 
   function ensureCss() {
     if (document.getElementById('st-lang-flags-css')) return;
     var st = document.createElement('style');
     st.id = 'st-lang-flags-css';
     st.textContent =
-      '.st-lang-flags{display:inline-flex;align-items:center;gap:0.25rem;margin-inline-start:0.25rem;flex-shrink:0}' +
-      '.st-lang-flag{display:inline-flex;align-items:center;justify-content:center;gap:0.25rem;padding:0.22rem 0.4rem;border:1px solid rgba(255,255,255,0.35);border-radius:8px;background:rgba(255,255,255,0.14);cursor:pointer;font-family:inherit;font-size:0.72rem;font-weight:700;color:#fff;line-height:1}' +
-      '.st-lang-flag span{display:inline!important;font-size:0.7rem;font-weight:800;letter-spacing:0.02em}' +
+      '.header-inner{display:flex!important;align-items:center!important;flex-wrap:nowrap!important;gap:0.3rem!important}' +
+      '#header-social.header-social{display:flex!important;flex-shrink:0!important;gap:0.22rem!important;order:2}' +
+      '#header-social.header-social a{width:1.65rem!important;height:1.65rem!important}' +
+      '.header-actions{display:flex!important;align-items:center!important;gap:0.25rem!important;margin-inline-start:auto!important;flex-shrink:0!important;order:5}' +
+      '.st-lang-flags{display:inline-flex;align-items:center;gap:0.22rem;flex-shrink:0;order:4}' +
+      '.st-lang-flag{display:inline-flex;align-items:center;justify-content:center;gap:0.22rem;padding:0.2rem 0.35rem;border:1px solid rgba(255,255,255,0.35);border-radius:8px;background:rgba(255,255,255,0.14);cursor:pointer;font-family:inherit;color:#fff;line-height:1}' +
+      '.st-lang-flag span{display:inline!important;font-size:0.68rem;font-weight:800}' +
       '.st-lang-flag svg{display:block;border-radius:2px}' +
       '.st-lang-flag.is-active{box-shadow:0 0 0 2px rgba(201,162,39,0.55);border-color:#c9a227}' +
-      '.st-lang-flag:not(.is-active){opacity:0.88}' +
-      '.st-lang-flag:hover{opacity:1}' +
-      '.lang-toggle.st-lang-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}';
+      '.lang-toggle.st-lang-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}' +
+      '#auth-header-wrap{order:6;flex-shrink:0}' +
+      '.nav-burger,.menu-btn{order:0;flex-shrink:0}' +
+      'a.logo,#header-brand{order:1;flex-shrink:1;min-width:0}';
     document.head.appendChild(st);
   }
 
   function paint() {
     ensureCss();
     var old = document.getElementById('lang-toggle');
-    if (!old) return;
     if (document.getElementById('st-lang-flags')) {
       syncActive();
       return;
     }
-
-    old.classList.add('st-lang-hidden');
-    old.setAttribute('aria-hidden', 'true');
+    if (old) {
+      old.classList.add('st-lang-hidden');
+      old.setAttribute('aria-hidden', 'true');
+    }
 
     var wrap = document.createElement('div');
     wrap.id = 'st-lang-flags';
@@ -98,8 +100,8 @@
     btnFa.type = 'button';
     btnFa.className = 'st-lang-flag';
     btnFa.setAttribute('data-lang', 'fa');
-    btnFa.setAttribute('title', 'Persian / \u0641\u0627\u0631\u0633\u06cc');
-    btnFa.setAttribute('aria-label', 'Persian');
+    btnFa.setAttribute('title', '\u0641\u0627\u0631\u0633\u06cc');
+    btnFa.setAttribute('aria-label', '\u0641\u0627\u0631\u0633\u06cc');
     btnFa.innerHTML = IRAN_SVG + '<span>FA</span>';
 
     var btnEn = document.createElement('button');
@@ -114,8 +116,10 @@
     wrap.appendChild(btnEn);
 
     var actions = document.querySelector('.header-actions');
+    var inner = document.querySelector('.header-inner');
     if (actions) actions.appendChild(wrap);
-    else if (old.parentNode) old.parentNode.insertBefore(wrap, old.nextSibling);
+    else if (inner) inner.appendChild(wrap);
+    else if (old && old.parentNode) old.parentNode.insertBefore(wrap, old.nextSibling);
     else document.body.appendChild(wrap);
 
     btnFa.addEventListener('click', function (e) {
@@ -126,12 +130,11 @@
       e.preventDefault();
       if (readLang() !== 'en') setLang('en');
     });
-
     syncActive();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paint);
   else paint();
-  setTimeout(paint, 300);
-  setTimeout(paint, 900);
+  setTimeout(paint, 400);
+  setTimeout(paint, 1000);
 })();
