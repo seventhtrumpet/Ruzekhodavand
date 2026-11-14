@@ -122,6 +122,7 @@
     } catch (e) {}
   }
 
+  loadScript('js/first_visit_bilingual.js', 'data-first-bilingual');
   loadScript('js/lang_flags.js', 'data-lang-flags');
   loadScript('js/css_restore.js', 'data-css-restore');
   loadScript('js/ads.js', 'data-ads-js');
