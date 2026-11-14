@@ -22,7 +22,7 @@
     if (window.toggleLanguage && readLang() !== lang) {
       try { window.toggleLanguage(); return; } catch (e2) {}
     }
-    try { localStorage.setItem('cog_lang', lang); } catch (e3) {}
+    try { localStorage.setItem('cog_lang', lang); localStorage.setItem('cog_lang_chosen', '1'); } catch (e3) {}
     try {
       document.documentElement.lang = lang;
       document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
