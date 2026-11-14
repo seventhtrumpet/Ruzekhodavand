@@ -1,11 +1,5 @@
 /* Header hamburger menu + theme + load shared scripts */
 (function () {
-  function isEn() {
-    try {
-      return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en';
-    } catch (e) { return false; }
-  }
-
   function refreshThemeBtn() {
     try {
       var btn = document.getElementById('theme-toggle');
@@ -129,6 +123,7 @@
   }
 
   loadScript('js/lang_flags.js', 'data-lang-flags');
+  loadScript('js/css_restore.js', 'data-css-restore');
   loadScript('js/ads.js', 'data-ads-js');
   loadScript('js/menu_overlay_fix.js', 'data-menu-overlay-fix');
   loadScript('js/bugfixes.js', 'data-bugfixes');
