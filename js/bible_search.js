@@ -8,16 +8,6 @@
   var debounceTimer = null;
   var CACHE = window.__bibleSearchCache = window.__bibleSearchCache || { fa: {}, en: {} };
 
-  var CHAPTER_COUNTS = {
-    10:50,20:40,30:27,40:36,50:34,60:24,70:21,80:4,90:31,100:24,
-    110:22,120:25,130:29,140:36,150:10,160:13,190:10,220:42,230:150,240:31,
-    250:12,260:8,290:66,300:52,310:5,330:48,340:12,350:14,360:3,370:9,
-    380:1,390:4,400:7,410:3,420:3,430:3,440:2,450:14,460:4,
-    470:28,480:16,490:24,500:21,510:28,520:16,530:16,540:13,550:6,560:6,
-    570:4,580:4,590:5,600:3,610:6,620:4,630:3,640:1,650:13,660:5,
-    670:5,680:3,690:5,700:1,710:1,720:1,730:22
-  };
-
   function isEn() {
     try { return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en'; }
     catch (e) { return false; }
@@ -266,20 +256,25 @@
   function loadKjv() {
     if (kjvList) return Promise.resolve(kjvList);
     if (!kjvPromise) {
-      kjvPromise = fetch('https://cdn.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json')
-        .then(function (r) {
-          if (!r.ok) throw new Error('KJV load failed');
-          return r.json();
-        })
-        .then(function (list) {
-          kjvList = list;
-          return list;
-        })
-        .catch(function (e) {
-          console.warn(e);
-          kjvPromise = null;
-          return null;
-        });
+      var urls = [
+        'https://cdn.jsdelivr.net/gh/thiagobodruk/bible/json/en_kjv.json',
+        'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json',
+        'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_kjv.json'
+      ];
+      kjvPromise = (async function () {
+        for (var i = 0; i < urls.length; i++) {
+          try {
+            var r = await fetch(urls[i]);
+            if (r.ok) {
+              kjvList = await r.json();
+              return kjvList;
+            }
+          } catch (e) {}
+        }
+        console.warn('KJV load failed');
+        kjvPromise = null;
+        return null;
+      })();
     }
     return kjvPromise;
   }
