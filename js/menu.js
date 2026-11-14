@@ -152,6 +152,7 @@
   loadScript('js/user_playlists.js', 'data-user-playlists');
   loadScript('js/player_expand.js', 'data-player-expand');
   loadScript('js/app_media.js', 'data-app-media');
+  loadCss('css/about_fix.css', 'data-about-fix');
   loadCss('css/mobile_header.css', 'data-mobile-header');
   loadCss('css/social.css', 'data-social-css');
   loadCss('css/quality.css', 'data-quality-css');
