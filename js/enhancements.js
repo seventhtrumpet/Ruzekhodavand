@@ -79,4 +79,39 @@
       btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     }
   });
+
+  /* Daily verse: smaller + appear a bit later so language/privacy come first */
+  (function () {
+    var st = document.createElement('style');
+    st.id = 'daily-verse-compact-css';
+    st.textContent =
+      '#daily-verse{opacity:0;transform:translateY(12px);transition:opacity .45s ease,transform .45s ease;pointer-events:none}' +
+      '#daily-verse.dv-ready{opacity:1;transform:none;pointer-events:auto}' +
+      '#daily-verse .daily-verse-inner{max-width:520px;margin-left:auto;margin-right:auto;padding:0.85rem 1rem!important;border-radius:12px}' +
+      '#daily-verse .daily-verse-label{font-size:0.85rem!important;margin-bottom:0.35rem!important}' +
+      '#daily-verse .daily-verse-text{font-size:0.92rem!important;line-height:1.55!important;margin:0.35rem 0!important}' +
+      '#daily-verse .daily-verse-ref{font-size:0.8rem!important}' +
+      '#daily-verse .verse-refresh{font-size:0.8rem!important;padding:0.3rem 0.7rem!important;margin-top:0.45rem!important}' +
+      '#daily-verse{padding:0.75rem 1rem!important}';
+    document.head.appendChild(st);
+
+    function reveal() {
+      var sec = document.getElementById('daily-verse');
+      if (sec) sec.classList.add('dv-ready');
+    }
+    function whenReady() {
+      try {
+        if (localStorage.getItem('cog_lang_chosen') !== '1') {
+          setTimeout(whenReady, 500);
+          return;
+        }
+      } catch (e) {}
+      setTimeout(reveal, 1200);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { setTimeout(whenReady, 200); });
+    } else {
+      setTimeout(whenReady, 200);
+    }
+  })();
 })();
