@@ -1,4 +1,4 @@
-/* Full Bible search — no result cap; faster Persian; All/OT/NT/This book */
+/* Full Bible search — no cap; skip missing FA files; faster Persian */
 (function () {
   if (window.__mbSearchBooted) return;
   var CORE = [
@@ -14,16 +14,26 @@
       /if \(s === 'ot'\) return bookId > 0 && bookId < NT_MIN;\s*if \(s === 'nt'\) return bookId >= NT_MIN;\s*if \(s === 'book'\) return bookId === currentBookId\(\);\s*return true;/,
       "if (s === 'ot') return (bookId=Number(bookId)||0)>=10&&bookId<NT_MIN; if (s === 'nt') return (bookId=Number(bookId)||0)>=NT_MIN&&bookId<=730; if (s === 'book') return Number(bookId)===currentBookId(); bookId=Number(bookId)||0; return bookId>=10&&bookId<=730;"
     );
-    src = src.replace(/mapPool\(files,\s*12,/g, 'mapPool(files, 20,');
-    src = src.replace(/mapPool\(files,\s*14,/g, 'mapPool(files, 20,');
-    src = src.replace(/checked % 20 === 0/g, 'checked % 35 === 0');
+    /* Skip missing whole-book stubs like b10.json (404) */
+    src = src.replace(
+      /list\.forEach\(function \(fn\) \{\s*if \(!seen\[fn\]\)/,
+      'list.forEach(function (fn) { if (/^b\\d+\\.json$/i.test(fn)) return; if (!seen[fn])'
+    );
+    if (src.indexOf('/^b\\d+\\.json$/i') < 0) {
+      src = src.replace(
+        'list.forEach(function (fn) {',
+        'list.forEach(function (fn) { if (/^b\\d+\\.json$/i.test(String(fn||""))) return;'
+      );
+    }
+    src = src.replace(/mapPool\(files,\s*\d+,/g, 'mapPool(files, 24,');
+    src = src.replace(/checked % 20 === 0/g, 'checked % 40 === 0');
     src = src.replace(/, 450\)/g, ', 800)');
     src = src.replace(/, 1000\)/g, ', 800)');
     return src;
   }
   function load(i) {
     if (i >= CORE.length) return;
-    fetch(CORE[i] + (CORE[i].indexOf('?') >= 0 ? '&' : '?') + 't=1')
+    fetch(CORE[i] + (CORE[i].indexOf('?') >= 0 ? '&' : '?') + 't=fa2')
       .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
       .then(function (src) {
         try { (0, eval)(patch(src)); }
