@@ -1,4 +1,4 @@
-/* Bible search: every result shows Book Name + chapter:verse */
+/* Whole Bible search (all 66 books) — never stop early mid-scan */
 (function () {
   if (window.__mbSearchBooted) return;
   window.__mbSearchBooted = true;
@@ -29,9 +29,8 @@
     var st = document.createElement('style');
     st.id = 'mb-hit-css';
     st.textContent =
-      '.mb-search-item{text-align:start}' +
-      '.mb-search-item .mb-ref-line{display:block;font-weight:800;color:#5b9fd4;margin-bottom:0.25rem;font-size:0.92rem}' +
-      '.mb-search-item mark.mb-hit,.mb-hit{background:#ffd54f;color:#6b1a1a;font-weight:700;padding:0 0.15em;border-radius:3px}' +
+      '.mb-search-item .mb-ref-line, .mb-search-item strong{display:block;font-weight:800;color:#5b9fd4;margin-bottom:0.2rem}' +
+      '.mb-search-item mark.mb-hit,.mb-hit{background:#ffd54f;color:#6b1a1a;font-weight:700;padding:0 0.12em;border-radius:3px}' +
       'body.dark .mb-hit{background:#c9a227;color:#1a1200}';
     document.head.appendChild(st);
   }
@@ -45,147 +44,70 @@
       return m ? m[1].trim() : s;
     } catch (e) { return ''; }
   }
-  function hasBookLetters(s) {
-    return /[A-Za-z\u0600-\u06FF]/.test(String(s || ''));
-  }
-  function cleanVerseText(text, verseNum) {
-    var t = String(text || '').replace(/\s+/g, ' ').trim();
-    t = t.replace(/^[\s\u2014\u2013\-:|]+/, '').trim();
-    if (verseNum) {
-      var vn = String(verseNum);
-      if (t.indexOf(vn) === 0) {
-        t = t.slice(vn.length).replace(/^[\s:.\-]+/, '');
-      }
-    }
-    return t.trim();
-  }
   function polishResults() {
     injectCss();
     var input = document.getElementById('mb-search');
     var q = input ? (input.value || '').trim() : '';
     if (!q) return;
-    var fallbackBook = currentBookName();
+    var book = currentBookName();
     var box = document.getElementById('mb-search-results');
     if (!box) return;
-
     box.querySelectorAll('.mb-search-item').forEach(function (btn) {
-      var existing = btn.querySelector('.mb-ref-line');
-      if (existing && hasBookLetters(existing.textContent) && btn.getAttribute('data-polished') === q) {
-        return;
+      if (btn.getAttribute('data-ok') === q) return;
+      var strong = btn.querySelector('strong, .mb-ref-line');
+      var label = strong ? (strong.textContent || '').trim() : '';
+      var body = '';
+      if (strong) {
+        var n = strong.nextSibling;
+        while (n) { body += n.textContent || ''; n = n.nextSibling; }
       }
-
-      var strong = btn.querySelector('strong');
-      var rawLabel = '';
-      var bodyText = '';
-
-      if (existing) {
-        rawLabel = (existing.textContent || '').trim();
-        bodyText = '';
-        var n = existing.nextSibling;
-        while (n) {
-          bodyText += n.textContent || '';
-          n = n.nextSibling;
-        }
-        if (!bodyText) {
-          var clone = btn.cloneNode(true);
-          var er = clone.querySelector('.mb-ref-line');
-          if (er) er.remove();
-          bodyText = (clone.textContent || '').trim();
-        }
-      } else if (strong) {
-        rawLabel = (strong.textContent || '').trim();
-        var n2 = strong.nextSibling;
-        while (n2) {
-          bodyText += n2.textContent || '';
-          n2 = n2.nextSibling;
-        }
-        if (!bodyText) {
-          var html = btn.innerHTML;
-          var parts = html.split(/<br\s*\/?>/i);
-          if (parts.length >= 2) {
-            var tmp = document.createElement('div');
-            tmp.innerHTML = parts.slice(1).join(' ');
-            bodyText = (tmp.textContent || '').trim();
-          }
-        }
-      } else {
-        rawLabel = (btn.textContent || '').trim();
-      }
-
-      bodyText = bodyText.replace(/^[\s\u2014\u2013\-]+/, '').trim();
-
-      var bookName = '';
-      var ch = '';
-      var vs = '';
-
-      var m = rawLabel.match(/^(.+?)\s+(\d+):(\d+)\s*$/);
-      if (m) {
-        bookName = m[1].trim();
-        ch = m[2];
-        vs = m[3];
-      } else {
-        m = rawLabel.match(/^(\d+):(\d+)\s*$/);
-        if (m) {
-          ch = m[1];
-          vs = m[2];
-        } else {
-          m = rawLabel.match(/^(.+?)\s+(\d+):(\d+)/);
-          if (m) {
-            bookName = m[1].trim();
-            ch = m[2];
-            vs = m[3];
+      if (!body) {
+        var parts = btn.innerHTML.split(/<br\s*\/?>/i);
+        if (parts.length >= 2) {
+          var tmp = document.createElement('div');
+          tmp.innerHTML = parts.slice(1).join(' ');
+          body = (tmp.textContent || '').trim();
+          if (!label) {
+            tmp.innerHTML = parts[0];
+            label = (tmp.textContent || '').trim();
           }
         }
       }
-
-      if (!hasBookLetters(bookName)) bookName = fallbackBook;
-      bodyText = cleanVerseText(bodyText, vs);
-
-      var refLine = '';
-      if (hasBookLetters(bookName) && ch && vs) {
-        refLine = bookName + ' ' + ch + ':' + vs;
-      } else if (hasBookLetters(bookName)) {
-        refLine = bookName + (ch ? ' ' + ch + (vs ? ':' + vs : '') : '');
-      } else if (ch && vs) {
-        refLine = (fallbackBook ? fallbackBook + ' ' : '') + ch + ':' + vs;
-      } else {
-        refLine = rawLabel || fallbackBook || '\u2026';
+      body = body.replace(/^[\s\u2014\u2013\-]+/, '').trim();
+      var ch = '', vs = '', bookName = '';
+      var m = label.match(/^(.+?)\s+(\d+):(\d+)\s*$/);
+      if (m) { bookName = m[1].trim(); ch = m[2]; vs = m[3]; }
+      else {
+        m = label.match(/^(\d+):(\d+)\s*$/);
+        if (m) { ch = m[1]; vs = m[2]; }
       }
-      refLine = refLine.replace(/\s+/g, ' ').trim();
-
-      btn.setAttribute('data-polished', q);
-      btn.innerHTML =
-        '<span class="mb-ref-line">' + escapeHtml(refLine) + '</span>' +
-        (bodyText ? highlightMatch(bodyText, q) : '');
+      if (!/[A-Za-z\u0600-\u06FF]/.test(bookName)) bookName = book;
+      if (vs && body.indexOf(vs) === 0) body = body.slice(vs.length).replace(/^[\s:.]+/, '');
+      var ref = (bookName ? bookName + ' ' : '') + (ch && vs ? ch + ':' + vs : label);
+      ref = ref.replace(/\s+/g, ' ').trim();
+      btn.setAttribute('data-ok', q);
+      btn.innerHTML = '<strong class="mb-ref-line">' + escapeHtml(ref) + '</strong>' +
+        (body ? highlightMatch(body, q) : '');
     });
   }
   function observe() {
     injectCss();
     var box = document.getElementById('mb-search-results');
-    if (box && !box._hiObs) {
-      box._hiObs = true;
-      new MutationObserver(function () {
-        setTimeout(polishResults, 40);
-      }).observe(box, { childList: true, subtree: true });
+    if (box && !box._obs) {
+      box._obs = true;
+      new MutationObserver(function () { setTimeout(polishResults, 30); }).observe(box, { childList: true, subtree: true });
     }
     function run() {
-      setTimeout(polishResults, 150);
-      setTimeout(polishResults, 600);
-      setTimeout(polishResults, 1500);
-      setTimeout(polishResults, 3500);
-      setTimeout(polishResults, 6000);
+      [200, 700, 1500, 3000, 6000, 10000].forEach(function (ms) {
+        setTimeout(polishResults, ms);
+      });
     }
     var btn = document.getElementById('mb-search-btn');
-    if (btn && !btn._hiBound) {
-      btn._hiBound = true;
-      btn.addEventListener('click', run);
-    }
+    if (btn && !btn._w) { btn._w = true; btn.addEventListener('click', run); }
     var input = document.getElementById('mb-search');
-    if (input && !input._hiBound) {
-      input._hiBound = true;
-      input.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') run();
-      });
+    if (input && !input._w) {
+      input._w = true;
+      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') run(); });
     }
   }
 
@@ -195,16 +117,29 @@
   ];
 
   function patchSource(src) {
+    /* NEVER stop mid-scan because of result count — scan ALL 66 books */
+    src = src.replace(/token !== abortToken \|\| items\.length >= \d+/g, 'token !== abortToken');
+    src = src.replace(/if \(items\.length >= \d+\) break;/g, '/* scan all books */');
+    src = src.replace(/if \(items\.length >= \d+\) return;/g, '/* scan all */');
+    src = src.replace(/items\.length >= 50/g, 'false');
+    src = src.replace(/items\.length >= 80/g, 'false');
+    src = src.replace(/items\.length >= 100/g, 'false');
+    src = src.replace(/slice\(0,\s*50\)/g, 'slice(0, 150)');
+    src = src.replace(/slice\(0,\s*80\)/g, 'slice(0, 150)');
+    src = src.replace(/slice\(0,\s*100\)/g, 'slice(0, 150)');
+    /* Genesis to Revelation order */
     src = src.replace(
       /return \(\(na >= 470 \? 0 : 1\) - \(nb >= 470 \? 0 : 1\)\) \|\| \(na - nb\);/g,
-      'return ((na >= 470 ? 1 : 0) - (nb >= 470 ? 1 : 0)) || (na - nb);'
+      'return Number(a) - Number(b);'
     );
     src = src.replace(
-      /var pa = ida >= 470 \? 0 : 1, pb = idb >= 470 \? 0 : 1;/g,
-      'var pa = ida >= 470 ? 1 : 0, pb = idb >= 470 ? 1 : 0;'
+      /var pa = ida >= 470 \? 0 : 1, pb = idb >= 470 \? 0 : 1;\s*return pa - pb \|\| a - b;/g,
+      'return a - b;'
     );
-    src = src.replace(/items\.length >= 50/g, 'items.length >= 100');
-    src = src.replace(/slice\(0, 50\)/g, 'slice(0, 100)');
+    src = src.replace(
+      /var pa = ida >= 470 \? 1 : 0, pb = idb >= 470 \? 1 : 0;\s*return pa - pb \|\| a - b;/g,
+      'return a - b;'
+    );
     src = src.replace(
       "html: '<strong>' + ch + ':' + vs + '</strong> — ' + escapeHtml(snip)",
       "html: '<strong>' + (function(){var t=document.getElementById('mb-ref');var s=t?(t.textContent||'').trim():'';var m=s.match(/^(.+?)\\s+[\\d\\u06f0-\\u06f9]/);return ((m?m[1]:s)||'').trim();})() + ' ' + ch + ':' + vs + '</strong><br>' + escapeHtml(snip)"
@@ -213,13 +148,10 @@
   }
 
   function runCore(src) {
-    try {
-      (0, eval)(patchSource(src));
-    } catch (e) {
-      console.warn('bible search eval failed', e);
-    }
-    setTimeout(observe, 200);
-    setTimeout(observe, 800);
+    try { (0, eval)(patchSource(src)); }
+    catch (e) { console.warn('bible search failed', e); }
+    setTimeout(observe, 250);
+    setTimeout(observe, 1000);
   }
 
   function load() {
