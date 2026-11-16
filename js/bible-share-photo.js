@@ -1,4 +1,4 @@
-/* Photo share: profile picture + verse + seventhtrumpet.org on one image */
+/* Photo share: profile picture + verse + website + Instagram on one image */
 (function () {
   function isEn() {
     try { return (localStorage.getItem('cog_lang') || 'fa') === 'en'; } catch (e) { return false; }
@@ -82,11 +82,11 @@
       ctx.font = '700 42px system-ui,Tahoma,sans-serif';
       ctx.fillText(brand(), W / 2, cy + r + 70);
       var verse = p.text || 'Seventh Trumpet';
-      if (verse.length > 300) verse = verse.slice(0, 300) + '\u2026';
+      if (verse.length > 280) verse = verse.slice(0, 280) + '\u2026';
       ctx.fillStyle = '#f5f7fa';
       ctx.font = '500 44px system-ui,Tahoma,sans-serif';
       var lines = wrap(ctx, verse, W - 140);
-      if (lines.length > 8) { lines = lines.slice(0, 8); lines[7] += '\u2026'; }
+      if (lines.length > 7) { lines = lines.slice(0, 7); lines[6] += '\u2026'; }
       var y = cy + r + 150;
       lines.forEach(function (ln, i) { ctx.fillText(ln, W / 2, y + i * 58); });
       if (p.ref) {
@@ -94,9 +94,22 @@
         ctx.font = '700 36px system-ui,Tahoma,sans-serif';
         ctx.fillText(p.ref, W / 2, y + lines.length * 58 + 40);
       }
-      ctx.fillStyle = 'rgba(255,255,255,.95)';
+      /* Bottom card: website + Instagram — large & clear */
+      var barTop = H - 210;
+      ctx.fillStyle = 'rgba(0,0,0,0.38)';
+      ctx.fillRect(60, barTop, W - 120, 150);
+      ctx.strokeStyle = 'rgba(201,162,39,0.95)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(60, barTop, W - 120, 150);
+      ctx.fillStyle = '#c9a227';
+      ctx.font = '700 32px system-ui,Tahoma,sans-serif';
+      ctx.fillText('seventhtrumpet.org', W / 2, barTop + 48);
+      ctx.fillStyle = '#ffffff';
       ctx.font = '700 34px system-ui,Tahoma,sans-serif';
-      ctx.fillText('seventhtrumpet.org', W / 2, H - 90);
+      ctx.fillText('@seventhtrumpet.media', W / 2, barTop + 98);
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.font = '600 26px system-ui,Tahoma,sans-serif';
+      ctx.fillText('https://seventhtrumpet.org', W / 2, barTop + 138);
       return c;
     });
   }
@@ -106,7 +119,7 @@
         if (!blob) return resolve(false);
         var file = new File([blob], 'seventh-trumpet-verse.jpg', { type: 'image/jpeg' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: brand(), text: 'seventhtrumpet.org' })
+          navigator.share({ files: [file], title: brand(), text: 'https://seventhtrumpet.org  @seventhtrumpet.media' })
             .then(function () { resolve(true); })
             .catch(function () {
               var a = document.createElement('a');
@@ -133,8 +146,8 @@
     makeCanvas().then(function (c) {
       return saveOrShare(c).then(function () {
         toast(en
-          ? 'Picture ready: profile + verse. Add to Instagram Story.'
-          : '\u0639\u06a9\u0633 \u0622\u0645\u0627\u062f\u0647: \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0622\u06cc\u0647. \u062f\u0631 \u0627\u0633\u062a\u0648\u0631\u06cc \u0628\u06af\u0630\u0627\u0631\u06cc\u062f.');
+          ? 'Picture ready: profile + verse + website + @seventhtrumpet.media'
+          : '\u0639\u06a9\u0633 \u0622\u0645\u0627\u062f\u0647: \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0622\u06cc\u0647 + \u0648\u0628\u0633\u0627\u06cc\u062a + @seventhtrumpet.media');
         if (openIg) setTimeout(function () {
           window.open('https://www.instagram.com/seventhtrumpet.media', '_blank', 'noopener');
         }, 500);
