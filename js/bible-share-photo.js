@@ -1,4 +1,4 @@
-/* Photo share: profile picture + verse + website + Instagram on one image */
+/* Photo share for Instagram: big profile + verse + website text (links are not tappable on IG photos) */
 (function () {
   function isEn() {
     try { return (localStorage.getItem('cog_lang') || 'fa') === 'en'; } catch (e) { return false; }
@@ -69,47 +69,50 @@
     ctx.strokeStyle = 'rgba(201,162,39,.9)'; ctx.lineWidth = 8;
     ctx.strokeRect(36, 36, W - 72, H - 72);
     return loadImg(getLogo()).then(function (logo) {
-      var cy = 220, r = 150;
+      /* Large profile */
+      var cy = 280, r = 220;
       if (logo) {
         ctx.save();
         ctx.beginPath(); ctx.arc(W / 2, cy, r, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
         ctx.drawImage(logo, W / 2 - r, cy - r, r * 2, r * 2);
         ctx.restore();
-        ctx.beginPath(); ctx.arc(W / 2, cy, r + 6, 0, Math.PI * 2);
-        ctx.strokeStyle = '#c9a227'; ctx.lineWidth = 10; ctx.stroke();
+        ctx.beginPath(); ctx.arc(W / 2, cy, r + 8, 0, Math.PI * 2);
+        ctx.strokeStyle = '#c9a227'; ctx.lineWidth = 12; ctx.stroke();
       }
       ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-      ctx.font = '700 42px system-ui,Tahoma,sans-serif';
-      ctx.fillText(brand(), W / 2, cy + r + 70);
+      ctx.font = '700 40px system-ui,Tahoma,sans-serif';
+      ctx.fillText(brand(), W / 2, cy + r + 64);
+
       var verse = p.text || 'Seventh Trumpet';
-      if (verse.length > 280) verse = verse.slice(0, 280) + '\u2026';
+      if (verse.length > 260) verse = verse.slice(0, 260) + '\u2026';
       ctx.fillStyle = '#f5f7fa';
-      ctx.font = '500 44px system-ui,Tahoma,sans-serif';
+      ctx.font = '500 42px system-ui,Tahoma,sans-serif';
       var lines = wrap(ctx, verse, W - 140);
-      if (lines.length > 7) { lines = lines.slice(0, 7); lines[6] += '\u2026'; }
-      var y = cy + r + 150;
-      lines.forEach(function (ln, i) { ctx.fillText(ln, W / 2, y + i * 58); });
+      if (lines.length > 6) { lines = lines.slice(0, 6); lines[5] += '\u2026'; }
+      var y = cy + r + 130;
+      lines.forEach(function (ln, i) { ctx.fillText(ln, W / 2, y + i * 54); });
       if (p.ref) {
         ctx.fillStyle = '#c9a227';
-        ctx.font = '700 36px system-ui,Tahoma,sans-serif';
-        ctx.fillText(p.ref, W / 2, y + lines.length * 58 + 40);
+        ctx.font = '700 34px system-ui,Tahoma,sans-serif';
+        ctx.fillText(p.ref, W / 2, y + lines.length * 54 + 36);
       }
-      /* Bottom card: website + Instagram — large & clear */
-      var barTop = H - 210;
-      ctx.fillStyle = 'rgba(0,0,0,0.38)';
-      ctx.fillRect(60, barTop, W - 120, 150);
+
+      /* Website + Instagram as text (not tappable on IG) */
+      var barTop = H - 200;
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.fillRect(60, barTop, W - 120, 140);
       ctx.strokeStyle = 'rgba(201,162,39,0.95)';
       ctx.lineWidth = 3;
-      ctx.strokeRect(60, barTop, W - 120, 150);
+      ctx.strokeRect(60, barTop, W - 120, 140);
       ctx.fillStyle = '#c9a227';
-      ctx.font = '700 32px system-ui,Tahoma,sans-serif';
+      ctx.font = '700 34px system-ui,Tahoma,sans-serif';
       ctx.fillText('seventhtrumpet.org', W / 2, barTop + 48);
       ctx.fillStyle = '#ffffff';
-      ctx.font = '700 34px system-ui,Tahoma,sans-serif';
+      ctx.font = '700 36px system-ui,Tahoma,sans-serif';
       ctx.fillText('@seventhtrumpet.media', W / 2, barTop + 98);
       ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      ctx.font = '600 26px system-ui,Tahoma,sans-serif';
-      ctx.fillText('https://seventhtrumpet.org', W / 2, barTop + 138);
+      ctx.font = '600 24px system-ui,Tahoma,sans-serif';
+      ctx.fillText('https://seventhtrumpet.org', W / 2, barTop + 128);
       return c;
     });
   }
@@ -142,12 +145,12 @@
   }
   window.ST_sharePhoto = function (openIg) {
     var en = isEn();
-    toast(en ? 'Preparing picture with profile\u2026' : '\u062f\u0631 \u062d\u0627\u0644 \u0633\u0627\u062e\u062a \u0639\u06a9\u0633 \u0628\u0627 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644\u2026');
+    toast(en ? 'Preparing picture\u2026' : '\u062f\u0631 \u062d\u0627\u0644 \u0633\u0627\u062e\u062a \u0639\u06a9\u0633\u2026');
     makeCanvas().then(function (c) {
       return saveOrShare(c).then(function () {
         toast(en
-          ? 'Picture ready: profile + verse + website + @seventhtrumpet.media'
-          : '\u0639\u06a9\u0633 \u0622\u0645\u0627\u062f\u0647: \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0622\u06cc\u0647 + \u0648\u0628\u0633\u0627\u06cc\u062a + @seventhtrumpet.media');
+          ? 'Picture ready — add to Instagram Story'
+          : '\u0639\u06a9\u0633 \u0622\u0645\u0627\u062f\u0647 — \u062f\u0631 \u0627\u0633\u062a\u0648\u0631\u06cc \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645 \u0628\u06af\u0630\u0627\u0631\u06cc\u062f');
         if (openIg) setTimeout(function () {
           window.open('https://www.instagram.com/seventhtrumpet.media', '_blank', 'noopener');
         }, 500);
@@ -157,31 +160,14 @@
     });
   };
 
+  /* Instagram only → photo with big profile */
   document.addEventListener('click', function (e) {
-    var btn = e.target && e.target.closest && e.target.closest('[data-go="ig"],[data-go="img"]');
+    var btn = e.target && e.target.closest && e.target.closest('[data-go="ig"]');
     if (!btn) return;
-    var go = btn.getAttribute('data-go');
-    if (go !== 'ig' && go !== 'img') return;
     e.preventDefault();
     e.stopPropagation();
     var ov = document.getElementById('vshare-overlay');
     if (ov) try { ov.remove(); } catch (err) {}
-    setTimeout(function () { window.ST_sharePhoto(go === 'ig'); }, 60);
+    setTimeout(function () { window.ST_sharePhoto(true); }, 60);
   }, true);
-
-  var obs = new MutationObserver(function () {
-    var grid = document.querySelector('.vshare-grid');
-    if (!grid || grid.querySelector('[data-go="img"]')) return;
-    var en = isEn();
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'vshare-btn img';
-    b.setAttribute('data-go', 'img');
-    b.textContent = en ? 'Photo (profile + verse)' : '\u0639\u06a9\u0633 (\u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0622\u06cc\u0647)';
-    b.style.cssText = 'background:#c9a227;color:#0a2540;grid-column:1/-1';
-    var more = grid.querySelector('[data-go="more"]');
-    if (more) grid.insertBefore(b, more);
-    else grid.appendChild(b);
-  });
-  obs.observe(document.documentElement, { childList: true, subtree: true });
 })();
