@@ -1,88 +1,39 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:title" content="Seventh Trumpet | شیپور هفتم">
-  <meta property="og:description" content="The everlasting gospel — Three angels' messages of Revelation 14">
-  <meta property="og:image" content="https://iili.io/n8MSJBp.jpg">
-  <meta property="og:image:width" content="512">
-  <meta property="og:image:height" content="512">
-  <meta property="og:url" content="https://seventhtrumpet.org/">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://iili.io/n8MSJBp.jpg">
-  <title>کتاب مقدس — شیپور هفتم</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/bible.css">
-  <link rel="stylesheet" href="css/menu.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>کتاب مقدس | Seventh Trumpet</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/polish.css" />
 </head>
 <body data-page="bible">
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo"><span data-i18n="siteName">شیپور هفتم</span></a>
-      <nav class="nav nav-main">
-        <a href="index.html" data-i18n="home" data-nav="home">خانه</a>
-        <a href="media.html" data-i18n="media" data-nav="media">رسانه‌ها</a>
-        <a href="bible.html" class="active" data-i18n="bibleNav" data-nav="bible">کتاب مقدس</a>
-        <a href="live.html" data-i18n="live" data-nav="live">پخش زنده</a>
-        <button type="button" id="lang-toggle" class="lang-toggle" data-i18n="langBtn" data-lang-toggle="1" onclick="if(window.__toggleLang){window.__toggleLang();}else if(window.toggleLanguage){window.toggleLanguage();}return false;">English</button>
+      <nav class="nav-main">
+        <a href="index.html" data-i18n="navHome">خانه</a>
+        <a href="bible.html" data-i18n="navBible">کتاب مقدس</a>
+        <a href="media.html" data-i18n="navMedia">رسانه</a>
+        <a href="about.html" data-i18n="navAbout">درباره</a>
       </nav>
+      <div class="header-actions" style="display:flex;align-items:center;gap:0.4rem;margin-inline-start:auto;">
+        <button type="button" id="lang-toggle" class="lang-toggle">EN</button>
+      </div>
     </div>
   </header>
-
-  <div class="mb-bar">
-    <button type="button" id="mb-prev" class="mb-nav" title="Prev chapter">‹</button>
-    <button type="button" id="mb-ref" class="mb-ref">—</button>
-    <button type="button" id="mb-next" class="mb-nav" title="Next chapter">›</button>
-  </div>
-
-  <div id="mb-sel" class="mb-sel hidden" aria-hidden="true">
-    <div class="mb-sel-bg" id="mb-sel-bg"></div>
-    <div class="mb-sel-panel">
-      <div class="mb-sel-tabs">
-        <button type="button" class="mb-tab active" data-tab="books" id="mb-tab-books" data-i18n="bibleBook">کتاب</button>
-        <button type="button" class="mb-tab" data-tab="chapters" id="mb-tab-chapters" data-i18n="bibleChapter">باب</button>
-        <button type="button" class="mb-tab" data-tab="verses" id="mb-tab-verses" data-i18n="bibleVerse">آیه</button>
-      </div>
-      <div class="mb-sel-body">
-        <div id="mb-books" class="mb-grid mb-books"></div>
-        <div id="mb-chapters" class="mb-grid mb-nums hidden"></div>
-        <div id="mb-verses" class="mb-grid mb-nums hidden"></div>
-      </div>
-      <div class="mb-sel-foot">
-        <span id="mb-version" class="mb-version">هزارۀ نو</span>
-        <button type="button" id="mb-close" class="mb-close" data-i18n="bibleDone">خواندن</button>
-      </div>
+  <main class="page">
+    <div class="mb-bar">
+      <button type="button" id="mb-share" data-i18n="share">اشتراک</button>
     </div>
-  </div>
-
-  <div id="mb-actions" class="mb-actions hidden">
-    <span id="mb-sel-label" class="mb-sel-label"></span>
-    <button type="button" id="mb-copy" data-i18n="copy">کپی</button>
-    <button type="button" id="mb-share" data-i18n="share">اشتراک</button>
-    <button type="button" id="mb-clear" data-i18n="clear">پاک</button>
-  </div>
-
-  <main class="mb-reader" id="mb-reader">
-    <h1 id="bible-heading" class="mb-heading"></h1>
-    <div id="bible-verses" class="mb-text">
-      <p class="bible-loading" data-i18n="bibleLoading">در حال بارگذاری...</p>
-    </div>
+    <div id="mb-reader"></div>
   </main>
-
-  <footer class="footer">
-    <p data-i18n="footer">شیپور هفتم — پیام سه فرشته مکاشفه ۱۴</p>
-  </footer>
-
   <script src="js/lang_fix.js"></script>
   <script src="js/bible_fa_fill.js"></script>
   <script src="js/bible.js"></script>
   <script src="js/bible_search.js"></script>
   <script src="js/bible-share.js"></script>
+  <script src="js/bible-share-photo.js"></script>
   <script src="js/menu.js"></script>
 </body>
 </html>
