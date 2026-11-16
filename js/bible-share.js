@@ -1,4 +1,4 @@
-/* Share: WhatsApp link card; Instagram copy+open; Facebook; system share for more apps */
+/* Share panel: WA/TG/IG/FB photo flow + Messenger + Signal */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -53,8 +53,7 @@
   }
 
   function versePayload() {
-    var text = '';
-    var ref = '';
+    var text = '', ref = '';
     try {
       var vt = document.getElementById('verse-text');
       if (vt) text = (vt.textContent || '').trim();
@@ -121,17 +120,12 @@
     }
   }
 
-  function systemShare(title, text, url) {
-    if (!navigator.share) return Promise.resolve(false);
-    return navigator.share({ title: title, text: text, url: url }).then(function () { return true; }).catch(function () { return false; });
-  }
-
   function doShare(app) {
     var msg = buildMessage();
     var pageUrl = SITE + '/';
     var brand = brandLine();
     var p = versePayload();
-    var cardTitle = (p.ref ? (p.ref + ' — ') : '') + brand;
+    var cardTitle = (p.ref ? (p.ref + ' \u2014 ') : '') + brand;
     var cardText = '';
     if (p.text) cardText += p.text + '\n\n';
     if (p.ref) cardText += p.ref + '\n\n';
@@ -140,13 +134,13 @@
     var en = isEn();
 
     if (app === 'more' || app === 'system') {
-      systemShare(cardTitle, cardText, pageUrl).then(function (ok) {
-        if (!ok) {
-          copyText(full).then(function () {
-            toast(en ? 'Copied — paste in any app' : '\u06a9\u067e\u06cc \u0634\u062f — \u062f\u0631 \u0647\u0631 \u0628\u0631\u0646\u0627\u0645\u0647\u200c\u0627\u06cc \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc \u06a9\u0646\u06cc\u062f');
-          });
-        }
-      });
+      if (navigator.share) {
+        navigator.share({ title: cardTitle, text: cardText, url: pageUrl }).catch(function () {
+          copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
+        });
+      } else {
+        copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
+      }
       return;
     }
 
@@ -166,31 +160,47 @@
       return;
     }
 
-    if (app === 'fb') {
-      window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener,width=600,height=500');
-      copyText(full).then(function () {
-        toast(en ? 'Link ready — you can also paste the verse' : '\u0644\u06cc\u0646\u06a9 \u0622\u0645\u0627\u062f\u0647 — \u0645\u06cc\u200c\u062a\u0648\u0627\u0646\u06cc\u062f \u0622\u06cc\u0647 \u0631\u0627 \u0647\u0645 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc \u06a9\u0646\u06cc\u062f');
-      });
+    /* FB/IG handled by bible-share-photo.js (picture) */
+    if (app === 'fb' || app === 'ig') {
+      if (typeof window.ST_sharePhoto === 'function') {
+        window.ST_sharePhoto(app === 'ig', app);
+      } else {
+        window.open(app === 'fb' ? SOCIAL.facebook + encodeURIComponent(pageUrl) : SOCIAL.instagram, '_blank', 'noopener');
+      }
       return;
     }
 
-    if (app === 'ig') {
+    if (app === 'msg' || app === 'messenger') {
       copyText(full).then(function () {
-        toast(en
-          ? 'Copied! Open Instagram → Story or Post → Paste'
-          : '\u06a9\u067e\u06cc \u0634\u062f! \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645 → \u0627\u0633\u062a\u0648\u0631\u06cc \u06cc\u0627 \u067e\u0633\u062a → \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
-        setTimeout(function () {
-          window.open(SOCIAL.instagram, '_blank', 'noopener');
-        }, 400);
+        toast(en ? 'Copied \u2014 paste in Messenger' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0645\u0633\u0646\u062c\u0631 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
       });
+      try {
+        window.location.href = 'fb-messenger://share/?link=' + encodeURIComponent(pageUrl);
+      } catch (e) {}
+      setTimeout(function () {
+        window.open('https://www.messenger.com/', '_blank', 'noopener');
+      }, 700);
+      return;
+    }
+
+    if (app === 'signal') {
+      copyText(full).then(function () {
+        toast(en ? 'Copied \u2014 paste in Signal' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0633\u06cc\u06af\u0646\u0627\u0644 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
+      });
+      try {
+        window.location.href = 'sgnl://send?text=' + encodeURIComponent(full);
+      } catch (e) {}
+      setTimeout(function () {
+        window.open('https://signal.me/', '_blank', 'noopener');
+      }, 700);
       return;
     }
 
     if (app === 'tt') {
       copyText(full).then(function () {
-        toast(en ? 'Copied! Paste in TikTok caption' : '\u06a9\u067e\u06cc \u0634\u062f! \u062f\u0631 \u06a9\u067e\u0634\u0646 \u062a\u06cc\u06a9\u200c\u062a\u0627\u06a9 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc\u062f');
-        setTimeout(function () { window.open(SOCIAL.tiktok, '_blank', 'noopener'); }, 400);
+        toast(en ? 'Copied \u2014 paste in TikTok' : '\u06a9\u067e\u06cc \u0634\u062f');
       });
+      setTimeout(function () { window.open(SOCIAL.tiktok, '_blank', 'noopener'); }, 400);
       return;
     }
 
@@ -200,7 +210,7 @@
     }
 
     copyText(full).then(function (ok) {
-      toast(ok ? (en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f') : (en ? 'Could not copy' : '\u06a9\u067e\u06cc \u0646\u0634\u062f'));
+      toast(ok ? (en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f') : (en ? 'Failed' : '\u0646\u0634\u062f'));
     });
   }
 
@@ -215,17 +225,14 @@
       '.vshare-title{font-weight:800;font-size:1.15rem;margin:0 0 0.9rem;text-align:center;color:#0a2540}' +
       'body.dark .vshare-title{color:#9ec5ea}' +
       '.vshare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}' +
-      '.vshare-btn{display:flex;align-items:center;justify-content:center;padding:0.9rem 0.4rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:0.95rem;cursor:pointer;color:#fff}' +
-      '.vshare-btn.wa{background:#25D366}' +
-      '.vshare-btn.tg{background:#0088cc}' +
+      '.vshare-btn{display:flex;align-items:center;justify-content:center;padding:0.85rem 0.35rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:0.9rem;cursor:pointer;color:#fff}' +
+      '.vshare-btn.wa{background:#25D366}.vshare-btn.tg{background:#0088cc}' +
       '.vshare-btn.ig{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}' +
-      '.vshare-btn.fb{background:#1877F2}' +
-      '.vshare-btn.tt{background:#111}' +
-      '.vshare-btn.yt{background:#FF0000}' +
-      '.vshare-btn.more{background:#5b6b7c;grid-column:1/-1}' +
-      '.vshare-btn.site{background:#0a2540;grid-column:1/-1}' +
-      '.vshare-hint{font-size:0.78rem;color:#6b7785;text-align:center;margin:0.55rem 0 0;line-height:1.35}' +
-      '.vshare-close{display:block;width:100%;margin-top:0.65rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
+      '.vshare-btn.fb{background:#1877F2}.vshare-btn.msg{background:#006AFF}.vshare-btn.signal{background:#3A76F0}' +
+      '.vshare-btn.tt{background:#111}.vshare-btn.yt{background:#FF0000}' +
+      '.vshare-btn.more{background:#5b6b7c;grid-column:1/-1}.vshare-btn.site{background:#0a2540;grid-column:1/-1}' +
+      '.vshare-hint{font-size:0.75rem;color:#6b7785;text-align:center;margin:0.5rem 0 0;line-height:1.35}' +
+      '.vshare-close{display:block;width:100%;margin-top:0.6rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
     document.head.appendChild(st);
   }
 
@@ -234,7 +241,6 @@
     var old = document.getElementById('vshare-overlay');
     if (old) old.remove();
     var en = isEn();
-
     var overlay = document.createElement('div');
     overlay.id = 'vshare-overlay';
     overlay.className = 'vshare-overlay';
@@ -246,6 +252,8 @@
       '<button type="button" class="vshare-btn tg" data-go="tg">Telegram</button>' +
       '<button type="button" class="vshare-btn ig" data-go="ig">Instagram</button>' +
       '<button type="button" class="vshare-btn fb" data-go="fb">Facebook</button>' +
+      '<button type="button" class="vshare-btn msg" data-go="msg">Messenger</button>' +
+      '<button type="button" class="vshare-btn signal" data-go="signal">Signal</button>' +
       '<button type="button" class="vshare-btn tt" data-go="tt">TikTok</button>' +
       '<button type="button" class="vshare-btn yt" data-go="yt">YouTube</button>' +
       '<button type="button" class="vshare-btn more" data-go="more">' +
@@ -253,19 +261,16 @@
       '</button>' +
       '<button type="button" class="vshare-btn site" data-go="site">' +
       (en ? 'Open website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u0633\u0627\u06cc\u062a') +
-      '</button>' +
-      '</div>' +
+      '</button></div>' +
       '<p class="vshare-hint">' +
       (en
-        ? 'Instagram has no direct share link — we copy the verse, then open the app so you can paste.'
-        : '\u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645 \u0644\u06cc\u0646\u06a9 \u0645\u0633\u062a\u0642\u06cc\u0645 \u0646\u062f\u0627\u0631\u062f — \u0622\u06cc\u0647 \u06a9\u067e\u06cc \u0645\u06cc\u200c\u0634\u0648\u062f\u060c \u0628\u0639\u062f \u0627\u067e \u0628\u0627\u0632 \u0645\u06cc\u200c\u0634\u0648\u062f \u062a\u0627 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc \u06a9\u0646\u06cc\u062f.') +
+        ? 'Facebook & Instagram: photo with profile. Messenger & Signal: text + link copied.'
+        : '\u0641\u06cc\u0633\u0628\u0648\u06a9 \u0648 \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645: \u0639\u06a9\u0633. \u0645\u0633\u0646\u062c\u0631 \u0648 \u0633\u06cc\u06af\u0646\u0627\u0644: \u0645\u062a\u0646 + \u0644\u06cc\u0646\u06a9.') +
       '</p>' +
       '<button type="button" class="vshare-close" id="vs-close">' +
       (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
-      '</button>' +
-      '</div>';
+      '</button></div>';
     document.body.appendChild(overlay);
-
     function close() { try { overlay.remove(); } catch (e) {} }
     overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
     var cl = document.getElementById('vs-close');
@@ -325,24 +330,13 @@
     }, true);
   }
 
-  function bindVerseTap() {
-    var textEl = document.getElementById('verse-text');
-    if (!textEl || textEl._stShareBound) return;
-    textEl._stShareBound = true;
-    textEl.style.cursor = 'pointer';
-    textEl.addEventListener('click', openSharePanel);
-  }
-
   function boot() {
     applyDeepLink();
     initDailyShare();
     bindBibleShare();
-    bindVerseTap();
     setLabels();
     setTimeout(bindBibleShare, 400);
     setTimeout(bindBibleShare, 1200);
-    var lt = document.getElementById('lang-toggle');
-    if (lt) lt.addEventListener('click', function () { setTimeout(setLabels, 150); });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
