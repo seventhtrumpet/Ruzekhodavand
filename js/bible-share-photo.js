@@ -1,4 +1,4 @@
-/* Photo share for Instagram: big profile + verse + website text (links are not tappable on IG photos) */
+/* Photo share: Instagram + Facebook get profile+verse image (links not tappable on photos) */
 (function () {
   function isEn() {
     try { return (localStorage.getItem('cog_lang') || 'fa') === 'en'; } catch (e) { return false; }
@@ -69,7 +69,6 @@
     ctx.strokeStyle = 'rgba(201,162,39,.9)'; ctx.lineWidth = 8;
     ctx.strokeRect(36, 36, W - 72, H - 72);
     return loadImg(getLogo()).then(function (logo) {
-      /* Large profile */
       var cy = 280, r = 220;
       if (logo) {
         ctx.save();
@@ -82,7 +81,6 @@
       ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
       ctx.font = '700 40px system-ui,Tahoma,sans-serif';
       ctx.fillText(brand(), W / 2, cy + r + 64);
-
       var verse = p.text || 'Seventh Trumpet';
       if (verse.length > 260) verse = verse.slice(0, 260) + '\u2026';
       ctx.fillStyle = '#f5f7fa';
@@ -96,8 +94,6 @@
         ctx.font = '700 34px system-ui,Tahoma,sans-serif';
         ctx.fillText(p.ref, W / 2, y + lines.length * 54 + 36);
       }
-
-      /* Website + Instagram as text (not tappable on IG) */
       var barTop = H - 200;
       ctx.fillStyle = 'rgba(0,0,0,0.4)';
       ctx.fillRect(60, barTop, W - 120, 140);
@@ -143,31 +139,44 @@
       }, 'image/jpeg', 0.92);
     });
   }
-  window.ST_sharePhoto = function (openIg) {
+  window.ST_sharePhoto = function (openIg, app) {
     var en = isEn();
     toast(en ? 'Preparing picture\u2026' : '\u062f\u0631 \u062d\u0627\u0644 \u0633\u0627\u062e\u062a \u0639\u06a9\u0633\u2026');
     makeCanvas().then(function (c) {
       return saveOrShare(c).then(function () {
-        toast(en
-          ? 'Picture ready — add to Instagram Story'
-          : '\u0639\u06a9\u0633 \u0622\u0645\u0627\u062f\u0647 — \u062f\u0631 \u0627\u0633\u062a\u0648\u0631\u06cc \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645 \u0628\u06af\u0630\u0627\u0631\u06cc\u062f');
-        if (openIg) setTimeout(function () {
-          window.open('https://www.instagram.com/seventhtrumpet.media', '_blank', 'noopener');
-        }, 500);
+        var tip = en
+          ? (app === 'fb'
+              ? 'Picture ready — upload it on Facebook as a Photo. Link share also opens.'
+              : 'Picture ready — add to Instagram Story')
+          : (app === 'fb'
+              ? '\u0639\u06a9\u0633 \u0622\u0645\u0627\u062f\u0647 — \u062f\u0631 \u0641\u06cc\u0633\u0628\u0648\u06a9 \u0628\u0647\u200c\u0639\u0646\u0648\u0627\u0646 \u0639\u06a9\u0633 \u0628\u06af\u0630\u0627\u0631\u06cc\u062f'
+              : '\u0639\u06a9\u0633 \u0622\u0645\u0627\u062f\u0647 — \u062f\u0631 \u0627\u0633\u062a\u0648\u0631\u06cc \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645 \u0628\u06af\u0630\u0627\u0631\u06cc\u062f');
+        toast(tip);
+        if (app === 'fb') {
+          setTimeout(function () {
+            window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://seventhtrumpet.org/'), '_blank', 'noopener');
+          }, 600);
+        } else if (openIg) {
+          setTimeout(function () {
+            window.open('https://www.instagram.com/seventhtrumpet.media', '_blank', 'noopener');
+          }, 500);
+        }
       });
     }).catch(function () {
       toast(en ? 'Could not make picture' : '\u0639\u06a9\u0633 \u0633\u0627\u062e\u062a\u0647 \u0646\u0634\u062f');
     });
   };
 
-  /* Instagram only → photo with big profile */
   document.addEventListener('click', function (e) {
-    var btn = e.target && e.target.closest && e.target.closest('[data-go="ig"]');
+    var btn = e.target && e.target.closest && e.target.closest('[data-go="ig"],[data-go="fb"]');
     if (!btn) return;
     e.preventDefault();
     e.stopPropagation();
+    var go = btn.getAttribute('data-go');
     var ov = document.getElementById('vshare-overlay');
     if (ov) try { ov.remove(); } catch (err) {}
-    setTimeout(function () { window.ST_sharePhoto(true); }, 60);
+    setTimeout(function () {
+      window.ST_sharePhoto(go === 'ig', go);
+    }, 60);
   }, true);
 })();
