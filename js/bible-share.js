@@ -1,4 +1,4 @@
-/* Bible.com style: profile picture + connected tappable link card under it (not caption, not part of the image) */
+/* Share: WhatsApp link card; Instagram copy+open; Facebook; system share for more apps */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -72,7 +72,7 @@
       if (ch || vs) ref = ch + ':' + vs;
     }
     if (!text) {
-      var main = document.querySelector('.angel-text, .daily-verse-text, #daily-verse .verse-body, article p, .mb-verse.active');
+      var main = document.querySelector('.mb-verse.active, .verse-body, article p');
       if (main) text = (main.textContent || '').trim().slice(0, 600);
     }
     return { text: (text || '').trim(), ref: (ref || '').trim() };
@@ -92,35 +92,71 @@
     return parts.join('\n\n');
   }
 
+  function toast(msg) {
+    var t = document.getElementById('vshare-toast');
+    if (t) t.remove();
+    t = document.createElement('div');
+    t.id = 'vshare-toast';
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;left:50%;bottom:5.5rem;transform:translateX(-50%);z-index:6000;background:#0a2540;color:#fff;padding:0.7rem 1rem;border-radius:12px;font-size:0.88rem;font-weight:700;max-width:90%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)';
+    document.body.appendChild(t);
+    setTimeout(function () { try { t.remove(); } catch (e) {} }, 3200);
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(function () { return true; }).catch(function () { return false; });
+    }
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;left:-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.remove();
+      return Promise.resolve(!!ok);
+    } catch (e) {
+      return Promise.resolve(false);
+    }
+  }
+
+  function systemShare(title, text, url) {
+    if (!navigator.share) return Promise.resolve(false);
+    return navigator.share({ title: title, text: text, url: url }).then(function () { return true; }).catch(function () { return false; });
+  }
+
   function doShare(app) {
     var msg = buildMessage();
     var pageUrl = SITE + '/';
     var brand = brandLine();
+    var p = versePayload();
+    var cardTitle = (p.ref ? (p.ref + ' — ') : '') + brand;
+    var cardText = '';
+    if (p.text) cardText += p.text + '\n\n';
+    if (p.ref) cardText += p.ref + '\n\n';
+    cardText += brand;
+    var full = cardText + '\n\n' + pageUrl;
+    var en = isEn();
+
+    if (app === 'more' || app === 'system') {
+      systemShare(cardTitle, cardText, pageUrl).then(function (ok) {
+        if (!ok) {
+          copyText(full).then(function () {
+            toast(en ? 'Copied — paste in any app' : '\u06a9\u067e\u06cc \u0634\u062f — \u062f\u0631 \u0647\u0631 \u0628\u0631\u0646\u0627\u0645\u0647\u200c\u0627\u06cc \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc \u06a9\u0646\u06cc\u062f');
+          });
+        }
+      });
+      return;
+    }
 
     if (app === 'wa') {
-      /*
-       * Bible.com style (same as last night working version):
-       * Share the real website URL — not an image file, not a caption under a photo.
-       * WhatsApp builds: profile picture (from website OG image) + white CARD under it.
-       * The card has the link and is tappable. Connected under the picture, not part of it.
-       */
-      var p = versePayload();
-      var cardTitle = (p.ref ? (p.ref + ' — ') : '') + brand;
-      var cardText = '';
-      if (p.text) cardText += p.text + '\n\n';
-      if (p.ref) cardText += p.ref + '\n\n';
-      cardText += brand;
-
       if (navigator.share) {
-        navigator.share({
-          title: cardTitle,
-          text: cardText,
-          url: pageUrl
-        }).catch(function () {
-          window.open('https://wa.me/?text=' + encodeURIComponent(cardText + '\n\n' + pageUrl), '_blank', 'noopener');
+        navigator.share({ title: cardTitle, text: cardText, url: pageUrl }).catch(function () {
+          window.open('https://wa.me/?text=' + encodeURIComponent(full), '_blank', 'noopener');
         });
       } else {
-        window.open('https://wa.me/?text=' + encodeURIComponent(cardText + '\n\n' + pageUrl), '_blank', 'noopener');
+        window.open('https://wa.me/?text=' + encodeURIComponent(full), '_blank', 'noopener');
       }
       return;
     }
@@ -131,19 +167,41 @@
     }
 
     if (app === 'fb') {
-      window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
+      window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener,width=600,height=500');
+      copyText(full).then(function () {
+        toast(en ? 'Link ready — you can also paste the verse' : '\u0644\u06cc\u0646\u06a9 \u0622\u0645\u0627\u062f\u0647 — \u0645\u06cc\u200c\u062a\u0648\u0627\u0646\u06cc\u062f \u0622\u06cc\u0647 \u0631\u0627 \u0647\u0645 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc \u06a9\u0646\u06cc\u062f');
+      });
       return;
     }
 
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(msg);
-      }
-    } catch (e) {}
+    if (app === 'ig') {
+      copyText(full).then(function () {
+        toast(en
+          ? 'Copied! Open Instagram → Story or Post → Paste'
+          : '\u06a9\u067e\u06cc \u0634\u062f! \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645 → \u0627\u0633\u062a\u0648\u0631\u06cc \u06cc\u0627 \u067e\u0633\u062a → \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
+        setTimeout(function () {
+          window.open(SOCIAL.instagram, '_blank', 'noopener');
+        }, 400);
+      });
+      return;
+    }
 
-    if (app === 'ig') window.open(SOCIAL.instagram, '_blank', 'noopener');
-    else if (app === 'tt') window.open(SOCIAL.tiktok, '_blank', 'noopener');
-    else if (app === 'yt') window.open(SOCIAL.youtube, '_blank', 'noopener');
+    if (app === 'tt') {
+      copyText(full).then(function () {
+        toast(en ? 'Copied! Paste in TikTok caption' : '\u06a9\u067e\u06cc \u0634\u062f! \u062f\u0631 \u06a9\u067e\u0634\u0646 \u062a\u06cc\u06a9\u200c\u062a\u0627\u06a9 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc\u062f');
+        setTimeout(function () { window.open(SOCIAL.tiktok, '_blank', 'noopener'); }, 400);
+      });
+      return;
+    }
+
+    if (app === 'yt') {
+      window.open(SOCIAL.youtube, '_blank', 'noopener');
+      return;
+    }
+
+    copyText(full).then(function (ok) {
+      toast(ok ? (en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f') : (en ? 'Could not copy' : '\u06a9\u067e\u06cc \u0646\u0634\u062f'));
+    });
   }
 
   function ensureCss() {
@@ -164,7 +222,9 @@
       '.vshare-btn.fb{background:#1877F2}' +
       '.vshare-btn.tt{background:#111}' +
       '.vshare-btn.yt{background:#FF0000}' +
+      '.vshare-btn.more{background:#5b6b7c;grid-column:1/-1}' +
       '.vshare-btn.site{background:#0a2540;grid-column:1/-1}' +
+      '.vshare-hint{font-size:0.78rem;color:#6b7785;text-align:center;margin:0.55rem 0 0;line-height:1.35}' +
       '.vshare-close{display:block;width:100%;margin-top:0.65rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
     document.head.appendChild(st);
   }
@@ -188,17 +248,28 @@
       '<button type="button" class="vshare-btn fb" data-go="fb">Facebook</button>' +
       '<button type="button" class="vshare-btn tt" data-go="tt">TikTok</button>' +
       '<button type="button" class="vshare-btn yt" data-go="yt">YouTube</button>' +
+      '<button type="button" class="vshare-btn more" data-go="more">' +
+      (en ? 'More apps\u2026' : '\u0628\u0631\u0646\u0627\u0645\u0647\u200c\u0647\u0627\u06cc \u0628\u06cc\u0634\u062a\u0631\u2026') +
+      '</button>' +
       '<button type="button" class="vshare-btn site" data-go="site">' +
-      (en ? 'Open website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a') + '</button>' +
+      (en ? 'Open website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u0633\u0627\u06cc\u062a') +
+      '</button>' +
       '</div>' +
+      '<p class="vshare-hint">' +
+      (en
+        ? 'Instagram has no direct share link — we copy the verse, then open the app so you can paste.'
+        : '\u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645 \u0644\u06cc\u0646\u06a9 \u0645\u0633\u062a\u0642\u06cc\u0645 \u0646\u062f\u0627\u0631\u062f — \u0622\u06cc\u0647 \u06a9\u067e\u06cc \u0645\u06cc\u200c\u0634\u0648\u062f\u060c \u0628\u0639\u062f \u0627\u067e \u0628\u0627\u0632 \u0645\u06cc\u200c\u0634\u0648\u062f \u062a\u0627 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc \u06a9\u0646\u06cc\u062f.') +
+      '</p>' +
       '<button type="button" class="vshare-close" id="vs-close">' +
-      (en ? 'Close' : '\u0628\u0633\u062a\u0646') + '</button></div>';
-
+      (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
+      '</button>' +
+      '</div>';
     document.body.appendChild(overlay);
-    function close() { overlay.remove(); }
-    document.getElementById('vs-close').onclick = close;
-    overlay.onclick = function (e) { if (e.target === overlay) close(); };
 
+    function close() { try { overlay.remove(); } catch (e) {} }
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+    var cl = document.getElementById('vs-close');
+    if (cl) cl.addEventListener('click', close);
     overlay.querySelectorAll('[data-go]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var go = btn.getAttribute('data-go');
