@@ -1,4 +1,4 @@
-/* Site-wide share photo: fast logo (preload + fallback), wait UI, preview then Save */
+/* Site-wide share photo — faster prepare (same UI) */
 (function () {
   var FALLBACK_LOGO = 'https://iili.io/n8MSJBp.jpg';
   var logoCache = null;
@@ -15,6 +15,7 @@
   }
 
   function preloadLogo() {
+    if (window.__stLogoImg) return Promise.resolve(window.__stLogoImg);
     if (logoReady) return logoReady;
     logoReady = new Promise(function (resolve) {
       function done(src) {
@@ -22,18 +23,19 @@
         logoCache = src;
         var im = new Image();
         im.crossOrigin = 'anonymous';
-        im.onload = function () { resolve(im); };
+        im.onload = function () { window.__stLogoImg = im; resolve(im); };
         im.onerror = function () {
           if (src !== FALLBACK_LOGO) {
             var im2 = new Image();
             im2.crossOrigin = 'anonymous';
-            im2.onload = function () { logoCache = FALLBACK_LOGO; resolve(im2); };
+            im2.onload = function () { logoCache = FALLBACK_LOGO; window.__stLogoImg = im2; resolve(im2); };
             im2.onerror = function () { resolve(null); };
             im2.src = FALLBACK_LOGO;
           } else resolve(null);
         };
         im.src = src;
       }
+      if (window.__stLogoImg) { resolve(window.__stLogoImg); return; }
       if (typeof window.ST_LOGO === 'string' && window.ST_LOGO.length > 200) {
         done(window.ST_LOGO);
         return;
@@ -43,23 +45,19 @@
         done(img.src);
         return;
       }
-      var n = 0;
-      var t = setInterval(function () {
-        n++;
-        if (typeof window.ST_LOGO === 'string' && window.ST_LOGO.length > 200) {
-          clearInterval(t);
-          done(window.ST_LOGO);
-        } else if (img && img.complete && img.naturalWidth > 10) {
-          clearInterval(t);
-          done(img.src);
-        } else if (n >= 30) {
-          clearInterval(t);
-          done(FALLBACK_LOGO);
-        }
-      }, 50);
+      /* Prefer fast hosted JPEG while waiting */
+      done(FALLBACK_LOGO);
     });
     return logoReady;
   }
+
+  /* Network logo ASAP */
+  (function () {
+    var im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.onload = function () { if (!window.__stLogoImg) window.__stLogoImg = im; };
+    im.src = FALLBACK_LOGO;
+  })();
   preloadLogo();
 
   function versePayload() {
@@ -100,7 +98,7 @@
 
   function makeCanvas(payload) {
     var p = payload || versePayload();
-    var W = 1080, H = 1350;
+    var W = 900, H = 1125;
     var c = document.createElement('canvas');
     c.width = W; c.height = H;
     var ctx = c.getContext('2d');
@@ -110,11 +108,11 @@
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = 'rgba(201,162,39,.9)';
-    ctx.lineWidth = 8;
-    ctx.strokeRect(36, 36, W - 72, H - 72);
+    ctx.lineWidth = 6;
+    ctx.strokeRect(28, 28, W - 56, H - 56);
 
     return preloadLogo().then(function (logoImg) {
-      var cy = 280, r = 220;
+      var cy = 230, r = 180;
       if (logoImg) {
         ctx.save();
         ctx.beginPath();
@@ -126,46 +124,46 @@
         ctx.beginPath();
         ctx.arc(W / 2, cy, r + 8, 0, Math.PI * 2);
         ctx.strokeStyle = '#c9a227';
-        ctx.lineWidth = 12;
+        ctx.lineWidth = 10;
         ctx.stroke();
       }
       ctx.fillStyle = '#fff';
       ctx.textAlign = 'center';
-      ctx.font = '700 40px system-ui,Tahoma,sans-serif';
-      ctx.fillText(brand(), W / 2, cy + r + 64);
+      ctx.font = '700 34px system-ui,Tahoma,sans-serif';
+      ctx.fillText(brand(), W / 2, cy + r + 52);
 
       var verse = (p && p.text) || 'Seventh Trumpet';
       if (verse.length > 260) verse = verse.slice(0, 260) + '\u2026';
       ctx.fillStyle = '#f5f7fa';
-      ctx.font = '500 42px system-ui,Tahoma,sans-serif';
-      var lines = wrap(ctx, verse, W - 140);
+      ctx.font = '500 36px system-ui,Tahoma,sans-serif';
+      var lines = wrap(ctx, verse, W - 120);
       if (lines.length > 6) {
         lines = lines.slice(0, 6);
         lines[5] += '\u2026';
       }
-      var y = cy + r + 130;
-      lines.forEach(function (ln, i) { ctx.fillText(ln, W / 2, y + i * 54); });
+      var y = cy + r + 100;
+      lines.forEach(function (ln, i) { ctx.fillText(ln, W / 2, y + i * 46); });
       if (p && p.ref) {
         ctx.fillStyle = '#c9a227';
-        ctx.font = '700 34px system-ui,Tahoma,sans-serif';
-        ctx.fillText(p.ref, W / 2, y + lines.length * 54 + 36);
+        ctx.font = '700 30px system-ui,Tahoma,sans-serif';
+        ctx.fillText(p.ref, W / 2, y + lines.length * 46 + 30);
       }
 
-      var barTop = H - 200;
+      var barTop = H - 170;
       ctx.fillStyle = 'rgba(0,0,0,0.4)';
-      ctx.fillRect(60, barTop, W - 120, 140);
+      ctx.fillRect(48, barTop, W - 96, 120);
       ctx.strokeStyle = 'rgba(201,162,39,0.95)';
       ctx.lineWidth = 3;
-      ctx.strokeRect(60, barTop, W - 120, 140);
+      ctx.strokeRect(48, barTop, W - 96, 120);
       ctx.fillStyle = '#c9a227';
-      ctx.font = '700 34px system-ui,Tahoma,sans-serif';
-      ctx.fillText('seventhtrumpet.org', W / 2, barTop + 48);
+      ctx.font = '700 28px system-ui,Tahoma,sans-serif';
+      ctx.fillText('seventhtrumpet.org', W / 2, barTop + 40);
       ctx.fillStyle = '#ffffff';
-      ctx.font = '700 36px system-ui,Tahoma,sans-serif';
-      ctx.fillText('@seventhtrumpet.media', W / 2, barTop + 98);
+      ctx.font = '700 30px system-ui,Tahoma,sans-serif';
+      ctx.fillText('@seventhtrumpet.media', W / 2, barTop + 82);
       ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      ctx.font = '600 24px system-ui,Tahoma,sans-serif';
-      ctx.fillText(siteUrl(), W / 2, barTop + 128);
+      ctx.font = '600 20px system-ui,Tahoma,sans-serif';
+      ctx.fillText(siteUrl(), W / 2, barTop + 108);
       return c;
     });
   }
@@ -297,8 +295,9 @@
       return new Promise(function (resolve, reject) {
         canvas.toBlob(function (blob) {
           if (!blob) return reject(new Error('blob'));
-          resolve({ blob: blob, dataUrl: canvas.toDataURL('image/jpeg', 0.92) });
-        }, 'image/jpeg', 0.92);
+          var url = URL.createObjectURL(blob);
+          resolve({ blob: blob, dataUrl: url });
+        }, 'image/jpeg', 0.8);
       });
     }).then(function (pack) {
       showReady(pack.dataUrl, pack.blob, app);
@@ -310,6 +309,10 @@
   window.ST_shareWithPhoto = function (text, ref, app) {
     window.ST_sharePhoto(app === 'ig', app || 'ig', { text: text || '', ref: ref || '' });
   };
+
+  if (document.body && (document.body.getAttribute('data-page') === 'bible' || (location.pathname || '').indexOf('bible') >= 0)) {
+    setTimeout(function () { preloadLogo(); }, 200);
+  }
 
   document.addEventListener('click', function (e) {
     var btn = e.target && e.target.closest && e.target.closest('[data-go="ig"],[data-go="fb"]');
