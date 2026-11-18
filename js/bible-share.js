@@ -1,4 +1,4 @@
-/* Share panel: WA/Messenger/More = photo+profile+link; IG/FB = photo */
+/* Share panel: WA/Messenger use real profile image + verse + link (like before) */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -134,8 +134,8 @@
     var en = isEn();
 
     if (app === 'more' || app === 'system') {
-      if (typeof window.ST_sharePhoto === 'function') {
-        window.ST_sharePhoto(false, 'more');
+      if (typeof window.ST_shareWhatsAppStyle === 'function') {
+        window.ST_shareWhatsAppStyle();
       } else if (navigator.share) {
         navigator.share({ title: cardTitle, text: cardText, url: pageUrl }).catch(function () {
           copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
@@ -147,8 +147,8 @@
     }
 
     if (app === 'wa') {
-      if (typeof window.ST_sharePhoto === 'function') {
-        window.ST_sharePhoto(false, 'wa');
+      if (typeof window.ST_shareWhatsAppStyle === 'function') {
+        window.ST_shareWhatsAppStyle();
       } else {
         window.open('https://wa.me/?text=' + encodeURIComponent(full), '_blank', 'noopener');
       }
@@ -170,8 +170,8 @@
     }
 
     if (app === 'msg' || app === 'messenger') {
-      if (typeof window.ST_sharePhoto === 'function') {
-        window.ST_sharePhoto(false, 'msg');
+      if (typeof window.ST_shareWhatsAppStyle === 'function') {
+        window.ST_shareWhatsAppStyle();
       } else {
         copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
       }
@@ -179,8 +179,8 @@
     }
 
     if (app === 'signal') {
-      if (typeof window.ST_sharePhoto === 'function') {
-        window.ST_sharePhoto(false, 'more');
+      if (typeof window.ST_shareWhatsAppStyle === 'function') {
+        window.ST_shareWhatsAppStyle();
       } else {
         copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
       }
@@ -253,8 +253,8 @@
       '</button></div>' +
       '<p class="vshare-hint">' +
       (en
-        ? 'WhatsApp, Messenger, Instagram, Facebook: profile photo + verse + website link.'
-        : '\u0648\u0627\u062a\u0633\u0627\u067e\u060c \u0645\u0633\u0646\u062c\u0631\u060c \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645: \u0639\u06a9\u0633 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9.') +
+        ? 'WhatsApp & Messenger: profile photo + verse + website link (like before).'
+        : '\u0648\u0627\u062a\u0633\u0627\u067e \u0648 \u0645\u0633\u0646\u062c\u0631: \u0639\u06a9\u0633 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9.') +
       '</p>' +
       '<button type="button" class="vshare-close" id="vs-close">' +
       (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
