@@ -136,7 +136,7 @@
   loadScript('js/profile_bg.js', 'data-profile-bg');
   loadScript('js/share.js', 'data-share');
   loadScript('js/bible-share.js', 'data-bible-share');
-  loadScript('js/bible-share-photo.js?v=fastlogo2', 'data-bible-share-photo');
+  loadScript('js/bible-share-photo.js?v=fast3', 'data-bible-share-photo');
   loadScript('js/page-share.js?v=1', 'data-page-share');
   loadScript('js/page_back.js', 'data-page-back');
   loadScript('js/fixed_header.js', 'data-fixed-header');
