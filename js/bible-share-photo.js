@@ -1,7 +1,6 @@
-/* Site-wide share photo — IG/FB only (WA/Messenger not forced to photo) */
+/* Share photo: profile + verse + website. WA/Messenger try image + tappable link together */
 (function () {
   var FALLBACK_LOGO = 'https://iili.io/n8MSJBp.jpg';
-  var logoCache = null;
   var logoReady = null;
 
   function isEn() {
@@ -13,6 +12,16 @@
   function siteUrl() {
     return 'https://seventhtrumpet.org/';
   }
+  function toast(msg) {
+    var t = document.getElementById('vshare-toast');
+    if (t) t.remove();
+    t = document.createElement('div');
+    t.id = 'vshare-toast';
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;left:50%;bottom:5.5rem;transform:translateX(-50%);z-index:8000;background:#0a2540;color:#fff;padding:0.7rem 1rem;border-radius:12px;font-size:0.88rem;font-weight:700;max-width:92%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)';
+    document.body.appendChild(t);
+    setTimeout(function () { try { t.remove(); } catch (e) {} }, 3500);
+  }
 
   function preloadLogo() {
     if (window.__stLogoImg) return Promise.resolve(window.__stLogoImg);
@@ -20,7 +29,6 @@
     logoReady = new Promise(function (resolve) {
       function done(src) {
         if (!src) src = FALLBACK_LOGO;
-        logoCache = src;
         var im = new Image();
         im.crossOrigin = 'anonymous';
         im.onload = function () { window.__stLogoImg = im; resolve(im); };
@@ -28,7 +36,7 @@
           if (src !== FALLBACK_LOGO) {
             var im2 = new Image();
             im2.crossOrigin = 'anonymous';
-            im2.onload = function () { logoCache = FALLBACK_LOGO; window.__stLogoImg = im2; resolve(im2); };
+            im2.onload = function () { window.__stLogoImg = im2; resolve(im2); };
             im2.onerror = function () { resolve(null); };
             im2.src = FALLBACK_LOGO;
           } else resolve(null);
@@ -36,15 +44,9 @@
         im.src = src;
       }
       if (window.__stLogoImg) { resolve(window.__stLogoImg); return; }
-      if (typeof window.ST_LOGO === 'string' && window.ST_LOGO.length > 200) {
-        done(window.ST_LOGO);
-        return;
-      }
       var img = document.querySelector('img.logo-img');
-      if (img && img.complete && img.naturalWidth > 10) {
-        done(img.src);
-        return;
-      }
+      if (img && img.complete && img.naturalWidth > 10) { done(img.src); return; }
+      if (typeof window.ST_LOGO === 'string' && window.ST_LOGO.length > 200) { done(window.ST_LOGO); return; }
       done(FALLBACK_LOGO);
     });
     return logoReady;
@@ -81,6 +83,15 @@
       if (dref) ref = (dref.textContent || '').trim();
     }
     return { text: text, ref: ref };
+  }
+
+  function captionFrom(p) {
+    var parts = [];
+    if (p && p.text) parts.push(String(p.text).slice(0, 220));
+    if (p && p.ref) parts.push(p.ref);
+    parts.push(brand());
+    parts.push(siteUrl());
+    return parts.join('\n\n');
   }
 
   function wrap(ctx, text, maxW) {
@@ -205,68 +216,47 @@
       '<p class="st-photo-title">' + (en ? 'Preparing picture\u2026' : '\u062f\u0631 \u062d\u0627\u0644 \u0633\u0627\u062e\u062a \u0639\u06a9\u0633\u2026') + '</p>' +
       '<div class="st-photo-spin"></div>' +
       '<p class="st-photo-status">' +
-      (en ? 'Please wait until the picture is ready.' : '\u0644\u0637\u0641\u0627\u064b \u062a\u0627 \u0622\u0645\u0627\u062f\u0647 \u0634\u062f\u0646 \u0639\u06a9\u0633 \u0635\u0628\u0631 \u06a9\u0646\u06cc\u062f.') +
+      (en ? 'Profile + verse + website link\u2026' : '\u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9 \u0648\u0628\u0633\u0627\u06cc\u062a\u2026') +
       '</p></div>';
     document.body.appendChild(ov);
   }
 
-  function showReady(dataUrl, blob, app) {
+  function showReady(dataUrl, blob, app, payload) {
     ensureCss();
     closePreview();
     var en = isEn();
-    var isFb = app === 'fb';
     var ov = document.createElement('div');
     ov.id = 'st-photo-overlay';
     ov.className = 'st-photo-overlay';
+    var saveLabel = en ? 'Share picture + link' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0639\u06a9\u0633 + \u0644\u06cc\u0646\u06a9';
     ov.innerHTML =
       '<div class="st-photo-card" role="dialog">' +
       '<p class="st-photo-title">' + (en ? 'Picture ready' : '\u0639\u06a9\u0633 \u0622\u0645\u0627\u062f\u0647 \u0627\u0633\u062a') + '</p>' +
       '<img class="st-photo-preview" alt="share" src="' + dataUrl + '" />' +
       '<p class="st-photo-status">' +
       (en
-        ? '1) Save picture  \u2192  2) Open app  \u2192  3) Add the photo'
-        : '1) \u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633  \u2192  2) \u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0628\u0631\u0646\u0627\u0645\u0647  \u2192  3) \u0627\u0636\u0627\u0641\u0647 \u06a9\u0631\u062f\u0646 \u0639\u06a9\u0633') +
+        ? 'Share sends profile photo + verse. The website link is included so people can open the site.'
+        : '\u0639\u06a9\u0633 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0622\u06cc\u0647. \u0644\u06cc\u0646\u06a9 \u0648\u0628\u0633\u0627\u06cc\u062a \u0647\u0645 \u0647\u0633\u062a \u062a\u0627 \u0628\u062a\u0648\u0627\u0646\u0646\u062f \u0648\u0627\u0631\u062f \u0633\u0627\u06cc\u062a \u0634\u0648\u0646\u062f.') +
       '</p>' +
       '<div class="st-photo-actions">' +
-      '<button type="button" class="st-photo-save" id="st-photo-save">' +
-      (en ? 'Save picture' : '\u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633') + '</button>' +
-      '<button type="button" class="st-photo-open" id="st-photo-open">' +
-      (isFb
-        ? (en ? 'Open Facebook' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0641\u06cc\u0633\u0628\u0648\u06a9')
-        : (en ? 'Open Instagram' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645')) +
-      '</button>' +
+      '<button type="button" class="st-photo-save" id="st-photo-save">' + saveLabel + '</button>' +
       '<button type="button" class="st-photo-close" id="st-photo-close">' +
       (en ? 'Done' : '\u062a\u0645\u0627\u0645') + '</button>' +
       '</div></div>';
     document.body.appendChild(ov);
 
     document.getElementById('st-photo-save').onclick = function () {
-      function download() {
-        var a = document.createElement('a');
-        a.href = dataUrl;
-        a.download = 'seventh-trumpet-share.jpg';
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function () { try { a.remove(); } catch (e) {} }, 400);
-      }
-      if (blob && navigator.canShare) {
-        try {
-          var file = new File([blob], 'seventh-trumpet-share.jpg', { type: 'image/jpeg' });
-          if (navigator.canShare({ files: [file] })) {
-            navigator.share({
-              files: [file],
-              title: brand(),
-              text: siteUrl() + '  @seventhtrumpet.media'
-            }).then(function () {}).catch(function () { download(); });
-            return;
-          }
-        } catch (e) {}
-      }
-      download();
-    };
-    document.getElementById('st-photo-open').onclick = function () {
-      if (isFb) window.open('https://www.facebook.com/', '_blank', 'noopener');
-      else window.open('https://www.instagram.com/seventhtrumpet.media', '_blank', 'noopener');
+      shareBlob(blob, payload, app).then(function (ok) {
+        if (!ok) {
+          var a = document.createElement('a');
+          a.href = dataUrl;
+          a.download = 'seventh-trumpet-share.jpg';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(function () { try { a.remove(); } catch (e) {} }, 400);
+          toast(en ? 'Picture saved — attach it and add the website link' : '\u0639\u06a9\u0633 \u0630\u062e\u06cc\u0631\u0647 \u0634\u062f');
+        }
+      });
     };
     document.getElementById('st-photo-close').onclick = closePreview;
     ov.addEventListener('click', function (e) {
@@ -278,38 +268,67 @@
     ensureCss();
     closePreview();
     var en = isEn();
-    var ov = document.createElement('div');
-    ov.id = 'st-photo-overlay';
-    ov.className = 'st-photo-overlay';
-    ov.innerHTML =
-      '<div class="st-photo-card">' +
-      '<p class="st-photo-title">' + (en ? 'Could not make picture' : '\u0639\u06a9\u0633 \u0633\u0627\u062e\u062a\u0647 \u0646\u0634\u062f') + '</p>' +
-      '<button type="button" class="st-photo-close" id="st-photo-close">' +
-      (en ? 'Close' : '\u0628\u0633\u062a\u0646') + '</button></div>';
-    document.body.appendChild(ov);
-    document.getElementById('st-photo-close').onclick = closePreview;
+    toast(en ? 'Could not make picture' : '\u0639\u06a9\u0633 \u0633\u0627\u062e\u062a\u0647 \u0646\u0634\u062f');
+  }
+
+  function shareBlob(blob, payload, app) {
+    var en = isEn();
+    var cap = captionFrom(payload || versePayload());
+    if (!blob) return Promise.resolve(false);
+    try {
+      var file = new File([blob], 'seventh-trumpet-share.jpg', { type: 'image/jpeg' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        return navigator.share({
+          files: [file],
+          title: brand(),
+          text: cap,
+          url: siteUrl()
+        }).then(function () {
+          toast(en ? 'Shared: photo + website link' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0634\u062f: \u0639\u06a9\u0633 + \u0644\u06cc\u0646\u06a9');
+          closePreview();
+          return true;
+        }).catch(function () {
+          return navigator.share({
+            files: [file],
+            title: brand(),
+            text: cap
+          }).then(function () {
+            toast(en ? 'Shared photo' : '\u0639\u06a9\u0633 \u0627\u0634\u062a\u0631\u0627\u06a9 \u0634\u062f');
+            closePreview();
+            return true;
+          }).catch(function () { return false; });
+        });
+      }
+    } catch (e) {}
+    return Promise.resolve(false);
   }
 
   window.ST_sharePhoto = function (openIg, app, payload) {
     app = app || (openIg ? 'ig' : 'fb');
+    payload = payload || null;
+    var p = payload || versePayload();
     showLoading();
-    makeCanvas(payload || null).then(function (canvas) {
+    makeCanvas(p).then(function (canvas) {
       return new Promise(function (resolve, reject) {
         canvas.toBlob(function (blob) {
           if (!blob) return reject(new Error('blob'));
-          var url = URL.createObjectURL(blob);
-          resolve({ blob: blob, dataUrl: url });
+          resolve({ blob: blob, dataUrl: URL.createObjectURL(blob) });
         }, 'image/jpeg', 0.8);
       });
     }).then(function (pack) {
-      showReady(pack.dataUrl, pack.blob, app);
+      if (app === 'wa' || app === 'msg' || app === 'more' || app === 'system') {
+        return shareBlob(pack.blob, p, app).then(function (ok) {
+          if (!ok) showReady(pack.dataUrl, pack.blob, app, p);
+        });
+      }
+      showReady(pack.dataUrl, pack.blob, app, p);
     }).catch(function () {
       showError();
     });
   };
 
   window.ST_shareWithPhoto = function (text, ref, app) {
-    window.ST_sharePhoto(app === 'ig', app || 'ig', { text: text || '', ref: ref || '' });
+    window.ST_sharePhoto(false, app || 'wa', { text: text || '', ref: ref || '' });
   };
 
   if (document.body && (document.body.getAttribute('data-page') === 'bible' || (location.pathname || '').indexOf('bible') >= 0)) {
