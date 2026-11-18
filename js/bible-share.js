@@ -1,4 +1,4 @@
-/* Share panel: WA/Messenger/IG/FB use photo+profile for Bible verses */
+/* Share panel — WA/Messenger text+link; IG/FB photo (reverted WA photo) */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -144,11 +144,8 @@
       return;
     }
 
-    /* WhatsApp + Messenger: same photo+profile as Instagram */
     if (app === 'wa') {
-      if (typeof window.ST_sharePhoto === 'function') {
-        window.ST_sharePhoto(false, 'wa');
-      } else if (navigator.share) {
+      if (navigator.share) {
         navigator.share({ title: cardTitle, text: cardText, url: pageUrl }).catch(function () {
           window.open('https://wa.me/?text=' + encodeURIComponent(full), '_blank', 'noopener');
         });
@@ -173,15 +170,11 @@
     }
 
     if (app === 'msg' || app === 'messenger') {
-      if (typeof window.ST_sharePhoto === 'function') {
-        window.ST_sharePhoto(false, 'msg');
-      } else {
-        copyText(full).then(function () {
-          toast(en ? 'Copied \u2014 paste in Messenger' : '\u06a9\u067e\u06cc \u0634\u062f');
-        });
-        try { window.location.href = 'fb-messenger://share/?link=' + encodeURIComponent(pageUrl); } catch (e) {}
-        setTimeout(function () { window.open('https://www.messenger.com/', '_blank', 'noopener'); }, 700);
-      }
+      copyText(full).then(function () {
+        toast(en ? 'Copied \u2014 paste in Messenger' : '\u06a9\u067e\u06cc \u0634\u062f');
+      });
+      try { window.location.href = 'fb-messenger://share/?link=' + encodeURIComponent(pageUrl); } catch (e) {}
+      setTimeout(function () { window.open('https://www.messenger.com/', '_blank', 'noopener'); }, 700);
       return;
     }
 
@@ -262,8 +255,8 @@
       '</button></div>' +
       '<p class="vshare-hint">' +
       (en
-        ? 'WhatsApp, Messenger, Instagram, Facebook: photo with profile. Then share the picture.'
-        : '\u0648\u0627\u062a\u0633\u0627\u067e\u060c \u0645\u0633\u0646\u062c\u0631\u060c \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645\u060c \u0641\u06cc\u0633\u0628\u0648\u06a9: \u0639\u06a9\u0633 \u0628\u0627 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644.') +
+        ? 'Facebook & Instagram: photo with profile. WhatsApp: link card. Messenger: text + link.'
+        : '\u0641\u06cc\u0633\u0628\u0648\u06a9 \u0648 \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645: \u0639\u06a9\u0633. \u0648\u0627\u062a\u0633\u0627\u067e \u0648 \u0645\u0633\u0646\u062c\u0631: \u0645\u062a\u0646 + \u0644\u06cc\u0646\u06a9.') +
       '</p>' +
       '<button type="button" class="vshare-close" id="vs-close">' +
       (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
