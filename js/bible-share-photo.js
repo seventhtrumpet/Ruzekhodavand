@@ -1,4 +1,4 @@
-/* Site-wide share photo — faster prepare; WA/Messenger also use profile photo */
+/* Site-wide share photo — IG/FB only (WA/Messenger not forced to photo) */
 (function () {
   var FALLBACK_LOGO = 'https://iili.io/n8MSJBp.jpg';
   var logoCache = null;
@@ -214,32 +214,27 @@
     ensureCss();
     closePreview();
     var en = isEn();
+    var isFb = app === 'fb';
     var ov = document.createElement('div');
     ov.id = 'st-photo-overlay';
     ov.className = 'st-photo-overlay';
-    var saveLabel = (app === 'wa' || app === 'msg')
-      ? (en ? 'Share picture (pick WhatsApp/Messenger)' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0639\u06a9\u0633 (WhatsApp / Messenger)')
-      : (en ? 'Save picture' : '\u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633');
-    var openLabel =
-      app === 'fb' ? (en ? 'Open Facebook' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0641\u06cc\u0633\u0628\u0648\u06a9')
-      : app === 'wa' ? (en ? 'Open WhatsApp' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0627\u062a\u0633\u0627\u067e')
-      : app === 'msg' ? (en ? 'Open Messenger' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0645\u0633\u0646\u062c\u0631')
-      : (en ? 'Open Instagram' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645');
-    var tip = (app === 'wa' || app === 'msg')
-      ? (en
-          ? 'Tap the gold button — choose WhatsApp or Messenger to send the photo with profile'
-          : '\u062f\u06a9\u0645\u0647 \u0637\u0644\u0627\u06cc\u06cc \u2192 WhatsApp \u06cc\u0627 Messenger \u0631\u0627 \u0628\u0631\u0627\u06cc \u0627\u0631\u0633\u0627\u0644 \u0639\u06a9\u0633 \u0628\u0627 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f')
-      : (en
-          ? '1) Save picture  \u2192  2) Open app  \u2192  3) Add the photo'
-          : '1) \u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633  \u2192  2) \u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0628\u0631\u0646\u0627\u0645\u0647  \u2192  3) \u0627\u0636\u0627\u0641\u0647 \u06a9\u0631\u062f\u0646 \u0639\u06a9\u0633');
     ov.innerHTML =
       '<div class="st-photo-card" role="dialog">' +
       '<p class="st-photo-title">' + (en ? 'Picture ready' : '\u0639\u06a9\u0633 \u0622\u0645\u0627\u062f\u0647 \u0627\u0633\u062a') + '</p>' +
       '<img class="st-photo-preview" alt="share" src="' + dataUrl + '" />' +
-      '<p class="st-photo-status">' + tip + '</p>' +
+      '<p class="st-photo-status">' +
+      (en
+        ? '1) Save picture  \u2192  2) Open app  \u2192  3) Add the photo'
+        : '1) \u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633  \u2192  2) \u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0628\u0631\u0646\u0627\u0645\u0647  \u2192  3) \u0627\u0636\u0627\u0641\u0647 \u06a9\u0631\u062f\u0646 \u0639\u06a9\u0633') +
+      '</p>' +
       '<div class="st-photo-actions">' +
-      '<button type="button" class="st-photo-save" id="st-photo-save">' + saveLabel + '</button>' +
-      '<button type="button" class="st-photo-open" id="st-photo-open">' + openLabel + '</button>' +
+      '<button type="button" class="st-photo-save" id="st-photo-save">' +
+      (en ? 'Save picture' : '\u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633') + '</button>' +
+      '<button type="button" class="st-photo-open" id="st-photo-open">' +
+      (isFb
+        ? (en ? 'Open Facebook' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0641\u06cc\u0633\u0628\u0648\u06a9')
+        : (en ? 'Open Instagram' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645')) +
+      '</button>' +
       '<button type="button" class="st-photo-close" id="st-photo-close">' +
       (en ? 'Done' : '\u062a\u0645\u0627\u0645') + '</button>' +
       '</div></div>';
@@ -270,9 +265,7 @@
       download();
     };
     document.getElementById('st-photo-open').onclick = function () {
-      if (app === 'fb') window.open('https://www.facebook.com/', '_blank', 'noopener');
-      else if (app === 'wa') window.open('https://wa.me/', '_blank', 'noopener');
-      else if (app === 'msg') window.open('https://www.messenger.com/', '_blank', 'noopener');
+      if (isFb) window.open('https://www.facebook.com/', '_blank', 'noopener');
       else window.open('https://www.instagram.com/seventhtrumpet.media', '_blank', 'noopener');
     };
     document.getElementById('st-photo-close').onclick = closePreview;
@@ -324,7 +317,7 @@
   }
 
   document.addEventListener('click', function (e) {
-    var btn = e.target && e.target.closest && e.target.closest('[data-go="ig"],[data-go="fb"],[data-go="wa"],[data-go="msg"]');
+    var btn = e.target && e.target.closest && e.target.closest('[data-go="ig"],[data-go="fb"]');
     if (!btn) return;
     e.preventDefault();
     e.stopPropagation();
