@@ -135,13 +135,13 @@
   loadScript('js/text_size.js', 'data-text-size');
   loadScript('js/profile_bg.js', 'data-profile-bg');
   loadScript('js/share.js', 'data-share');
-  loadScript('js/bible-share.js?v=restore70e1', 'data-bible-share');
-  loadScript('js/bible-share-photo.js?v=restore70e1', 'data-bible-share-photo');
-  loadScript('js/page-share.js?v=restore70e1', 'data-page-share');
+  loadScript('js/bible-share.js?v=msgfix1', 'data-bible-share');
+  loadScript('js/bible-share-photo.js?v=msgfix1', 'data-bible-share-photo');
+  loadScript('js/page-share.js?v=msgfix1', 'data-page-share');
   loadScript('js/page_back.js', 'data-page-back');
   loadScript('js/fixed_header.js', 'data-fixed-header');
   loadScript('js/bible_bar_fix.js', 'data-bible-bar-fix');
-  loadScript('js/bible_search.js', 'data-bible-search');
+  loadScript('js/bible_search.js?v=msgfix1', 'data-bible-search');
   loadScript('js/home_polish.js', 'data-home-polish');
   loadScript('js/welcome_tip.js', 'data-welcome-tip');
   loadScript('js/loading.js', 'data-loading');
@@ -156,4 +156,10 @@
   loadCss('css/quality.css', 'data-quality-css');
   loadCss('css/player_expand.css', 'data-player-expand-css');
   loadScript('js/social.js', 'data-social-js');
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/sw.js').catch(function () {});
+    });
+  }
 })();
