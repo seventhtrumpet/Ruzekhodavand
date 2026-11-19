@@ -172,12 +172,16 @@
     }
 
     if (app === 'wa') {
-      if (navigator.share) {
-        navigator.share({ title: cardTitle, text: cardText, url: pageUrl }).catch(function () {
-          window.open('https://wa.me/?text=' + encodeURIComponent(full), '_blank', 'noopener');
-        });
-      } else {
+      try {
         window.open('https://wa.me/?text=' + encodeURIComponent(full), '_blank', 'noopener');
+      } catch (e) {
+        if (navigator.share) {
+          navigator.share({ title: cardTitle, text: cardText, url: pageUrl }).catch(function () {
+            copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
+          });
+        } else {
+          copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
+        }
       }
       return;
     }
@@ -197,29 +201,15 @@
     }
 
     if (app === 'msg' || app === 'messenger') {
-      if (navigator.share) {
-        navigator.share({ title: cardTitle, text: cardText, url: pageUrl }).catch(function () {
-          copyText(full).then(function () {
-            toast(en ? 'Copied \u2014 paste in Messenger' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0645\u0633\u0646\u062c\u0631 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
-          });
-          try {
-            window.location.href = 'fb-messenger://share/?link=' + encodeURIComponent(pageUrl);
-          } catch (e) {}
-          setTimeout(function () {
-            window.open('https://www.messenger.com/', '_blank', 'noopener');
-          }, 700);
-        });
-      } else {
-        copyText(full).then(function () {
-          toast(en ? 'Copied \u2014 paste in Messenger' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0645\u0633\u0646\u062c\u0631 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
-        });
-        try {
-          window.location.href = 'fb-messenger://share/?link=' + encodeURIComponent(pageUrl);
-        } catch (e) {}
-        setTimeout(function () {
-          window.open('https://www.messenger.com/', '_blank', 'noopener');
-        }, 700);
-      }
+      copyText(full).then(function () {
+        toast(en ? 'Copied \u2014 open Messenger & paste' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u0645\u0633\u0646\u062c\u0631 \u0631\u0627 \u0628\u0627\u0632 \u06a9\u0646\u06cc\u062f \u0648 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
+      });
+      try {
+        window.location.href = 'fb-messenger://share/?link=' + encodeURIComponent(pageUrl);
+      } catch (e) {}
+      setTimeout(function () {
+        window.open('https://www.messenger.com/new', '_blank', 'noopener');
+      }, 500);
       return;
     }
 
@@ -238,14 +228,17 @@
 
     if (app === 'tt') {
       copyText(full).then(function () {
-        toast(en ? 'Copied \u2014 paste in TikTok' : '\u06a9\u067e\u06cc \u0634\u062f');
+        toast(en ? 'Copied \u2014 paste in TikTok' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u062a\u06cc\u06a9\u200c\u062a\u0627\u06a9 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
       });
-      setTimeout(function () { window.open(SOCIAL.tiktok, '_blank', 'noopener'); }, 400);
+      setTimeout(function () { window.open(SOCIAL.tiktok, '_blank', 'noopener'); }, 350);
       return;
     }
 
     if (app === 'yt') {
-      window.open(SOCIAL.youtube, '_blank', 'noopener');
+      copyText(full).then(function () {
+        toast(en ? 'Copied \u2014 paste in YouTube' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u06cc\u0648\u062a\u06cc\u0648\u0628 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
+      });
+      setTimeout(function () { window.open(SOCIAL.youtube, '_blank', 'noopener'); }, 350);
       return;
     }
 
@@ -304,8 +297,8 @@
       '</button></div>' +
       '<p class="vshare-hint">' +
       (en
-        ? 'Facebook & Instagram: photo with profile. WhatsApp & Messenger: verse + link preview.'
-        : '\u0641\u06cc\u0633\u0628\u0648\u06a9 \u0648 \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645: \u0639\u06a9\u0633 + \u067e\u0631\u0648\u0641\u0627\u06cc\u0644. \u0648\u0627\u062a\u0633\u0627\u067e \u0648 \u0645\u0633\u0646\u062c\u0631: \u0622\u06cc\u0647 + \u0674\u06cc\u0634\u200c\u0646\u0645\u0627\u06cc\u0634.') +
+        ? 'WhatsApp: fast text+link. Messenger: copy+open. Instagram/Facebook: photo with profile.'
+        : '\u0648\u0627\u062a\u0633\u0627\u067e: \u0633\u0631\u06cc\u0639. \u0645\u0633\u0646\u062c\u0631: \u06a9\u067e\u06cc+\u0628\u0627\u0632. \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645/\u0641\u06cc\u0633\u0628\u0648\u06a9: \u0639\u06a9\u0633+\u067e\u0631\u0648\u0641\u0627\u06cc\u0644.') +
       '</p>' +
       '<button type="button" class="vshare-close" id="vs-close">' +
       (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
