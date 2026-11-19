@@ -10,6 +10,7 @@
   var debounceTimer = null;
   var SCOPE_KEY = 'cog_bible_search_scope';
   var NT_MIN = 470;
+  var MAX_SHOW = 800;
 
   var IDS = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,190,220,230,240,250,260,290,300,310,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730];
 
@@ -77,7 +78,7 @@
     return s;
   }
   function escapeHtml(s) {
-    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return String(s || '').replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
   }
   function escapeRegex(s) {
     return String(s || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -223,7 +224,7 @@
     if (!items.length && !statusMsg) {
       html = '<div class="mb-search-status">' + (isEn() ? 'No results' : '\u0646\u062a\u06cc\u062c\u0647\u200c\u0627\u06cc \u06cc\u0627\u0641\u062a \u0646\u0634\u062f') + '</div>';
     }
-    var show = items.length > 400 ? items.slice(0, 400) : items;
+    var show = items.length > MAX_SHOW ? items.slice(0, MAX_SHOW) : items;
     show.forEach(function (it, i) {
       html += '<button type="button" class="mb-search-item" data-i="' + i + '">' + it.html + '</button>';
     });
@@ -379,9 +380,16 @@
         if (token !== abortToken) return;
         var items = searchMemory(verses, q, token);
         if (token !== abortToken) return;
-        var msg = items.length
-          ? (en ? items.length + ' results \u00b7 ' + scopeLabel() : items.length + ' \u0646\u062a\u06cc\u062c\u0647 \u00b7 ' + scopeLabel())
-          : (en ? 'No results \u00b7 ' + scopeLabel() : '\u0646\u062a\u06cc\u062c\u0647\u200c\u0627\u06cc \u06cc\u0627\u0641\u062a \u0646\u0634\u062f \u00b7 ' + scopeLabel());
+        var msg;
+        if (!items.length) {
+          msg = en ? 'No results \u00b7 ' + scopeLabel() : '\u0646\u062a\u06cc\u062c\u0647\u200c\u0627\u06cc \u06cc\u0627\u0641\u062a \u0646\u0634\u062f \u00b7 ' + scopeLabel();
+        } else if (items.length > MAX_SHOW) {
+          msg = en
+            ? 'Showing ' + MAX_SHOW + ' of ' + items.length + ' \u00b7 ' + scopeLabel()
+            : '\u0646\u0645\u0627\u06cc\u0634 ' + MAX_SHOW + ' \u0627\u0632 ' + items.length + ' \u00b7 ' + scopeLabel();
+        } else {
+          msg = en ? items.length + ' results \u00b7 ' + scopeLabel() : items.length + ' \u0646\u062a\u06cc\u062c\u0647 \u00b7 ' + scopeLabel();
+        }
         renderItems(items, msg);
       }
     } catch (e) {
