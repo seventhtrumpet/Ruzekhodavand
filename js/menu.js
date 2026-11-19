@@ -134,11 +134,10 @@
   loadScript('js/visits.js', 'data-visits');
   loadScript('js/text_size.js', 'data-text-size');
   loadScript('js/profile_bg.js', 'data-profile-bg');
-  loadScript('js/share.js', 'data-share');
-  loadScript('js/share-wa-style.js?v=1', 'data-share-wa');
-  loadScript('js/bible-share.js?v=likeBefore1', 'data-bible-share');
-  loadScript('js/bible-share-photo.js?v=photoLink3', 'data-bible-share-photo');
-  loadScript('js/page-share.js?v=1', 'data-page-share');
+  loadScript('js/share.js?v=restore70', 'data-share');
+  loadScript('js/bible-share.js?v=restore70', 'data-bible-share');
+  loadScript('js/bible-share-photo.js?v=restore70', 'data-bible-share-photo');
+  loadScript('js/page-share.js?v=restore70', 'data-page-share');
   loadScript('js/page_back.js', 'data-page-back');
   loadScript('js/fixed_header.js', 'data-fixed-header');
   loadScript('js/bible_bar_fix.js', 'data-bible-bar-fix');
