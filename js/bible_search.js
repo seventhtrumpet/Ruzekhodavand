@@ -1,4 +1,4 @@
-/* Fast Bible search — one load per language, search in memory */
+/* Fast Bible search — all books represented (per-book cap) */
 (function () {
   if (window.__mbSearchBooted) return;
   window.__mbSearchBooted = true;
@@ -10,7 +10,8 @@
   var debounceTimer = null;
   var SCOPE_KEY = 'cog_bible_search_scope';
   var NT_MIN = 470;
-  var MAX_SHOW = 800;
+  var MAX_SHOW = 2000;
+  var PER_BOOK = 25;
 
   var IDS = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,190,220,230,240,250,260,290,300,310,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730];
 
@@ -344,16 +345,31 @@
 
   function searchMemory(verses, query, token) {
     var nq = normalize(query);
-    if (!nq || nq.length < 2) return [];
-    var items = [];
+    if (!nq || nq.length < 2) return { items: [], total: 0, books: 0 };
+    var byBook = {};
+    var total = 0;
     for (var i = 0; i < verses.length; i++) {
-      if (token !== abortToken) return items;
+      if (token !== abortToken) break;
       var row = verses[i];
       if (!inScope(row.id)) continue;
       if (row.norm.indexOf(nq) < 0) continue;
-      items.push(makeItem(row.label, row.ch, row.v, row.text, query, row.id));
+      total++;
+      var bid = row.id;
+      if (!byBook[bid]) byBook[bid] = [];
+      if (byBook[bid].length < PER_BOOK) {
+        byBook[bid].push(makeItem(row.label, row.ch, row.v, row.text, query, row.id));
+      }
     }
-    return items;
+    var items = [];
+    var bookCount = 0;
+    for (var j = 0; j < IDS.length; j++) {
+      var list = byBook[IDS[j]];
+      if (list && list.length) {
+        bookCount++;
+        for (var k = 0; k < list.length; k++) items.push(list[k]);
+      }
+    }
+    return { items: items, total: total, books: bookCount };
   }
 
   async function startSearch() {
@@ -378,17 +394,22 @@
         renderItems([], (en ? 'Searching\u2026 ' : '\u062c\u0633\u062a\u062c\u0648\u2026 ') + scopeLabel());
         await new Promise(function (r) { setTimeout(r, 10); });
         if (token !== abortToken) return;
-        var items = searchMemory(verses, q, token);
+        var result = searchMemory(verses, q, token);
         if (token !== abortToken) return;
+        var items = result.items || [];
+        var total = result.total || 0;
+        var books = result.books || 0;
         var msg;
-        if (!items.length) {
+        if (!total) {
           msg = en ? 'No results \u00b7 ' + scopeLabel() : '\u0646\u062a\u06cc\u062c\u0647\u200c\u0627\u06cc \u06cc\u0627\u0641\u062a \u0646\u0634\u062f \u00b7 ' + scopeLabel();
-        } else if (items.length > MAX_SHOW) {
+        } else if (total > items.length) {
           msg = en
-            ? 'Showing ' + MAX_SHOW + ' of ' + items.length + ' \u00b7 ' + scopeLabel()
-            : '\u0646\u0645\u0627\u06cc\u0634 ' + MAX_SHOW + ' \u0627\u0632 ' + items.length + ' \u00b7 ' + scopeLabel();
+            ? items.length + ' shown of ' + total + ' in ' + books + ' books \u00b7 ' + scopeLabel()
+            : items.length + ' \u0646\u0645\u0627\u06cc\u0634 \u0627\u0632 ' + total + ' \u062f\u0631 ' + books + ' \u06a9\u062a\u0627\u0628 \u00b7 ' + scopeLabel();
         } else {
-          msg = en ? items.length + ' results \u00b7 ' + scopeLabel() : items.length + ' \u0646\u062a\u06cc\u062c\u0647 \u00b7 ' + scopeLabel();
+          msg = en
+            ? total + ' results in ' + books + ' books \u00b7 ' + scopeLabel()
+            : total + ' \u0646\u062a\u06cc\u062c\u0647 \u062f\u0631 ' + books + ' \u06a9\u062a\u0627\u0628 \u00b7 ' + scopeLabel();
         }
         renderItems(items, msg);
       }
