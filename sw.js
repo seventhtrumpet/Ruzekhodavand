@@ -1,14 +1,16 @@
-/* Seventh Trumpet — basic offline shell */
-var CACHE = 'st-v1';
+/* Seventh Trumpet — optimized offline + cache */
+var CACHE = 'st-v2';
 var PRECACHE = [
   '/',
   '/index.html',
-  '/media.html',
   '/bible.html',
+  '/media.html',
   '/css/style.css',
+  '/css/menu.css',
   '/css/quality.css',
+  '/js/menu.js',
   '/js/app.js',
-  '/js/menu.js'
+  '/js/app_core.js'
 ];
 
 self.addEventListener('install', function (e) {
@@ -38,24 +40,67 @@ self.addEventListener('activate', function (e) {
 self.addEventListener('fetch', function (e) {
   var req = e.request;
   if (req.method !== 'GET') return;
+
   var url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  e.respondWith(
-    fetch(req)
-      .then(function (res) {
+  if (url.pathname === '/sw.js') {
+    e.respondWith(fetch(req));
+    return;
+  }
+
+  var isHTML = req.mode === 'navigate' ||
+    (req.headers.get('accept') || '').indexOf('text/html') !== -1 ||
+    /\.html$/.test(url.pathname) ||
+    url.pathname === '/';
+
+  var isStatic = /\.(js|css|woff2?|jpg|jpeg|png|gif|webp|svg|ico)$/i.test(url.pathname) ||
+    url.pathname.indexOf('/js/') === 0 ||
+    url.pathname.indexOf('/css/') === 0 ||
+    url.pathname.indexOf('/data/') === 0;
+
+  if (isHTML) {
+    e.respondWith(
+      fetch(req).then(function (res) {
         try {
           var copy = res.clone();
-          caches.open(CACHE).then(function (cache) {
-            cache.put(req, copy);
-          });
+          caches.open(CACHE).then(function (c) { c.put(req, copy); });
         } catch (err) {}
         return res;
-      })
-      .catch(function () {
+      }).catch(function () {
         return caches.match(req).then(function (cached) {
           return cached || caches.match('/index.html');
         });
       })
+    );
+    return;
+  }
+
+  if (isStatic) {
+    e.respondWith(
+      caches.match(req).then(function (cached) {
+        if (cached) return cached;
+        return fetch(req).then(function (res) {
+          try {
+            var copy = res.clone();
+            caches.open(CACHE).then(function (c) { c.put(req, copy); });
+          } catch (err) {}
+          return res;
+        });
+      })
+    );
+    return;
+  }
+
+  e.respondWith(
+    fetch(req).then(function (res) {
+      try {
+        var copy = res.clone();
+        caches.open(CACHE).then(function (c) { c.put(req, copy); });
+      } catch (err) {}
+      return res;
+    }).catch(function () {
+      return caches.match(req);
+    })
   );
 });
