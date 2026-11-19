@@ -1,11 +1,9 @@
-/* Share panel: WA/TG/IG/FB photo flow + Messenger + Signal */
+/* Share panel: WA/TG/IG/FB/Messenger/Signal — no YT/TT */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
     instagram: 'https://www.instagram.com/seventhtrumpet.media',
     facebook: 'https://www.facebook.com/sharer/sharer.php?u=',
-    tiktok: 'https://www.tiktok.com/@seventhtrumpet.me',
-    youtube: 'https://youtube.com/@seventhtrumpetmedia',
     telegram: 'https://t.me/share/url?url='
   };
 
@@ -201,15 +199,23 @@
     }
 
     if (app === 'msg' || app === 'messenger') {
+      /* ONLY Messenger — never system share / More sheet */
       copyText(full).then(function () {
-        toast(en ? 'Copied \u2014 open Messenger & paste' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u0645\u0633\u0646\u062c\u0631 \u0631\u0627 \u0628\u0627\u0632 \u06a9\u0646\u06cc\u062f \u0648 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
+        toast(en
+          ? 'Text copied — paste in the chat'
+          : '\u0645\u062a\u0646 \u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0686\u062a \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
       });
+      var link = encodeURIComponent(pageUrl);
       try {
-        window.location.href = 'fb-messenger://share/?link=' + encodeURIComponent(pageUrl);
-      } catch (e) {}
+        window.location.href = 'fb-messenger://share/?link=' + link;
+      } catch (e1) {}
       setTimeout(function () {
-        window.open('https://www.messenger.com/new', '_blank', 'noopener');
-      }, 500);
+        try {
+          window.location.href = 'https://www.messenger.com/share/?link=' + link;
+        } catch (e2) {
+          window.open('https://www.messenger.com/share/?link=' + link, '_blank', 'noopener');
+        }
+      }, 600);
       return;
     }
 
@@ -223,22 +229,6 @@
       setTimeout(function () {
         window.open('https://signal.me/', '_blank', 'noopener');
       }, 700);
-      return;
-    }
-
-    if (app === 'tt') {
-      copyText(full).then(function () {
-        toast(en ? 'Copied \u2014 paste in TikTok' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u062a\u06cc\u06a9\u200c\u062a\u0627\u06a9 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
-      });
-      setTimeout(function () { window.open(SOCIAL.tiktok, '_blank', 'noopener'); }, 350);
-      return;
-    }
-
-    if (app === 'yt') {
-      copyText(full).then(function () {
-        toast(en ? 'Copied \u2014 paste in YouTube' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u06cc\u0648\u062a\u06cc\u0648\u0628 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
-      });
-      setTimeout(function () { window.open(SOCIAL.youtube, '_blank', 'noopener'); }, 350);
       return;
     }
 
@@ -262,7 +252,6 @@
       '.vshare-btn.wa{background:#25D366}.vshare-btn.tg{background:#0088cc}' +
       '.vshare-btn.ig{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}' +
       '.vshare-btn.fb{background:#1877F2}.vshare-btn.msg{background:#006AFF}.vshare-btn.signal{background:#3A76F0}' +
-      '.vshare-btn.tt{background:#111}.vshare-btn.yt{background:#FF0000}' +
       '.vshare-btn.more{background:#5b6b7c;grid-column:1/-1}.vshare-btn.site{background:#0a2540;grid-column:1/-1}' +
       '.vshare-hint{font-size:0.75rem;color:#6b7785;text-align:center;margin:0.5rem 0 0;line-height:1.35}' +
       '.vshare-close{display:block;width:100%;margin-top:0.6rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
@@ -287,8 +276,6 @@
       '<button type="button" class="vshare-btn fb" data-go="fb">Facebook</button>' +
       '<button type="button" class="vshare-btn msg" data-go="msg">Messenger</button>' +
       '<button type="button" class="vshare-btn signal" data-go="signal">Signal</button>' +
-      '<button type="button" class="vshare-btn tt" data-go="tt">TikTok</button>' +
-      '<button type="button" class="vshare-btn yt" data-go="yt">YouTube</button>' +
       '<button type="button" class="vshare-btn more" data-go="more">' +
       (en ? 'More apps\u2026' : '\u0628\u0631\u0646\u0627\u0645\u0647\u200c\u0647\u0627\u06cc \u0628\u06cc\u0634\u062a\u0631\u2026') +
       '</button>' +
@@ -297,8 +284,8 @@
       '</button></div>' +
       '<p class="vshare-hint">' +
       (en
-        ? 'WhatsApp: fast text+link. Messenger: copy+open. Instagram/Facebook: photo with profile.'
-        : '\u0648\u0627\u062a\u0633\u0627\u067e: \u0633\u0631\u06cc\u0639. \u0645\u0633\u0646\u062c\u0631: \u06a9\u067e\u06cc+\u0628\u0627\u0632. \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645/\u0641\u06cc\u0633\u0628\u0648\u06a9: \u0639\u06a9\u0633+\u067e\u0631\u0648\u0641\u0627\u06cc\u0644.') +
+        ? 'WhatsApp: text+link. Messenger: opens Messenger. Instagram/Facebook: photo with profile.'
+        : '\u0648\u0627\u062a\u0633\u0627\u067e: \u0645\u062a\u0646+\u0644\u06cc\u0646\u06a9. \u0645\u0633\u0646\u062c\u0631: \u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0645\u0633\u0646\u062c\u0631. \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645/\u0641\u06cc\u0633\u0628\u0648\u06a9: \u0639\u06a9\u0633+\u067e\u0631\u0648\u0641\u0627\u06cc\u0644.') +
       '</p>' +
       '<button type="button" class="vshare-close" id="vs-close">' +
       (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
