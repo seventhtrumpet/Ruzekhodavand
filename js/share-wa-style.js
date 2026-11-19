@@ -1,1 +1,1 @@
-(function(){/* restored: disabled */})();
+(function () { /* restored: disabled broken helper */ })();

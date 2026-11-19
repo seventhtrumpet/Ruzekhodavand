@@ -1,4 +1,4 @@
-/* Share panel: WA/Messenger use real profile image + verse + link (like before) */
+/* Bible share — restored stable behavior */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -8,50 +8,10 @@
     youtube: 'https://youtube.com/@seventhtrumpetmedia',
     telegram: 'https://t.me/share/url?url='
   };
-
   function isEn() {
-    try {
-      return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en';
-    } catch (e) { return false; }
+    try { return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en'; }
+    catch (e) { return false; }
   }
-
-  function getParams() {
-    try {
-      var p = new URLSearchParams(location.search);
-      var b = p.get('b') || p.get('book');
-      var c = p.get('c') || p.get('chapter');
-      var v = p.get('v') || p.get('verse');
-      if (b && c) {
-        var verse = 1;
-        if (v) {
-          var m = String(v).match(/^(\d+)/);
-          if (m) verse = Number(m[1]);
-        }
-        return { bookId: Number(b), chapter: Number(c), verse: verse };
-      }
-    } catch (e) {}
-    return null;
-  }
-
-  function applyDeepLink() {
-    var params = getParams();
-    if (!params) return;
-    try { localStorage.setItem('cog_bible_state', JSON.stringify(params)); } catch (e) {}
-    var tries = 0;
-    function tryScroll() {
-      tries++;
-      var el = document.getElementById('v-' + params.chapter + '-' + params.verse);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('highlight');
-        setTimeout(function () { el.classList.remove('highlight'); }, 2500);
-        return;
-      }
-      if (tries < 40) setTimeout(tryScroll, 250);
-    }
-    setTimeout(tryScroll, 700);
-  }
-
   function versePayload() {
     var text = '', ref = '';
     try {
@@ -66,31 +26,11 @@
       selected.forEach(function (el) { lines.push((el.textContent || '').trim()); });
       text = lines.join('\n');
       var first = selected[0];
-      var ch = first.getAttribute('data-chapter') || '';
-      var vs = first.getAttribute('data-verse') || '';
-      if (ch || vs) ref = ch + ':' + vs;
-    }
-    if (!text) {
-      var main = document.querySelector('.mb-verse.active, .verse-body, article p');
-      if (main) text = (main.textContent || '').trim().slice(0, 600);
+      ref = (first.getAttribute('data-chapter') || '') + ':' + (first.getAttribute('data-verse') || '');
     }
     return { text: (text || '').trim(), ref: (ref || '').trim() };
   }
-
-  function brandLine() {
-    return 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
-  }
-
-  function buildMessage() {
-    var p = versePayload();
-    var parts = [];
-    if (p.text) parts.push(p.text);
-    if (p.ref) parts.push(p.ref);
-    parts.push(brandLine());
-    parts.push(SITE + '/');
-    return parts.join('\n\n');
-  }
-
+  function brandLine() { return 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645'; }
   function toast(msg) {
     var t = document.getElementById('vshare-toast');
     if (t) t.remove();
@@ -101,7 +41,6 @@
     document.body.appendChild(t);
     setTimeout(function () { try { t.remove(); } catch (e) {} }, 3200);
   }
-
   function copyText(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       return navigator.clipboard.writeText(text).then(function () { return true; }).catch(function () { return false; });
@@ -115,16 +54,12 @@
       var ok = document.execCommand('copy');
       ta.remove();
       return Promise.resolve(!!ok);
-    } catch (e) {
-      return Promise.resolve(false);
-    }
+    } catch (e) { return Promise.resolve(false); }
   }
-
   function doShare(app) {
-    var msg = buildMessage();
+    var p = versePayload();
     var pageUrl = SITE + '/';
     var brand = brandLine();
-    var p = versePayload();
     var cardTitle = (p.ref ? (p.ref + ' \u2014 ') : '') + brand;
     var cardText = '';
     if (p.text) cardText += p.text + '\n\n';
@@ -132,77 +67,49 @@
     cardText += brand;
     var full = cardText + '\n\n' + pageUrl;
     var en = isEn();
+    var msg = full;
 
-    if (app === 'more' || app === 'system') {
-      if (typeof window.ST_shareWhatsAppStyle === 'function') {
-        window.ST_shareWhatsAppStyle();
-      } else if (navigator.share) {
+    function shareTextLink() {
+      if (navigator.share) {
         navigator.share({ title: cardTitle, text: cardText, url: pageUrl }).catch(function () {
-          copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
+          window.open('https://wa.me/?text=' + encodeURIComponent(full), '_blank', 'noopener');
         });
-      } else {
-        copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
-      }
-      return;
-    }
-
-    if (app === 'wa') {
-      if (typeof window.ST_shareWhatsAppStyle === 'function') {
-        window.ST_shareWhatsAppStyle();
       } else {
         window.open('https://wa.me/?text=' + encodeURIComponent(full), '_blank', 'noopener');
       }
-      return;
     }
 
+    if (app === 'wa' || app === 'more' || app === 'system' || app === 'msg' || app === 'messenger' || app === 'signal') {
+      shareTextLink();
+      return;
+    }
     if (app === 'tg') {
       window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
       return;
     }
-
     if (app === 'fb' || app === 'ig') {
       if (typeof window.ST_sharePhoto === 'function') {
         window.ST_sharePhoto(app === 'ig', app);
+      } else if (app === 'fb') {
+        window.open(SOCIAL.facebook + encodeURIComponent(pageUrl), '_blank', 'noopener');
       } else {
-        window.open(app === 'fb' ? SOCIAL.facebook + encodeURIComponent(pageUrl) : SOCIAL.instagram, '_blank', 'noopener');
+        window.open(SOCIAL.instagram, '_blank', 'noopener');
       }
       return;
     }
-
-    if (app === 'msg' || app === 'messenger') {
-      if (typeof window.ST_shareWhatsAppStyle === 'function') {
-        window.ST_shareWhatsAppStyle();
-      } else {
-        copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
-      }
-      return;
-    }
-
-    if (app === 'signal') {
-      if (typeof window.ST_shareWhatsAppStyle === 'function') {
-        window.ST_shareWhatsAppStyle();
-      } else {
-        copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
-      }
-      return;
-    }
-
     if (app === 'tt') {
       copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
       setTimeout(function () { window.open(SOCIAL.tiktok, '_blank', 'noopener'); }, 400);
       return;
     }
-
     if (app === 'yt') {
       window.open(SOCIAL.youtube, '_blank', 'noopener');
       return;
     }
-
     copyText(full).then(function (ok) {
       toast(ok ? (en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f') : (en ? 'Failed' : '\u0646\u0634\u062f'));
     });
   }
-
   function ensureCss() {
     if (document.getElementById('vshare-icons-css')) return;
     var st = document.createElement('style');
@@ -224,7 +131,6 @@
       '.vshare-close{display:block;width:100%;margin-top:0.6rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
     document.head.appendChild(st);
   }
-
   function openSharePanel() {
     ensureCss();
     var old = document.getElementById('vshare-overlay');
@@ -252,9 +158,8 @@
       (en ? 'Open website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u0633\u0627\u06cc\u062a') +
       '</button></div>' +
       '<p class="vshare-hint">' +
-      (en
-        ? 'WhatsApp & Messenger: profile photo + verse + website link (like before).'
-        : '\u0648\u0627\u062a\u0633\u0627\u067e \u0648 \u0645\u0633\u0646\u062c\u0631: \u0639\u06a9\u0633 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9.') +
+      (en ? 'WhatsApp: verse + website link. Instagram/Facebook: photo.' :
+        '\u0648\u0627\u062a\u0633\u0627\u067e: \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9. \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645/\u0641\u06cc\u0633\u0628\u0648\u06a9: \u0639\u06a9\u0633.') +
       '</p>' +
       '<button type="button" class="vshare-close" id="vs-close">' +
       (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
@@ -277,7 +182,6 @@
       });
     });
   }
-
   function setLabels() {
     var en = isEn();
     var label = en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9';
@@ -286,28 +190,6 @@
     if (share) share.textContent = label;
     if (daily) daily.textContent = label;
   }
-
-  function initDailyShare() {
-    var section = document.getElementById('daily-verse');
-    if (!section) return;
-    var btn = document.getElementById('daily-share');
-    if (!btn) {
-      btn = document.createElement('button');
-      btn.type = 'button';
-      btn.id = 'daily-share';
-      btn.className = 'verse-refresh';
-      btn.style.marginInlineStart = '0.5rem';
-      var refresh = document.getElementById('verse-refresh');
-      if (refresh && refresh.parentNode) refresh.parentNode.insertBefore(btn, refresh.nextSibling);
-      else {
-        var inner = section.querySelector('.daily-verse-inner');
-        if (inner) inner.appendChild(btn);
-      }
-    }
-    btn.onclick = function (e) { e.preventDefault(); openSharePanel(); };
-    setLabels();
-  }
-
   function bindBibleShare() {
     var btn = document.getElementById('mb-share');
     if (!btn || btn._stShareBound) return;
@@ -318,16 +200,12 @@
       openSharePanel();
     }, true);
   }
-
   function boot() {
-    applyDeepLink();
-    initDailyShare();
     bindBibleShare();
     setLabels();
     setTimeout(bindBibleShare, 400);
     setTimeout(bindBibleShare, 1200);
   }
-
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();
