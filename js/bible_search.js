@@ -1,4 +1,4 @@
-/* Fast Bible search — all books represented (per-book cap) */
+/* Fast Bible search — ALL matches, progressive Load more */
 (function () {
   if (window.__mbSearchBooted) return;
   window.__mbSearchBooted = true;
@@ -6,12 +6,11 @@
   var path = (location.pathname || '').toLowerCase();
   if (document.body && document.body.getAttribute('data-page') !== 'bible' && path.indexOf('bible') < 0) return;
 
+  var BATCH = 150;
   var abortToken = 0;
   var debounceTimer = null;
   var SCOPE_KEY = 'cog_bible_search_scope';
   var NT_MIN = 470;
-  var MAX_SHOW = 2000;
-  var PER_BOOK = 25;
 
   var IDS = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,190,220,230,240,250,260,290,300,310,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730];
 
@@ -19,6 +18,9 @@
   var EN_VERSES = null;
   var faLoadPromise = null;
   var enLoadPromise = null;
+  var _allItems = [];
+  var _shown = 0;
+  var _statusMsg = '';
 
   function isEn() {
     try {
@@ -220,24 +222,73 @@
   function renderItems(items, statusMsg) {
     var box = document.getElementById('mb-search-results');
     if (!box) return;
-    var html = '';
-    if (statusMsg) html += '<div class="mb-search-status">' + escapeHtml(statusMsg) + '</div>';
-    if (!items.length && !statusMsg) {
-      html = '<div class="mb-search-status">' + (isEn() ? 'No results' : '\u0646\u062a\u06cc\u062c\u0647\u200c\u0627\u06cc \u06cc\u0627\u0641\u062a \u0646\u0634\u062f') + '</div>';
-    }
-    var show = items.length > MAX_SHOW ? items.slice(0, MAX_SHOW) : items;
-    show.forEach(function (it, i) {
-      html += '<button type="button" class="mb-search-item" data-i="' + i + '">' + it.html + '</button>';
-    });
-    box.innerHTML = html;
+    _allItems = items || [];
+    _shown = 0;
+    _statusMsg = statusMsg || '';
+    box.innerHTML = '';
     box.classList.add('open');
-    box.querySelectorAll('.mb-search-item').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var it = show[Number(btn.getAttribute('data-i'))];
-        if (it && it.action) it.action();
-        box.classList.remove('open');
+    if (statusMsg) {
+      var st = document.createElement('div');
+      st.className = 'mb-search-status';
+      st.id = 'mb-search-status';
+      st.textContent = statusMsg;
+      box.appendChild(st);
+    }
+    if (!_allItems.length && !statusMsg) {
+      var empty = document.createElement('div');
+      empty.className = 'mb-search-status';
+      empty.textContent = isEn() ? 'No results' : '\u0646\u062a\u06cc\u062c\u0647\u200c\u0627\u06cc \u06cc\u0627\u0641\u062a \u0646\u0634\u062f';
+      box.appendChild(empty);
+      return;
+    }
+    appendBatch();
+  }
+
+  function appendBatch() {
+    var box = document.getElementById('mb-search-results');
+    if (!box) return;
+    var oldMore = document.getElementById('mb-search-more');
+    if (oldMore) oldMore.remove();
+    var end = Math.min(_shown + BATCH, _allItems.length);
+    for (var i = _shown; i < end; i++) {
+      (function (it) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'mb-search-item';
+        btn.innerHTML = it.html;
+        btn.addEventListener('click', function () {
+          if (it.action) it.action();
+          box.classList.remove('open');
+        });
+        box.appendChild(btn);
+      })(_allItems[i]);
+    }
+    _shown = end;
+    var st = document.getElementById('mb-search-status');
+    if (st && _statusMsg) {
+      var extra = _shown < _allItems.length
+        ? (isEn()
+          ? ' \u00b7 showing ' + _shown + ' / ' + _allItems.length
+          : ' \u00b7 \u0646\u0645\u0627\u06cc\u0634 ' + _shown + ' / ' + _allItems.length)
+        : '';
+      st.textContent = _statusMsg + extra;
+    }
+    if (_shown < _allItems.length) {
+      var more = document.createElement('button');
+      more.type = 'button';
+      more.id = 'mb-search-more';
+      more.className = 'mb-search-item';
+      more.style.cssText = 'font-weight:800;text-align:center;background:rgba(10,37,64,.06);color:#0a2540';
+      more.textContent = isEn()
+        ? 'Show more (' + (_allItems.length - _shown) + ' left)'
+        : '\u0646\u0645\u0627\u06cc\u0634 \u0628\u06cc\u0634\u062a\u0631 (' + (_allItems.length - _shown) + ' \u0628\u0627\u0642\u06cc\u0645\u0627\u0646\u062f\u0647)';
+      more.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        appendBatch();
       });
-    });
+      box.appendChild(more);
+    }
   }
 
   function makeItem(label, ch, v, text, query, bookId) {
@@ -346,30 +397,21 @@
   function searchMemory(verses, query, token) {
     var nq = normalize(query);
     if (!nq || nq.length < 2) return { items: [], total: 0, books: 0 };
-    var byBook = {};
-    var total = 0;
+    var items = [];
+    var seenBooks = {};
+    var bookCount = 0;
     for (var i = 0; i < verses.length; i++) {
       if (token !== abortToken) break;
       var row = verses[i];
       if (!inScope(row.id)) continue;
       if (row.norm.indexOf(nq) < 0) continue;
-      total++;
-      var bid = row.id;
-      if (!byBook[bid]) byBook[bid] = [];
-      if (byBook[bid].length < PER_BOOK) {
-        byBook[bid].push(makeItem(row.label, row.ch, row.v, row.text, query, row.id));
-      }
-    }
-    var items = [];
-    var bookCount = 0;
-    for (var j = 0; j < IDS.length; j++) {
-      var list = byBook[IDS[j]];
-      if (list && list.length) {
+      items.push(makeItem(row.label, row.ch, row.v, row.text, query, row.id));
+      if (!seenBooks[row.id]) {
+        seenBooks[row.id] = true;
         bookCount++;
-        for (var k = 0; k < list.length; k++) items.push(list[k]);
       }
     }
-    return { items: items, total: total, books: bookCount };
+    return { items: items, total: items.length, books: bookCount };
   }
 
   async function startSearch() {
@@ -402,10 +444,6 @@
         var msg;
         if (!total) {
           msg = en ? 'No results \u00b7 ' + scopeLabel() : '\u0646\u062a\u06cc\u062c\u0647\u200c\u0627\u06cc \u06cc\u0627\u0641\u062a \u0646\u0634\u062f \u00b7 ' + scopeLabel();
-        } else if (total > items.length) {
-          msg = en
-            ? items.length + ' shown of ' + total + ' in ' + books + ' books \u00b7 ' + scopeLabel()
-            : items.length + ' \u0646\u0645\u0627\u06cc\u0634 \u0627\u0632 ' + total + ' \u062f\u0631 ' + books + ' \u06a9\u062a\u0627\u0628 \u00b7 ' + scopeLabel();
         } else {
           msg = en
             ? total + ' results in ' + books + ' books \u00b7 ' + scopeLabel()
