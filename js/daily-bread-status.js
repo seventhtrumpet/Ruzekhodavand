@@ -4,6 +4,8 @@
 
   var SITE = 'https://www.seventhtrumpet.org';
   var BUTTON_ID = 'daily-status-share';
+  var preparedFile = null;
+  var prepareAttempts = 0;
 
   function language() {
     try { return localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa'; }
@@ -180,43 +182,72 @@
     });
   }
 
-  function shareStatus() {
+  function warmShareImage() {
+    if (preparedFile) return;
     var verse = dailyVerse();
     if (!verse) {
-      alert(language() === 'en' ? 'The daily verses are still loading. Please try again.' : 'آیات هنوز بارگذاری نشده‌اند. لطفاً دوباره تلاش کنید.');
+      if (prepareAttempts++ < 40) setTimeout(warmShareImage, 300);
       return;
     }
-    var button = document.getElementById(BUTTON_ID);
-    if (button) button.disabled = true;
     Promise.resolve(document.fonts && document.fonts.ready).catch(function () {}).then(function () {
       return makeImage(verse);
     }).then(function (file) {
-      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
-        return navigator.share({ files: [file] }).catch(function (err) {
-          if (err && err.name === 'AbortError') return;
-          throw err;
-        });
+      preparedFile = file;
+      var button = document.getElementById(BUTTON_ID);
+      if (button) {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
       }
-      var url = URL.createObjectURL(file);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
-      alert(language() === 'en'
-        ? 'Your verse image was saved. Open your preferred app and attach the image to share it.'
-        : 'تصویر آیه ذخیره شد. برنامه موردنظر خود را باز کنید و تصویر را برای اشتراک‌گذاری پیوست کنید.');
     }).catch(function () {
-      alert(language() === 'en' ? 'Sharing is not available on this browser. Please try another browser.' : 'اشتراک‌گذاری در این مرورگر در دسترس نیست. لطفاً مرورگر دیگری را امتحان کنید.');
-    }).then(function () {
-      if (button) button.disabled = false;
+      var button = document.getElementById(BUTTON_ID);
+      if (button) {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+      }
     });
+  }
+
+  function shareStatus() {
+    var file = preparedFile;
+    if (!file) {
+      alert(language() === 'en' ? 'The verse image is still preparing. Please wait a moment and try again.' : 'تصویر آیه هنوز آماده می‌شود. لطفاً کمی صبر کنید و دوباره تلاش کنید.');
+      return;
+    }
+
+    // Call the Web Share API immediately in the tap handler. Android browsers
+    // require transient user activation; awaiting canvas/font work first loses it.
+    if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+      try {
+        var sharePromise = navigator.share({ files: [file] });
+        if (sharePromise && sharePromise.catch) {
+          sharePromise.catch(function (err) {
+            if (err && err.name !== 'AbortError') {
+              alert(language() === 'en' ? 'Android could not open the share menu. Please try again.' : 'منوی اشتراک‌گذاری اندروید باز نشد. لطفاً دوباره تلاش کنید.');
+            }
+          });
+        }
+      } catch (err) {
+        alert(language() === 'en' ? 'Android could not open the share menu. Please try again.' : 'منوی اشتراک‌گذاری اندروید باز نشد. لطفاً دوباره تلاش کنید.');
+      }
+      return;
+    }
+
+    var url = URL.createObjectURL(file);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+    alert(language() === 'en'
+      ? 'Your verse image was saved. Open your preferred app and attach the image to share it.'
+      : 'تصویر آیه ذخیره شد. برنامه موردنظر خود را باز کنید و تصویر را برای اشتراک‌گذاری پیوست کنید.');
   }
 
   function boot() {
     addButton();
+    warmShareImage();
     if (!document.getElementById(BUTTON_ID)) {
       var observer = new MutationObserver(addButton);
       observer.observe(document.body, { childList: true, subtree: true });
