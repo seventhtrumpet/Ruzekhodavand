@@ -50,43 +50,43 @@
       <p class="section-label">DAILY BIBLE VERSE</p>
       <p id="verse-en" class="verse-en"></p>
       <p id="ref-en" class="ref"></p>
-      <div class="links">
-        <a class="info-link" href="https://www.instagram.com/seventhtrumpet.media/" target="_blank" rel="noopener">
-          <small>PROFILE / پروفایل</small>@seventhtrumpet.media
-        </a>
-        <a class="info-link" href="https://www.seventhtrumpet.org/" target="_blank" rel="noopener">
-          <small>WEBSITE / وب‌سایت</small>www.seventhtrumpet.org
-        </a>
-      </div>
-      <p class="social-title">FOLLOW SEVENTH TRUMPET / ما را دنبال کنید</p>
-      <nav class="socials" aria-label="Social media">
-        <a class="social facebook" href="https://www.facebook.com/share/1Ev7nyyXVu/" target="_blank" rel="noopener" aria-label="Facebook">
-          <svg viewBox="0 0 24 24"><path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H7v3h3v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1z"/></svg>Facebook
-        </a>
-        <a class="social telegram" href="https://t.me/seventhtrumpetmedia" target="_blank" rel="noopener" aria-label="Telegram">
-          <svg viewBox="0 0 24 24"><path d="M21.8 4.2 18.5 20c-.2 1.1-.9 1.4-1.8.9l-5-3.7-2.4 2.3c-.3.3-.5.5-1 .5l.4-5.1 9.3-8.4c.4-.4-.1-.6-.6-.2L6 13.5 1 12c-1.1-.3-1.1-1 .2-1.5L20.4 3c.9-.3 1.7.2 1.4 1.2z"/></svg>Telegram
-        </a>
-        <a class="social instagram" href="https://www.instagram.com/seventhtrumpet.media/" target="_blank" rel="noopener" aria-label="Instagram">
-          <svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.5-3a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"/></svg>Instagram
-        </a>
-        <a class="social youtube" href="https://www.youtube.com/@SeventhTrumpet-n6k" target="_blank" rel="noopener" aria-label="YouTube">
-          <svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.8 15.5v-7l6.2 3.5-6.2 3.5z"/></svg>YouTube
-        </a>
-      </nav>
-      <p class="handle">@seventhtrumpet.media</p>
-      <p class="footer-site">www.seventhtrumpet.org</p>
+      <div class="rule"></div>
+      <a class="info-link" href="https://www.seventhtrumpet.org/" target="_blank" rel="noopener">
+        <small>WEBSITE / وب‌سایت</small>www.seventhtrumpet.org
+      </a>
     </article>
   </main>
   <script>
     (function () {
       var p = new URLSearchParams(location.search);
       function set(id, value) { document.getElementById(id).textContent = value || ''; }
-      set('verse-fa', p.get('fa') || 'هر روز کلام خدا را بخوانید و در محبت او زندگی کنید.');
-      set('ref-fa', p.get('rf') || '');
-      set('verse-en', p.get('en') || 'Read God’s Word daily and live in His love.');
-      set('ref-en', p.get('re') || '');
-      var ref = p.get('re') || p.get('rf') || '';
-      if (ref) document.title = ref + ' | Seventh Trumpet';
+      function render(v) {
+        set('verse-fa', v.fa);
+        set('ref-fa', v.ref_fa || v.refFa || v.ref);
+        set('verse-en', v.en || v.fa);
+        set('ref-en', v.ref_en || v.refEn || v.ref);
+        var ref = v.ref_en || v.ref_fa || '';
+        if (ref) document.title = ref + ' | Seventh Trumpet';
+      }
+      var idx = p.get('i');
+      if (idx !== null && /^\\d+$/.test(idx)) {
+        var s = document.createElement('script');
+        s.src = '/js/daily_verses.js';
+        s.onload = function () {
+          var verses = window.DAILY_VERSES || [];
+          var v = verses[Number(idx)];
+          if (v) render(v);
+          else set('verse-en', 'Daily Bible verse');
+        };
+        document.head.appendChild(s);
+      } else {
+        render({
+          fa: p.get('fa') || 'هر روز کلام خدا را بخوانید و در محبت او زندگی کنید.',
+          en: p.get('en') || 'Read God’s Word daily and live in His love.',
+          ref_fa: p.get('rf') || '',
+          ref_en: p.get('re') || ''
+        });
+      }
     })();
   </script>
 </body>
