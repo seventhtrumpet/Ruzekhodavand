@@ -188,13 +188,17 @@
     }
     var button = document.getElementById(BUTTON_ID);
     if (button) button.disabled = true;
+    /* Copy the URL during the user's tap so it can be pasted into WhatsApp's Status text editor. */
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(SITE).catch(function () {});
+    }
     Promise.resolve(document.fonts && document.fonts.ready).catch(function () {}).then(function () {
       return makeImage(verse);
     }).then(function (file) {
       var shareData = {
         files: [file],
         title: language() === 'en' ? 'Daily Bible Verse — Seventh Trumpet' : 'آیه روز — شیپور هفتم',
-        text: SITE
+        text: 'Visit SeventhTrumpet.org: ' + SITE
       };
       if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
         return navigator.share(shareData).catch(function (err) {
@@ -211,8 +215,8 @@
       a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
       alert(language() === 'en'
-        ? 'Your verse image was saved. Open WhatsApp, choose Status, and select the image. Website: ' + SITE
-        : 'تصویر آیه ذخیره شد. واتساپ را باز کنید، وضعیت را انتخاب کنید و تصویر را بارگذاری کنید. وب‌سایت: ' + SITE);
+        ? 'Your verse image was saved and the website link was copied. In WhatsApp Status, select the image, tap the T text icon, and paste the link so viewers can tap it: ' + SITE
+        : 'تصویر آیه ذخیره و لینک وب‌سایت کپی شد. در وضعیت واتساپ، تصویر را انتخاب کنید، روی آیکون T بزنید و لینک را جای‌گذاری کنید تا بینندگان بتوانند آن را باز کنند: ' + SITE);
     }).catch(function () {
       alert(language() === 'en' ? 'Sharing is not available on this browser. Please try another browser.' : 'اشتراک‌گذاری در این مرورگر در دسترس نیست. لطفاً مرورگر دیگری را امتحان کنید.');
     }).then(function () {
