@@ -1,11 +1,6 @@
-/* Share panel: WA / WA Business / TG / IG / FB / Messenger / Signal */
+/* Share: system sheet (verse + tappable link + OG profile) + optional photo */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
-  var SOCIAL = {
-    instagram: 'https://www.instagram.com/seventhtrumpet.media',
-    facebook: 'https://www.facebook.com/sharer/sharer.php?u=',
-    telegram: 'https://t.me/share/url?url='
-  };
 
   function isEn() {
     try {
@@ -95,25 +90,31 @@
           } catch (e2) {}
         }
         if (b && ch) {
-          return SITE + '/bible.html?b=' + encodeURIComponent(b) + '&c=' + encodeURIComponent(ch) + '&v=' + encodeURIComponent(vs || '1');
+          return SITE + '/bible.html?b=' + encodeURIComponent(b) +
+            '&c=' + encodeURIComponent(ch) +
+            '&v=' + encodeURIComponent(vs || '1');
         }
       }
       var params = getParams();
       if (params && params.bookId && params.chapter) {
-        return SITE + '/bible.html?b=' + params.bookId + '&c=' + params.chapter + '&v=' + (params.verse || 1);
+        return SITE + '/bible.html?b=' + params.bookId +
+          '&c=' + params.chapter +
+          '&v=' + (params.verse || 1);
       }
     } catch (e) {}
     return SITE + '/';
   }
 
-  function buildMessage() {
+  function buildParts() {
     var p = versePayload();
-    var parts = [];
-    if (p.text) parts.push(p.text);
-    if (p.ref) parts.push(p.ref);
-    parts.push(brandLine());
-    parts.push(sharePageUrl());
-    return parts.join('\n\n');
+    var pageUrl = sharePageUrl();
+    var brand = brandLine();
+    var title = (p.ref ? (p.ref + ' \u2014 ') : '') + brand;
+    var text = '';
+    if (p.text) text += p.text + '\n\n';
+    if (p.ref) text += p.ref + '\n';
+    text += brand;
+    return { title: title, text: text.trim(), url: pageUrl, payload: p };
   }
 
   function toast(msg) {
@@ -145,114 +146,37 @@
     }
   }
 
-  function doShare(app) {
-    var msg = buildMessage();
-    var pageUrl = sharePageUrl();
-    var brand = brandLine();
-    var p = versePayload();
-    var cardTitle = (p.ref ? (p.ref + ' \u2014 ') : '') + brand;
-    var cardText = '';
-    if (p.text) cardText += p.text + '\n\n';
-    if (p.ref) cardText += p.ref + '\n\n';
-    cardText += brand;
-    var full = cardText + '\n\n' + pageUrl;
+  function shareSystem() {
+    var parts = buildParts();
     var en = isEn();
-
-    if (app === 'more' || app === 'system') {
-      if (navigator.share) {
-        navigator.share({ title: cardTitle, text: cardText, url: pageUrl }).catch(function () {
-          copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
-        });
-      } else {
-        copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
-      }
+    if (navigator.share) {
+      navigator.share({
+        title: parts.title,
+        text: parts.text,
+        url: parts.url
+      }).catch(function () {});
       return;
     }
-
-    if (app === 'wa' || app === 'wab') {
-      var waText = encodeURIComponent(full);
-      var ua = (navigator.userAgent || '').toLowerCase();
-      var isAndroid = ua.indexOf('android') >= 0;
-      if (app === 'wab' && isAndroid) {
-        window.location.href =
-          'intent://send?text=' + waText +
-          '#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end';
-        setTimeout(function () {
-          window.location.href = 'https://wa.me/?text=' + waText;
-        }, 800);
-      } else if (isAndroid) {
-        window.location.href =
-          'intent://send?text=' + waText +
-          '#Intent;scheme=whatsapp;package=com.whatsapp;end';
-        setTimeout(function () {
-          window.location.href = 'https://wa.me/?text=' + waText;
-        }, 700);
-      } else {
-        window.location.href = 'https://wa.me/?text=' + waText;
-      }
-      return;
-    }
-
-    if (app === 'tg') {
-      window.open(SOCIAL.telegram + encodeURIComponent(pageUrl) + '&text=' + encodeURIComponent(msg), '_blank', 'noopener');
-      return;
-    }
-
-    if (app === 'fb' || app === 'ig') {
-      if (typeof window.ST_sharePhoto === 'function') {
-        window.ST_sharePhoto(app === 'ig', app);
-      } else {
-        window.open(app === 'fb' ? SOCIAL.facebook + encodeURIComponent(pageUrl) : SOCIAL.instagram, '_blank', 'noopener');
-      }
-      return;
-    }
-
-    if (app === 'msg' || app === 'messenger') {
-      copyText(full);
-      var link = encodeURIComponent(pageUrl);
-      var ua2 = (navigator.userAgent || '').toLowerCase();
-      var isAndroid2 = ua2.indexOf('android') >= 0;
-      var isIOS = /iphone|ipad|ipod/.test(ua2);
-      if (isAndroid2) {
-        window.location.href =
-          'intent://share/?link=' + link +
-          '#Intent;scheme=fb-messenger;package=com.facebook.orca;end';
-        setTimeout(function () {
-          window.location.href = 'fb-messenger://share/?link=' + link;
-        }, 400);
-        setTimeout(function () {
-          window.location.href = 'https://www.messenger.com/share/?link=' + link;
-        }, 1200);
-      } else if (isIOS) {
-        window.location.href = 'fb-messenger://share/?link=' + link;
-        setTimeout(function () {
-          window.location.href = 'https://www.messenger.com/share/?link=' + link;
-        }, 900);
-      } else {
-        window.open('https://www.messenger.com/share/?link=' + link, '_blank', 'noopener');
-      }
-      toast(en
-        ? 'Text copied — paste in Messenger chat'
-        : '\u0645\u062a\u0646 \u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0686\u062a \u0645\u0633\u0646\u062c\u0631 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
-      return;
-    }
-
-    if (app === 'signal') {
-      copyText(full).then(function () {
-        toast(en ? 'Copied \u2014 paste in Signal' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0633\u06cc\u06af\u0646\u0627\u0644 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
-      });
-      try {
-        window.location.href = 'sgnl://send?text=' + encodeURIComponent(full);
-      } catch (e) {}
-      setTimeout(function () {
-        window.open('https://signal.me/', '_blank', 'noopener');
-      }, 700);
-      return;
-    }
-
+    var full = parts.text + '\n\n' + parts.url;
     copyText(full).then(function (ok) {
-      toast(ok ? (en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f') : (en ? 'Failed' : '\u0646\u0634\u062f'));
+      toast(ok
+        ? (en ? 'Copied verse + link' : '\u06a9\u067e\u06cc \u0634\u062f: \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9')
+        : (en ? 'Share not supported' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u067e\u0634\u062a\u06cc\u0628\u0627\u0646\u06cc \u0646\u0645\u06cc\u200c\u0634\u0648\u062f'));
     });
+  }
+
+  function sharePhoto() {
+    var parts = buildParts();
+    if (typeof window.ST_sharePhoto === 'function') {
+      window.ST_sharePhoto(false, 'ig', {
+        text: parts.payload.text,
+        ref: parts.payload.ref,
+        url: parts.url,
+        title: parts.title
+      });
+      return;
+    }
+    shareSystem();
   }
 
   function ensureCss() {
@@ -263,16 +187,15 @@
       '.vshare-overlay{position:fixed;inset:0;z-index:5000;background:rgba(8,16,28,0.55);display:flex;align-items:flex-end;justify-content:center;padding:0.75rem}' +
       '.vshare-panel{width:100%;max-width:400px;background:#fff;border-radius:16px;padding:1.15rem 1rem 1rem;box-shadow:0 -8px 32px rgba(0,0,0,0.25)}' +
       'body.dark .vshare-panel{background:#152536;color:#e8eef5}' +
-      '.vshare-title{font-weight:800;font-size:1.15rem;margin:0 0 0.9rem;text-align:center;color:#0a2540}' +
+      '.vshare-title{font-weight:800;font-size:1.15rem;margin:0 0 0.55rem;text-align:center;color:#0a2540}' +
       'body.dark .vshare-title{color:#9ec5ea}' +
-      '.vshare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}' +
-      '.vshare-btn{display:flex;align-items:center;justify-content:center;padding:0.85rem 0.35rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:0.9rem;cursor:pointer;color:#fff}' +
-      '.vshare-btn.wa{background:#25D366}.vshare-btn.wab{background:#128C7E}.vshare-btn.tg{background:#0088cc}' +
-      '.vshare-btn.ig{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}' +
-      '.vshare-btn.fb{background:#1877F2}.vshare-btn.msg{background:#006AFF}.vshare-btn.signal{background:#3A76F0}' +
-      '.vshare-btn.more{background:#5b6b7c;grid-column:1/-1}.vshare-btn.site{background:#0a2540;grid-column:1/-1}' +
-      '.vshare-hint{font-size:0.75rem;color:#6b7785;text-align:center;margin:0.5rem 0 0;line-height:1.35}' +
-      '.vshare-close{display:block;width:100%;margin-top:0.6rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
+      '.vshare-desc{font-size:0.82rem;color:#5a6a7a;text-align:center;margin:0 0 0.9rem;line-height:1.45}' +
+      'body.dark .vshare-desc{color:#9aabbc}' +
+      '.vshare-btn{display:flex;align-items:center;justify-content:center;width:100%;padding:0.95rem 0.5rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:1rem;cursor:pointer;color:#fff;margin-bottom:0.5rem}' +
+      '.vshare-btn.main{background:#0a2540}' +
+      '.vshare-btn.photo{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}' +
+      '.vshare-btn.site{background:#5b6b7c}' +
+      '.vshare-close{display:block;width:100%;margin-top:0.35rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
     document.head.appendChild(st);
   }
 
@@ -287,25 +210,20 @@
     overlay.innerHTML =
       '<div class="vshare-panel" role="dialog">' +
       '<p class="vshare-title">' + (en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9') + '</p>' +
-      '<div class="vshare-grid">' +
-      '<button type="button" class="vshare-btn wa" data-go="wa">WhatsApp</button>' +
-      '<button type="button" class="vshare-btn wab" data-go="wab">WA Business</button>' +
-      '<button type="button" class="vshare-btn tg" data-go="tg">Telegram</button>' +
-      '<button type="button" class="vshare-btn ig" data-go="ig">Instagram</button>' +
-      '<button type="button" class="vshare-btn fb" data-go="fb">Facebook</button>' +
-      '<button type="button" class="vshare-btn msg" data-go="msg">Messenger</button>' +
-      '<button type="button" class="vshare-btn signal" data-go="signal">Signal</button>' +
-      '<button type="button" class="vshare-btn more" data-go="more">' +
-      (en ? 'More apps\u2026' : '\u0628\u0631\u0646\u0627\u0645\u0647\u200c\u0647\u0627\u06cc \u0628\u06cc\u0634\u062a\u0631\u2026') +
+      '<p class="vshare-desc">' +
+      (en
+        ? 'Sends the verse + a real tappable website link. Profile photo appears as the link preview. Choose WhatsApp, Signal, Messenger, etc.'
+        : '\u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9 \u0648\u0627\u0642\u0639\u06cc \u0642\u0627\u0628\u0644\u0650 \u0644\u0645\u0633 \u0627\u0631\u0633\u0627\u0644 \u0645\u06cc\u200c\u0634\u0648\u062f. \u0639\u06a9\u0633 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 \u0627\u0632 \u067e\u06cc\u0634\u200c\u0646\u0645\u0627\u06cc\u0634 \u0644\u06cc\u0646\u06a9 \u0645\u06cc\u200c\u0622\u06cc\u062f. \u062e\u0648\u062f\u062a\u0627\u0646 \u0648\u0627\u062a\u0633\u0627\u067e\u060c \u0633\u06cc\u06af\u0646\u0627\u0644\u060c \u0645\u0633\u0646\u062c\u0631 \u0648 \u2026 \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f.') +
+      '</p>' +
+      '<button type="button" class="vshare-btn main" data-go="system">' +
+      (en ? 'Share (WhatsApp, Signal, \u2026)' : '\u0627\u0634\u062a\u0631\u0627\u06a9 (\u0648\u0627\u062a\u0633\u0627\u067e\u060c \u0633\u06cc\u06af\u0646\u0627\u0644\u060c \u2026)') +
+      '</button>' +
+      '<button type="button" class="vshare-btn photo" data-go="photo">' +
+      (en ? 'Share as photo (Instagram \u2026)' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0628\u0627 \u0639\u06a9\u0633 (\u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645 \u2026)') +
       '</button>' +
       '<button type="button" class="vshare-btn site" data-go="site">' +
       (en ? 'Open website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u0633\u0627\u06cc\u062a') +
-      '</button></div>' +
-      '<p class="vshare-hint">' +
-      (en
-        ? 'WhatsApp / Business: opens app with text+link (profile via link). Messenger: opens Messenger. IG/FB: photo.'
-        : '\u0648\u0627\u062a\u0633\u0627\u067e / \u0628\u06cc\u0632\u06cc\u0646\u0633: \u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0627\u067e + \u0644\u06cc\u0646\u06a9. \u0645\u0633\u0646\u062c\u0631: \u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0645\u0633\u0646\u062c\u0631. \u0627\u06cc\u062c\u06cc/\u0641\u06cc\u0633\u0628\u0648\u06a9: \u0639\u06a9\u0633.') +
-      '</p>' +
+      '</button>' +
       '<button type="button" class="vshare-close" id="vs-close">' +
       (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
       '</button></div>';
@@ -319,11 +237,14 @@
         var go = btn.getAttribute('data-go');
         if (go === 'site') {
           window.open(SITE + '/', '_blank', 'noopener');
-          setTimeout(close, 200);
+          setTimeout(close, 150);
           return;
         }
         close();
-        setTimeout(function () { doShare(go); }, 80);
+        setTimeout(function () {
+          if (go === 'photo') sharePhoto();
+          else shareSystem();
+        }, 80);
       });
     });
   }
