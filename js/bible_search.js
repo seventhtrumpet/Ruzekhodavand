@@ -6,7 +6,7 @@
   var path = (location.pathname || '').toLowerCase();
   if (document.body && document.body.getAttribute('data-page') !== 'bible' && path.indexOf('bible') < 0) return;
 
-  var BATCH = 150;
+  var BATCH = 800;
   var abortToken = 0;
   var debounceTimer = null;
   var SCOPE_KEY = 'cog_bible_search_scope';
@@ -249,6 +249,8 @@
     if (!box) return;
     var oldMore = document.getElementById('mb-search-more');
     if (oldMore) oldMore.remove();
+    var oldAll = document.getElementById('mb-search-all');
+    if (oldAll) oldAll.remove();
     var end = Math.min(_shown + BATCH, _allItems.length);
     for (var i = _shown; i < end; i++) {
       (function (it) {
@@ -274,20 +276,38 @@
       st.textContent = _statusMsg + extra;
     }
     if (_shown < _allItems.length) {
+      var left = _allItems.length - _shown;
       var more = document.createElement('button');
       more.type = 'button';
       more.id = 'mb-search-more';
       more.className = 'mb-search-item';
-      more.style.cssText = 'font-weight:800;text-align:center;background:rgba(10,37,64,.06);color:#0a2540';
+      more.style.cssText = 'font-weight:800;text-align:center;background:rgba(10,37,64,.08);color:#0a2540';
       more.textContent = isEn()
-        ? 'Show more (' + (_allItems.length - _shown) + ' left)'
-        : '\u0646\u0645\u0627\u06cc\u0634 \u0628\u06cc\u0634\u062a\u0631 (' + (_allItems.length - _shown) + ' \u0628\u0627\u0642\u06cc\u0645\u0627\u0646\u062f\u0647)';
+        ? 'Show more (+' + Math.min(BATCH, left) + ') \u00b7 ' + left + ' left'
+        : '\u0646\u0645\u0627\u06cc\u0634 \u0628\u06cc\u0634\u062a\u0631 (+' + Math.min(BATCH, left) + ') \u00b7 ' + left + ' \u0628\u0627\u0642\u06cc';
       more.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
         appendBatch();
       });
       box.appendChild(more);
+      var allBtn = document.createElement('button');
+      allBtn.type = 'button';
+      allBtn.id = 'mb-search-all';
+      allBtn.className = 'mb-search-item';
+      allBtn.style.cssText = 'font-weight:800;text-align:center;background:#0a2540;color:#fff';
+      allBtn.textContent = isEn()
+        ? 'Show ALL ' + left + ' remaining results'
+        : '\u0646\u0645\u0627\u06cc\u0634 \u0647\u0645\u0647\u0650 ' + left + ' \u0646\u062a\u06cc\u062c\u0647\u0650 \u0628\u0627\u0642\u06cc\u0645\u0627\u0646\u062f\u0647';
+      allBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var prev = BATCH;
+        BATCH = _allItems.length;
+        appendBatch();
+        BATCH = prev;
+      });
+      box.appendChild(allBtn);
     }
   }
 
