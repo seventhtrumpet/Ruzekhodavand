@@ -1,4 +1,4 @@
-/* Share panel: WA/TG/IG/FB/Messenger/Signal — no YT/TT */
+/* Share panel: WA / WA Business / TG / IG / FB / Messenger / Signal */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -169,17 +169,26 @@
       return;
     }
 
-    if (app === 'wa') {
-      try {
-        window.open('https://wa.me/?text=' + encodeURIComponent(full), '_blank', 'noopener');
-      } catch (e) {
-        if (navigator.share) {
-          navigator.share({ title: cardTitle, text: cardText, url: pageUrl }).catch(function () {
-            copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
-          });
-        } else {
-          copyText(full).then(function () { toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f'); });
-        }
+    if (app === 'wa' || app === 'wab') {
+      var waText = encodeURIComponent(full);
+      var ua = (navigator.userAgent || '').toLowerCase();
+      var isAndroid = ua.indexOf('android') >= 0;
+      if (app === 'wab' && isAndroid) {
+        window.location.href =
+          'intent://send?text=' + waText +
+          '#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end';
+        setTimeout(function () {
+          window.location.href = 'https://wa.me/?text=' + waText;
+        }, 800);
+      } else if (isAndroid) {
+        window.location.href =
+          'intent://send?text=' + waText +
+          '#Intent;scheme=whatsapp;package=com.whatsapp;end';
+        setTimeout(function () {
+          window.location.href = 'https://wa.me/?text=' + waText;
+        }, 700);
+      } else {
+        window.location.href = 'https://wa.me/?text=' + waText;
       }
       return;
     }
@@ -199,23 +208,32 @@
     }
 
     if (app === 'msg' || app === 'messenger') {
-      /* ONLY Messenger — never system share / More sheet */
-      copyText(full).then(function () {
-        toast(en
-          ? 'Text copied — paste in the chat'
-          : '\u0645\u062a\u0646 \u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0686\u062a \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
-      });
+      copyText(full);
       var link = encodeURIComponent(pageUrl);
-      try {
-        window.location.href = 'fb-messenger://share/?link=' + link;
-      } catch (e1) {}
-      setTimeout(function () {
-        try {
+      var ua2 = (navigator.userAgent || '').toLowerCase();
+      var isAndroid2 = ua2.indexOf('android') >= 0;
+      var isIOS = /iphone|ipad|ipod/.test(ua2);
+      if (isAndroid2) {
+        window.location.href =
+          'intent://share/?link=' + link +
+          '#Intent;scheme=fb-messenger;package=com.facebook.orca;end';
+        setTimeout(function () {
+          window.location.href = 'fb-messenger://share/?link=' + link;
+        }, 400);
+        setTimeout(function () {
           window.location.href = 'https://www.messenger.com/share/?link=' + link;
-        } catch (e2) {
-          window.open('https://www.messenger.com/share/?link=' + link, '_blank', 'noopener');
-        }
-      }, 600);
+        }, 1200);
+      } else if (isIOS) {
+        window.location.href = 'fb-messenger://share/?link=' + link;
+        setTimeout(function () {
+          window.location.href = 'https://www.messenger.com/share/?link=' + link;
+        }, 900);
+      } else {
+        window.open('https://www.messenger.com/share/?link=' + link, '_blank', 'noopener');
+      }
+      toast(en
+        ? 'Text copied — paste in Messenger chat'
+        : '\u0645\u062a\u0646 \u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0686\u062a \u0645\u0633\u0646\u062c\u0631 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
       return;
     }
 
@@ -249,7 +267,7 @@
       'body.dark .vshare-title{color:#9ec5ea}' +
       '.vshare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}' +
       '.vshare-btn{display:flex;align-items:center;justify-content:center;padding:0.85rem 0.35rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:0.9rem;cursor:pointer;color:#fff}' +
-      '.vshare-btn.wa{background:#25D366}.vshare-btn.tg{background:#0088cc}' +
+      '.vshare-btn.wa{background:#25D366}.vshare-btn.wab{background:#128C7E}.vshare-btn.tg{background:#0088cc}' +
       '.vshare-btn.ig{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}' +
       '.vshare-btn.fb{background:#1877F2}.vshare-btn.msg{background:#006AFF}.vshare-btn.signal{background:#3A76F0}' +
       '.vshare-btn.more{background:#5b6b7c;grid-column:1/-1}.vshare-btn.site{background:#0a2540;grid-column:1/-1}' +
@@ -271,6 +289,7 @@
       '<p class="vshare-title">' + (en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9') + '</p>' +
       '<div class="vshare-grid">' +
       '<button type="button" class="vshare-btn wa" data-go="wa">WhatsApp</button>' +
+      '<button type="button" class="vshare-btn wab" data-go="wab">WA Business</button>' +
       '<button type="button" class="vshare-btn tg" data-go="tg">Telegram</button>' +
       '<button type="button" class="vshare-btn ig" data-go="ig">Instagram</button>' +
       '<button type="button" class="vshare-btn fb" data-go="fb">Facebook</button>' +
@@ -284,8 +303,8 @@
       '</button></div>' +
       '<p class="vshare-hint">' +
       (en
-        ? 'WhatsApp: text+link. Messenger: opens Messenger. Instagram/Facebook: photo with profile.'
-        : '\u0648\u0627\u062a\u0633\u0627\u067e: \u0645\u062a\u0646+\u0644\u06cc\u0646\u06a9. \u0645\u0633\u0646\u062c\u0631: \u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0645\u0633\u0646\u062c\u0631. \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645/\u0641\u06cc\u0633\u0628\u0648\u06a9: \u0639\u06a9\u0633+\u067e\u0631\u0648\u0641\u0627\u06cc\u0644.') +
+        ? 'WhatsApp / Business: opens app with text+link (profile via link). Messenger: opens Messenger. IG/FB: photo.'
+        : '\u0648\u0627\u062a\u0633\u0627\u067e / \u0628\u06cc\u0632\u06cc\u0646\u0633: \u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0627\u067e + \u0644\u06cc\u0646\u06a9. \u0645\u0633\u0646\u062c\u0631: \u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0645\u0633\u0646\u062c\u0631. \u0627\u06cc\u062c\u06cc/\u0641\u06cc\u0633\u0628\u0648\u06a9: \u0639\u06a9\u0633.') +
       '</p>' +
       '<button type="button" class="vshare-close" id="vs-close">' +
       (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
