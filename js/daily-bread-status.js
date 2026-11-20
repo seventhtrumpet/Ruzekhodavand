@@ -140,21 +140,54 @@
       alert(msg('The daily verse is not ready yet. Please try again.', 'آیه روز هنوز آماده نیست. لطفاً دوباره تلاش کنید.'));
       return;
     }
+
+    // Share the original square profile image as a real image attachment.
+    // Keep the verse and website in the separate share text/caption.
+    var caption = [
+      data.text,
+      data.reference,
+      'Seventh Trumpet | شیپور هفتم',
+      SITE
+    ].filter(Boolean).join('\n\n');
+
     fetch(LOGO, { mode: 'cors', cache: 'force-cache' })
-      .then(function (r) { if (!r.ok) throw new Error('photo-fetch'); return r.blob(); })
-      .then(function (blob) { return makeShareCard(blob, data); })
-      .then(function (cardBlob) {
-        var file = new File([cardBlob], 'seventh-trumpet-daily-verse.jpg', { type: 'image/jpeg' });
+      .then(function (r) {
+        if (!r.ok) throw new Error('photo-fetch');
+        return r.blob();
+      })
+      .then(function (blob) {
+        var file = new File([blob], 'seventh-trumpet.jpg', { type: blob.type || 'image/jpeg' });
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-          return navigator.share({ files: [file], title: 'Seventh Trumpet | Daily Bible Verse' });
+          return navigator.share({
+            files: [file],
+            title: 'Seventh Trumpet | Daily Bible Verse',
+            text: caption,
+            url: SITE
+          }).catch(function (err) {
+            if (err && err.name === 'AbortError') throw err;
+            // Some Android share targets accept the image and caption but not a
+            // separate URL field. Keep the URL in the caption in that case.
+            return navigator.share({
+              files: [file],
+              title: 'Seventh Trumpet | Daily Bible Verse',
+              text: caption
+            });
+          });
         }
-        if (navigator.share) return navigator.share({ title: 'Seventh Trumpet', text: data.text + '\n' + data.reference + '\n' + data.url, url: data.url });
+        if (navigator.share) {
+          return navigator.share({
+            title: 'Seventh Trumpet | Daily Bible Verse',
+            text: caption,
+            url: SITE
+          });
+        }
         throw new Error('share-unavailable');
-      }).catch(function (err) {
+      })
+      .catch(function (err) {
         if (err && err.name === 'AbortError') return;
         alert(msg(
-          'Your browser could not create or share the verse image. Please try again.',
-          'ساخت یا اشتراک‌گذاری تصویر آیه انجام نشد. لطفاً دوباره تلاش کنید.'
+          'Your browser could not share the profile photo and verse. Please try again.',
+          'اشتراک‌گذاری عکس پروفایل و آیه انجام نشد. لطفاً دوباره تلاش کنید.'
         ));
       });
   }
