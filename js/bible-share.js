@@ -1,6 +1,9 @@
-/* Share: system sheet (verse + tappable link + OG profile) + optional photo */
+/* Share panel: verse first + tappable link + OG profile; WA / TG / Signal / Photo / More */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
+  var SOCIAL = {
+    telegram: 'https://t.me/share/url?url='
+  };
 
   function isEn() {
     try {
@@ -109,12 +112,23 @@
     var p = versePayload();
     var pageUrl = sharePageUrl();
     var brand = brandLine();
-    var title = (p.ref ? (p.ref + ' \u2014 ') : '') + brand;
-    var text = '';
-    if (p.text) text += p.text + '\n\n';
-    if (p.ref) text += p.ref + '\n';
-    text += brand;
-    return { title: title, text: text.trim(), url: pageUrl, payload: p };
+    var title = brand;
+    if (p.ref) title = p.ref + ' \u2014 ' + brand;
+
+    var textLines = [];
+    if (p.text) textLines.push(p.text);
+    if (p.ref) textLines.push(p.ref);
+    textLines.push(brand);
+    var text = textLines.join('\n\n');
+    var full = text + '\n\n' + pageUrl;
+
+    return {
+      title: title,
+      text: text,
+      url: pageUrl,
+      full: full,
+      payload: p
+    };
   }
 
   function toast(msg) {
@@ -125,7 +139,7 @@
     t.textContent = msg;
     t.style.cssText = 'position:fixed;left:50%;bottom:5.5rem;transform:translateX(-50%);z-index:6000;background:#0a2540;color:#fff;padding:0.7rem 1rem;border-radius:12px;font-size:0.88rem;font-weight:700;max-width:90%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)';
     document.body.appendChild(t);
-    setTimeout(function () { try { t.remove(); } catch (e) {} }, 3200);
+    setTimeout(function () { try { t.remove(); } catch (e) {} }, 2800);
   }
 
   function copyText(text) {
@@ -146,37 +160,81 @@
     }
   }
 
-  function shareSystem() {
+  function doShare(app) {
     var parts = buildParts();
     var en = isEn();
-    if (navigator.share) {
-      navigator.share({
-        title: parts.title,
-        text: parts.text,
-        url: parts.url
-      }).catch(function () {});
-      return;
-    }
-    var full = parts.text + '\n\n' + parts.url;
-    copyText(full).then(function (ok) {
-      toast(ok
-        ? (en ? 'Copied verse + link' : '\u06a9\u067e\u06cc \u0634\u062f: \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9')
-        : (en ? 'Share not supported' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u067e\u0634\u062a\u06cc\u0628\u0627\u0646\u06cc \u0646\u0645\u06cc\u200c\u0634\u0648\u062f'));
-    });
-  }
 
-  function sharePhoto() {
-    var parts = buildParts();
-    if (typeof window.ST_sharePhoto === 'function') {
-      window.ST_sharePhoto(false, 'ig', {
-        text: parts.payload.text,
-        ref: parts.payload.ref,
-        url: parts.url,
-        title: parts.title
-      });
+    if (app === 'wa') {
+      window.location.href = 'https://wa.me/?text=' + encodeURIComponent(parts.full);
       return;
     }
-    shareSystem();
+
+    if (app === 'tg') {
+      window.open(
+        SOCIAL.telegram + encodeURIComponent(parts.url) + '&text=' + encodeURIComponent(parts.text),
+        '_blank',
+        'noopener'
+      );
+      return;
+    }
+
+    if (app === 'signal') {
+      if (navigator.share) {
+        navigator.share({
+          title: parts.title,
+          text: parts.text,
+          url: parts.url
+        }).catch(function () {
+          copyText(parts.full).then(function () {
+            toast(en ? 'Copied \u2014 paste in Signal' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0633\u06cc\u06af\u0646\u0627\u0644 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
+          });
+          try { window.location.href = 'sgnl://send?text=' + encodeURIComponent(parts.full); } catch (e) {}
+        });
+      } else {
+        copyText(parts.full).then(function () {
+          toast(en ? 'Copied \u2014 paste in Signal' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0633\u06cc\u06af\u0646\u0627\u0644 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
+        });
+        try { window.location.href = 'sgnl://send?text=' + encodeURIComponent(parts.full); } catch (e2) {}
+      }
+      return;
+    }
+
+    if (app === 'photo') {
+      if (typeof window.ST_sharePhoto === 'function') {
+        window.ST_sharePhoto(false, 'ig', {
+          text: parts.payload.text,
+          ref: parts.payload.ref,
+          url: parts.url,
+          title: parts.title
+        });
+      } else {
+        doShare('more');
+      }
+      return;
+    }
+
+    if (app === 'more' || app === 'system') {
+      if (navigator.share) {
+        navigator.share({
+          title: parts.title,
+          text: parts.text,
+          url: parts.url
+        }).catch(function () {
+          copyText(parts.full).then(function (ok) {
+            if (ok) toast(en ? 'Copied verse + link' : '\u06a9\u067e\u06cc \u0634\u062f: \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9');
+          });
+        });
+      } else {
+        copyText(parts.full).then(function (ok) {
+          toast(ok
+            ? (en ? 'Copied verse + link' : '\u06a9\u067e\u06cc \u0634\u062f: \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9')
+            : (en ? 'Share not supported' : '\u067e\u0634\u062a\u06cc\u0628\u0627\u0646\u06cc \u0646\u0645\u06cc\u200c\u0634\u0648\u062f'));
+        });
+      }
+      return;
+    }
+
+    copyText(parts.full);
   }
 
   function ensureCss() {
@@ -187,15 +245,16 @@
       '.vshare-overlay{position:fixed;inset:0;z-index:5000;background:rgba(8,16,28,0.55);display:flex;align-items:flex-end;justify-content:center;padding:0.75rem}' +
       '.vshare-panel{width:100%;max-width:400px;background:#fff;border-radius:16px;padding:1.15rem 1rem 1rem;box-shadow:0 -8px 32px rgba(0,0,0,0.25)}' +
       'body.dark .vshare-panel{background:#152536;color:#e8eef5}' +
-      '.vshare-title{font-weight:800;font-size:1.15rem;margin:0 0 0.55rem;text-align:center;color:#0a2540}' +
+      '.vshare-title{font-weight:800;font-size:1.15rem;margin:0 0 0.4rem;text-align:center;color:#0a2540}' +
       'body.dark .vshare-title{color:#9ec5ea}' +
-      '.vshare-desc{font-size:0.82rem;color:#5a6a7a;text-align:center;margin:0 0 0.9rem;line-height:1.45}' +
+      '.vshare-desc{font-size:0.78rem;color:#5a6a7a;text-align:center;margin:0 0 0.85rem;line-height:1.4}' +
       'body.dark .vshare-desc{color:#9aabbc}' +
-      '.vshare-btn{display:flex;align-items:center;justify-content:center;width:100%;padding:0.95rem 0.5rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:1rem;cursor:pointer;color:#fff;margin-bottom:0.5rem}' +
-      '.vshare-btn.main{background:#0a2540}' +
-      '.vshare-btn.photo{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}' +
-      '.vshare-btn.site{background:#5b6b7c}' +
-      '.vshare-close{display:block;width:100%;margin-top:0.35rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
+      '.vshare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}' +
+      '.vshare-btn{display:flex;align-items:center;justify-content:center;padding:0.85rem 0.35rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:0.9rem;cursor:pointer;color:#fff}' +
+      '.vshare-btn.wa{background:#25D366}.vshare-btn.tg{background:#0088cc}' +
+      '.vshare-btn.signal{background:#3A76F0}.vshare-btn.photo{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}' +
+      '.vshare-btn.more{background:#5b6b7c;grid-column:1/-1}' +
+      '.vshare-close{display:block;width:100%;margin-top:0.55rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
     document.head.appendChild(st);
   }
 
@@ -212,18 +271,20 @@
       '<p class="vshare-title">' + (en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9') + '</p>' +
       '<p class="vshare-desc">' +
       (en
-        ? 'Sends the verse + a real tappable website link. Profile photo appears as the link preview. Choose WhatsApp, Signal, Messenger, etc.'
-        : '\u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9 \u0648\u0627\u0642\u0639\u06cc \u0642\u0627\u0628\u0644\u0650 \u0644\u0645\u0633 \u0627\u0631\u0633\u0627\u0644 \u0645\u06cc\u200c\u0634\u0648\u062f. \u0639\u06a9\u0633 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 \u0627\u0632 \u067e\u06cc\u0634\u200c\u0646\u0645\u0627\u06cc\u0634 \u0644\u06cc\u0646\u06a9 \u0645\u06cc\u200c\u0622\u06cc\u062f. \u062e\u0648\u062f\u062a\u0627\u0646 \u0648\u0627\u062a\u0633\u0627\u067e\u060c \u0633\u06cc\u06af\u0646\u0627\u0644\u060c \u0645\u0633\u0646\u062c\u0631 \u0648 \u2026 \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f.') +
+        ? 'Verse + profile preview + tappable website link'
+        : '\u0622\u06cc\u0647 + \u067e\u06cc\u0634\u200c\u0646\u0645\u0627\u06cc\u0634 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0644\u06cc\u0646\u06a9 \u0642\u0627\u0628\u0644\u0650 \u0644\u0645\u0633') +
       '</p>' +
-      '<button type="button" class="vshare-btn main" data-go="system">' +
-      (en ? 'Share (WhatsApp, Signal, \u2026)' : '\u0627\u0634\u062a\u0631\u0627\u06a9 (\u0648\u0627\u062a\u0633\u0627\u067e\u060c \u0633\u06cc\u06af\u0646\u0627\u0644\u060c \u2026)') +
-      '</button>' +
+      '<div class="vshare-grid">' +
+      '<button type="button" class="vshare-btn wa" data-go="wa">WhatsApp</button>' +
+      '<button type="button" class="vshare-btn tg" data-go="tg">Telegram</button>' +
+      '<button type="button" class="vshare-btn signal" data-go="signal">Signal</button>' +
       '<button type="button" class="vshare-btn photo" data-go="photo">' +
-      (en ? 'Share as photo (Instagram \u2026)' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0628\u0627 \u0639\u06a9\u0633 (\u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645 \u2026)') +
+      (en ? 'Photo' : '\u0639\u06a9\u0633') +
       '</button>' +
-      '<button type="button" class="vshare-btn site" data-go="site">' +
-      (en ? 'Open website' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0648\u0628\u0633\u0627\u06cc\u062a') +
+      '<button type="button" class="vshare-btn more" data-go="more">' +
+      (en ? 'More apps\u2026' : '\u0628\u0631\u0646\u0627\u0645\u0647\u200c\u0647\u0627\u06cc \u0628\u06cc\u0634\u062a\u0631\u2026') +
       '</button>' +
+      '</div>' +
       '<button type="button" class="vshare-close" id="vs-close">' +
       (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
       '</button></div>';
@@ -235,16 +296,8 @@
     overlay.querySelectorAll('[data-go]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var go = btn.getAttribute('data-go');
-        if (go === 'site') {
-          window.open(SITE + '/', '_blank', 'noopener');
-          setTimeout(close, 150);
-          return;
-        }
         close();
-        setTimeout(function () {
-          if (go === 'photo') sharePhoto();
-          else shareSystem();
-        }, 80);
+        setTimeout(function () { doShare(go); }, 80);
       });
     });
   }
