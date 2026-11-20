@@ -10,6 +10,28 @@
   function dailyVerse() {
     var verses = window.DAILY_VERSES || [];
     if (!verses.length) return null;
+
+    // Use the verse currently shown on the page, including a verse chosen
+    // with the "New verse" button, rather than independently recalculating it.
+    var visibleText = '';
+    var visibleRef = '';
+    var textEl = document.getElementById('verse-text');
+    var refEl = document.getElementById('verse-ref');
+    if (textEl) visibleText = (textEl.textContent || '').trim();
+    if (refEl) visibleRef = (refEl.textContent || '').trim();
+
+    if (visibleRef || visibleText) {
+      var match = verses.find(function (v) {
+        return (visibleRef && [v.ref_fa, v.ref_en, v.refFa, v.refEn, v.ref]
+          .some(function (r) { return r && String(r).trim() === visibleRef; })) ||
+          (visibleText && [v.fa, v.en].some(function (t) {
+            return t && String(t).trim() === visibleText;
+          }));
+      });
+      if (match) return match;
+    }
+
+    // Fallback to the same calendar-day selection used by the homepage.
     var now = new Date();
     var start = new Date(now.getFullYear(), 0, 0);
     var day = Math.floor((now - start) / 86400000);
