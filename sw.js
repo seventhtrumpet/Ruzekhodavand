@@ -1,5 +1,5 @@
-/* Seventh Trumpet — optimized offline + cache */
-var CACHE = 'st-v2';
+/* Seventh Trumpet — offline + cache (st-v5: network-first for JS) */
+var CACHE = 'st-v5';
 var PRECACHE = [
   '/',
   '/index.html',
@@ -76,17 +76,34 @@ self.addEventListener('fetch', function (e) {
     return;
   }
 
+  /* JS always network-first so ?v= cache-bust works */
+  var isJS = /\.js$/i.test(url.pathname) || url.pathname.indexOf('/js/') === 0;
+  if (isJS) {
+    e.respondWith(
+      fetch(req).then(function (res) {
+        try {
+          var copy = res.clone();
+          caches.open(CACHE).then(function (c) { c.put(req, copy); });
+        } catch (err) {}
+        return res;
+      }).catch(function () {
+        return caches.match(req);
+      })
+    );
+    return;
+  }
+
   if (isStatic) {
     e.respondWith(
       caches.match(req).then(function (cached) {
-        if (cached) return cached;
-        return fetch(req).then(function (res) {
+        var net = fetch(req).then(function (res) {
           try {
             var copy = res.clone();
             caches.open(CACHE).then(function (c) { c.put(req, copy); });
           } catch (err) {}
           return res;
-        });
+        }).catch(function () { return cached; });
+        return cached || net;
       })
     );
     return;
