@@ -345,7 +345,6 @@
 
   function boot() {
     applyDeepLink();
-    initDailyShare();
     bindBibleShare();
     setLabels();
     setTimeout(bindBibleShare, 400);
