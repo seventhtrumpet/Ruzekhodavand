@@ -1,16 +1,26 @@
-/* Site-wide share photo: logo, verse, preview; share file + tappable link */
+/* Site-wide share photo – faster version
+   Preloads logo + pre-generates the image so Photo is almost instant */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var W = 1080, H = 1350;
+
+  // Cache of the last generated photo
+  var lastCache = {
+    key: null,
+    blob: null,
+    dataUrl: null
+  };
 
   function isEn() {
     try {
       return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en';
     } catch (e) { return false; }
   }
+
   function brand() {
     return 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
   }
+
   function siteUrl() {
     return SITE + '/';
   }
@@ -39,6 +49,10 @@
     return { text: (text || '').trim(), ref: (ref || '').trim() };
   }
 
+  function cacheKey(p) {
+    return (p.ref || '') + '|' + (p.text || '').slice(0, 80);
+  }
+
   function wrapText(ctx, text, maxWidth) {
     var words = String(text || '').split(/\s+/);
     var lines = [];
@@ -54,8 +68,10 @@
     return lines;
   }
 
+  // ---------- Logo preload (starts immediately) ----------
   var logoImg = null;
   var logoPromise = null;
+
   function preloadLogo() {
     if (logoImg && logoImg.complete) return Promise.resolve(logoImg);
     if (logoPromise) return logoPromise;
@@ -72,6 +88,10 @@
     return logoPromise;
   }
 
+  // Start loading logo as early as possible
+  preloadLogo();
+
+  // ---------- Canvas generation ----------
   function makeCanvas(payload) {
     return preloadLogo().then(function (logo) {
       var p = versePayload(payload);
@@ -79,12 +99,15 @@
       canvas.width = W;
       canvas.height = H;
       var ctx = canvas.getContext('2d');
+
+      // Background
       var g = ctx.createLinearGradient(0, 0, 0, H);
       g.addColorStop(0, '#0a2540');
       g.addColorStop(1, '#163a5f');
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, W, H);
 
+      // Logo
       var cx = W / 2, cy = 220, r = 110;
       if (logo) {
         ctx.save();
@@ -101,16 +124,19 @@
         ctx.stroke();
       }
 
+      // Verse text
       ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
       ctx.direction = 'rtl';
       var y = 420;
+
       if (p.ref) {
         ctx.font = '700 42px Vazirmatn, Tahoma, sans-serif';
         ctx.fillStyle = '#c9a227';
         ctx.fillText(p.ref, W / 2, y);
         y += 70;
       }
+
       ctx.fillStyle = '#ffffff';
       ctx.font = '600 40px Vazirmatn, Tahoma, sans-serif';
       var lines = wrapText(ctx, p.text || brand(), W - 120);
@@ -119,6 +145,7 @@
         y += 54;
       }
 
+      // Bottom bar
       ctx.fillStyle = 'rgba(0,0,0,0.25)';
       ctx.fillRect(0, H - 160, W, 160);
       ctx.fillStyle = '#ffffff';
@@ -127,10 +154,54 @@
       ctx.font = '500 28px Vazirmatn, Tahoma, sans-serif';
       ctx.fillStyle = '#9ec5ea';
       ctx.fillText(siteUrl().replace('https://', ''), W / 2, H - 45);
+
       return canvas;
     });
   }
 
+  // ---------- Pre-generate & cache ----------
+  function pregenerate(payload) {
+    var p = versePayload(payload);
+    var key = cacheKey(p);
+    if (lastCache.key === key && lastCache.blob) return Promise.resolve(lastCache);
+
+    return makeCanvas(payload).then(function (canvas) {
+      return new Promise(function (resolve) {
+        // Slightly lower quality = much faster on phones
+        canvas.toBlob(function (blob) {
+          if (!blob) return resolve(null);
+          var dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          lastCache = { key: key, blob: blob, dataUrl: dataUrl };
+          resolve(lastCache);
+        }, 'image/jpeg', 0.82);
+      });
+    });
+  }
+
+  // Automatically pre-generate when the daily verse is ready
+  function tryPregenerate() {
+    var section = document.querySelector('.daily-verse, #daily-verse, .daily-verse-inner');
+    if (!section) return;
+    // Small delay so the verse text is fully in the DOM
+    setTimeout(function () {
+      pregenerate(null).catch(function () {});
+    }, 600);
+  }
+
+  // Run after page load and when language/verse changes
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryPregenerate);
+  } else {
+    tryPregenerate();
+  }
+  // Also re-generate when user clicks “Another loaf”
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.classList && e.target.classList.contains('verse-refresh')) {
+      setTimeout(function () { pregenerate(null).catch(function () {}); }, 400);
+    }
+  });
+
+  // ---------- UI helpers ----------
   function ensureCss() {
     if (document.getElementById('st-photo-css')) return;
     var st = document.createElement('style');
@@ -263,18 +334,26 @@
     document.getElementById('st-photo-close').onclick = closePreview;
   }
 
+  // Main entry point – uses cache if available so it is fast
   window.ST_sharePhoto = function (openIg, app, payload) {
     app = app || (openIg ? 'ig' : 'fb');
+    var p = versePayload(payload || null);
+    var key = cacheKey(p);
+
+    // If we already have the photo ready → show it immediately
+    if (lastCache.key === key && lastCache.blob && lastCache.dataUrl) {
+      showReady(lastCache.dataUrl, lastCache.blob, app, payload || null);
+      return;
+    }
+
+    // Otherwise generate now (still faster than before because logo is preloaded)
     showLoading();
-    makeCanvas(payload || null).then(function (canvas) {
-      return new Promise(function (resolve, reject) {
-        canvas.toBlob(function (blob) {
-          if (!blob) return reject(new Error('blob'));
-          resolve({ blob: blob, dataUrl: canvas.toDataURL('image/jpeg', 0.92) });
-        }, 'image/jpeg', 0.92);
-      });
-    }).then(function (pack) {
-      showReady(pack.dataUrl, pack.blob, app, payload || null);
+    pregenerate(payload || null).then(function (pack) {
+      if (pack && pack.dataUrl) {
+        showReady(pack.dataUrl, pack.blob, app, payload || null);
+      } else {
+        showError();
+      }
     }).catch(function () {
       showError();
     });
