@@ -184,10 +184,14 @@
     makeCardBlob(data).then(function (blob) {
       var file = new File([blob], 'Seventh-Trumpet-Daily-Verse.png', { type: 'image/png' });
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        var shareText = language() === 'en'
+          ? 'Daily Bible Verse | Read the verse: ' + data.url
+          : 'آیه روز کتاب مقدس | برای خواندن آیه لمس کنید: ' + data.url;
         return navigator.share({
           files: [file],
           title: 'Daily Bible Verse | Seventh Trumpet',
-          text: 'www.seventhtrumpet.org'
+          text: shareText,
+          url: data.url
         }).catch(function (err) {
           if (err && err.name !== 'AbortError') throw err;
         });
