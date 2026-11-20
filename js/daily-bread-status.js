@@ -92,6 +92,7 @@
     var grid = document.createElement('div');
     grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:9px';
     var apps = [
+      { id: 'wa', label: 'WhatsApp', color: '#25D366' },
       { id: 'msg', label: 'Messenger', color: '#087CFA' },
       { id: 'signal', label: 'Signal', color: '#3A76F0' },
       { id: 'tg', label: 'Telegram', color: '#0088cc' },
