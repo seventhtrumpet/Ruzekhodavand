@@ -36,8 +36,8 @@
     var help = document.createElement('p');
     help.id = 'daily-status-link-help';
     help.textContent = language() === 'en'
-      ? 'To make the website link clickable in WhatsApp Status, tap the T text icon after choosing the image, then paste the copied link.'
-      : 'برای قابل کلیک شدن لینک وب‌سایت در وضعیت واتساپ، پس از انتخاب تصویر روی آیکون T بزنید و لینک کپی‌شده را جای‌گذاری کنید.';
+      ? 'To add a clickable website card, choose the image in WhatsApp Status, tap Stickers > Link, and paste the copied website address.'
+      : 'برای افزودن کارت لینک قابل کلیک، تصویر را در وضعیت واتساپ انتخاب کنید، روی برچسب‌ها و سپس Link بزنید و نشانی کپی‌شده را جای‌گذاری کنید.';
     help.style.margin = '0.5rem 0';
     help.style.fontSize = '0.9em';
     help.style.opacity = '0.85';
@@ -182,10 +182,37 @@
       ctx.font = '400 25px Inter, sans-serif';
       ctx.fillText('The everlasting Gospel for all nations', 540, 1800);
 
-      canvas.toBlob(function (blob) {
-        if (blob) resolve(new File([blob], 'seventh-trumpet-daily-verse.png', { type: 'image/png' }));
-        else reject(new Error('Could not create the image'));
-      }, 'image/png');
+      /* Add the site's existing social-preview logo as a circular profile mark. */
+      var logo = new Image();
+      logo.crossOrigin = 'anonymous';
+      var logoFinished = false;
+      var logoTimer = setTimeout(finishImage, 2500);
+      logo.onload = function () {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(165, 170, 62, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(logo, 103, 108, 124, 124);
+        ctx.restore();
+        ctx.beginPath();
+        ctx.arc(165, 170, 64, 0, Math.PI * 2);
+        ctx.strokeStyle = '#e8d48b';
+        ctx.lineWidth = 5;
+        ctx.stroke();
+        finishImage();
+      };
+      logo.onerror = finishImage;
+      logo.src = 'https://iili.io/n8MSJBp.jpg';
+
+      function finishImage() {
+        if (logoFinished) return;
+        logoFinished = true;
+        clearTimeout(logoTimer);
+        canvas.toBlob(function (blob) {
+          if (blob) resolve(new File([blob], 'seventh-trumpet-daily-verse.png', { type: 'image/png' }));
+          else reject(new Error('Could not create the image'));
+        }, 'image/png');
+      }
     });
   }
 
@@ -224,8 +251,8 @@
       a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
       alert(language() === 'en'
-        ? 'Your verse image was saved and the website link was copied. In WhatsApp Status, select the image, tap the T text icon, and paste the link so viewers can tap it: ' + SITE
-        : 'تصویر آیه ذخیره و لینک وب‌سایت کپی شد. در وضعیت واتساپ، تصویر را انتخاب کنید، روی آیکون T بزنید و لینک را جای‌گذاری کنید تا بینندگان بتوانند آن را باز کنند: ' + SITE);
+        ? 'Your verse image was saved and the website link was copied. In WhatsApp Status, choose the image, tap Stickers > Link, and paste the address to add a clickable link card: ' + SITE
+        : 'تصویر آیه ذخیره و لینک وب‌سایت کپی شد. در وضعیت واتساپ، تصویر را انتخاب کنید، روی برچسب‌ها و سپس Link بزنید و نشانی را جای‌گذاری کنید تا کارت لینک قابل کلیک اضافه شود: ' + SITE);
     }).catch(function () {
       alert(language() === 'en' ? 'Sharing is not available on this browser. Please try another browser.' : 'اشتراک‌گذاری در این مرورگر در دسترس نیست. لطفاً مرورگر دیگری را امتحان کنید.');
     }).then(function () {
