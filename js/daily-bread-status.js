@@ -246,6 +246,11 @@
   }
 
   function boot() {
+    // Remove the legacy Daily Bread share control if an older script left it in the page.
+    var legacyButton = document.getElementById('daily-share');
+    if (legacyButton) legacyButton.remove();
+    var legacyPanel = document.getElementById('vshare-overlay');
+    if (legacyPanel) legacyPanel.remove();
     addButton();
     warmShareImage();
     if (!document.getElementById(BUTTON_ID)) {
