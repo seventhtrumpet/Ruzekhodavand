@@ -33,6 +33,15 @@
     button.style.marginInlineStart = '0.45rem';
     button.addEventListener('click', shareStatus);
     refresh.parentNode.insertBefore(button, refresh.nextSibling);
+    var help = document.createElement('p');
+    help.id = 'daily-status-link-help';
+    help.textContent = language() === 'en'
+      ? 'To make the website link clickable in WhatsApp Status, tap the T text icon after choosing the image, then paste the copied link.'
+      : 'برای قابل کلیک شدن لینک وب‌سایت در وضعیت واتساپ، پس از انتخاب تصویر روی آیکون T بزنید و لینک کپی‌شده را جای‌گذاری کنید.';
+    help.style.margin = '0.5rem 0';
+    help.style.fontSize = '0.9em';
+    help.style.opacity = '0.85';
+    button.parentNode.insertBefore(help, button.nextSibling);
   }
 
   function roundedRect(ctx, x, y, w, h, r) {
