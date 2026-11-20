@@ -59,7 +59,7 @@
   }
 
   function wrapText(ctx, text, maxWidth) {
-    var words = String(text || '').split(/\\s+/);
+    var words = String(text || '').split(/\s+/);
     var lines = [];
     var line = '';
     words.forEach(function (word) {
