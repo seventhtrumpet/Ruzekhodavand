@@ -193,8 +193,8 @@
       ctx.fillText(data.refEn, 540, y + 10);
 
       ctx.beginPath();
-      ctx.moveTo(155, 1190);
-      ctx.lineTo(925, 1190);
+      ctx.moveTo(155, 1480);
+      ctx.lineTo(925, 1480);
       ctx.strokeStyle = '#d8c58e';
       ctx.stroke();
       ctx.fillStyle = '#0b3859';
