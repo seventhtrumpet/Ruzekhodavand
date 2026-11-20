@@ -43,15 +43,11 @@
       alert(language() === 'en' ? 'The daily verse is not ready yet. Please try again.' : 'آیه روز هنوز آماده نیست. لطفاً دوباره تلاش کنید.');
       return;
     }
-    var params = new URLSearchParams();
-    params.set('fa', verse.fa || '');
-    params.set('en', verse.en || '');
-    params.set('rf', verse.ref_fa || '');
-    params.set('re', verse.ref_en || '');
-    var url = SITE + '/daily-bread-share.html?' + params.toString();
-    var text = (verse.fa || '') + '\n' + (verse.ref_fa || '') + '\n\n' +
-      (verse.en || '') + '\n' + (verse.ref_en || '') + '\n\n' +
-      'Seventh Trumpet | www.seventhtrumpet.org';
+    var index = (window.DAILY_VERSES || []).indexOf(verse);
+    if (index < 0) index = 0;
+    // Compact, readable URL: /v/0 instead of a long URL containing the verse text.
+    var url = SITE + '/v/' + index;
+    var text = 'Seventh Trumpet | www.seventhtrumpet.org';
     if (navigator.share) {
       try {
         var p = navigator.share({ title: 'Daily Bible Verse | Seventh Trumpet', text: text, url: url });
