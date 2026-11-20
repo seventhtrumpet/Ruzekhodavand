@@ -1,4 +1,4 @@
-/* Fast Bible search — ALL matches, progressive Load more */
+/* Fast Bible search — ALL matches; Show all next to scope filters */
 (function () {
   if (window.__mbSearchBooted) return;
   window.__mbSearchBooted = true;
@@ -120,6 +120,8 @@
         'body.dark .mb-scope button{background:#1a2b3c;border-color:#2a3a4c;color:#dbe7f3}' +
         '.mb-scope button.is-on{background:#0a2540;border-color:#0a2540;color:#fff}' +
         'body.dark .mb-scope button.is-on{background:#c9a227;border-color:#c9a227;color:#0a2540}' +
+        '.mb-scope button.mb-show-all{background:#c9a227;border-color:#c9a227;color:#0a2540;font-weight:800}' +
+        '.mb-scope button.mb-show-all:disabled{opacity:0.45;cursor:default}' +
         '.mb-search-results{position:relative;margin-top:0.35rem;max-height:50vh;overflow:auto;background:var(--bg-card,#fff);border:1px solid var(--border,#d8dee6);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.12);display:none}' +
         'body.dark .mb-search-results{background:#152536;border-color:#2a3a4c}' +
         '.mb-search-results.open{display:block}' +
@@ -133,8 +135,8 @@
     }
 
     var L = isEn()
-      ? { all: 'All', ot: 'Old T.', nt: 'New T.', book: 'This book', go: 'Search', ph: 'Search whole Bible\u2026' }
-      : { all: '\u0647\u0645\u0647', ot: '\u0639\u062a\u06cc\u0642', nt: '\u062c\u062f\u06cc\u062f', book: '\u0647\u0645\u06cc\u0646 \u06a9\u062a\u0627\u0628', go: '\u062c\u0633\u062a\u062c\u0648', ph: '\u062c\u0633\u062a\u062c\u0648 \u062f\u0631 \u06a9\u0644 \u06a9\u062a\u0627\u0628\u2026' };
+      ? { all: 'All', ot: 'Old T.', nt: 'New T.', book: 'This book', showAll: 'Show all', go: 'Search', ph: 'Search whole Bible\u2026' }
+      : { all: '\u0647\u0645\u0647', ot: '\u0639\u062a\u06cc\u0642', nt: '\u062c\u062f\u06cc\u062f', book: '\u0647\u0645\u06cc\u0646 \u06a9\u062a\u0627\u0628', showAll: '\u0646\u0645\u0627\u06cc\u0634 \u0647\u0645\u0647', go: '\u062c\u0633\u062a\u062c\u0648', ph: '\u062c\u0633\u062a\u062c\u0648 \u062f\u0631 \u06a9\u0644 \u06a9\u062a\u0627\u0628\u2026' };
 
     var wrap = document.createElement('div');
     wrap.id = 'mb-search-wrap';
@@ -150,6 +152,7 @@
       '<button type="button" data-scope="ot">' + L.ot + '</button>' +
       '<button type="button" data-scope="nt">' + L.nt + '</button>' +
       '<button type="button" data-scope="book">' + L.book + '</button>' +
+      '<button type="button" class="mb-show-all" id="mb-scope-show-all" disabled>' + L.showAll + '</button>' +
       '</div>' +
       '<div id="mb-search-results" class="mb-search-results" role="listbox"></div>' +
       '</div>';
@@ -157,12 +160,21 @@
     placeSearch();
 
     document.getElementById('mb-scope').addEventListener('click', function (e) {
+      if (e.target.closest('#mb-scope-show-all')) return;
       var b = e.target.closest('[data-scope]');
       if (!b) return;
       setScope(b.getAttribute('data-scope'));
       var input = document.getElementById('mb-search');
       if (input && (input.value || '').trim().length >= 2) startSearch();
     });
+    var showAllBtn = document.getElementById('mb-scope-show-all');
+    if (showAllBtn) {
+      showAllBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        showAllResults();
+      });
+    }
     syncScopeUi();
 
     var input = document.getElementById('mb-search');
@@ -177,6 +189,7 @@
       if (v.length < 2) {
         var box = document.getElementById('mb-search-results');
         if (box) box.classList.remove('open');
+        updateShowAllBtn();
         return;
       }
       debounceTimer = setTimeout(startSearch, 350);
@@ -239,9 +252,34 @@
       empty.className = 'mb-search-status';
       empty.textContent = isEn() ? 'No results' : '\u0646\u062a\u06cc\u062c\u0647\u200c\u0627\u06cc \u06cc\u0627\u0641\u062a \u0646\u0634\u062f';
       box.appendChild(empty);
+      updateShowAllBtn();
       return;
     }
     appendBatch();
+  }
+
+  function updateShowAllBtn() {
+    var btn = document.getElementById('mb-scope-show-all');
+    if (!btn) return;
+    var left = _allItems.length - _shown;
+    if (!_allItems.length || left <= 0) {
+      btn.disabled = true;
+      btn.textContent = isEn() ? 'Show all' : '\u0646\u0645\u0627\u06cc\u0634 \u0647\u0645\u0647';
+    } else {
+      btn.disabled = false;
+      btn.textContent = isEn()
+        ? 'Show all (' + _allItems.length + ')'
+        : '\u0646\u0645\u0627\u06cc\u0634 \u0647\u0645\u0647 (' + _allItems.length + ')';
+    }
+  }
+
+  function showAllResults() {
+    if (!_allItems.length || _shown >= _allItems.length) return;
+    var prev = BATCH;
+    BATCH = _allItems.length;
+    appendBatch();
+    BATCH = prev;
+    updateShowAllBtn();
   }
 
   function appendBatch() {
@@ -302,13 +340,11 @@
       allBtn.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        var prev = BATCH;
-        BATCH = _allItems.length;
-        appendBatch();
-        BATCH = prev;
+        showAllResults();
       });
       box.appendChild(allBtn);
     }
+    updateShowAllBtn();
   }
 
   function makeItem(label, ch, v, text, query, bookId) {
