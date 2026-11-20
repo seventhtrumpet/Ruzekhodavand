@@ -28,20 +28,11 @@
     button.type = 'button';
     button.id = BUTTON_ID;
     button.className = 'verse-refresh';
-    button.textContent = language() === 'en' ? 'Share to WhatsApp Status' : 'اشتراک‌گذاری در وضعیت واتساپ';
+    button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-inline-end:7px"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"></path></svg><span>' + (language() === 'en' ? 'Share' : 'اشتراک‌گذاری') + '</span>';
     button.setAttribute('aria-label', 'Share the daily Bible verse image');
     button.style.marginInlineStart = '0.45rem';
     button.addEventListener('click', shareStatus);
     refresh.parentNode.insertBefore(button, refresh.nextSibling);
-    var help = document.createElement('p');
-    help.id = 'daily-status-link-help';
-    help.textContent = language() === 'en'
-      ? 'To add a clickable website card, choose the image in WhatsApp Status, tap Stickers > Link, and paste the copied website address.'
-      : 'برای افزودن کارت لینک قابل کلیک، تصویر را در وضعیت واتساپ انتخاب کنید، روی برچسب‌ها و سپس Link بزنید و نشانی کپی‌شده را جای‌گذاری کنید.';
-    help.style.margin = '0.5rem 0';
-    help.style.fontSize = '0.9em';
-    help.style.opacity = '0.85';
-    button.parentNode.insertBefore(help, button.nextSibling);
   }
 
   function roundedRect(ctx, x, y, w, h, r) {
@@ -182,37 +173,10 @@
       ctx.font = '400 25px Inter, sans-serif';
       ctx.fillText('The everlasting Gospel for all nations', 540, 1800);
 
-      /* Add the site's existing social-preview logo as a circular profile mark. */
-      var logo = new Image();
-      logo.crossOrigin = 'anonymous';
-      var logoFinished = false;
-      var logoTimer = setTimeout(finishImage, 2500);
-      logo.onload = function () {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(165, 170, 62, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(logo, 103, 108, 124, 124);
-        ctx.restore();
-        ctx.beginPath();
-        ctx.arc(165, 170, 64, 0, Math.PI * 2);
-        ctx.strokeStyle = '#e8d48b';
-        ctx.lineWidth = 5;
-        ctx.stroke();
-        finishImage();
-      };
-      logo.onerror = finishImage;
-      logo.src = 'https://iili.io/n8MSJBp.jpg';
-
-      function finishImage() {
-        if (logoFinished) return;
-        logoFinished = true;
-        clearTimeout(logoTimer);
-        canvas.toBlob(function (blob) {
-          if (blob) resolve(new File([blob], 'seventh-trumpet-daily-verse.png', { type: 'image/png' }));
-          else reject(new Error('Could not create the image'));
-        }, 'image/png');
-      }
+      canvas.toBlob(function (blob) {
+        if (blob) resolve(new File([blob], 'seventh-trumpet-daily-verse.png', { type: 'image/png' }));
+        else reject(new Error('Could not create the image'));
+      }, 'image/png');
     });
   }
 
@@ -224,20 +188,11 @@
     }
     var button = document.getElementById(BUTTON_ID);
     if (button) button.disabled = true;
-    /* Copy the URL during the user's tap so it can be pasted into WhatsApp's Status text editor. */
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(SITE).catch(function () {});
-    }
     Promise.resolve(document.fonts && document.fonts.ready).catch(function () {}).then(function () {
       return makeImage(verse);
     }).then(function (file) {
-      var shareData = {
-        files: [file],
-        title: language() === 'en' ? 'Daily Bible Verse — Seventh Trumpet' : 'آیه روز — شیپور هفتم',
-        text: 'Visit SeventhTrumpet.org: ' + SITE
-      };
-      if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
-        return navigator.share(shareData).catch(function (err) {
+      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+        return navigator.share({ files: [file] }).catch(function (err) {
           if (err && err.name === 'AbortError') return;
           throw err;
         });
@@ -251,8 +206,8 @@
       a.remove();
       setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
       alert(language() === 'en'
-        ? 'Your verse image was saved and the website link was copied. In WhatsApp Status, choose the image, tap Stickers > Link, and paste the address to add a clickable link card: ' + SITE
-        : 'تصویر آیه ذخیره و لینک وب‌سایت کپی شد. در وضعیت واتساپ، تصویر را انتخاب کنید، روی برچسب‌ها و سپس Link بزنید و نشانی را جای‌گذاری کنید تا کارت لینک قابل کلیک اضافه شود: ' + SITE);
+        ? 'Your verse image was saved. Open your preferred app and attach the image to share it.'
+        : 'تصویر آیه ذخیره شد. برنامه موردنظر خود را باز کنید و تصویر را برای اشتراک‌گذاری پیوست کنید.');
     }).catch(function () {
       alert(language() === 'en' ? 'Sharing is not available on this browser. Please try another browser.' : 'اشتراک‌گذاری در این مرورگر در دسترس نیست. لطفاً مرورگر دیگری را امتحان کنید.');
     }).then(function () {
