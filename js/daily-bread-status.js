@@ -175,7 +175,7 @@
     });
   }
 
-  function shareCard() {
+  function shareToApp(app) {
     var data = verseData();
     if (!data || !data.text) {
       alert(msg('The daily verse is not ready yet. Please try again.', 'آیه روز هنوز آماده نیست. لطفاً دوباره تلاش کنید.'));
@@ -183,17 +183,19 @@
     }
     makeCardBlob(data).then(function (blob) {
       var file = new File([blob], 'Seventh-Trumpet-Daily-Verse.png', { type: 'image/png' });
+      var shareText = (language() === 'en'
+        ? data.text + '\\n\\n' + data.reference + '\\n\\nSeventh Trumpet\\n' + data.url
+        : data.text + '\\n\\n' + data.reference + '\\n\\nشیپور هفتم\\n' + data.url);
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        var shareText = language() === 'en'
-          ? 'Daily Bible Verse | Read the verse: ' + data.url
-          : 'آیه روز کتاب مقدس | برای خواندن آیه لمس کنید: ' + data.url;
         return navigator.share({
           files: [file],
           title: 'Daily Bible Verse | Seventh Trumpet',
           text: shareText,
           url: data.url
         }).catch(function (err) {
-          if (err && err.name !== 'AbortError') throw err;
+          if (err && err.name !== 'AbortError') {
+            alert(msg('Sharing could not be opened. Please try another app.', 'اشتراک‌گذاری باز نشد. لطفاً برنامه دیگری را امتحان کنید.'));
+          }
         });
       }
       var objectUrl = URL.createObjectURL(blob);
@@ -205,8 +207,8 @@
       link.remove();
       window.setTimeout(function () { URL.revokeObjectURL(objectUrl); }, 60000);
       alert(msg(
-        'The verse card image was saved. Open it in Gallery, tap Share, then choose WhatsApp Status or another app.',
-        'تصویر آیه ذخیره شد. آن را در گالری باز کنید، روی اشتراک‌گذاری بزنید و وضعیت واتساپ یا برنامه دیگری را انتخاب کنید.'
+        'Your phone does not support sharing the image directly. The card was saved to Gallery.',
+        'گوشی شما اشتراک‌گذاری مستقیم تصویر را پشتیبانی نمی‌کند. کارت در گالری ذخیره شد.'
       ));
     }).catch(function () {
       alert(msg(
@@ -214,6 +216,60 @@
         'ساخت تصویر انجام نشد. لطفاً اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.'
       ));
     });
+  }
+
+  function openDailySharePanel() {
+    var old = document.getElementById('daily-bread-share-overlay');
+    if (old) old.remove();
+    var en = language() === 'en';
+    var overlay = document.createElement('div');
+    overlay.id = 'daily-bread-share-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(8,16,28,.62);display:flex;align-items:flex-end;justify-content:center;padding:12px';
+    var panel = document.createElement('div');
+    panel.style.cssText = 'width:100%;max-width:420px;background:#fff;color:#172b3e;border-radius:18px 18px 14px 14px;padding:18px 16px 14px;box-shadow:0 -8px 32px rgba(0,0,0,.25);font-family:inherit';
+    if (document.body.classList.contains('dark')) {
+      panel.style.background = '#152536';
+      panel.style.color = '#e8eef5';
+    }
+    var heading = document.createElement('p');
+    heading.textContent = en ? 'Share Daily Verse' : 'اشتراک‌گذاری آیه روز';
+    heading.style.cssText = 'font-weight:800;font-size:1.1rem;text-align:center;margin:0 0 14px';
+    panel.appendChild(heading);
+    var grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:9px';
+    var apps = [
+      { id: 'wa', label: 'WhatsApp', color: '#25D366' },
+      { id: 'msg', label: 'Messenger', color: '#087CFA' },
+      { id: 'signal', label: 'Signal', color: '#3A76F0' },
+      { id: 'tg', label: 'Telegram', color: '#0088cc' },
+      { id: 'fb', label: 'Facebook', color: '#1877F2' },
+      { id: 'ig', label: 'Instagram', color: '#C13584' },
+      { id: 'tt', label: 'TikTok', color: '#202020' },
+      { id: 'more', label: en ? 'More apps…' : 'برنامه‌های بیشتر…', color: '#5b6b7c' }
+    ];
+    apps.forEach(function (app) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = app.label;
+      button.style.cssText = 'border:0;border-radius:12px;padding:13px 8px;color:#fff;font:700 .92rem inherit;cursor:pointer;background:' + app.color;
+      button.addEventListener('click', function () {
+        overlay.remove();
+        shareToApp(app.id);
+      });
+      grid.appendChild(button);
+    });
+    panel.appendChild(grid);
+    var close = document.createElement('button');
+    close.type = 'button';
+    close.textContent = en ? 'Close' : 'بستن';
+    close.style.cssText = 'display:block;width:100%;border:0;background:transparent;color:inherit;opacity:.75;font:600 .95rem inherit;padding:13px 8px 2px;cursor:pointer';
+    close.addEventListener('click', function () { overlay.remove(); });
+    panel.appendChild(close);
+    overlay.appendChild(panel);
+    overlay.addEventListener('click', function (event) {
+      if (event.target === overlay) overlay.remove();
+    });
+    document.body.appendChild(overlay);
   }
 
   function addButton() {
@@ -227,8 +283,8 @@
     button.style.marginInlineStart = '0.45rem';
     button.style.marginTop = '0.4rem';
     button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-inline-end:7px"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"></path></svg><span>' + msg('Share Daily Verse', 'اشتراک‌گذاری آیه روز') + '</span>';
-    button.setAttribute('aria-label', msg('Share the Bible verse card image with any installed app', 'اشتراک‌گذاری تصویر آیه کتاب مقدس با برنامه‌های نصب‌شده'));
-    button.addEventListener('click', shareCard);
+    button.setAttribute('aria-label', msg('Choose WhatsApp, Messenger, Signal or another app to share the Daily Verse', 'برای اشتراک‌گذاری آیه روز، واتساپ، مسنجر، سیگنال یا برنامه دیگری را انتخاب کنید'));
+    button.addEventListener('click', openDailySharePanel);
     refresh.parentNode.insertBefore(button, refresh.nextSibling);
   }
 
