@@ -161,29 +161,7 @@
       ctx.direction = 'ltr';
       ctx.fillText(enRef, 540, y + 12);
 
-      // Separate bilingual website invitation card at the bottom of the shared image.
-      ctx.fillStyle = 'rgba(5,20,35,0.88)';
-      ctx.strokeStyle = '#c9a227';
-      ctx.lineWidth = 3;
-      roundedRect(ctx, 105, 1580, 870, 260, 28);
-      ctx.fill();
-      ctx.stroke();
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#f1d58a';
-      ctx.font = '700 35px Inter, sans-serif';
-      ctx.direction = 'ltr';
-      ctx.fillText('VISIT OUR WEBSITE', 540, 1645);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '600 34px Vazirmatn, Tahoma, sans-serif';
-      ctx.direction = 'rtl';
-      ctx.fillText('از وب‌سایت ما دیدن کنید', 540, 1700);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '700 37px Inter, sans-serif';
-      ctx.direction = 'ltr';
-      ctx.fillText('www.seventhtrumpet.org', 540, 1770);
-      ctx.fillStyle = '#cbd7e2';
-      ctx.font = '400 23px Inter, sans-serif';
-      ctx.fillText('The everlasting Gospel for all nations', 540, 1815);
+      // Keep the shared verse image clean; the website link is a separate clickable card on the page.
 
       canvas.toBlob(function (blob) {
         if (blob) resolve(new File([blob], 'seventh-trumpet-daily-verse.png', { type: 'image/png' }));
@@ -228,12 +206,7 @@
     // require transient user activation; awaiting canvas/font work first loses it.
     if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
       try {
-        var sharePromise = navigator.share({
-          files: [file],
-          title: 'Seventh Trumpet | شیپور هفتم',
-          text: 'Visit SeventhTrumpet.org — از وب‌سایت شیپور هفتم دیدن کنید',
-          url: SITE
-        });
+        var sharePromise = navigator.share({ files: [file], title: 'Seventh Trumpet | شیپور هفتم' });
         if (sharePromise && sharePromise.catch) {
           sharePromise.catch(function (err) {
             if (err && err.name !== 'AbortError') {
