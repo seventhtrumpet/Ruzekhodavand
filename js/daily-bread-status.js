@@ -116,7 +116,7 @@
     return loadLogo().then(function (logo) {
       var canvas = document.createElement('canvas');
       canvas.width = 1080;
-      canvas.height = 1700;
+      canvas.height = 1920;
       var ctx = canvas.getContext('2d');
       var bg = ctx.createLinearGradient(0, 0, 1080, 1400);
       bg.addColorStop(0, '#071b31');
@@ -128,7 +128,7 @@
       ctx.shadowColor = 'rgba(0,0,0,.28)';
       ctx.shadowBlur = 34;
       ctx.shadowOffsetY = 14;
-      roundedRect(ctx, 58, 270, 964, 1370, 34);
+      roundedRect(ctx, 58, 270, 964, 1590, 34);
       ctx.fillStyle = '#ffffff';
       ctx.fill();
       ctx.shadowColor = 'transparent';
@@ -193,16 +193,16 @@
       ctx.fillText(data.refEn, 540, y + 10);
 
       ctx.beginPath();
-      ctx.moveTo(155, 1480);
-      ctx.lineTo(925, 1480);
+      ctx.moveTo(155, 1720);
+      ctx.lineTo(925, 1720);
       ctx.strokeStyle = '#d8c58e';
       ctx.stroke();
       ctx.fillStyle = '#0b3859';
       ctx.font = 'bold 30px system-ui, sans-serif';
-      ctx.fillText('www.seventhtrumpet.org', 540, 1545);
+      ctx.fillText('www.seventhtrumpet.org', 540, 1790);
       ctx.fillStyle = '#687887';
       ctx.font = '22px system-ui, sans-serif';
-      ctx.fillText('Read the Bible • Share the Gospel', 540, 1590);
+      ctx.fillText('Read the Bible • Share the Gospel', 540, 1840);
 
       return new Promise(function (resolve, reject) {
         canvas.toBlob(function (blob) {
