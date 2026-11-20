@@ -235,3 +235,51 @@ body.dark .footer { background: #0a1520; }
   .hero { padding: 2.5rem 1rem 3rem; }
   .angel-card { width: 100%; max-width: 280px; }
 }
+
+
+/* Independent clickable logo-background website card below Daily Bread. */
+.daily-website-card {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  overflow: hidden;
+  max-width: 720px;
+  min-height: 190px;
+  margin: 0 auto 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(201,162,39,.85);
+  border-radius: 16px;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  background: #071b31 url('https://iili.io/n8MSJBp.jpg') center 42% / cover no-repeat;
+  box-shadow: var(--shadow);
+}
+.daily-website-card-overlay {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(3,15,29,.72), rgba(3,15,29,.88));
+}
+.daily-website-card-content {
+  display: flex;
+  min-height: 150px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  text-shadow: 0 2px 5px rgba(0,0,0,.9);
+}
+.daily-website-card-content strong { color: #f1d58a; font-size: 1.25rem; letter-spacing: .08em; }
+.daily-website-card-content span { line-height: 1.55; }
+.daily-website-card-url {
+  display: inline-block;
+  margin-top: .2rem;
+  padding: .35rem .8rem;
+  border: 1px solid #e2be5b;
+  border-radius: 999px;
+  color: #f1d58a;
+  font-weight: 700;
+}
+.daily-website-card:focus-visible { outline: 3px solid #f1d58a; outline-offset: 4px; }
+.daily-website-card:hover .daily-website-card-overlay { background: linear-gradient(135deg, rgba(3,15,29,.6), rgba(3,15,29,.78)); }
