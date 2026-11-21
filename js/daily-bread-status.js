@@ -17,18 +17,18 @@
   function verseData() {
     var textEl = document.getElementById('verse-text');
     var refEl = document.getElementById('verse-ref');
-    var text = (textEl && textEl.textContent || '').trim();
-    var ref = (refEl && refEl.textContent || '').trim();
+    var visibleText = (textEl && textEl.textContent || '').trim();
+    var visibleRef = (refEl && refEl.textContent || '').trim();
     var verses = window.DAILY_VERSES || [];
+    var match = null;
 
     if (verses.length) {
-      var match = null;
       for (var i = 0; i < verses.length; i++) {
         var v = verses[i];
         var refs = [v.ref_fa, v.ref_en, v.refFa, v.refEn, v.ref];
         var texts = [v.fa, v.en];
-        var refHit = ref && refs.some(function (r) { return r && String(r).trim() === ref; });
-        var textHit = text && texts.some(function (t) { return t && String(t).trim() === text; });
+        var refHit = visibleRef && refs.some(function (r) { return r && String(r).trim() === visibleRef; });
+        var textHit = visibleText && texts.some(function (t) { return t && String(t).trim() === visibleText; });
         if (refHit || textHit) { match = v; break; }
       }
       if (!match) {
@@ -37,27 +37,46 @@
         var day = Math.floor((now - start) / 86400000);
         match = verses[Math.abs(now.getFullYear() * 366 + day) % verses.length];
       }
-      if (match) {
-        text = isEn() ? (match.en || match.fa || text) : (match.fa || match.en || text);
-        ref = isEn()
-          ? (match.ref_en || match.refEn || match.ref || ref)
-          : (match.ref_fa || match.refFa || match.ref || ref);
-      }
     }
-    return { text: text, reference: ref };
+
+    if (match) {
+      return {
+        enText: String(match.en || '').trim(),
+        enRef: String(match.ref_en || match.refEn || match.ref || '').trim(),
+        faText: String(match.fa || '').trim(),
+        faRef: String(match.ref_fa || match.refFa || match.ref || '').trim(),
+        text: visibleText,
+        reference: visibleRef
+      };
+    }
+
+    /* Safe fallback: preserve the currently displayed verse if bilingual
+       source fields are not available; never invent a translation. */
+    return {
+      enText: isEn() ? visibleText : '',
+      enRef: isEn() ? visibleRef : '',
+      faText: isEn() ? '' : visibleText,
+      faRef: isEn() ? '' : visibleRef,
+      text: visibleText,
+      reference: visibleRef
+    };
   }
 
   function buildCaption(data) {
-    return [
-      data.text,
-      data.reference,
-      'Seventh Trumpet | شیپور هفتم'
-    ].filter(Boolean).join('\n\n');
+    var lines = [];
+    if (data.enText) lines.push(data.enText);
+    if (data.enRef) lines.push(data.enRef);
+    if (data.faText) lines.push(data.faText);
+    if (data.faRef) lines.push(data.faRef);
+    if (!data.enText && !data.faText && data.text) lines.push(data.text);
+    if (!data.enRef && !data.faRef && data.reference) lines.push(data.reference);
+    lines.push('Seventh Trumpet | شیپور هفتم');
+    return lines.filter(Boolean).join('\n\n');
   }
 
   function shareFreshBread() {
     var data = verseData();
-    if (!data.text) {
+    if (!data.enText && !data.faText && !data.text) {
       alert(msg('The daily verse is not ready yet. Please try again.',
         'آیه امروز هنوز آماده نیست. لطفاً دوباره تلاش کنید.'));
       return;
