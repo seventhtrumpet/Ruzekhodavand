@@ -134,107 +134,70 @@
     });
   }
 
-  function shareToApp(app) {
-    var data = verseData();
-    if (!data || !data.text) {
-      alert(msg('The daily verse is not ready yet. Please try again.', 'آیه روز هنوز آماده نیست. لطفاً دوباره تلاش کنید.'));
-      return;
-    }
-
-    // Share the original square profile image as a real image attachment.
-    // Keep the verse and website in the separate share text/caption.
-    var caption = [
-      data.text,
-      data.reference,
-      'Seventh Trumpet | شیپور هفتم',
-      SITE
-    ].filter(Boolean).join('\n\n');
-
+  // Preload the profile image before the user taps Share. Web Share must be
+  // called directly from the tap handler or Android may reject the request.
+  var preparedShareFile = null;
+  function prepareShareFile() {
     fetch(LOGO, { mode: 'cors', cache: 'force-cache' })
       .then(function (r) {
         if (!r.ok) throw new Error('photo-fetch');
         return r.blob();
       })
       .then(function (blob) {
-        var file = new File([blob], 'seventh-trumpet.jpg', { type: blob.type || 'image/jpeg' });
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-          return navigator.share({
-            files: [file],
-            title: 'Seventh Trumpet | Daily Bible Verse',
-            text: caption,
-            url: SITE
-          }).catch(function (err) {
-            if (err && err.name === 'AbortError') throw err;
-            // Some Android share targets accept the image and caption but not a
-            // separate URL field. Keep the URL in the caption in that case.
-            return navigator.share({
-              files: [file],
-              title: 'Seventh Trumpet | Daily Bible Verse',
-              text: caption
-            });
-          });
-        }
-        if (navigator.share) {
-          return navigator.share({
-            title: 'Seventh Trumpet | Daily Bible Verse',
-            text: caption,
-            url: SITE
-          });
-        }
-        throw new Error('share-unavailable');
+        preparedShareFile = new File([blob], 'seventh-trumpet.jpg', {
+          type: blob.type || 'image/jpeg'
+        });
       })
       .catch(function (err) {
-        if (err && err.name === 'AbortError') return;
-        alert(msg(
-          'Your browser could not share the profile photo and verse. Please try again.',
-          'اشتراک‌گذاری عکس پروفایل و آیه انجام نشد. لطفاً دوباره تلاش کنید.'
-        ));
+        console.warn('Daily Bread profile image could not be preloaded:', err);
       });
   }
 
-  function openDailySharePanel() {
-    var old = document.getElementById('daily-bread-share-overlay');
-    if (old) old.remove();
-    var en = language() === 'en';
-    var overlay = document.createElement('div');
-    overlay.id = 'daily-bread-share-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(8,16,28,.62);display:flex;align-items:flex-end;justify-content:center;padding:12px';
-    var panel = document.createElement('div');
-    panel.style.cssText = 'width:100%;max-width:420px;background:#fff;color:#172b3e;border-radius:18px;padding:18px 16px 14px;box-shadow:0 -8px 32px rgba(0,0,0,.25);font-family:inherit';
-    if (document.body.classList.contains('dark')) { panel.style.background = '#152536'; panel.style.color = '#e8eef5'; }
-    var heading = document.createElement('p');
-    heading.textContent = en ? 'Share Daily Verse' : 'اشتراک‌گذاری آیه روز';
-    heading.style.cssText = 'font-weight:800;font-size:1.1rem;text-align:center;margin:0 0 14px';
-    panel.appendChild(heading);
-    var grid = document.createElement('div');
-    grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:9px';
-    var apps = [
-      { id: 'wa', label: 'WhatsApp', color: '#25D366' },
-      { id: 'msg', label: 'Messenger', color: '#087CFA' },
-      { id: 'signal', label: 'Signal', color: '#3A76F0' },
-      { id: 'tg', label: 'Telegram', color: '#0088cc' },
-      { id: 'fb', label: 'Facebook', color: '#1877F2' },
-      { id: 'ig', label: 'Instagram', color: '#C13584' },
-      { id: 'more', label: en ? 'More apps…' : 'برنامه‌های بیشتر…', color: '#5b6b7c' }
-    ];
-    apps.forEach(function (app) {
-      var button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = app.label;
-      button.style.cssText = 'border:0;border-radius:12px;padding:13px 8px;color:#fff;font:700 .92rem inherit;cursor:pointer;background:' + app.color;
-      button.addEventListener('click', function () { overlay.remove(); shareToApp(app.id); });
-      grid.appendChild(button);
-    });
-    panel.appendChild(grid);
-    var close = document.createElement('button');
-    close.type = 'button';
-    close.textContent = en ? 'Close' : 'بستن';
-    close.style.cssText = 'display:block;width:100%;border:0;background:transparent;color:inherit;opacity:.75;font:600 .95rem inherit;padding:13px 8px 2px;cursor:pointer';
-    close.addEventListener('click', function () { overlay.remove(); });
-    panel.appendChild(close);
-    overlay.appendChild(panel);
-    overlay.addEventListener('click', function (event) { if (event.target === overlay) overlay.remove(); });
-    document.body.appendChild(overlay);
+  function shareToApp() {
+    var data = verseData();
+    if (!data || !data.text) {
+      alert(msg('The daily verse is not ready yet. Please try again.', 'آیه روز هنوز آماده نیست. لطفاً دوباره تلاش کنید.'));
+      return;
+    }
+
+    var caption = [
+      data.text,
+      data.reference,
+      'Seventh Trumpet | شیپور هفتم',
+      SITE
+    ].filter(Boolean).join('\\n\\n');
+
+    if (!navigator.share) {
+      alert(msg('Sharing is not supported by this browser.', 'مرورگر شما از اشتراک‌گذاری پشتیبانی نمی‌کند.'));
+      return;
+    }
+
+    var shareData = {
+      title: 'Seventh Trumpet | Daily Bible Verse',
+      text: caption,
+      url: SITE
+    };
+
+    // Attach the real square profile photo when it was preloaded and the
+    // browser confirms file sharing is supported. The website stays in text.
+    if (preparedShareFile && navigator.canShare) {
+      try {
+        if (navigator.canShare({ files: [preparedShareFile] })) {
+          shareData.files = [preparedShareFile];
+        }
+      } catch (e) {}
+    }
+
+    try {
+      navigator.share(shareData).catch(function (err) {
+        if (err && err.name === 'AbortError') return;
+        console.error('Daily Bread share failed:', err);
+        alert(msg('Sharing failed. Please try again.', 'اشتراک‌گذاری انجام نشد. لطفاً دوباره تلاش کنید.'));
+      });
+    } catch (err) {
+      console.error('Daily Bread share failed:', err);
+      alert(msg('Sharing failed. Please try again.', 'اشتراک‌گذاری انجام نشد. لطفاً دوباره تلاش کنید.'));
+    }
   }
 
   function addButton() {
@@ -248,8 +211,8 @@
     button.style.marginInlineStart = '0.45rem';
     button.style.marginTop = '0.4rem';
     button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-inline-end:7px"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"></path></svg><span>' + msg('Share Daily Verse', 'اشتراک‌گذاری آیه روز') + '</span>';
-    button.setAttribute('aria-label', msg('Share the profile photo with an attached verse and website panel', 'اشتراک‌گذاری عکس پروفایل همراه با کادر آیه و لینک وب‌سایت'));
-    button.addEventListener('click', openDailySharePanel);
+    button.setAttribute('aria-label', msg('Share the profile photo with the daily verse and website link', 'اشتراک‌گذاری عکس پروفایل همراه با آیه روز و لینک وب‌سایت'));
+    button.addEventListener('click', shareToApp);
     refresh.parentNode.insertBefore(button, refresh.nextSibling);
   }
 
@@ -258,6 +221,7 @@
       var old = document.getElementById(id);
       if (old) old.remove();
     });
+    prepareShareFile();
     addButton();
     if (!document.getElementById(BUTTON_ID)) {
       var observer = new MutationObserver(addButton);
