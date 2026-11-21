@@ -5,6 +5,7 @@
   'use strict';
 
   var SITE = 'https://seventhtrumpet.org/';
+  var SHARE_PHOTO = 'https://iili.io/n8MSJBp.jpg';
   var BUTTON_ID = 'daily-status-share-card';
 
   function language() {
@@ -93,16 +94,40 @@
       return;
     }
 
-    /* Put the URL directly in the shared text. Android/WhatsApp may ignore
-       the separate ShareData.url field; an explicit URL in text triggers the
-       native WhatsApp website preview (OG image + tappable white link card).
-       The bilingual verse remains ordinary editable Status text below it. */
-    navigator.share({
-      title: 'Seventh Trumpet | شیپور هفتم',
-      text: caption + '\n\n' + SITE
-    }).catch(function (err) {
-      if (err && err.name === 'AbortError') return;
-    });
+    /* Attach the original profile artwork as an actual image file so it
+       appears in WhatsApp Status. Keep the website URL in the caption so
+       WhatsApp can also create its native tappable website preview card.
+       Bilingual verse stays editable text; no text is baked into the photo. */
+    var shareText = caption + '\n\n' + SITE;
+
+    function send(file) {
+      var payload = {
+        title: 'Seventh Trumpet | شیپور هفتم',
+        text: shareText,
+        url: SITE
+      };
+      if (file) payload.files = [file];
+      navigator.share(payload).catch(function (err) {
+        if (err && err.name === 'AbortError') return;
+        if (file) {
+          navigator.share({ title: payload.title, text: shareText, url: SITE }).catch(function () {});
+        }
+      });
+    }
+
+    fetch(SHARE_PHOTO, { mode: 'cors', cache: 'force-cache' })
+      .then(function (response) {
+        if (!response.ok) throw new Error('Profile image could not be loaded');
+        return response.blob();
+      })
+      .then(function (blob) {
+        var mime = blob.type && blob.type.indexOf('image/') === 0 ? blob.type : 'image/jpeg';
+        send(new File([blob], 'seventh-trumpet.jpg', { type: mime }));
+      })
+      .catch(function (error) {
+        console.warn('Could not attach profile image to share:', error);
+        send(null);
+      });
   }
 
   function addButton() {
