@@ -5,7 +5,6 @@
   'use strict';
 
   var SITE = 'https://seventhtrumpet.org/';
-  var SHARE_PHOTO = 'https://iili.io/n8MSJBp.jpg';
   var BUTTON_ID = 'daily-status-share-card';
 
   function language() {
@@ -18,18 +17,18 @@
   function verseData() {
     var textEl = document.getElementById('verse-text');
     var refEl = document.getElementById('verse-ref');
-    var visibleText = (textEl && textEl.textContent || '').trim();
-    var visibleRef = (refEl && refEl.textContent || '').trim();
+    var text = (textEl && textEl.textContent || '').trim();
+    var ref = (refEl && refEl.textContent || '').trim();
     var verses = window.DAILY_VERSES || [];
-    var match = null;
 
     if (verses.length) {
+      var match = null;
       for (var i = 0; i < verses.length; i++) {
         var v = verses[i];
         var refs = [v.ref_fa, v.ref_en, v.refFa, v.refEn, v.ref];
         var texts = [v.fa, v.en];
-        var refHit = visibleRef && refs.some(function (r) { return r && String(r).trim() === visibleRef; });
-        var textHit = visibleText && texts.some(function (t) { return t && String(t).trim() === visibleText; });
+        var refHit = ref && refs.some(function (r) { return r && String(r).trim() === ref; });
+        var textHit = text && texts.some(function (t) { return t && String(t).trim() === text; });
         if (refHit || textHit) { match = v; break; }
       }
       if (!match) {
@@ -38,46 +37,27 @@
         var day = Math.floor((now - start) / 86400000);
         match = verses[Math.abs(now.getFullYear() * 366 + day) % verses.length];
       }
+      if (match) {
+        text = isEn() ? (match.en || match.fa || text) : (match.fa || match.en || text);
+        ref = isEn()
+          ? (match.ref_en || match.refEn || match.ref || ref)
+          : (match.ref_fa || match.refFa || match.ref || ref);
+      }
     }
-
-    if (match) {
-      return {
-        enText: String(match.en || '').trim(),
-        enRef: String(match.ref_en || match.refEn || match.ref || '').trim(),
-        faText: String(match.fa || '').trim(),
-        faRef: String(match.ref_fa || match.refFa || match.ref || '').trim(),
-        text: visibleText,
-        reference: visibleRef
-      };
-    }
-
-    /* Safe fallback: preserve the currently displayed verse if bilingual
-       source fields are not available; never invent a translation. */
-    return {
-      enText: isEn() ? visibleText : '',
-      enRef: isEn() ? visibleRef : '',
-      faText: isEn() ? '' : visibleText,
-      faRef: isEn() ? '' : visibleRef,
-      text: visibleText,
-      reference: visibleRef
-    };
+    return { text: text, reference: ref };
   }
 
   function buildCaption(data) {
-    var lines = [];
-    if (data.enText) lines.push(data.enText);
-    if (data.enRef) lines.push(data.enRef);
-    if (data.faText) lines.push(data.faText);
-    if (data.faRef) lines.push(data.faRef);
-    if (!data.enText && !data.faText && data.text) lines.push(data.text);
-    if (!data.enRef && !data.faRef && data.reference) lines.push(data.reference);
-    lines.push('Seventh Trumpet | شیپور هفتم');
-    return lines.filter(Boolean).join('\n\n');
+    return [
+      data.text,
+      data.reference,
+      'Seventh Trumpet | شیپور هفتم'
+    ].filter(Boolean).join('\n\n');
   }
 
   function shareFreshBread() {
     var data = verseData();
-    if (!data.enText && !data.faText && !data.text) {
+    if (!data.text) {
       alert(msg('The daily verse is not ready yet. Please try again.',
         'آیه امروز هنوز آماده نیست. لطفاً دوباره تلاش کنید.'));
       return;
@@ -94,40 +74,18 @@
       return;
     }
 
-    /* Attach the original profile artwork as an actual image file so it
-       appears in WhatsApp Status. Keep the website URL in the caption so
-       WhatsApp can also create its native tappable website preview card.
-       Bilingual verse stays editable text; no text is baked into the photo. */
-    var shareText = caption + '\n\n' + SITE;
-
-    function send(file) {
-      var payload = {
-        title: 'Seventh Trumpet | شیپور هفتم',
-        text: shareText,
-        url: SITE
-      };
-      if (file) payload.files = [file];
-      navigator.share(payload).catch(function (err) {
-        if (err && err.name === 'AbortError') return;
-        if (file) {
-          navigator.share({ title: payload.title, text: shareText, url: SITE }).catch(function () {});
-        }
-      });
-    }
-
-    fetch(SHARE_PHOTO, { mode: 'cors', cache: 'force-cache' })
-      .then(function (response) {
-        if (!response.ok) throw new Error('Profile image could not be loaded');
-        return response.blob();
-      })
-      .then(function (blob) {
-        var mime = blob.type && blob.type.indexOf('image/') === 0 ? blob.type : 'image/jpeg';
-        send(new File([blob], 'seventh-trumpet.jpg', { type: mime }));
-      })
-      .catch(function (error) {
-        console.warn('Could not attach profile image to share:', error);
-        send(null);
-      });
+    /* Share the URL as a real URL, not as pixels or a photo attachment.
+       WhatsApp builds the image + attached white link card from the site's OG tags.
+       The verse remains ordinary editable Status text below that preview. */
+    navigator.share({
+      title: 'Seventh Trumpet | شیپور هفتم',
+      text: caption,
+      url: SITE
+    }).catch(function (err) {
+      if (err && err.name === 'AbortError') return;
+      navigator.share({ title: 'Seventh Trumpet | شیپور هفتم', text: caption + '\n\n' + SITE })
+        .catch(function () {});
+    });
   }
 
   function addButton() {
