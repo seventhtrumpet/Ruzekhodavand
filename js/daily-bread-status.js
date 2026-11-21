@@ -93,17 +93,15 @@
       return;
     }
 
-    /* Share the URL as a real URL, not as pixels or a photo attachment.
-       WhatsApp builds the image + attached white link card from the site's OG tags.
-       The verse remains ordinary editable Status text below that preview. */
+    /* Put the URL directly in the shared text. Android/WhatsApp may ignore
+       the separate ShareData.url field; an explicit URL in text triggers the
+       native WhatsApp website preview (OG image + tappable white link card).
+       The bilingual verse remains ordinary editable Status text below it. */
     navigator.share({
       title: 'Seventh Trumpet | شیپور هفتم',
-      text: caption,
-      url: SITE
+      text: caption + '\n\n' + SITE
     }).catch(function (err) {
       if (err && err.name === 'AbortError') return;
-      navigator.share({ title: 'Seventh Trumpet | شیپور هفتم', text: caption + '\n\n' + SITE })
-        .catch(function () {});
     });
   }
 
