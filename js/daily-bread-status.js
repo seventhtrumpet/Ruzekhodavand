@@ -1,233 +1,374 @@
-/* Fresh Bread share: square profile photo with an attached verse-and-link panel. */
+/* Daily Bread: ONE image = profile photo + card attached under it + real tappable link in share text */
 (function () {
   'use strict';
-  var SITE = 'https://www.seventhtrumpet.org/';
+
+  var SITE = 'https://seventhtrumpet.org/';
   var LOGO = 'https://iili.io/n8MSJBp.jpg';
   var BUTTON_ID = 'daily-status-share-card';
+  var WIDTH = 1080;
+  var PHOTO_H = 1080;
+
+  var preparedFile = null;
+  var preparedKey = '';
+  var logoBitmap = null;
 
   function language() {
-    try { return localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa'; }
-    catch (e) { return document.documentElement.lang || 'fa'; }
+    try {
+      return localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa';
+    } catch (e) {
+      return document.documentElement.lang || 'fa';
+    }
   }
-  function msg(en, fa) { return language() === 'en' ? en : fa; }
+  function isEn() { return language() === 'en'; }
+  function msg(en, fa) { return isEn() ? en : fa; }
 
   function verseData() {
-    var verses = window.DAILY_VERSES || [];
-    if (!verses.length) return null;
-    var text = (document.getElementById('verse-text') || {}).textContent || '';
-    var ref = (document.getElementById('verse-ref') || {}).textContent || '';
-    text = text.trim(); ref = ref.trim();
-    var match = verses.find(function (v) {
-      return (ref && [v.ref_fa, v.ref_en, v.refFa, v.refEn, v.ref]
-        .some(function (r) { return r && String(r).trim() === ref; })) ||
-        (text && [v.fa, v.en].some(function (t) { return t && String(t).trim() === text; }));
-    });
-    if (!match) {
-      var now = new Date();
-      var start = new Date(now.getFullYear(), 0, 0);
-      var day = Math.floor((now - start) / 86400000);
-      match = verses[Math.abs(now.getFullYear() * 366 + day) % verses.length];
-    }
-    var index = verses.indexOf(match);
-    var en = language() === 'en';
-    return {
-      text: en ? (match.en || match.fa || '') : (match.fa || match.en || ''),
-      reference: en ? (match.ref_en || match.refEn || match.ref || '') :
-        (match.ref_fa || match.refFa || match.ref || ''),
-      url: SITE + 'v/' + Math.max(0, index),
-      heading: en ? 'DAILY BIBLE VERSE' : 'آیه روز از کتاب مقدس',
-      brand: en ? 'SEVENTH TRUMPET' : 'شیپور هفتم'
-    };
-  }
+    var textEl = document.getElementById('verse-text');
+    var refEl = document.getElementById('verse-ref');
+    var text = (textEl && textEl.textContent || '').trim();
+    var ref = (refEl && refEl.textContent || '').trim();
 
-  function loadImage(blob) {
-    return new Promise(function (resolve, reject) {
-      var objectUrl = URL.createObjectURL(blob);
-      var img = new Image();
-      img.onload = function () { URL.revokeObjectURL(objectUrl); resolve(img); };
-      img.onerror = function () { URL.revokeObjectURL(objectUrl); reject(new Error('image-decode')); };
-      img.src = objectUrl;
-    });
+    var verses = window.DAILY_VERSES || [];
+    if (verses.length) {
+      var match = null;
+      for (var i = 0; i < verses.length; i++) {
+        var v = verses[i];
+        var refs = [v.ref_fa, v.ref_en, v.refFa, v.refEn, v.ref];
+        var texts = [v.fa, v.en];
+        var refHit = ref && refs.some(function (r) { return r && String(r).trim() === ref; });
+        var textHit = text && texts.some(function (t) { return t && String(t).trim() === text; });
+        if (refHit || textHit) { match = v; break; }
+      }
+      if (!match) {
+        var now = new Date();
+        var start = new Date(now.getFullYear(), 0, 0);
+        var day = Math.floor((now - start) / 86400000);
+        match = verses[Math.abs(now.getFullYear() * 366 + day) % verses.length];
+      }
+      if (match) {
+        text = isEn() ? (match.en || match.fa || text) : (match.fa || match.en || text);
+        ref = isEn()
+          ? (match.ref_en || match.refEn || match.ref || ref)
+          : (match.ref_fa || match.refFa || match.ref || ref);
+      }
+    }
+
+    return {
+      text: text,
+      reference: ref,
+      heading: isEn() ? 'FRESH BREAD' : '\u0646\u0627\u0646 \u062a\u0627\u0632\u0647',
+      sub: isEn() ? 'Daily Bible Verse' : '\u0622\u06cc\u0647\u0650 \u0631\u0648\u0632 \u0627\u0632 \u06a9\u062a\u0627\u0628 \u0645\u0642\u062f\u0633',
+      brand: isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645',
+      urlLabel: 'seventhtrumpet.org',
+      url: SITE
+    };
   }
 
   function wrapText(ctx, text, maxWidth) {
     var words = String(text || '').split(/\s+/);
-    var lines = [], line = '';
-    words.forEach(function (word) {
-      var candidate = line ? line + ' ' + word : word;
-      if (line && ctx.measureText(candidate).width > maxWidth) {
-        lines.push(line); line = word;
-      } else line = candidate;
-    });
+    var lines = [];
+    var line = '';
+    for (var i = 0; i < words.length; i++) {
+      var test = line ? line + ' ' + words[i] : words[i];
+      if (line && ctx.measureText(test).width > maxWidth) {
+        lines.push(line);
+        line = words[i];
+      } else {
+        line = test;
+      }
+    }
     if (line) lines.push(line);
-    return lines;
+    return lines.length ? lines : [''];
   }
 
-  function makeShareCard(blob, data) {
-    return loadImage(blob).then(function (img) {
-      var width = 1080, photoHeight = 1080, pad = 76;
+  function loadLogo() {
+    if (logoBitmap) return Promise.resolve(logoBitmap);
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () {
+        logoBitmap = img;
+        resolve(img);
+      };
+      img.onerror = function () { resolve(null); };
+      img.src = LOGO;
+    });
+  }
+
+  /**
+   * ONE continuous image:
+   * [======== profile picture block ========]
+   * [======== card attached under it =======]  same canvas, no gap, same width
+   */
+  function makeConnectedCard(data) {
+    return loadLogo().then(function (img) {
+      var pad = 72;
+      var measure = document.createElement('canvas').getContext('2d');
+      measure.font = '44px "Vazirmatn", "Noto Naskh Arabic", Tahoma, Arial, sans-serif';
+      var verseLines = wrapText(measure, data.text, WIDTH - pad * 2);
+      measure.font = 'bold 36px "Vazirmatn", Tahoma, Arial, sans-serif';
+      var refLines = wrapText(measure, data.reference, WIDTH - pad * 2);
+
+      var lineH = 58;
+      var cardBody =
+        56 +
+        70 +
+        48 +
+        36 +
+        verseLines.length * lineH +
+        28 +
+        refLines.length * 48 +
+        40 +
+        56 +
+        70;
+      cardBody = Math.max(420, Math.min(cardBody, 900));
+
+      var H = PHOTO_H + cardBody;
       var canvas = document.createElement('canvas');
+      canvas.width = WIDTH;
+      canvas.height = H;
       var ctx = canvas.getContext('2d');
-      ctx.font = '44px "Noto Naskh Arabic", "Noto Sans Arabic", Arial, sans-serif';
-      var verseLines = wrapText(ctx, data.text, width - pad * 2);
-      var refLines = wrapText(ctx, data.reference, width - pad * 2);
-      var lineHeight = 66;
-      var panelHeight = 270 + verseLines.length * lineHeight + refLines.length * 54;
-      panelHeight = Math.max(440, Math.min(panelHeight, 1050));
-      canvas.width = width;
-      canvas.height = photoHeight + panelHeight;
+
+      /* ----- PROFILE BLOCK (top) ----- */
+      var bg = ctx.createLinearGradient(0, 0, 0, PHOTO_H);
+      bg.addColorStop(0, '#0a2540');
+      bg.addColorStop(1, '#163a5f');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, WIDTH, PHOTO_H);
+
+      if (img) {
+        var size = Math.min(img.width, img.height);
+        var sx = (img.width - size) / 2;
+        var sy = (img.height - size) / 2;
+        var out = 720;
+        var ox = (WIDTH - out) / 2;
+        var oy = (PHOTO_H - out) / 2;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(WIDTH / 2, PHOTO_H / 2, out / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(img, sx, sy, size, size, ox, oy, out, out);
+        ctx.restore();
+        ctx.beginPath();
+        ctx.arc(WIDTH / 2, PHOTO_H / 2, out / 2 + 6, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(201,162,39,0.85)';
+        ctx.lineWidth = 10;
+        ctx.stroke();
+      }
+
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, width, canvas.height);
-
-      // Keep the profile picture square and undistorted at the top.
-      var scale = Math.min(width / img.width, photoHeight / img.height);
-      var drawW = img.width * scale, drawH = img.height * scale;
-      ctx.fillStyle = '#101b2b';
-      ctx.fillRect(0, 0, width, photoHeight);
-      ctx.drawImage(img, (width - drawW) / 2, (photoHeight - drawH) / 2, drawW, drawH);
-
-      // Attached caption panel is part of the same share image.
-      var panelY = photoHeight;
-      var gradient = ctx.createLinearGradient(0, panelY, 0, canvas.height);
-      gradient.addColorStop(0, '#fffdf7');
-      gradient.addColorStop(1, '#f0eadc');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, panelY, width, panelHeight);
-      ctx.fillStyle = '#b58a42';
-      ctx.fillRect(0, panelY, width, 9);
-
+      ctx.font = 'bold 40px "Vazirmatn", Arial, sans-serif';
       ctx.textAlign = 'center';
       ctx.direction = 'ltr';
+      ctx.fillText(data.brand, WIDTH / 2, PHOTO_H - 48);
+
+      /* ----- CARD ATTACHED (same canvas, flush under photo) ----- */
+      var y0 = PHOTO_H;
+
+      /* gold seam connecting photo to card */
+      ctx.fillStyle = '#c9a227';
+      ctx.fillRect(0, y0 - 6, WIDTH, 12);
+
+      var cardGrad = ctx.createLinearGradient(0, y0, 0, H);
+      cardGrad.addColorStop(0, '#fffdf8');
+      cardGrad.addColorStop(1, '#f3ebdc');
+      ctx.fillStyle = cardGrad;
+      ctx.fillRect(0, y0, WIDTH, cardBody);
+
+      var y = y0 + 64;
       ctx.fillStyle = '#9a7130';
-      ctx.font = 'bold 34px Arial, sans-serif';
-      ctx.fillText(data.heading, width / 2, panelY + 72);
-      ctx.fillStyle = '#1d2c3d';
-      ctx.font = 'bold 38px Arial, sans-serif';
-      ctx.fillText(data.brand, width / 2, panelY + 126);
+      ctx.font = 'bold 32px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.direction = 'ltr';
+      ctx.fillText(data.heading, WIDTH / 2, y);
 
-      var y = panelY + 208;
-      ctx.direction = language() === 'en' ? 'ltr' : 'rtl';
-      ctx.textAlign = language() === 'en' ? 'left' : 'right';
-      ctx.fillStyle = '#26384a';
-      ctx.font = '44px "Noto Naskh Arabic", "Noto Sans Arabic", Arial, sans-serif';
-      verseLines.forEach(function (line) {
-        if (y < canvas.height - 160) ctx.fillText(line, language() === 'en' ? pad : width - pad, y);
-        y += lineHeight;
-      });
+      y += 48;
+      ctx.fillStyle = '#5a6a7a';
+      ctx.font = '600 28px "Vazirmatn", Arial, sans-serif';
+      ctx.fillText(data.sub, WIDTH / 2, y);
+
+      y += 56;
+      ctx.direction = isEn() ? 'ltr' : 'rtl';
+      ctx.textAlign = isEn() ? 'left' : 'right';
+      ctx.fillStyle = '#1a2b3c';
+      ctx.font = '600 42px "Vazirmatn", "Noto Naskh Arabic", Tahoma, sans-serif';
+      var x = isEn() ? pad : WIDTH - pad;
+      for (var i = 0; i < verseLines.length; i++) {
+        ctx.fillText(verseLines[i], x, y);
+        y += lineH;
+      }
+
+      y += 20;
       ctx.fillStyle = '#87642e';
-      ctx.font = 'bold 35px "Noto Naskh Arabic", "Noto Sans Arabic", Arial, sans-serif';
-      refLines.forEach(function (line) {
-        if (y < canvas.height - 125) ctx.fillText(line, language() === 'en' ? pad : width - pad, y);
-        y += 54;
-      });
+      ctx.font = 'bold 34px "Vazirmatn", Tahoma, sans-serif';
+      for (var j = 0; j < refLines.length; j++) {
+        ctx.fillText(refLines[j], x, y);
+        y += 48;
+      }
 
       ctx.direction = 'ltr';
       ctx.textAlign = 'center';
+      ctx.fillStyle = '#0a2540';
+      ctx.font = 'bold 30px Arial, sans-serif';
+      ctx.fillText(data.brand, WIDTH / 2, H - 88);
       ctx.fillStyle = '#145b91';
-      ctx.font = 'bold 34px Arial, sans-serif';
-      ctx.fillText('www.seventhtrumpet.org', width / 2, canvas.height - 58);
+      ctx.font = 'bold 36px Arial, sans-serif';
+      ctx.fillText(data.urlLabel, WIDTH / 2, H - 40);
+
       return new Promise(function (resolve, reject) {
-        canvas.toBlob(function (out) {
-          if (out) resolve(out); else reject(new Error('card-render'));
-        }, 'image/jpeg', 0.94);
+        canvas.toBlob(function (blob) {
+          if (blob) resolve(blob);
+          else reject(new Error('blob'));
+        }, 'image/jpeg', 0.92);
       });
     });
   }
 
-  // Preload the profile image before the user taps Share. Web Share must be
-  // called directly from the tap handler or Android may reject the request.
-  var preparedShareFile = null;
-  function prepareShareFile() {
-    fetch(LOGO, { mode: 'cors', cache: 'force-cache' })
-      .then(function (r) {
-        if (!r.ok) throw new Error('photo-fetch');
-        return r.blob();
-      })
+  function cacheKey(data) {
+    return language() + '|' + (data.reference || '') + '|' + (data.text || '').slice(0, 60);
+  }
+
+  function prepare() {
+    var data = verseData();
+    if (!data.text) return;
+    var key = cacheKey(data);
+    if (key === preparedKey && preparedFile) return;
+    makeConnectedCard(data)
       .then(function (blob) {
-        preparedShareFile = new File([blob], 'seventh-trumpet.jpg', {
-          type: blob.type || 'image/jpeg'
-        });
+        preparedFile = new File([blob], 'seventh-trumpet-fresh-bread.jpg', { type: 'image/jpeg' });
+        preparedKey = key;
       })
       .catch(function (err) {
-        console.warn('Daily Bread profile image could not be preloaded:', err);
+        console.warn('Daily Bread card prepare failed:', err);
       });
   }
 
-  function shareToApp() {
+  function shareConnected() {
     var data = verseData();
     if (!data || !data.text) {
-      alert(msg('The daily verse is not ready yet. Please try again.', 'آیه روز هنوز آماده نیست. لطفاً دوباره تلاش کنید.'));
+      alert(msg(
+        'The daily verse is not ready yet. Please try again.',
+        '\u0622\u06cc\u0647 \u0631\u0648\u0632 \u0647\u0646\u0648\u0632 \u0622\u0645\u0627\u062f\u0647 \u0646\u06cc\u0633\u062a. \u0644\u0637\u0641\u0627\u064b \u062f\u0648\u0628\u0627\u0631\u0647 \u062a\u0644\u0627\u0634 \u06a9\u0646\u06cc\u062f.'
+      ));
       return;
     }
 
     var caption = [
       data.text,
       data.reference,
-      'Seventh Trumpet | شیپور هفتم',
-      SITE
-    ].filter(Boolean).join('\\n\\n');
+      data.brand + ' | ' + data.heading,
+      data.url
+    ].filter(Boolean).join('\n\n');
 
-    if (!navigator.share) {
-      alert(msg('Sharing is not supported by this browser.', 'مرورگر شما از اشتراک‌گذاری پشتیبانی نمی‌کند.'));
+    function doShare(file) {
+      if (!navigator.share) {
+        try {
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(file);
+          a.download = 'seventh-trumpet-fresh-bread.jpg';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(function () { try { a.remove(); URL.revokeObjectURL(a.href); } catch (e) {} }, 500);
+        } catch (e) {}
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(caption);
+        }
+        alert(msg(
+          'Image saved. Link copied — paste it with the photo.',
+          '\u0639\u06a9\u0633 \u0630\u062e\u06cc\u0631\u0647 \u0634\u062f. \u0644\u06cc\u0646\u06a9 \u06a9\u067e\u06cc \u0634\u062f \u2014 \u0647\u0645\u0631\u0627\u0647 \u0639\u06a9\u0633 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc \u06a9\u0646\u06cc\u062f.'
+        ));
+        return;
+      }
+
+      var payload = {
+        title: data.brand + ' | ' + data.heading,
+        text: caption,
+        url: data.url
+      };
+      var withFile = {
+        title: payload.title,
+        text: payload.text,
+        url: payload.url
+      };
+      if (file) {
+        try {
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            withFile.files = [file];
+          }
+        } catch (e) {}
+      }
+
+      navigator.share(withFile.files ? withFile : payload).catch(function (err) {
+        if (err && err.name === 'AbortError') return;
+        if (withFile.files) {
+          navigator.share(payload).catch(function () {});
+        }
+      });
+    }
+
+    var key = cacheKey(data);
+    if (preparedFile && preparedKey === key) {
+      doShare(preparedFile);
       return;
     }
 
-    var shareData = {
-      title: 'Seventh Trumpet | Daily Bible Verse',
-      text: caption,
-      url: SITE
-    };
-
-    // Attach the real square profile photo when it was preloaded and the
-    // browser confirms file sharing is supported. The website stays in text.
-    if (preparedShareFile && navigator.canShare) {
-      try {
-        if (navigator.canShare({ files: [preparedShareFile] })) {
-          shareData.files = [preparedShareFile];
-        }
-      } catch (e) {}
-    }
-
-    try {
-      navigator.share(shareData).catch(function (err) {
-        if (err && err.name === 'AbortError') return;
-        console.error('Daily Bread share failed:', err);
-        alert(msg('Sharing failed. Please try again.', 'اشتراک‌گذاری انجام نشد. لطفاً دوباره تلاش کنید.'));
+    makeConnectedCard(data)
+      .then(function (blob) {
+        var file = new File([blob], 'seventh-trumpet-fresh-bread.jpg', { type: 'image/jpeg' });
+        preparedFile = file;
+        preparedKey = key;
+        doShare(file);
+      })
+      .catch(function () {
+        doShare(null);
       });
-    } catch (err) {
-      console.error('Daily Bread share failed:', err);
-      alert(msg('Sharing failed. Please try again.', 'اشتراک‌گذاری انجام نشد. لطفاً دوباره تلاش کنید.'));
-    }
   }
 
   function addButton() {
     var section = document.getElementById('daily-verse');
     var refresh = document.getElementById('verse-refresh');
-    if (!section || !refresh || document.getElementById(BUTTON_ID)) return;
+    if (!section || !refresh) return;
+
+    var oldIds = ['daily-status-share-card', 'daily-share', 'daily-status-share', 'daily-status-share-image'];
+    oldIds.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) try { el.remove(); } catch (e) {}
+    });
+
     var button = document.createElement('button');
     button.type = 'button';
     button.id = BUTTON_ID;
     button.className = 'verse-refresh';
     button.style.marginInlineStart = '0.45rem';
     button.style.marginTop = '0.4rem';
-    button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-inline-end:7px"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"></path></svg><span>' + msg('Share Daily Verse', 'اشتراک‌گذاری آیه روز') + '</span>';
-    button.setAttribute('aria-label', msg('Share the profile photo with the daily verse and website link', 'اشتراک‌گذاری عکس پروفایل همراه با آیه روز و لینک وب‌سایت'));
-    button.addEventListener('click', shareToApp);
+    button.textContent = msg('Share', '\u0627\u0634\u062a\u0631\u0627\u06a9');
+    button.setAttribute(
+      'aria-label',
+      msg(
+        'Share profile picture with Fresh Bread card and website link',
+        '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0639\u06a9\u0633 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 \u0628\u0627 \u06a9\u0627\u0631\u062a \u0646\u0627\u0646 \u062a\u0627\u0632\u0647 \u0648 \u0644\u06cc\u0646\u06a9 \u0648\u0628\u0633\u0627\u06cc\u062a'
+      )
+    );
+    button.addEventListener('click', function (e) {
+      e.preventDefault();
+      shareConnected();
+    });
     refresh.parentNode.insertBefore(button, refresh.nextSibling);
   }
 
   function boot() {
-    ['daily-share', 'vshare-overlay', 'daily-status-share', 'daily-status-share-image'].forEach(function (id) {
-      var old = document.getElementById(id);
-      if (old) old.remove();
-    });
-    prepareShareFile();
     addButton();
-    if (!document.getElementById(BUTTON_ID)) {
-      var observer = new MutationObserver(addButton);
-      observer.observe(document.body, { childList: true, subtree: true });
-      window.setTimeout(function () { observer.disconnect(); }, 10000);
+    loadLogo().then(function () { prepare(); });
+    var refresh = document.getElementById('verse-refresh');
+    if (refresh) {
+      refresh.addEventListener('click', function () {
+        preparedFile = null;
+        preparedKey = '';
+        setTimeout(prepare, 400);
+      });
     }
+    setTimeout(prepare, 1200);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
