@@ -20,6 +20,10 @@
     var text = (textEl && textEl.textContent || '').trim();
     var ref = (refEl && refEl.textContent || '').trim();
     var verses = window.DAILY_VERSES || [];
+    var englishText = '';
+    var persianText = '';
+    var englishRef = '';
+    var persianRef = '';
 
     if (verses.length) {
       var match = null;
@@ -38,21 +42,37 @@
         match = verses[Math.abs(now.getFullYear() * 366 + day) % verses.length];
       }
       if (match) {
-        text = isEn() ? (match.en || match.fa || text) : (match.fa || match.en || text);
-        ref = isEn()
-          ? (match.ref_en || match.refEn || match.ref || ref)
-          : (match.ref_fa || match.refFa || match.ref || ref);
+        englishText = String(match.en || '').trim();
+        persianText = String(match.fa || '').trim();
+        englishRef = String(match.ref_en || match.refEn || match.ref || '').trim();
+        persianRef = String(match.ref_fa || match.refFa || match.ref || '').trim();
       }
     }
-    return { text: text, reference: ref };
+    if (!englishText && isEn()) { englishText = text; englishRef = ref; }
+    if (!persianText && !isEn()) { persianText = text; persianRef = ref; }
+    return {
+      text: text,
+      reference: ref,
+      englishText: englishText,
+      persianText: persianText,
+      englishRef: englishRef,
+      persianRef: persianRef
+    };
   }
 
   function buildCaption(data) {
-    return [
-      data.text,
-      data.reference,
-      'Seventh Trumpet | شیپور هفتم'
-    ].filter(Boolean).join('\n\n');
+    var parts = [];
+    if (data.englishText) {
+      parts.push(data.englishText);
+      if (data.englishRef) parts.push(data.englishRef);
+    }
+    if (data.persianText) {
+      parts.push(data.persianText);
+      if (data.persianRef) parts.push(data.persianRef);
+    }
+    if (!parts.length) parts.push(data.text, data.reference);
+    parts.push('Seventh Trumpet | شیپور هفتم');
+    return parts.filter(Boolean).join('\n\n');
   }
 
   function shareFreshBread() {
