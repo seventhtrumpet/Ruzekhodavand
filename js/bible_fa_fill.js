@@ -73,10 +73,26 @@
   }
 
   function isIncomplete(pack, id) {
-    var have = chapterCount(pack, id);
-    if (have <= 0) return true;
+    if (!pack || typeof pack !== 'object') return true;
+    var data = pack[String(id)] || pack[id] || pack;
+    var chapters = data && data.chapters;
+    if (!chapters || typeof chapters !== 'object') return true;
+
     var need = CH_COUNT[id];
-    if (need && have < need) return true;
+    if (!need) return true;
+    var chapterKeys = Object.keys(chapters).filter(function (k) { return /^\\d+$/.test(k); });
+    if (chapterKeys.length !== need) return true;
+
+    for (var ch = 1; ch <= need; ch++) {
+      var verses = chapters[String(ch)];
+      if (!verses || typeof verses !== 'object') return true;
+      var verseKeys = Object.keys(verses).filter(function (k) { return /^\\d+$/.test(k); }).map(Number).sort(function (a,b) { return a-b; });
+      if (!verseKeys.length || verseKeys[0] !== 1) return true;
+      for (var v = 0; v < verseKeys.length; v++) {
+        if (verseKeys[v] !== v + 1) return true;
+        if (typeof verses[String(verseKeys[v])] !== 'string' || !verses[String(verseKeys[v])].trim()) return true;
+      }
+    }
     return false;
   }
 
