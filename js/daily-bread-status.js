@@ -1,6 +1,6 @@
-/* Fresh Bread share: one native website preview (Open Graph image + white tappable card)
-   followed by the Bible verse in the WhatsApp Status caption.
-   Nothing is composited into an image and no separate photo attachment is sent. */
+/* Fresh Bread share: keep the native WhatsApp website preview (profile image + tappable link).
+   The preview opens /v/:id, a clean bilingual verse card with the profile photo.
+   The verse itself is not sent as a long caption. */
 (function () {
   'use strict';
 
@@ -22,68 +22,65 @@
     var verses = window.DAILY_VERSES || [];
 
     if (verses.length) {
-      var match = null;
+      var matchIndex = -1;
       for (var i = 0; i < verses.length; i++) {
         var v = verses[i];
         var refs = [v.ref_fa, v.ref_en, v.refFa, v.refEn, v.ref];
         var texts = [v.fa, v.en];
         var refHit = ref && refs.some(function (r) { return r && String(r).trim() === ref; });
         var textHit = text && texts.some(function (t) { return t && String(t).trim() === text; });
-        if (refHit || textHit) { match = v; break; }
+        if (refHit || textHit) { matchIndex = i; break; }
       }
-      if (!match) {
+      if (matchIndex < 0) {
         var now = new Date();
         var start = new Date(now.getFullYear(), 0, 0);
         var day = Math.floor((now - start) / 86400000);
-        match = verses[Math.abs(now.getFullYear() * 366 + day) % verses.length];
+        matchIndex = Math.abs(now.getFullYear() * 366 + day) % verses.length;
       }
+      var match = verses[matchIndex];
       if (match) {
-        text = isEn() ? (match.en || match.fa || text) : (match.fa || match.en || text);
-        ref = isEn()
-          ? (match.ref_en || match.refEn || match.ref || ref)
-          : (match.ref_fa || match.refFa || match.ref || ref);
+        return {
+          index: matchIndex,
+          fa: match.fa || '',
+          en: match.en || match.fa || '',
+          refFa: match.ref_fa || match.refFa || match.ref || '',
+          refEn: match.ref_en || match.refEn || match.ref || ''
+        };
       }
     }
-    return { text: text, reference: ref };
-  }
-
-  function buildCaption(data) {
-    return [
-      data.text,
-      data.reference,
-      'Seventh Trumpet | شیپور هفتم'
-    ].filter(Boolean).join('\n\n');
+    return { index: 0, fa: text, en: text, refFa: ref, refEn: ref };
   }
 
   function shareFreshBread() {
     var data = verseData();
-    if (!data.text) {
+    if (!data.fa && !data.en) {
       alert(msg('The daily verse is not ready yet. Please try again.',
         'آیه امروز هنوز آماده نیست. لطفاً دوباره تلاش کنید.'));
       return;
     }
 
-    var caption = buildCaption(data);
+    var shareUrl = SITE + 'v/' + encodeURIComponent(String(data.index));
+    var caption = 'Seventh Trumpet | شیپور هفتم';
+
     if (!navigator.share) {
-      var fallback = caption + '\n\n' + SITE;
+      var fallback = caption + '\n\n' + shareUrl;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(fallback);
       }
-      alert(msg('Verse and website link copied. Open WhatsApp Status and paste them.',
-        'آیه و لینک سایت کپی شد. در وضعیت واتساپ آن‌ها را جای‌گذاری کنید.'));
+      alert(msg('Your bilingual verse card link is copied. Open WhatsApp Status and paste it.',
+        'لینک کارت دوزبانه آیه کپی شد. آن را در وضعیت واتساپ جای‌گذاری کنید.'));
       return;
     }
 
-    /* Share the URL as a real URL, not as pixels or a photo attachment.
-       WhatsApp builds the image + attached white link card from the site's OG tags.
-       The verse remains ordinary editable Status text below that preview. */
+    /* Keep sharing a real URL so WhatsApp retains its native tappable preview.
+       The linked page displays the profile photo and the bilingual white verse card. */
     navigator.share({
       title: 'Seventh Trumpet | شیپور هفتم',
       text: caption,
-      url: SITE
+      url: shareUrl
     }).catch(function (err) {
       if (err && err.name === 'AbortError') return;
-      navigator.share({ title: 'Seventh Trumpet | شیپور هفتم', text: caption + '\n\n' + SITE })
+      navigator.share({ title: 'Seventh Trumpet | شیپور هفتم', text: caption + '\n\n' + shareUrl })
         .catch(function () {});
     });
   }
@@ -106,8 +103,8 @@
     button.style.marginTop = '0.4rem';
     button.textContent = msg('Share', 'اشتراک');
     button.setAttribute('aria-label', msg(
-      'Share website preview with tappable link and Bible verse',
-      'اشتراک پیش‌نمایش سایت با لینک قابل لمس و آیه کتاب مقدس'
+      'Share the bilingual daily Bible verse card with a tappable website link',
+      'اشتراک کارت دوزبانه آیه روز با لینک قابل لمس سایت'
     ));
     button.addEventListener('click', function (event) {
       event.preventDefault();
