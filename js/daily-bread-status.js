@@ -1,15 +1,17 @@
-/* Fresh Bread share: keep the native WhatsApp website preview (profile image + tappable link).
-   The preview opens /v/:id, a clean bilingual verse card with the profile photo.
-   The verse itself is not sent as a long caption. */
+/* Fresh Bread share: share the verse in the visitor's selected site language.
+   Keep the original native website preview (profile image + tappable homepage link). */
 (function () {
   'use strict';
 
-  var SITE = 'https://seventhtrumpet.org/';
+  var SITE = 'https://www.seventhtrumpet.org/';
   var BUTTON_ID = 'daily-status-share-card';
 
   function language() {
-    try { return localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa'; }
-    catch (e) { return document.documentElement.lang || 'fa'; }
+    try {
+      var saved = localStorage.getItem('cog_lang');
+      if (saved === 'en' || saved === 'fa') return saved;
+    } catch (e) {}
+    return document.documentElement.lang === 'en' ? 'en' : 'fa';
   }
   function isEn() { return language() === 'en'; }
   function msg(en, fa) { return isEn() ? en : fa; }
@@ -40,47 +42,56 @@
       var match = verses[matchIndex];
       if (match) {
         return {
-          index: matchIndex,
           fa: match.fa || '',
-          en: match.en || match.fa || '',
+          en: match.en || '',
           refFa: match.ref_fa || match.refFa || match.ref || '',
           refEn: match.ref_en || match.refEn || match.ref || ''
         };
       }
     }
-    return { index: 0, fa: text, en: text, refFa: ref, refEn: ref };
+    return {
+      fa: isEn() ? '' : text,
+      en: isEn() ? text : '',
+      refFa: isEn() ? '' : ref,
+      refEn: isEn() ? ref : ''
+    };
   }
 
   function shareFreshBread() {
     var data = verseData();
-    if (!data.fa && !data.en) {
+    var english = isEn();
+    var verse = english ? data.en : data.fa;
+    var reference = english ? data.refEn : data.refFa;
+
+    if (!verse) {
       alert(msg('The daily verse is not ready yet. Please try again.',
         'آیه امروز هنوز آماده نیست. لطفاً دوباره تلاش کنید.'));
       return;
     }
 
-    var shareUrl = SITE + 'v/' + encodeURIComponent(String(data.index));
-    var caption = 'Seventh Trumpet | شیپور هفتم';
+    var brand = english ? 'Seventh Trumpet' : 'شیپور هفتم';
+    var caption = verse + (reference ? '\\n\\n' + reference : '') + '\\n\\n' + brand;
 
     if (!navigator.share) {
-      var fallback = caption + '\n\n' + shareUrl;
+      var fallback = caption + '\\n\\n' + SITE;
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(fallback);
+        navigator.clipboard.writeText(fallback).then(function () {
+          alert(msg('The English verse and website link have been copied.',
+            'آیه فارسی و لینک وب‌سایت کپی شد.'));
+        }).catch(function () {});
       }
-      alert(msg('Your bilingual verse card link is copied. Open WhatsApp Status and paste it.',
-        'لینک کارت دوزبانه آیه کپی شد. آن را در وضعیت واتساپ جای‌گذاری کنید.'));
       return;
     }
 
-    /* Keep sharing a real URL so WhatsApp retains its native tappable preview.
-       The linked page displays the profile photo and the bilingual white verse card. */
+    /* Share the selected-language verse as text and the homepage as a real URL.
+       This preserves WhatsApp's native profile-image preview and clickable link. */
     navigator.share({
-      title: 'Seventh Trumpet | شیپور هفتم',
+      title: brand,
       text: caption,
-      url: shareUrl
+      url: SITE
     }).catch(function (err) {
       if (err && err.name === 'AbortError') return;
-      navigator.share({ title: 'Seventh Trumpet | شیپور هفتم', text: caption + '\n\n' + shareUrl })
+      navigator.share({ title: brand, text: caption + '\\n\\n' + SITE })
         .catch(function () {});
     });
   }
@@ -103,8 +114,8 @@
     button.style.marginTop = '0.4rem';
     button.textContent = msg('Share', 'اشتراک');
     button.setAttribute('aria-label', msg(
-      'Share the bilingual daily Bible verse card with a tappable website link',
-      'اشتراک کارت دوزبانه آیه روز با لینک قابل لمس سایت'
+      'Share the English daily Bible verse with the website link',
+      'اشتراک آیه روز به زبان فارسی همراه با لینک سایت'
     ));
     button.addEventListener('click', function (event) {
       event.preventDefault();
