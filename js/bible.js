@@ -20,10 +20,7 @@
 
     code = code.replace(
       "const files = man[String(id)] || ['b' + id + '.json'];",
-      "let files = (man[String(id)] || []).slice();" +
-      "const __nCh = (typeof CHAPTER_COUNTS!=='undefined' && CHAPTER_COUNTS[id]) ? CHAPTER_COUNTS[id] : 1;" +
-      "for (let __ch=1; __ch<=__nCh; __ch++) { const __fn='b'+id+'c'+__ch+'.json'; if (files.indexOf(__fn)===-1) files.push(__fn); }" +
-      "if (!files.length) files = ['b' + id + '.json'];"
+      "const files = (man[String(id)] || ['b' + id + '.json']).slice();"
     );
 
     code = code.replace(
