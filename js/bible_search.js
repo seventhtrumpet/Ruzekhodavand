@@ -81,7 +81,7 @@
     return s;
   }
   function escapeHtml(s) {
-    return String(s || '').replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
   function escapeRegex(s) {
     return String(s || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
