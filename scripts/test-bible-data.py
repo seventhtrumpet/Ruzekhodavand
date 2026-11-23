@@ -161,19 +161,19 @@ def check_english_metadata(available_english: list[str]) -> None:
 
 
 def check_runtime_chapter_catalogue() -> None:
-    """Compare every local edition's chapter counts with the reader's catalogue."""
+    """Compare every local edition's chapter count with the reader's catalogue."""
     core = (ROOT / "js/bible-core-pinned.js").read_text(encoding="utf-8")
-    match = re.search(r"const CHAPTER_COUNTS = \\{(.*?)\\n  \\};", core, re.S)
+    match = re.search(r"const CHAPTER_COUNTS = \{(.*?)\n  \};", core, re.S)
     if not match:
         fail("Pinned reader core is missing its chapter-count catalogue")
         return
-    catalogue = {int(book): int(chapters) for book, chapters in re.findall(r"(\\d+)\\s*:\\s*(\\d+)", match.group(1))}
+    catalogue = {int(book): int(chapters) for book, chapters in re.findall(r"(\d+)\s*:\s*(\d+)", match.group(1))}
     editions = [(f"data/bible-en/local/{edition}", edition) for edition in ENGLISH]
     editions += [(f"data/bible-fa/{edition}", edition) for edition in ("opv", "opcb")]
     for relative, edition in editions:
         base = ROOT / relative
         for path in sorted(base.glob("b*.json")):
-            file_match = re.fullmatch(r"b(\\d+)\\.json", path.name)
+            file_match = re.fullmatch(r"b(\d+)\.json", path.name)
             if not file_match:
                 continue
             book_id = int(file_match.group(1))
