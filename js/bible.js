@@ -22,7 +22,7 @@
     if (enCache[id].chapters[String(ch)]) return enCache[id];
     try {
       const selectedTranslation = localStorage.getItem('cog_bible_en_version') || 'kjv';
-      const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885'];
+      const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885','msb'];
       const isOdr = selectedTranslation === 'odr' || selectedTranslation === 'odr-original';
       const isLocalEnglish = localEnglishIds.indexOf(selectedTranslation) >= 0;
       const isFreeBible = selectedTranslation === 'kjv' || selectedTranslation === 'bbe';
@@ -214,7 +214,7 @@
       if (translationNote) translationNote.textContent = english
         ? (['odr','odr-original'].includes(savedEnglishVersion)
           ? "Original Douay-Rheims (1582/1609–1610), 76 listed texts: the 73-book Catholic canon plus three appendix texts. Both spelling forms are served from this website's own files. This beta dataset is marked CC0; only Scripture verses are displayed, not study notes or front matter. Search remains KJV-based. See Sources and Licences for details."
-          : "Read and compare translations here without leaving SeventhTrumpet.org. Ten English editions, plus both Original Douay-Rheims spelling forms, are served from this website's own files. KJV and BBE chapter text is fetched in the background from Free.Bible; these two editions are not self-hosted. The search index remains KJV-based. See Sources and Licences for details.")
+          : "Read and compare translations here without leaving SeventhTrumpet.org. Eleven English editions, plus both Original Douay-Rheims spelling forms, are served from this website's own files. KJV and BBE chapter text is fetched in the background from Free.Bible; these two editions are not self-hosted. The search index remains KJV-based. See Sources and Licences for details.")
         : "متن دو نسخهٔ فارسی OPV و OPCB از فایل‌های خودِ SeventhTrumpet.org بارگذاری می‌شود و برای خواندن آن‌ها به وب‌سایت دیگری منتقل نمی‌شوید. نسخه‌های انگلیسیِ میزبانی‌شده روی سایت و دو نگارش Douay-Rheims نیز از فایل‌های خود سایت خوانده می‌شوند؛ فقط متن فصل‌های KJV و BBE در پس‌زمینه از Free.Bible دریافت می‌شود. نمایهٔ جست‌وجو بر پایهٔ KJV است. برای جزئیات منبع و شرایط استفاده، صفحهٔ منابع و مجوزها را ببینید.";
       var nmvLink = document.getElementById('nmv-external-link');
       if (nmvLink) nmvLink.textContent = english
