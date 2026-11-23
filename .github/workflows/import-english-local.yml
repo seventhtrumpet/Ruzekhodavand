@@ -29,11 +29,14 @@ jobs:
       - name: Download and validate official public-domain VPL archives
         run: python scripts/import-english-local.py
 
+      - name: Build compact Original Douay-Rheims search indexes
+        run: python scripts/build-odr-search-index.py
+
       - name: Commit generated local English books
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/bible-en/local
+          git add data/bible-en/local data/bible-en/odr/search-index.json data/bible-en/odr/original-spelling/search-index.json
           if git diff --cached --quiet; then
             echo "Local English Bible data is already up to date."
             exit 0
