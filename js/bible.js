@@ -139,8 +139,10 @@
       if (persianVersionSelect) persianVersionSelect.value = localStorage.getItem('cog_bible_fa_version') || 'opcb';
       var translationNote = document.getElementById('bible-translation-note');
       if (translationNote) translationNote.textContent = english
-        ? (['odr','odr-original'].includes(savedEnglishVersion) ? "Original Douay-Rheims (1582/1609–1610), 76 books. This beta dataset is CC0. The reader displays scripture verses only; study notes and front matter are not included. The original-spelling option preserves historical spelling. The 73-book Catholic canon is followed by three appendix texts. Search remains KJV-based." : "Compare these translations freely. Geneva uses Bolls chapter delivery; Darby and Douay-Rheims use Bible API chapter delivery. The search index remains KJV. See sources and licences for details.")
-        : 'این فهرست شامل ترجمه‌های کامل فارسی است که متن آن‌ها با مجوز اعلام‌شده قابل میزبانی است. برای آگاهی از منبع و شرایط استفاده، صفحهٔ منابع و مجوزها را ببینید.';
+        ? (['odr','odr-original'].includes(savedEnglishVersion)
+          ? "Original Douay-Rheims (1582/1609–1610), 76 listed texts: the 73-book Catholic canon plus three appendix texts. Both spelling forms are served from this website's own files. This beta dataset is marked CC0; only Scripture verses are displayed, not study notes or front matter. Search remains KJV-based. See Sources and Licences for details."
+          : "Read and compare translations here without leaving SeventhTrumpet.org. Ten English editions, plus both Original Douay-Rheims spelling forms, are served from this website's own files. KJV and BBE chapter text is fetched in the background from Free.Bible; these two editions are not self-hosted. The search index remains KJV-based. See Sources and Licences for details.")
+        : "متن دو نسخهٔ فارسی OPV و OPCB از فایل‌های خودِ SeventhTrumpet.org بارگذاری می‌شود و برای خواندن آن‌ها به وب‌سایت دیگری منتقل نمی‌شوید. نسخه‌های انگلیسیِ میزبانی‌شده روی سایت و دو نگارش Douay-Rheims نیز از فایل‌های خود سایت خوانده می‌شوند؛ فقط متن فصل‌های KJV و BBE در پس‌زمینه از Free.Bible دریافت می‌شود. نمایهٔ جست‌وجو بر پایهٔ KJV است. برای جزئیات منبع و شرایط استفاده، صفحهٔ منابع و مجوزها را ببینید.";
       var nmvLink = document.getElementById('nmv-external-link');
       if (nmvLink) nmvLink.textContent = english
         ? 'New Millennium Version (NMV) — read on the publisher’s website'
