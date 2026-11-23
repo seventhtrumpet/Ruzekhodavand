@@ -119,6 +119,14 @@
           '&c=' + params.chapter +
           '&v=' + (params.verse || 1));
       }
+      // The reader can also be opened from its saved reading position without
+      // query parameters; preserve that position instead of sharing the homepage.
+      var state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}');
+      if (state.bookId && state.chapter) {
+        return withSelectedVersion(SITE + '/bible.html?b=' + encodeURIComponent(state.bookId) +
+          '&c=' + encodeURIComponent(state.chapter) +
+          '&v=' + encodeURIComponent(state.verse || 1));
+      }
     } catch (e) {}
     return SITE + '/';
   }
