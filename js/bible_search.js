@@ -52,16 +52,18 @@
   function inScope(bookId) {
     var s = getScope();
     bookId = Number(bookId) || 0;
-    if (s === 'ot') return (bookId >= 10 && bookId < NT_MIN) || (bookId >= 740 && bookId <= 800);
-    if (s === 'nt') return bookId >= NT_MIN && bookId <= 730;
+    if (s === 'ot') return (bookId >= 10 && bookId < NT_MIN) || (bookId >= 740 && bookId <= 800) || (bookId >= 1001 && bookId <= 1049);
+    if (s === 'nt') return (bookId >= NT_MIN && bookId <= 730) || (bookId >= 1050 && bookId <= 1076);
     if (s === 'book') return bookId === currentBookId();
-    return (bookId >= 10 && bookId <= 730) || (bookId >= 740 && bookId <= 800);
+    return (bookId >= 10 && bookId <= 730) || (bookId >= 740 && bookId <= 800) || (bookId >= 1001 && bookId <= 1076);
   }
   function searchSourceLabel() {
     if (isEn()) {
       var version = 'kjv';
       try { version = localStorage.getItem('cog_bible_en_version') || 'kjv'; } catch (e) {}
       var localVersions = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885','msb'];
+      if (version === 'odr') return 'Index: Original Douay-Rheims';
+      if (version === 'odr-original') return 'Index: Original Douay-Rheims (original spelling)';
       return localVersions.indexOf(version) >= 0 ? 'Index: ' + version.toUpperCase() : (version === 'kjv' ? 'Index: KJV' : 'Index: KJV (reader: ' + version.toUpperCase() + ')');
     }
     var persianVersion = 'opcb';
@@ -504,6 +506,14 @@
     return out;
   }
 
+  function flattenOriginalDouaySearch(rows) {
+    if (!Array.isArray(rows)) throw new Error('Malformed Original Douay-Rheims search index');
+    return rows.map(function (row) {
+      var text = String(row.text == null ? '' : row.text);
+      return { id: Number(row.id), ch: Number(row.ch), v: Number(row.v), text: text, label: String(row.label || 'Original Douay-Rheims'), norm: normalize(text) };
+    }).filter(function (row) { return row.text.trim() && row.id >= 1001 && row.id <= 1076 && row.ch > 0 && row.v > 0; });
+  }
+
   function loadEn() {
     var version = 'kjv';
     try { version = localStorage.getItem('cog_bible_en_version') || 'kjv'; } catch (e) {}
@@ -514,6 +524,17 @@
     enLoadedVersion = version;
     enLoadPromise = (async function () {
       try {
+        if (version === 'odr' || version === 'odr-original') {
+          var odrIndexUrl = version === 'odr-original'
+            ? '/data/bible-en/odr/original-spelling/search-index.json'
+            : '/data/bible-en/odr/search-index.json';
+          var odrResponse = await fetch(odrIndexUrl);
+          if (!odrResponse.ok) throw new Error('Original Douay-Rheims search index request failed (' + odrResponse.status + ')');
+          var odrRows = await odrResponse.json();
+          if (enLoadedVersion !== version) return [];
+          EN_VERSES = flattenOriginalDouaySearch(odrRows);
+          return EN_VERSES;
+        }
         if (localVersions.indexOf(version) >= 0) {
           var searchIds = IDS.slice();
           if (version === 'dra' || version === 'webbe') searchIds = searchIds.concat([740,750,760,770,780,790,800]);
