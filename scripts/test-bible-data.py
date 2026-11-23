@@ -153,6 +153,8 @@ def check_reader_safeguards() -> None:
         fail("Original Douay-Rheims reader must map book IDs to source file slugs")
     if "hasDeuterocanon" not in reader or "return hasDeuterocanon ? meta : meta.filter(b => b.id < 740)" not in reader:
     if "const expandedEsther = bookId === 190" not in reader or "expandedEsther ? 16" not in reader:
+    if "const availableIds = availableBooks().map(b => b.id)" not in reader:
+        fail("Switching to Persian must move away from books absent from Persian editions")
     if "['dra','odr','odr-original'].indexOf(selectedTranslation)" not in reader:
         fail("Expanded Esther must be limited to DRA and Original Douay-Rheims, not WEBBE")
     for version, expected in (("dra",16),("webbe",10)):
