@@ -195,6 +195,12 @@ def check_reader_safeguards() -> None:
         fail("Persian Bible search must not depend on external text/CDN providers")
     if "faLoadedVersion" not in search:
         fail("Switching between OPV and OPCB must invalidate the cached Persian search index")
+    if "function flattenLocalEnglish" not in search or "data/bible-en/local/' + version + '/b' + id + '.json" not in search:
+        fail("English Bible search must use the selected locally hosted edition when available")
+    if "enLoadedVersion" not in search or "msb" not in search:
+        fail("Switching English editions must refresh the selected local search index, including MSB")
+    if "cdn.jsdelivr.net" not in search or "fastly.jsdelivr.net" not in search or "raw.githubusercontent.com" not in search:
+        fail("KJV fallback sources must remain available until KJV/BBE rights and local source archives are fully reviewed")
 
 def main() -> int:
     for version in ENGLISH:
