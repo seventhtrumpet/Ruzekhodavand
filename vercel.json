@@ -104,5 +104,17 @@
       "source": "/v/:id",
       "destination": "/daily-bread-share.html?i=:id"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/admin",
+      "destination": "/admin-disabled.html",
+      "permanent": false
+    },
+    {
+      "source": "/admin.html",
+      "destination": "/admin-disabled.html",
+      "permanent": false
+    }
   ]
 }
