@@ -80,29 +80,44 @@
   function sharePageUrl() {
     try {
       var selected = document.querySelectorAll('.mb-verse.selected');
+      var params = getParams();
+      var state = {};
+      try { state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}'); } catch (e) {}
+      var isBiblePage = /\/bible\.html$/i.test(location.pathname || '');
+      var bookId = '';
+      var chapter = '';
+      var verse = '1';
       if (selected.length) {
         var first = selected[0];
-        var ch = first.getAttribute('data-chapter') || '';
-        var vs = first.getAttribute('data-verse') || '';
-        var p = new URLSearchParams(location.search);
-        var b = p.get('b') || p.get('book') || '';
-        if (!b) {
-          try {
-            var st = JSON.parse(localStorage.getItem('cog_bible_state') || '{}');
-            if (st.bookId) b = String(st.bookId);
-          } catch (e2) {}
-        }
-        if (b && ch) {
-          return SITE + '/bible.html?b=' + encodeURIComponent(b) +
-            '&c=' + encodeURIComponent(ch) +
-            '&v=' + encodeURIComponent(vs || '1');
-        }
+        chapter = first.getAttribute('data-chapter') || '';
+        verse = first.getAttribute('data-verse') || '1';
+        bookId = state.bookId || (params && params.bookId) || '';
+      } else if (params && params.bookId && params.chapter) {
+        bookId = params.bookId;
+        chapter = params.chapter;
+        verse = params.verse || 1;
+      } else if (isBiblePage && state.bookId && state.chapter) {
+        bookId = state.bookId;
+        chapter = state.chapter;
+        verse = state.verse || 1;
       }
-      var params = getParams();
-      if (params && params.bookId && params.chapter) {
-        return SITE + '/bible.html?b=' + params.bookId +
-          '&c=' + params.chapter +
-          '&v=' + (params.verse || 1);
+      if (bookId && chapter) {
+        var lang = isEn() ? 'en' : 'fa';
+        var version = lang === 'en'
+          ? (localStorage.getItem('cog_bible_en_version') || 'kjv')
+          : (localStorage.getItem('cog_bible_fa_version') || 'opcb');
+        var slug = localStorage.getItem('cog_bible_book_slug') || '';
+        if (!slug && window.__stBibleSlugByCanonicalId) {
+          slug = window.__stBibleSlugByCanonicalId[bookId] || '';
+        }
+        var route = new URLSearchParams();
+        route.set('b', String(bookId));
+        route.set('c', String(chapter));
+        route.set('v', String(verse));
+        route.set('lang', lang);
+        route.set('version', version);
+        if (slug) route.set('slug', slug);
+        return SITE + '/bible.html?' + route.toString();
       }
     } catch (e) {}
     return SITE + '/';
