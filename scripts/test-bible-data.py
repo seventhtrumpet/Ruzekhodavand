@@ -117,11 +117,18 @@ def check_odr() -> None:
 
 def check_reader_safeguards() -> None:
     reader = (ROOT / "js/bible.js").read_text(encoding="utf-8")
+    core = (ROOT / "js/bible-core-pinned.js").read_text(encoding="utf-8")
     html = (ROOT / "bible.html").read_text(encoding="utf-8")
     share = (ROOT / "js/bible-share.js").read_text(encoding="utf-8")
     photo = (ROOT / "js/bible-share-photo.js").read_text(encoding="utf-8")
     admin = (ROOT / "admin.html").read_text(encoding="utf-8")
     admin_js = (ROOT / "js/admin.js").read_text(encoding="utf-8")
+    if "code.replace(/const ref = encodeURIComponent" not in reader:
+        fail("English chapter fetch patch must target loadEnChapter, not the first generic fetch call")
+    if "code.replace(/const res = await fetch" in reader:
+        fail("English chapter fetch patch must not replace the first generic fetch call")
+    if "const ref = encodeURIComponent(b.en + ' ' + ch);" not in core:
+        fail("Pinned reader core no longer has the expected chapter-fetch anchor")
     if "Ten English editions" not in reader or "KJV and BBE" not in reader:
         fail("Reader hosting note must distinguish local editions from remotely fetched KJV/BBE")
     if "Geneva uses Bolls chapter delivery" in reader or "Darby and Douay-Rheims use Bible API" in reader:
