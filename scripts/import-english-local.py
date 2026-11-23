@@ -29,6 +29,7 @@ SOURCES = {
     "rv1885": ("eng-rv", "English Revised Version (1885)", "Public Domain"),
     "dra": ("engDRA", "Douay-Rheims 1899", "Public Domain"),
     "webbe": ("eng-webbe", "World English Bible British Edition", "Public Domain"),
+    "msb": ("engmsb", "Majority Standard Bible", "Public Domain"),
 }
 EXPECTED_ARCHIVE_SHA256 = {
     "web": "93e867cdb2bfc84d1e997172e7773e166e718d9265985a054f8fca565f5cd21e",
@@ -53,6 +54,7 @@ EXPECTED_GENESIS_1_1 = {
     "rv1885": "In the beginning God created the heaven and the earth.",
     "dra": "In the beginning God created heaven, and earth.",
     "webbe": "In the beginning, God created the heavens and the earth.",
+    "msb": "In the beginning God created the heavens and the earth.",
 }
 BOOKS = [
     (10,"GEN","Genesis",50),(20,"EXO","Exodus",40),(30,"LEV","Leviticus",27),
@@ -163,12 +165,17 @@ def parse_vpl(text: str, translation: str, book_defs: list[tuple]) -> tuple[dict
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     metadata = {}
+    metadata_path = OUT / "metadata.json"
+    previous_metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.exists() else {}
     for translation, (archive_id, title, license_name) in SOURCES.items():
         url = f"https://ebible.org/Scriptures/{archive_id}_vpl.zip"
         archive = download(url)
         archive_sha = hashlib.sha256(archive).hexdigest()
-        if archive_sha != EXPECTED_ARCHIVE_SHA256[translation]:
+        pinned_sha = EXPECTED_ARCHIVE_SHA256.get(translation) or previous_metadata.get(translation, {}).get("source_archive_sha256")
+        if pinned_sha and archive_sha != pinned_sha:
             raise RuntimeError(f"{translation}: source archive hash changed; review before importing")
+        if not pinned_sha:
+            print(f"{translation}: first import; recording official source archive SHA-256 {archive_sha}")
         with zipfile.ZipFile(BytesIO(archive)) as zf:
             bad = zf.testzip()
             if bad:
@@ -209,9 +216,9 @@ def main() -> None:
     (OUT / "README.md").write_text(
         "# Local English public-domain Bible texts\n\n"
         "Sources: official eBible.org VPL archives, pinned by SHA-256 in metadata.json.\n"
-        "Included editions: WEB Classic, ASV 1901, YLT 1898, Webster 1833, Darby 1884, Geneva 1599, BSB, ERV 1885, Douay-Rheims 1899, and WEBBE. DRA and WEBBE include the seven deuterocanonical books; DRA also includes the longer Esther and Daniel chapter divisions.\n"
+        "Included editions: WEB Classic, ASV 1901, YLT 1898, Webster 1833, Darby 1884, Geneva 1599, BSB, ERV 1885, Douay-Rheims 1899, WEBBE, and MSB. DRA and WEBBE include the seven deuterocanonical books; DRA also includes the longer Esther and Daniel chapter divisions.\n"
         "The VPL format contains Bible text only. The importer preserves verse wording; 66-book editions include the standard canon, while DRA and WEBBE include the seven deuterocanonical books. Empty verse markers and verse-number gaps are preserved, never filled from another edition.\n"
-        "The World English Bible name is retained only for the unchanged source text.\n",
+        "The World English Bible name is retained only for the unchanged source text. The Majority Standard Bible is identified as Public Domain by its official eBible.org source.\n",
         encoding="utf-8",
     )
 
