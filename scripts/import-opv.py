@@ -2,6 +2,7 @@
 """Build the Persian Old Persian Version (OPV) JSON packs from eBible USFM."""
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import urllib.request
@@ -10,6 +11,7 @@ from pathlib import Path
 from io import BytesIO
 
 SOURCE_URL = "https://ebible.org/Scriptures/pesOPV_usfm.zip"
+EXPECTED_ARCHIVE_SHA256 = "dfadecb7be54dbde66059cb113c46b03586f11ff0adee57493ec2c75e7bf9769"
 OUT_DIR = Path("data/bible-fa/opv")
 IDS = [
     10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,190,
@@ -75,6 +77,11 @@ def parse_usfm(source: str, book_id: int) -> dict:
 
 def main() -> None:
     archive = download_archive()
+    archive_sha256 = hashlib.sha256(archive).hexdigest()
+    if archive_sha256 != EXPECTED_ARCHIVE_SHA256:
+        raise RuntimeError(
+            f"OPV source archive hash changed: {archive_sha256}; review before importing"
+        )
     with zipfile.ZipFile(BytesIO(archive)) as zf:
         bad_file = zf.testzip()
         if bad_file:
@@ -165,7 +172,8 @@ def main() -> None:
 
         readme = (
             "# Persian Old Persian Version (OPV) data\n\n"
-            "Source: https://ebible.org/bible/details.php?id=pesOPV\n\n"
+            "Source: https://ebible.org/bible/details.php?id=pesOPV\n"
+            f"Source archive SHA-256: {EXPECTED_ARCHIVE_SHA256}\n\n"
             "The source identifies OPV as public domain and credits Wycliffe Bible Translators.\n"
             "Original USFM archive: https://ebible.org/Scriptures/pesOPV_usfm.zip\n\n"
             "Generated as one JSON file per Bible book for the reader, plus index.json for full-text search.\n"
