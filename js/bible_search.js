@@ -466,12 +466,18 @@
           if (!response.ok) throw new Error('Persian Bible data request failed: ' + id + ' (' + response.status + ')');
           return await response.json();
         }));
-        FA_VERSES = flattenLocalPersian(packs);
+        var flattened = flattenLocalPersian(packs);
+        // Ignore an older request if the reader's Persian edition changed
+        // while its 66 local book files were still loading.
+        if (faLoadedVersion !== version) return [];
+        FA_VERSES = flattened;
         return FA_VERSES;
       } catch (e) {
         console.warn('Persian Bible search data could not be loaded', e);
-        FA_VERSES = null;
-        faLoadPromise = null;
+        if (faLoadedVersion === version) {
+          FA_VERSES = null;
+          faLoadPromise = null;
+        }
         return [];
       }
     })();
