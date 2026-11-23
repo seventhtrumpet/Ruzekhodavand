@@ -52,7 +52,7 @@ The reader requests chapter text from these runtime sources (the Original Douay-
 | KJV, WEB, ASV, BBE, ERV 1885, YLT, Webster | Free.Bible | Chapter fetched on demand |
 | BSB, WEBBE, Darby, DRA 1899 | bible-api.com | Chapter fetched on demand |
 | Geneva 1599 | Bolls API | Chapter fetched on demand |
-| Original Douay-Rheims, both spelling forms | Same-origin `/data/bible-en/odr/` files (after importer run) | Pinned 76-book manifest and 152 book JSON files |
+| Original Douay-Rheims, both spelling forms | Same-origin `/data/bible-en/odr/` files | Pinned 76-book manifest and 152 book JSON files |
 
 The reader does not navigate visitors to these providers. English chapter data for several editions and Original Douay-Rheims remain upstream runtime dependencies; Persian OPV and OPCB are designed to load from same-origin local files.
 
@@ -122,9 +122,9 @@ Each verse should be linked to its source-language text and stable reference. Th
 - Share payloads: the dedicated share module uses the canonical SeventhTrumpet.org URL. The legacy selected-verse share fallback now also uses the canonical domain, independent of preview host.
 - OPV structure/import: previously inspected from the supplied USFM archive.
 - OPCB importer and local reader path: implemented; GitHub Actions import completed successfully and generated 66 local per-book JSON files (1,189 chapters; 28,731 verses). The site still needs a successful Vercel deployment and browser test before production availability can be claimed. Three sample passages were compared with official eBible samples; not a full collation.
-- Original Douay-Rheims manifest and representative files: checked in its implementation PR; not a full text collation.
+- Original Douay-Rheims: GitHub Actions import completed successfully; 76 files per spelling form, 1,361 chapters, and 37,154 JSON verse entries per form are stored locally. The 73-book Catholic canon and three appendix texts remain clearly distinguished. This is structural validation, not a full scholarly verse-by-verse collation.
 - Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**.
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**.
-- Complete self-hosting of every translation text: **not yet completed**.
+- Complete self-hosting of every translation text: **not yet completed**; English versions other than Original Douay-Rheims still use upstream chapter services.
 - Elimination of all third-party runtime dependencies across the whole website (including fonts, analytics, and unrelated services): **not yet completed**.
 - Production deployment of the latest main commits: **blocked by Vercel build/API usage limits at the last check; verify before claiming live**.
