@@ -195,6 +195,12 @@ def check_reader_safeguards() -> None:
         fail("Persian Bible search must not depend on external text/CDN providers")
     if "faLoadedVersion" not in search:
         fail("Switching between OPV and OPCB must invalidate the cached Persian search index")
+    if "if (faLoadedVersion !== version) return []" not in search:
+        fail("A stale Persian search request must not overwrite a newer edition's index")
+    if "function withSelectedVersion(url)" not in share or "enVersion=" not in share or "faVersion=" not in share:
+        fail("Shared Bible links must preserve the selected English or Persian translation")
+    if "sharedParams.get('enVersion')" not in reader or "sharedParams.get('faVersion')" not in reader:
+        fail("Bible reader must restore the selected translation from a shared same-site link")
 
 def main() -> int:
     for version in ENGLISH:
