@@ -1,0 +1,43 @@
+name: Import and validate Persian OPCB data
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/import-opcb.yml
+      - scripts/import-opcb.py
+
+permissions:
+  contents: write
+
+jobs:
+  import-opcb:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Download, validate, and convert the pinned OPCB dataset
+        run: python scripts/import-opcb.py
+
+      - name: Commit generated OPCB books
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/bible-fa/opcb
+          if git diff --cached --quiet; then
+            echo "OPCB data is already up to date."
+            exit 0
+          fi
+          git commit -m "Add locally hosted Persian OPCB Bible data"
+          git pull --rebase origin main
+          git push origin HEAD:main
