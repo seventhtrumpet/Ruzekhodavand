@@ -1,8 +1,8 @@
 # Bible Reader Audit and Translation Roadmap
 
-Last reviewed: 2026-11-23 (including structural-count checks, expanded-canon fixes, and reader cache refresh)
+Last reviewed: 2026-11-23 (including ODR slug resolution, edition-aware sharing, live asset checks, and Persian reader-path correction)
 Repository: seventhtrumpet/Ruzekhodavand
-Latest main commit reviewed: 1b487916c086062b9ec6a77c59189ae5577fdb7c (PR #67 cache-refresh documentation checkpoint)
+Latest main commit reviewed: b31bf8b368d9df11a89a352743c14deccfa607d6 (PR #76 reader parser and OPCB path hotfix)
 Latest reader-code fixes: PR #62 (WEBBE expanded-canon visibility), PR #64 (Douay Daniel chapter visibility), and PR #66 (cache-busting refresh); PR #55 also fixed MSB saved-version and change-handler allowlists
 Latest importer-code commit reviewed: 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV source archive checksum pin).
 Recent main commits: 952dc50996461733287dde43e3bc14630321e45b (licence-page corrections), 5c60083c427a4e9891803f33f4ef26c507b26be2 (KJV rights label), 1ee801b8394a5daea9b83f65b0d4574cae88299a (audit results), 87a504f3b985ac20bd281e16c1bc044426fba10f (importer scope wording), 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV archive checksum pin), and e68ede1ac758202bec74bf878cc645bef63b3ef1 (OPV data regenerated with the pinned archive).
@@ -204,3 +204,17 @@ Each verse should be linked to its source-language text and stable reference. Th
 - The Bible-data regression test now requires the fix6 cache key. GitHub Actions passed before merge.
 - Latest main commit at this checkpoint: `1b487916c086062b9ec6a77c59189ae5577fdb7c` (PR #67 documentation checkpoint).
 - Vercel production deployment records still show the older production commit `d42c7fde4377daed614357e0794758cecf0ad7ca`; the latest reader fixes are not confirmed live. Do not ask for or use a user token, and do not repeatedly retry the Vercel daily deployment quota.
+
+
+## Latest reader and deployment verification (2026-11-23, after PR #76)
+
+- PR #73 fixed Original Douay-Rheims chapter loading to use the manifest's dynamic book slug instead of assuming the older canonical numeric-ID map. The legacy slug map remains a fallback.
+- PR #74 made Bible share URLs preserve the selected language, translation edition, book slug, chapter, and verse. The URLs remain on https://seventhtrumpet.org; the receiving reader restores the shared state before starting the pinned core.
+- PR #75 restored the pinned reader core's exact boot-patch anchor so the edition-aware catalogue and saved-book slug resolution are applied at runtime.
+- Live smoke testing of the READY deployment for commit 86ae294 exposed two additional reader defects before release: a literal escaped newline in the route parser (invalid JavaScript syntax) and the OPCB chapter loader pointing at /data/bible-fa/ instead of /data/bible-fa/opcb/. PR #76 fixed both, refreshed the immutable reader asset cache key, and added regression assertions. No Scripture text or translation data was changed.
+- PR #76 is merged. Main is b31bf8b368d9df11a89a352743c14deccfa607d6. GitHub Actions run 45287861269 passed for that merge commit; the validator parsed 2,778 JSON files and confirmed 11 English packs, 2 Persian packs, both 76-text Original Douay-Rheims spelling forms, and reader safeguards.
+- HTTP checks against the READY deployment for commit 86ae294 returned 200 for the homepage, Bible page, ODR manifest, all 11 local English Genesis files, OPV Genesis, OPCB Genesis, and both Original Douay-Rheims Genesis files. The actual Persian paths are /data/bible-fa/opv/ and /data/bible-fa/opcb/ respectively. These asset checks do not execute browser JavaScript and do not prove the reader UI works.
+- Vercel deployment dpl_2HUR1Qzrmvu1YMK1cY36FUU4NQyQ reached READY for commit 86ae294fb9c63ffd7cd8648f16cf49b6f1b45bd2 and carries the aliases seventhtrumpet.org and www.seventhtrumpet.org. It predates PR #76 and therefore does not include the route-parser or OPCB path fixes.
+- A production deployment for main commit b31bf8b368d9df11a89a352743c14deccfa607d6 was attempted after PR #76 merged, but Vercel returned HTTP 402 with api-deployments-free-per-day and retryAfter 86400 seconds. The local Vercel CLI is not installed. Do not repeatedly retry during this limit window, and do not claim PR #76 is live until a READY deployment for b31bf8 is verified.
+- Recent Vercel runtime-error query returned no runtime error clusters for the selected 24-hour window; the 30-minute warning/error log query returned no records. This is not a substitute for browser interaction tests.
+- Still outstanding: full verse-by-verse source collation for every edition; rights review for KJV and BBE; browser/device tests of the corrected deep links, OPV/OPCB switching, all book/chapter selectors, and mobile layout; production deployment and post-deployment smoke testing for b31bf8.
