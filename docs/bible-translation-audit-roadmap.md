@@ -148,3 +148,8 @@ Each verse should be linked to its source-language text and stable reference. Th
 - js/admin.js currently embeds the login password in browser-delivered JavaScript and uses a client-side sessionStorage flag as its only gate. Anyone can inspect or bypass this check. This is not secure authentication and must not protect sensitive or shared data.
 - The legacy admin panel stores posts and live-state data in the visitor's browser localStorage, rather than a protected server-side database. A secure replacement requires server-side authentication/authorization and protected storage. Do not describe the current panel as securely password-protected.
 - Until that replacement is implemented and tested, restrict or disable public access to /admin.html if the panel is still deployed. Do not put a replacement secret in static JavaScript, HTML, README files, or Git history.
+
+
+## Deployment follow-up (2026-11-23)
+
+- The bilingual licence-page clarification for BBE redistribution rights is committed to main (commit be09327c1fd7327c83b6b102d6c83f904ebc69a9), but it is not yet in the latest confirmed production deployment. The Vercel deployment API returned its daily deployment quota limit, and the Vercel CLI is not installed in the available environment. Do not claim this latest licence wording is live until a subsequent production deployment reaches READY and the live page is checked.
