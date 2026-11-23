@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-11-23
 Repository: seventhtrumpet/Ruzekhodavand
-Production baseline reviewed: 18be4ab88e5a31db0b843fd9c26ffaa5e2ee0961
+Latest main reviewed: 31a524657b20e6d82360f87d95a4ca8456dae778
 
 ## Purpose
 
@@ -54,9 +54,9 @@ The reader requests chapter text from these runtime sources:
 | Geneva 1599 | Bolls API | Chapter fetched on demand |
 | Original Douay-Rheims, both spelling forms | Pinned GitHub raw dataset | Pinned 76-book manifest and book JSON files |
 
-The reader does not intentionally navigate visitors to these providers. However, these versions are not yet all self-hosted. A provider outage, rate limit, CORS change, or upstream availability issue can prevent a chapter from loading.
+The reader does not navigate visitors to these providers. However, chapter data for these editions is not yet self-hosted. A provider outage, rate limit, CORS change, or upstream availability issue can prevent a chapter from loading.
 
-The reader wrapper also retrieves its pinned upstream JavaScript core from jsDelivr, with Raw GitHub as fallback. This is an additional runtime dependency that should be removed by vendoring the reviewed core into the repository and testing the patched version locally.
+The reader wrapper now retrieves the reviewed, pinned JavaScript core from the same-origin path `/js/bible-core-pinned.js`. The core itself is self-hosted; the selected Bible chapter data for several editions remains externally fetched.
 
 ## Rights and presentation rules
 
@@ -115,10 +115,16 @@ Each verse should be linked to its source-language text and stable reference. Th
 
 ## Audit status
 
-- Reader selector and runtime source map: inspected in the production-baseline source.
+- Reader selector and runtime source map: inspected in the latest main source.
+- Reader JavaScript core: self-hosted at `/js/bible-core-pinned.js`; new deployment and real-browser verification still required.
+- Bible reader and home-page preview metadata: external image-host URLs removed from the HTML metadata; verify production after next deployment.
+- License-page visitor navigation: no external reading/download anchors remain in the inspected page; source names are plain text.
+- Share payloads: the dedicated share module uses the canonical SeventhTrumpet.org URL. The legacy selected-verse share fallback now also uses the canonical domain, independent of preview host.
 - OPV structure/import: previously inspected from the supplied USFM archive.
 - OPCB structure and three sample passages: recorded in the repository's audit notes; not a full collation.
 - Original Douay-Rheims manifest and representative files: checked in its implementation PR; not a full text collation.
 - Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**.
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**.
-- Complete self-hosting and elimination of third-party runtime dependencies: **not yet completed**.
+- Complete self-hosting of every translation text: **not yet completed**.
+- Elimination of all third-party runtime dependencies across the whole website (including fonts, analytics, and unrelated services): **not yet completed**.
+- Production deployment of the latest main commits: **blocked by Vercel build/API usage limits at the last check; verify before claiming live**.

@@ -106,7 +106,7 @@
       });
       var state = {};
       try { state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}'); } catch (e) {}
-      var url = (location.origin || 'https://seventhtrumpet.org') + '/bible.html?b=' + (state.bookId || '') + '&c=' + firstCh + '&v=' + firstV + (lastV !== firstV ? '-' + lastV : '');
+      var url = 'https://seventhtrumpet.org/bible.html?b=' + encodeURIComponent(state.bookId || '') + '&c=' + encodeURIComponent(firstCh) + '&v=' + encodeURIComponent(firstV) + (lastV !== firstV ? '-' + encodeURIComponent(lastV) : '');
       var body = lines.join('\n') + '\n\n' + url;
       if (navigator.share) navigator.share({ title: 'Bible', text: body, url: url }).catch(function () {});
       else if (navigator.clipboard) navigator.clipboard.writeText(body);
