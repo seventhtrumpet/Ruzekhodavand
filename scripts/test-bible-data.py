@@ -141,7 +141,7 @@ def check_reader_safeguards() -> None:
         fail("Reader hosting note must distinguish local editions from remotely fetched KJV/BBE")
     if "Geneva uses Bolls chapter delivery" in reader or "Darby and Douay-Rheims use Bible API" in reader:
         fail("Reader contains obsolete external-provider hosting notice")
-    if "hosting-note-20261123" not in html:
+    if "chapter-loader-fix-20261123" not in html:
         fail("Bible reader script URL is missing the hosting-note cache-busting version")
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
         fail("Bible share scripts must use the canonical site origin")
