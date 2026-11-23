@@ -81,16 +81,19 @@
     <p id="bible-translation-note" style="margin:-.35rem 0 1rem;font-size:.82rem;line-height:1.7;opacity:.82;">
       Translations reflect different textual and interpretive choices. No translation is completely free of interpretation. WEB and OEB describe their projects as ecumenical/open; Darby and Douay-Rheims have distinct historical church backgrounds. Compare translations rather than assuming they teach identical theology.
     </p>
-    <div id="persian-version-wrap" style="display:none;align-items:center;gap:.5rem;margin:0 0 1rem;">
-      <label for="persian-version-select">انتخاب نسخهٔ فارسی</label>
-      <select id="persian-version-select">
-        <option value="opcb">ترجمهٔ فارسی موجود در سایت</option>
-        <option value="opv">ترجمهٔ قدیم فارسی (OPV) — مطالعهٔ آنلاین</option>
-      </select>
-    </div>
-    <a id="persian-version-link" href="https://ebible.org/study/?t1=local%3ApesOPV&v1=GEN1_1&w1=bible" target="_blank" rel="noopener noreferrer" style="display:none;margin:0 0 1rem;font-size:.85rem;">
-      مطالعهٔ آنلاین ترجمهٔ قدیم فارسی (OPV) در eBible
-    </a>
+    <section id="persian-version-wrap" class="persian-version-list" style="display:none;" aria-label="نسخه‌های فارسی کتاب مقدس">
+      <div class="persian-version-item persian-version-active">
+        <strong>ترجمهٔ معاصر فارسی (OPCB)</strong>
+        <span>نسخهٔ فعال در همین صفحه — متن کامل ۶۶ کتاب</span>
+      </div>
+      <div class="persian-version-item">
+        <strong>ترجمهٔ قدیم فارسی (OPV)</strong>
+        <span>نسخهٔ جداگانه؛ برای خواندن آنلاین در وب‌سایت eBible باز می‌شود.</span>
+        <a id="persian-version-link" href="https://ebible.org/study/?t1=local%3ApesOPV&v1=GEN1_1&w1=bible" target="_blank" rel="noopener noreferrer">
+          مطالعهٔ ترجمهٔ قدیم فارسی (OPV) در eBible
+        </a>
+      </div>
+    </section>
     <h1 id="bible-heading" class="mb-heading"></h1>
     <div id="bible-verses" class="mb-text"></div>
   </main>
