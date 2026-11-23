@@ -210,8 +210,8 @@ def check_reader_safeguards() -> None:
     for index_path in (ROOT / "data/bible-en/odr/search-index.json", ROOT / "data/bible-en/odr/original-spelling/search-index.json"):
         if index_path.is_file():
             rows = load_json(index_path)
-            if not isinstance(rows, list) or len(rows) != 37154:
-                fail(f"{index_path.relative_to(ROOT)}: expected 37,154 verse search rows")
+            if not isinstance(rows, list) or len(rows) != 37153:
+                fail(f"{index_path.relative_to(ROOT)}: expected 37,153 scripture verse search rows (excluding Tobias chapter zero)")
             elif any(not isinstance(row, dict) or not all(k in row for k in ("id","ch","v","text","label")) for row in rows[:20]):
                 fail(f"{index_path.relative_to(ROOT)}: malformed search-index row")
     if "cdn.jsdelivr.net" not in search or "fastly.jsdelivr.net" not in search or "raw.githubusercontent.com" not in search:
