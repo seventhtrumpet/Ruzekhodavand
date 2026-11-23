@@ -173,7 +173,7 @@
     if (enCache[id].chapters[String(ch)]) return enCache[id];
     try {
       const ref = encodeURIComponent(b.en + ' ' + ch);
-      const res = await fetch('https://bible-api.com/' + ref + '?translation=kjv');
+      const res = await fetch(requestUrl);
       if (!res.ok) return enCache[id];
       const data = await res.json();
       const verses = {};
