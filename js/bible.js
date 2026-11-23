@@ -15,7 +15,7 @@
     // Replace the pinned core's chapter loader as one complete unit. The pinned
     // core's historical requestUrl reference is undefined; patching a smaller
     // fragment is fragile and can silently leave every English chapter blank.
-    code = code.replace(/  async function loadEnChapter\\(id, ch\\) \\{[\\s\\S]*?\\n  \\}\\n\\n  function escapeHtml/, `  async function loadEnChapter(id, ch) {
+    code = code.replace(/  async function loadEnChapter\(id, ch\) \{[\s\S]*?\n  \}\n\n  function escapeHtml/, `  async function loadEnChapter(id, ch) {
     const b = meta.find(x => x.id === id);
     if (!b) return null;
     if (!enCache[id]) enCache[id] = { id, name: b.en, chapters: {} };
