@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Build compact, local verse-only search indexes for both Original Douay-Rheims spellings."""
+"""Build compact, local verse-only search indexes for both Original Douay-Rheims spellings.
+
+Empty source verse markers remain represented as empty rows; the reader searcher
+filters them from matches without borrowing text from another translation.
+"""
 from __future__ import annotations
 
 import json
@@ -43,8 +47,10 @@ def build_variant(source_dir: Path, target: Path, books: list[dict]) -> int:
                     raise ValueError(f"{source}: malformed verse in chapter {chapter_number}")
                 verse_number = int(verse.get("verse", 0))
                 text = verse.get("text")
-                if verse_number <= 0 or not isinstance(text, str) or not text.strip():
+                if verse_number <= 0:
                     continue
+                if not isinstance(text, str):
+                    raise ValueError(f"{source}: verse {chapter_number}:{verse_number} has non-text content")
                 rows.append({
                     "id": book_id,
                     "ch": chapter_number,
