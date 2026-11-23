@@ -197,3 +197,10 @@ Each verse should be linked to its source-language text and stable reference. Th
 - The reader now exposes Daniel chapters 13–14 only for DRA and both Original Douay-Rheims spelling forms. WEBBE remains at its source-specific 12 chapters.
 - Regression checks validate DRA Daniel has 14 chapters, WEBBE has 12, and the runtime chapter-count rule is edition-specific. The workflow passed before merge.
 - No Scripture wording or source files were changed. Production deployment and live-reader verification remain pending for the current main branch.
+
+## Reader cache refresh after canon corrections (2026-11-23)
+
+- PR #66 bumped the `bible.js` cache key in `bible.html` from `expanded-canon-search-fix5-20261123` to `expanded-canon-search-fix6-20261123` after the WEBBE and Douay Daniel reader fixes. This matters because the site serves long-lived cached JavaScript assets.
+- The Bible-data regression test now requires the fix6 cache key. GitHub Actions passed before merge.
+- Latest main commit at this checkpoint: `d1e299acd0dc9a7eb00110b82107f4bb547307d4`.
+- Vercel production deployment records still show the older production commit `d42c7fde4377daed614357e0794758cecf0ad7ca`; the latest reader fixes are not confirmed live. Do not ask for or use a user token, and do not repeatedly retry the Vercel daily deployment quota.
