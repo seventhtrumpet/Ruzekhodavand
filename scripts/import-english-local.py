@@ -68,7 +68,15 @@ BOOKS = [
     (680,"2PE","2 Peter",3),(690,"1JN","1 John",5),(700,"2JN","2 John",1),
     (710,"3JN","3 John",1),(720,"JUD","Jude",1),(730,"REV","Revelation",22),
 ]
-CODE_MAP = {code: (book_id, name, chapters) for book_id, code, name, chapters in BOOKS}
+CODE_ALIASES = {
+    "EZK": "EZE", "JOL": "JOE", "NAM": "NAH", "MRK": "MAR",
+    "PHP": "PHI", "JAS": "JAM", "1JN": "1JO", "2JN": "2JO",
+    "3JN": "3JO", "SNG": "SOL",
+}
+CODE_MAP = {
+    CODE_ALIASES.get(code, code): (book_id, name, chapters)
+    for book_id, code, name, chapters in BOOKS
+}
 LINE_RE = re.compile(r"^([A-Z0-9]{3})\s+(\d+):(\d+)\s+(.*)$")
 
 
