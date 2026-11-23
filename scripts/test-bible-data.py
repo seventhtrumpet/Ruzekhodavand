@@ -29,10 +29,32 @@ def fail(message: str) -> None:
     ERRORS.append(message)
 
 
+def reject_duplicate_keys(pairs):
+    """Reject duplicate JSON object keys instead of silently keeping the last value."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate object key {key!r}")
+        result[key] = value
+    return result
+
+
+def check_duplicate_key_guard() -> None:
+    """Prove the JSON parser rejects duplicate keys and accepts valid objects."""
+    try:
+        json.loads('{"book": 1, "book": 2}', object_pairs_hook=reject_duplicate_keys)
+    except ValueError:
+        pass
+    else:
+        fail("duplicate JSON object keys must be rejected")
+    if json.loads('{"book": 1}', object_pairs_hook=reject_duplicate_keys) != {"book": 1}:
+        fail("duplicate-key parser must preserve valid JSON objects")
+
+
 def load_json(path: Path):
     global CHECKED_JSON
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=reject_duplicate_keys)
         CHECKED_JSON += 1
         return data
     except Exception as exc:
@@ -408,6 +430,7 @@ def check_reader_safeguards() -> None:
         fail("KJV fallback sources must remain available until KJV/BBE rights and local source archives are fully reviewed")
 
 def main() -> int:
+    check_duplicate_key_guard()
     available_english = [version for version in ENGLISH if (ROOT / f"data/bible-en/local/{version}").is_dir()]
     check_english_metadata(available_english)
     for version in available_english:
