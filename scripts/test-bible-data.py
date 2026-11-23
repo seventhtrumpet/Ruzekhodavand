@@ -169,7 +169,7 @@ def check_reader_safeguards() -> None:
                 fail(f"{version}: Esther should have {expected} chapters, found {len(chapters)}")
         fail("Douay-Rheims editions with expanded Esther must expose all 16 chapters")
         fail("Reader must show the expanded canon only for editions that contain it")
-    if "expanded-canon-fix-20261123" not in html:
+    if "expanded-canon-fix2-20261123" not in html:
         fail("Bible reader script URL is missing the hosting-note cache-busting version")
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
         fail("Bible share scripts must use the canonical site origin")
