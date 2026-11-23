@@ -334,8 +334,8 @@ def check_reader_safeguards() -> None:
     for book_id, chapters in {740:14,750:16,760:19,770:51,780:6,790:16,800:15}.items():
         if not re.search(rf"\b{book_id}:{chapters}\b", core_counts):
             fail(f"Reader chapter-count map is missing book {book_id} ({chapters} chapters)")
-    if "odrSlugById[id]" not in reader:
-        fail("Original Douay-Rheims reader must map book IDs to source file slugs")
+    if "odrSlugById[id]" not in reader or "const odrBookSlug = b.slug || odrSlugById[id]" not in reader:
+        fail("Original Douay-Rheims reader must prefer manifest slugs for dynamically numbered books and retain the legacy ID map as fallback")
     if "hasDeuterocanon" not in reader or "return hasDeuterocanon ? meta : meta.filter(b => b.id < 740)" not in reader:
         fail("Reader must show the expanded canon only for editions that contain it")
     if "hasDeuterocanon = ['dra','webbe','odr','odr-original']" not in reader:
@@ -362,7 +362,7 @@ def check_reader_safeguards() -> None:
         fail("DRA and Original Douay-Rheims must expose Daniel chapters 13-14 without changing WEBBE")
     if "const availableIds = availableBooks().map(b => b.id)" not in reader:
         fail("Switching to Persian must move away from books absent from Persian editions")
-    if "expanded-canon-search-fix6-20261123" not in html or "odr-local-search-20261123" not in html:
+    if "odr-manifest-slug-fix-20261123" not in html or "odr-local-search-20261123" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
