@@ -1,4 +1,4 @@
-/* Complete Persian Bible — always serve full 66 books from OPCB (local packs only as overlay) */
+/* Complete Persian Bible — keep OPCB and OPV separate; never mix legacy NMV fragments into OPCB. */
 (function () {
   if (window.__faFillInit) return;
   window.__faFillInit = true;
@@ -191,6 +191,7 @@
     var url = typeof input === 'string' ? input : (input && input.url) || '';
     var isOpv = false;
     try { isOpv = localStorage.getItem('cog_bible_fa_version') === 'opv'; } catch (e) {}
+
     if (isOpv && url.indexOf('/data/bible-fa/manifest.json') >= 0) {
       return Promise.resolve(jsonResponse(fullManifest()));
     }
@@ -204,7 +205,6 @@
         });
       }
     }
-    var p = origFetch(input, init);
 
     if (url.indexOf('/data/bible-fa/manifest.json') >= 0) {
       return Promise.resolve(jsonResponse(fullManifest())).then(function (res) {
@@ -218,45 +218,18 @@
         url.indexOf('meta.json') < 0 &&
         url.indexOf('pack.json') < 0) {
       var id = bookIdFromUrl(url);
-      if (!id || IDS.indexOf(id) < 0) return p;
-
-      return p.then(function (res) {
-        return opcbBookPayload(id).then(function (opcb) {
-          if (!opcb) {
-            return res && res.ok ? res : jsonResponse({});
-          }
-
-          var base = JSON.parse(JSON.stringify(opcb));
-
-          if (res && res.ok) {
-            return res.clone().text().then(function (txt) {
-              var t = (txt || '').trim();
-              if (t && t !== 'PLACEHOLDER' && t !== '{}') {
-                try {
-                  var parsed = JSON.parse(t);
-                  var local = parsed[String(id)] || parsed[id] || parsed;
-                  if (local && local.chapters) {
-                    deepMergeChapters(base[String(id)].chapters, local.chapters);
-                    if (local.name) base[String(id)].name = local.name;
-                  }
-                } catch (e) {}
-              }
-              return jsonResponse(base);
-            }).catch(function () {
-              return jsonResponse(base);
-            });
-          }
-
-          return jsonResponse(base);
-        });
-      }).catch(function () {
+      if (id && IDS.indexOf(id) >= 0) {
+        // Always return the selected OPCB text as one consistent translation.
+        // Legacy local fragments contain NMV material and must never be merged into OPCB.
         return opcbBookPayload(id).then(function (opcb) {
           return opcb ? jsonResponse(opcb) : jsonResponse({});
+        }).catch(function () {
+          return jsonResponse({});
         });
-      });
+      }
     }
 
-    return p;
+    return origFetch(input, init);
   };
 
   setTimeout(function () { loadOpcb(); }, 400);

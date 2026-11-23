@@ -18,7 +18,7 @@
     code = code.replace(/mb-book-btn/g, 'mb-cell');
     code = code.replace(/mb-num-btn/g, 'mb-cell');
 
-    code = code.replace("version: 'هزارۀ نو (FANMV)',", "version: (localStorage.getItem('cog_bible_fa_version') === 'opv' ? 'ترجمه قدیم فارسی (OPV)' : 'هزاره نو (FANMV)'),");
+    code = code.replace("version: 'هزارۀ نو (FANMV)',", "version: (localStorage.getItem('cog_bible_fa_version') === 'opv' ? 'ترجمه قدیم فارسی (OPV)' : 'ترجمه معاصر فارسی (OPCB)'),");
     code = code.replace("version: 'King James Version',", "version: ({kjv:'King James Version',web:'World English Bible',asv:'American Standard Version (1901)',bbe:'Bible in Basic English',bsb:'Berean Standard Bible',webbe:'World English Bible (British Edition)'})[localStorage.getItem('cog_bible_en_version') || 'kjv'] || 'King James Version',");
     code = code.replace("'?translation=kjv'", "'?translation=' + encodeURIComponent(localStorage.getItem('cog_bible_en_version') || 'kjv') + '&single_chapter_book_matching=indifferent'");
 
@@ -122,6 +122,10 @@
       if (translationNote) translationNote.textContent = english
         ? "Choose from the full English translations listed here. The list excludes denominational editions and incomplete translations."
         : 'از میان ترجمه‌های کامل فارسی انتخاب کنید. نسخه‌هایی که برای انتشار کامل به مجوز جداگانه نیاز دارند، در این فهرستِ متنِ قابل میزبانی قرار نمی‌گیرند.';
+      var nmvLink = document.getElementById('nmv-external-link');
+      if (nmvLink) nmvLink.textContent = english
+        ? 'New Millennium Version (NMV) — read on the publisher’s website'
+        : 'هزارهٔ نو (NMV) — مطالعه در وب‌سایت ناشر';
     }
     syncVersionControl();
     if (versionSelect) versionSelect.addEventListener('change', function () {
