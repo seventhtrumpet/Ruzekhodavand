@@ -57,8 +57,8 @@
     );
 
     code = code.replace(
-      "document.getElementById('lang-toggle')?.addEventListener('click', async () => {\\n      currentLang = currentLang === 'fa' ? 'en' : 'fa';\\n      localStorage.setItem(LANG_KEY, currentLang);\\n      applyChrome();\\n      await renderBook(true);\\n    });",
-      "window.__stSetBibleLanguage = async function (lang) {\\n      currentLang = lang === 'en' ? 'en' : 'fa';\\n      localStorage.setItem(LANG_KEY, currentLang);\\n      applyChrome();\\n      await renderBook(true);\\n    };"
+      "document.getElementById('lang-toggle')?.addEventListener('click', async () => {\n      currentLang = currentLang === 'fa' ? 'en' : 'fa';\n      localStorage.setItem(LANG_KEY, currentLang);\n      applyChrome();\n      await renderBook(true);\n    });",
+      "window.__stSetBibleLanguage = async function (lang) {\n      currentLang = lang === 'en' ? 'en' : 'fa';\n      localStorage.setItem(LANG_KEY, currentLang);\n      applyChrome();\n      await renderBook(true);\n    };"
     );
 
     (0, eval)(code);
