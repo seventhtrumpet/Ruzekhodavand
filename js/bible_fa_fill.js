@@ -132,7 +132,7 @@
   }
 
   var opvCache = {};
-  var OPV_BASE = '/api/opv?id=';
+  var OPV_BASE = '/data/bible-fa/opv/b';
   function cleanUsfmText(value) {
     return String(value || '')
       .replace(/\\f[\s\S]*?\\f\*/g, ' ')
@@ -170,12 +170,14 @@
     if (opvCache[id]) return opvCache[id];
     var index = IDS.indexOf(Number(id));
     if (index < 0 || !OPV_FILES[index]) return Promise.resolve(null);
-    opvCache[id] = origFetch(OPV_BASE + encodeURIComponent(id)).then(function(res) {
-      if (!res.ok) throw new Error('OPV source unavailable: ' + res.status);
-      return res.text();
-    }).then(function(source) {
-      var parsed = parseOpvUsfm(source, Number(id));
-      if (!Object.keys(parsed[String(id)].chapters).length) throw new Error('OPV file has no readable chapters');
+    opvCache[id] = origFetch(OPV_BASE + encodeURIComponent(id) + '.json').then(function(res) {
+      if (!res.ok) throw new Error('OPV book file unavailable: ' + res.status);
+      return res.json();
+    }).then(function(parsed) {
+      var book = parsed && (parsed[String(id)] || parsed[id] || parsed);
+      if (!book || !book.chapters || !Object.keys(book.chapters).length) {
+        throw new Error('OPV JSON has no readable chapters');
+      }
       return parsed;
     }).catch(function(error) {
       delete opvCache[id];
