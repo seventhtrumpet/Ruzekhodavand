@@ -25,6 +25,7 @@ SOURCES = {
     "darby": ("engDBY", "Darby Translation (1884)", "Public Domain"),
     "gnv": ("enggnv", "Geneva Bible (1599)", "Public Domain"),
     "bsb": ("engbsb", "Berean Standard Bible", "Public Domain"),
+    "rv1885": ("eng-rv", "English Revised Version (1885)", "Public Domain"),
     "dra": ("engDRA", "Douay-Rheims 1899", "Public Domain"),
     "webbe": ("eng-webbe", "World English Bible British Edition", "Public Domain"),
 }
@@ -36,6 +37,7 @@ EXPECTED_ARCHIVE_SHA256 = {
     "darby": "7eb1df2a434f5bbd831591aa96c08e94b900b1458fda74ccf1d1739d5af73619",
     "gnv": "faa35b12d04bdacda78b5b53b35bc241d576c63e5d6cd5bccd99bb337b8f7ade",
     "bsb": "72ecd9e0131e82737b76e1f2d706c85771d6054b6350673f80f49c839133f45e",
+    "rv1885": "3f26f6bb6fd48d9ee18ae11fff0670054e84ed35d3ae8c984cd95e9af0ed5791",
     "dra": "4b7ddcaec6bcf1d973d483a14e6495657daba94056b3a9678d0002315e7e57dd",
     "webbe": "055c1a5c21aa18c62117747ce7dd602346d587547399c89673fa7d0a511b8f14",
 }
@@ -47,6 +49,7 @@ EXPECTED_GENESIS_1_1 = {
     "darby": "In the beginning God created the heavens and the earth.",
     "gnv": "In the beginning God created the heauen and the earth.",
     "bsb": "In the beginning God created the heavens and the earth.",
+    "rv1885": "In the beginning God created the heaven and the earth.",
     "dra": "In the beginning God created heaven, and earth.",
     "webbe": "In the beginning, God created the heavens and the earth.",
 }
