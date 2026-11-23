@@ -21,7 +21,8 @@
       localStorage.setItem('cog_lang', lang);
     }
     var slug = route.get('slug');
-    if (slug) localStorage.setItem('cog_bible_book_slug', slug);\n    else if (route.has('b') || route.has('book')) localStorage.removeItem('cog_bible_book_slug');
+    if (slug) localStorage.setItem('cog_bible_book_slug', slug);
+    else if (route.has('b') || route.has('book')) localStorage.removeItem('cog_bible_book_slug');
     var bookId = Number(route.get('b') || route.get('book'));
     var chapter = Number(route.get('c') || route.get('chapter'));
     var verseText = route.get('v') || route.get('verse') || '1';
