@@ -17,7 +17,6 @@ Recent main commits: 952dc50996461733287dde43e3bc14630321e45b (licence-page corr
 - Present translation history and church tradition neutrally. Readers may compare editions, but the site's own notes must not misrepresent what the source text says.
 - Provide this explanation in Persian and English, separate from the verse text.
 
-
 Keep Bible reading inside SeventhTrumpet.org, preserve useful complete translations when their reuse terms allow it, disclose the source and limitations of every edition, and progressively reduce dependence on third-party runtime services. Do not describe a translation as fully audited until a complete text-level comparison has actually been completed.
 
 ## Current reader inventory
@@ -72,7 +71,6 @@ The reader wrapper loads the pinned JavaScript core from the same-origin path `/
 - Do not add incomplete corpora to the full-Bible selector. If a partial corpus is ever shown, label it conspicuously as partial.
 - Do not add NMV full text or an external reading link without documented permission and a clear user decision.
 - Keep source and licence information on the site's own bilingual information page. A source citation is not a reason to send the reader away from the site's Bible reader.
-
 
 ## No-external-link and sharing policy
 
@@ -140,23 +138,17 @@ Each verse should be linked to its source-language text and stable reference. Th
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**; the current sandbox browser launch remains blocked by a missing system library.
 - Latest production deployment `dpl_HUcJJeQMyrvjdEXMBTxpZdrL6ME9` is `READY` for commit `2ea342c5c7ba6c7d5e82665f4e4ed9aebe107d1d`; aliases include `www.seventhtrumpet.org` and `seventhtrumpet.org`. This deployment includes the corrected bilingual licence page, the jurisdiction-qualified KJV selector label, the OPV archive checksum pin, and the updated audit/importer documentation. The current main branch has subsequent audit-document-only updates; the website content in the latest production deployment has been verified live. Both `/bible.html` and `/bible-licenses.html` return HTTP 200, the KJV label and Original Douay-Rheims editorial-note explanation are present, neither page has external anchor links, and the stale Bible API/Bolls descriptions are gone. All 964 local Bible JSON endpoints returned HTTP 200 on the deployed site. The apex domain redirects to `www` with HTTP 308. A Playwright browser attempt could not launch because the sandbox lacks `libglib-2.0.so.0`; interactive device testing remains outstanding.
 
-
-
 ## Additional security finding (2026-11-23)
 
-- The legacy README and browser-delivered js/admin.js exposed the same static admin password. It has been removed from the current README and current js/admin.js; it remains in Git history, so treat it as compromised and rotate it anywhere it was reused. Do not reuse it.
-- The static client-side login was not authentication: it could be inspected or bypassed. The old panel stored posts/live state in each visitor's localStorage, not a protected shared database.
-- Current main replaces admin.html with a bilingual maintenance notice, removes the password check from js/admin.js (fail-closed), and adds Vercel redirects for /admin and /admin.html to /admin-disabled.html. These are committed changes; verify a READY production deployment and the live route before calling the public route fully disabled.
+- The legacy README and browser-delivered `js/admin.js` exposed the same static admin password. It has been removed from the current README and current `js/admin.js`; it remains in Git history, so treat it as compromised and rotate it anywhere it was reused. Do not reuse it.
+- The static client-side login was not authentication: it could be inspected or bypassed. The old panel stored posts/live state in each visitor's `localStorage`, not a protected shared database.
+- Current main replaces `admin.html` with a bilingual maintenance notice, retires the old admin client, and adds Vercel redirects for `/admin` and `/admin.html` to `/admin-disabled.html`. Verify a READY production deployment and the live route before calling the public route fully disabled.
 - A secure replacement requires server-side authentication/authorization and protected shared storage. Never put secrets in static JavaScript, HTML, README files, or Git history.
-
 
 ## Deployment follow-up (2026-11-23)
 
-- The bilingual licence-page clarification for BBE redistribution rights is committed to main (commit be09327c1fd7327c83b6b102d6c83f904ebc69a9), but it is not yet in the latest confirmed production deployment. The Vercel deployment API returned its daily deployment quota limit, and the Vercel CLI is not installed in the available environment. Do not claim this latest licence wording is live until a subsequent production deployment reaches READY and the live page is checked.
-
-
-## Security remediation progress (2026-11-23)
-
-- Removed the exposed password from the current README and js/admin.js. The credential remains in repository history; treat it as compromised. Rotation/replacement of any reused credential must be performed in the external system where it was used.
-- Replaced admin.html with a bilingual maintenance page and committed Vercel redirects for /admin and /admin.html. The latest confirmed production deployment at the time of this note contains the fail-closed js/admin.js change, but the subsequent admin.html replacement, redirect configuration, and dedicated maintenance page still require a READY production deployment and live-route verification.
-- No claim is made that server-side admin authentication exists. The old localStorage-only publishing panel is disabled pending a secure backend design.
+- The bilingual licence-page clarification for BBE redistribution rights is committed to main (commit `be09327c1fd7327c83b6b102d6c83f904ebc69a9`), but it is not yet in the latest confirmed production deployment. The Vercel deployment API returned its daily deployment quota limit; no working local Vercel CLI deployment path is available in the current environment. Do not claim this latest licence wording is live until a subsequent production deployment reaches READY and the live page is checked.
+- The latest confirmed security deployment `dpl_EFcMh8Vr9LaFoSyQxH7FsgzdGcTS` is READY for commit `fb69293cc872bc8e3fd723b55bdfa79e870c92ec`. Live checks confirmed that the browser-delivered `/js/admin.js` no longer contains the old password and the old login check fails closed. However, the live `/admin` route returned 404 rather than the intended bilingual maintenance page because the subsequent redirects and HTML replacement were not in that deployment.
+- On 2026-11-23, a further hardening commit `4d7c0419452f3477ce174a7c2c2656f8f75765a8` replaced `js/admin.js` with an inert stub. This removes the old admin UI logic and localStorage management functions from the directly accessible JavaScript asset, not merely the password check. This commit is on main but is not yet deployed. The file remains only as a harmless compatibility stub for stale references.
+- The live `/admin` path currently returns 404, and the latest confirmed deployment's source commit predates the bilingual `admin.html` replacement, dedicated maintenance page, redirects, and inert-stub hardening. Do not treat the 404 as proof that every old path or cached copy is safely disabled. Recheck `/admin`, `/admin.html`, `/admin-disabled.html`, and `/js/admin.js` after the next successful production deployment.
+- The Vercel deployment API returned HTTP 402 with the `api-deployments-free-per-day` limit and a `retryAfter` of 86400 seconds. Do not repeatedly retry deployment creation during the limit window or change billing/security settings automatically. GitHub main is updated; production publication and live route verification remain pending.
