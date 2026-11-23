@@ -319,3 +319,29 @@ body.lang-en .mb-verse { text-align: left; }
     font-size: 0.78rem;
   }
 }
+
+
+/* Bible translation selector: readable in both light and dark themes */
+#bible-version-wrap { flex-wrap: wrap; align-items: center; gap: 0.55rem; }
+#bible-version-wrap label { color: #172536; font-weight: 650; }
+#bible-version-select {
+  min-width: 12rem; min-height: 2.65rem;
+  padding: 0.55rem 2.2rem 0.55rem 0.75rem !important;
+  border: 1px solid #66788c !important; border-radius: 0.55rem !important;
+  background-color: #ffffff !important; color: #172536 !important;
+  font: inherit; font-size: 0.92rem; line-height: 1.4;
+  color-scheme: light; cursor: pointer;
+}
+#bible-version-select option { background: #ffffff; color: #172536; }
+#bible-version-select:focus-visible { outline: 3px solid #2878bd; outline-offset: 2px; }
+body.dark #bible-version-wrap label { color: #f1f5f9; }
+body.dark #bible-version-select {
+  background-color: #1b2b3c !important; color: #f8fafc !important;
+  border-color: #9aafc4 !important; color-scheme: dark;
+}
+body.dark #bible-version-select option { background: #1b2b3c; color: #f8fafc; }
+#bible-translation-note { color: #344256; }
+body.dark #bible-translation-note { color: #d8e2ee; }
+@media (max-width: 480px) {
+  #bible-version-select { flex: 1 1 100%; width: 100%; min-width: 0; }
+}
