@@ -61,7 +61,7 @@
 
     code = code.replace(
       "document.getElementById('lang-toggle')?.addEventListener('click', async () => {\n      currentLang = currentLang === 'fa' ? 'en' : 'fa';\n      localStorage.setItem(LANG_KEY, currentLang);\n      applyChrome();\n      await renderBook(true);\n    });",
-      "window.__stSetBibleLanguage = async function (lang) {\n      currentLang = lang === 'en' ? 'en' : 'fa';\n      localStorage.setItem(LANG_KEY, currentLang);\n      applyChrome();\n      await renderBook(true);\n    };"
+      "window.__stSetBibleLanguage = async function (lang) {\n      currentLang = lang === 'en' ? 'en' : 'fa';\n      if (currentLang === 'fa' && [740,750,760,770,780,790,800].includes(bookId)) { bookId = 480; chapter = 1; verse = 1; }\n      localStorage.setItem(LANG_KEY, currentLang);\n      applyChrome();\n      await renderBook(true);\n    };"
     );
 
     (0, eval)(code);
