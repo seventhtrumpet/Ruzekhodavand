@@ -161,6 +161,40 @@
     ],
     "format_note": "Official eBible VPL text; 66 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
   },
+  "rv1885": {
+    "title": "English Revised Version (1885)",
+    "source_archive": "eng-rv_vpl.zip",
+    "source_url": "https://ebible.org/Scriptures/eng-rv_vpl.zip",
+    "source_archive_sha256": "3f26f6bb6fd48d9ee18ae11fff0670054e84ed35d3ae8c984cd95e9af0ed5791",
+    "license": "Public Domain",
+    "counts": {
+      "books": 66,
+      "chapters": 1189,
+      "verses": 31102,
+      "empty_verse_markers": 16,
+      "chapters_with_verse_gaps": 0
+    },
+    "empty_verses": [
+      "MAT 17:21",
+      "MAT 18:11",
+      "MAT 23:14",
+      "MAR 7:16",
+      "MAR 9:44",
+      "MAR 9:46",
+      "MAR 11:26",
+      "MAR 15:28",
+      "LUK 17:36",
+      "LUK 23:17",
+      "JOH 5:4",
+      "ACT 8:37",
+      "ACT 15:34",
+      "ACT 24:7",
+      "ACT 28:29",
+      "ROM 16:24"
+    ],
+    "verse_gaps": [],
+    "format_note": "Official eBible VPL text; 66 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+  },
   "dra": {
     "title": "Douay-Rheims 1899",
     "source_archive": "engDRA_vpl.zip",
