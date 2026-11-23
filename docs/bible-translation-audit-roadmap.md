@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-11-23
 Repository: seventhtrumpet/Ruzekhodavand
-Latest main reviewed: 3e44475ce90b909d99aede242fd0484286cd1f62
+Latest main reviewed: 397ca1cafaadaa8372e0f1b0da75ad14076a87a2
 
 ## Purpose
 
@@ -118,19 +118,19 @@ Each verse should be linked to its source-language text and stable reference. Th
 ## Audit status
 
 - Reader selector and runtime source map: inspected in main; all 14 English selector choices remain present.
-- Reader JavaScript core: self-hosted at `/js/bible-core-pinned.js`; syntax checks pass. A live browser/device test is still required.
-- Bible reader and home-page preview metadata: third-party image-host URLs removed from the HTML metadata.
-- License-page visitor navigation: no external reading/download anchors remain; source names and licence names are plain text.
-- Share payloads: WhatsApp, Telegram, Signal, system share, copy, and generated share images use the canonical SeventhTrumpet.org URL; no Bible-provider URL is included in the share content.
+- Reader JavaScript core: self-hosted at `/js/bible-core-pinned.js`; syntax checks pass and the production page returns HTTP 200. Full interactive browser/device testing is still required.
+- Bible reader and home-page preview metadata: third-party image-host URLs removed from the HTML metadata; the live reader HTML has no external OG image.
+- License-page visitor navigation: live `/bible-licenses.html` returns HTTP 200 and has no external reading/download anchors; source names and licence names are plain text.
+- Share payloads: live share scripts return HTTP 200 and use the canonical SeventhTrumpet.org URL for WhatsApp, Telegram, Signal, system share, copy, and generated share images; no Bible-provider URL is included in the share content.
 - OPV: supplied USFM structure checked (66 books, 1,189 chapters, 31,090 original verse markers); one Ezekiel 25:5 boundary is restored by the importer and two empty Job markers are preserved.
 - OPCB: 66 books, 1,189 chapters, 28,731 verse entries; GitHub Actions imported all 66 per-book files locally. Three passages were spot-checked against official eBible samples; not a full collation.
 - Original Douay-Rheims: both spelling forms imported locally; 76 listed texts, 1,361 chapters, and 37,154 JSON verse entries per form. The 73-book Catholic canon and three appendix texts are distinguished. The corpus count differs because verse-0 fragments are folded into summary continuations and Tobias chapter 0 is introductory.
-- Ten English editions are now self-hosted in main: WEB Classic (31,103 verses), ASV (31,102), YLT (31,102), Webster (31,102), Darby (31,099), Geneva (31,090), BSB (31,086), ERV 1885 (31,102), DRA 1899 (35,811), and WEBBE (35,197). The local English tree contains 674 per-book JSON files and about 43 MB of JSON text. DRA has 73 books/1,334 chapters; WEBBE has 73 books/1,326 chapters.
+- Ten English editions are now self-hosted in main and the current production deployment: WEB Classic (31,103 verses), ASV (31,102), YLT (31,102), Webster (31,102), Darby (31,099), Geneva (31,090), BSB (31,086), ERV 1885 (31,102), DRA 1899 (35,811), and WEBBE (35,197). The local English tree contains 674 per-book JSON files and about 43 MB of JSON text. DRA has 73 books/1,334 chapters; WEBBE has 73 books/1,326 chapters.
 - The English importer pins official eBible VPL archive SHA-256 hashes, checks the source archive's Public Domain notice, validates book/chapter structure, and records empty verse markers and verse-number gaps. It never fills an omitted verse from another translation. Genesis 1:1, Psalm 23:1, and John 3:16 were spot-checked against the previous provider; full verse-by-verse collation remains outstanding.
 - Translation fidelity: no verse text is rewritten to declare Sunday holy or to call Sunday the Sabbath. The reader's Persian/English editorial note is separate from the verse text. Source headings, including historical headings that mention the first day of the week, remain clearly identified as source material.
-- Remaining translation-text dependency in main: Free.Bible for KJV and BBE only. KJV has a UK Crown copyright caveat; BBE rights vary by jurisdiction. ERV 1885 is now self-hosted from the official eBible VPL archive, whose embedded notice identifies it as Public Domain. Do not self-host until these points are resolved.
+- Remaining translation-text dependency in main and production: Free.Bible for KJV and BBE only. KJV has a UK Crown copyright caveat; BBE rights vary by jurisdiction. ERV 1885 is now self-hosted from the official eBible VPL archive, whose embedded notice identifies it as Public Domain. Do not self-host until these points are resolved.
 - Other website dependencies (for example, Google Fonts, Firebase, analytics, and unrelated site scripts) are separate from Bible translation text and have not all been localized.
 - Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**.
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**.
-- Production deployment: latest READY deployment on `seventhtrumpet.org` is commit `5c3ca44143bb6846d9821a010ff83b7457676c46`. Main is now at `3e44475ce90b909d99aede242fd0484286cd1f62`, nine commits ahead. The live deployment includes seven local English editions plus the earlier Persian and Original Douay-Rheims work; DRA 1899, WEBBE, and the removal of the final Bible-API fallback are in main but not yet confirmed live. Vercel reports `build-rate-limit` and a 24-hour daily deployment API limit, so a new production deployment is currently blocked.
+- Production deployment: latest deployment `dpl_F7keignFoxQcaY7FG87ysEn7PgXK` is `READY` for commit `397ca1cafaadaa8372e0f1b0da75ad14076a87a2`; aliases include `www.seventhtrumpet.org` and `seventhtrumpet.org`. Live checks on the `www` domain returned HTTP 200 for `/bible.html`, `/bible-licenses.html`, local ERV 1885 Genesis JSON, local DRA Tobit JSON, Original Douay-Rheims historical-spelling Genesis JSON, and Persian OPV/OPCB Genesis JSON. The live reader script confirms local routing for ten English editions, Free.Bible only for KJV/BBE, and no Bible-API.com or Bolls references. The apex domain redirects to `www` with HTTP 308. An interactive Playwright run could not start in the test sandbox because Chromium lacked `libglib-2.0.so.0`; static production checks passed, but interactive device testing remains outstanding.
 
