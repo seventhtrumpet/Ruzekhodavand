@@ -33,8 +33,10 @@ def download(url: str) -> bytes:
 
 def validate_book(raw: bytes, slug: str, expected_chapters: int) -> tuple[dict, int, int]:
     data = json.loads(raw.decode("utf-8"))
-    if data.get("book") != slug:
-        raise ValueError(f"{slug}: source book slug mismatch")
+    if not isinstance(data.get("book"), str) or not data["book"].strip():
+        raise ValueError(f"{slug}: source book title is missing")
+    # The source manifest slug is authoritative; some source files use a display
+    # title (for example, "Prayer of Manasses") in the `book` field instead.
     chapters = data.get("chapters")
     if not isinstance(chapters, list) or len(chapters) != expected_chapters:
         raise ValueError(f"{slug}: expected {expected_chapters} chapters")
