@@ -55,6 +55,17 @@
     if (s === 'book') return bookId === currentBookId();
     return bookId >= 10 && bookId <= 730;
   }
+  function searchSourceLabel() {
+    if (isEn()) {
+      var version = 'kjv';
+      try { version = localStorage.getItem('cog_bible_en_version') || 'kjv'; } catch (e) {}
+      return version === 'kjv' ? 'Index: KJV' : 'Index: KJV (reader: ' + version.toUpperCase() + ')';
+    }
+    var persianVersion = 'opcb';
+    try { persianVersion = localStorage.getItem('cog_bible_fa_version') || 'opcb'; } catch (e2) {}
+    return persianVersion === 'opv' ? 'منبع جست‌وجو: OPV' : 'منبع جست‌وجو: OPCB';
+  }
+
   function scopeLabel() {
     var s = getScope();
     if (isEn()) return { all: 'All Bible', ot: 'Old Testament', nt: 'New Testament', book: 'This book' }[s] || 'All Bible';
@@ -377,6 +388,27 @@
     return out;
   }
 
+  function flattenOpv(index) {
+    var out = [];
+    var list = Array.isArray(index) ? index : (index && index.books) || [];
+    for (var i = 0; i < list.length && i < 66; i++) {
+      var book = list[i];
+      if (!book) continue;
+      var id = IDS[i];
+      var label = book.name || ('Book ' + id);
+      var chapters = book.chapters || {};
+      Object.keys(chapters).sort(function (a, b) { return Number(a) - Number(b); }).forEach(function (ch) {
+        var verses = chapters[ch] || {};
+        Object.keys(verses).sort(function (a, b) { return Number(a) - Number(b); }).forEach(function (v) {
+          var text = String(verses[v] || '');
+          if (!text.trim()) return;
+          out.push({ id: id, ch: Number(ch), v: Number(v), text: text, label: label, norm: normalize(text) });
+        });
+      });
+    }
+    return out;
+  }
+
   function flattenKjv(list, meta) {
     var out = [];
     if (!Array.isArray(list)) return out;
@@ -400,18 +432,22 @@
   function loadFa() {
     if (FA_VERSES) return Promise.resolve(FA_VERSES);
     if (faLoadPromise) return faLoadPromise;
-    var urls = [
-      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible/json/fa_opcb.json',
-      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/fa_opcb.json',
-      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/fa_opcb.json'
-    ];
+    var opv = false;
+    try { opv = localStorage.getItem('cog_bible_fa_version') === 'opv'; } catch (e) {}
+    var urls = opv
+      ? ['/data/bible-fa/opv/index.json']
+      : [
+          'https://cdn.jsdelivr.net/gh/thiagobodruk/bible/json/fa_opcb.json',
+          'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/fa_opcb.json',
+          'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/fa_opcb.json'
+        ];
     faLoadPromise = (async function () {
       for (var i = 0; i < urls.length; i++) {
         try {
           var r = await fetch(urls[i]);
           if (!r.ok) continue;
           var list = await r.json();
-          FA_VERSES = flattenOpcb(list);
+          FA_VERSES = opv ? flattenOpv(list) : flattenOpcb(list);
           return FA_VERSES;
         } catch (e) {}
       }
@@ -481,7 +517,7 @@
     if (btn) { btn.disabled = true; btn.textContent = '\u2026'; }
 
     var en = isEn();
-    renderItems([], (en ? 'Loading Bible\u2026 ' : '\u0628\u0627\u0631\u06af\u0630\u0627\u0631\u06cc \u06a9\u062a\u0627\u0628\u2026 ') + scopeLabel());
+    renderItems([], (en ? 'Loading Bible\u2026 ' : '\u0628\u0627\u0631\u06af\u0630\u0627\u0631\u06cc \u06a9\u062a\u0627\u0628\u2026 ') + scopeLabel() + ' · ' + searchSourceLabel());
 
     try {
       var verses = en ? await loadEn() : await loadFa();
@@ -502,8 +538,8 @@
           msg = en ? 'No results \u00b7 ' + scopeLabel() : '\u0646\u062a\u06cc\u062c\u0647\u200c\u0627\u06cc \u06cc\u0627\u0641\u062a \u0646\u0634\u062f \u00b7 ' + scopeLabel();
         } else {
           msg = en
-            ? total + ' results in ' + books + ' books \u00b7 ' + scopeLabel()
-            : total + ' \u0646\u062a\u06cc\u062c\u0647 \u062f\u0631 ' + books + ' \u06a9\u062a\u0627\u0628 \u00b7 ' + scopeLabel();
+            ? total + ' results in ' + books + ' books · ' + scopeLabel() + ' · ' + searchSourceLabel()
+            : total + ' \u0646\u062a\u06cc\u062c\u0647 \u062f\u0631 ' + books + ' \u06a9\u062a\u0627\u0628 · ' + scopeLabel() + ' · ' + searchSourceLabel();
         }
         renderItems(items, msg);
       }
