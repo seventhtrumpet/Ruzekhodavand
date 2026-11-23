@@ -183,3 +183,10 @@ Each verse should be linked to its source-language text and stable reference. Th
 - The OPV test also confirms that the only empty verse markers are the two source markers in Job 35:1 and 40:1. OPCB remains at 28,731 verse entries.
 - The corrected PR #60 test run passed and the change was merged. These are structural and import-integrity checks, not a complete verse-by-verse comparison with the official source texts.
 - The latest repository main commit after these changes is `f9db8f3813ae7466b1a343c542d110691757471e`. Production publication and live-browser verification must be checked separately; a successful GitHub Actions run does not mean the changes are already live on SeventhTrumpet.org.
+
+## WEBBE canon-visibility correction (2026-11-23)
+
+- PR #62 fixed a reader bug: WEBBE's local dataset and metadata contain 73 books, but the reader's available-book filter had not included `webbe` in the expanded-canon allowlist. As a result, its seven additional books were present in the data and search index but hidden from the reading selector.
+- The reader now exposes the expanded 73-book catalogue for WEBBE as well as DRA and both Original Douay-Rheims spellings. The separate 16-chapter Esther rule remains limited to DRA and Original Douay-Rheims; WEBBE retains its source-specific 10-chapter Esther structure.
+- A regression assertion for WEBBE's expanded canon passed in GitHub Actions before PR #62 was merged. No verse text was modified.
+- Production deployment records have not yet advanced to the current main commit. Do not claim this reader correction is live until a READY production deployment contains the current commit and the live reader is checked.
