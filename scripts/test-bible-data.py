@@ -159,6 +159,40 @@ def check_english_metadata(available_english: list[str]) -> None:
                 fail(f"{edition}: metadata {key}={counts.get(key)!r} does not match local data ({value})")
 
 
+
+def check_runtime_chapter_catalogue() -> None:
+    """Compare every local edition's chapter count with the reader's catalogue."""
+    core = (ROOT / "js/bible-core-pinned.js").read_text(encoding="utf-8")
+    match = re.search(r"const CHAPTER_COUNTS = \{(.*?)\n  \};", core, re.S)
+    if not match:
+        fail("Pinned reader core is missing its chapter-count catalogue")
+        return
+    catalogue = {int(book): int(chapters) for book, chapters in re.findall(r"(\d+)\s*:\s*(\d+)", match.group(1))}
+    editions = [(f"data/bible-en/local/{edition}", edition) for edition in ENGLISH]
+    editions += [(f"data/bible-fa/{edition}", edition) for edition in ("opv", "opcb")]
+    for relative, edition in editions:
+        base = ROOT / relative
+        for path in sorted(base.glob("b*.json")):
+            file_match = re.fullmatch(r"b(\d+)\.json", path.name)
+            if not file_match:
+                continue
+            book_id = int(file_match.group(1))
+            payload = load_json(path)
+            book = payload.get(str(book_id), {}) if isinstance(payload, dict) else {}
+            chapters = book.get("chapters", {}) if isinstance(book, dict) else {}
+            if not isinstance(chapters, dict):
+                continue
+            expected = catalogue.get(book_id)
+            if edition == "dra" and book_id == 190:
+                expected = 16
+            if edition == "dra" and book_id == 340:
+                expected = 14
+            if expected is None:
+                fail(f"{relative}/{path.name}: book {book_id} is absent from the reader chapter catalogue")
+            elif len(chapters) != expected:
+                fail(f"{relative}/{path.name}: reader catalogue expects {expected} chapters, local edition contains {len(chapters)}")
+
+
 def check_odr() -> None:
     base = ROOT / "data/bible-en/odr"
     manifest = load_json(base / "manifest.json")
@@ -381,6 +415,7 @@ def main() -> int:
     check_pack("data/bible-fa/opcb", BOOK_IDS)
     check_pack("data/bible-fa/opv", BOOK_IDS)
     check_persian_verse_totals()
+    check_runtime_chapter_catalogue()
     check_odr()
     check_reader_safeguards()
     if ERRORS:
