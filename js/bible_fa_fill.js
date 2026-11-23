@@ -17,6 +17,12 @@
     470:28,480:16,490:24,500:21,510:28,520:16,530:16,540:13,550:6,560:6,570:4,580:4,590:5,600:3,610:6,620:4,630:3,640:1,650:13,660:5,670:5,680:3,690:5,700:1,710:1,720:1,730:22
   };
 
+  var OPV_FILES = [
+    '02-GENpesOPV.usfm','03-EXOpesOPV.usfm','04-LEVpesOPV.usfm','05-NUMpesOPV.usfm','06-DEUpesOPV.usfm','07-JOSpesOPV.usfm','08-JDGpesOPV.usfm','09-RUTpesOPV.usfm',
+    '10-1SApesOPV.usfm','11-2SApesOPV.usfm','12-1KIpesOPV.usfm','13-2KIpesOPV.usfm','14-1CHpesOPV.usfm','15-2CHpesOPV.usfm','16-EZRpesOPV.usfm','17-NEHpesOPV.usfm','18-ESTpesOPV.usfm','19-JOBpesOPV.usfm','20-PSApesOPV.usfm','21-PROpesOPV.usfm','22-ECCpesOPV.usfm','23-SNGpesOPV.usfm','24-ISApesOPV.usfm','25-JERpesOPV.usfm','26-LAMpesOPV.usfm','27-EZKpesOPV.usfm','28-DANpesOPV.usfm','29-HOSpesOPV.usfm','30-JOLpesOPV.usfm','31-AMOpesOPV.usfm','32-OBApesOPV.usfm','33-JONpesOPV.usfm','34-MICpesOPV.usfm','35-NAMpesOPV.usfm','36-HABpesOPV.usfm','37-ZEPpesOPV.usfm','38-HAGpesOPV.usfm','39-ZECpesOPV.usfm','40-MALpesOPV.usfm',
+    '70-MATpesOPV.usfm','71-MRKpesOPV.usfm','72-LUKpesOPV.usfm','73-JHNpesOPV.usfm','74-ACTpesOPV.usfm','75-ROMpesOPV.usfm','76-1COpesOPV.usfm','77-2COpesOPV.usfm','78-GALpesOPV.usfm','79-EPHpesOPV.usfm','80-PHPpesOPV.usfm','81-COLpesOPV.usfm','82-1THpesOPV.usfm','83-2THpesOPV.usfm','84-1TIpesOPV.usfm','85-2TIpesOPV.usfm','86-TITpesOPV.usfm','87-PHMpesOPV.usfm','88-HEBpesOPV.usfm','89-JASpesOPV.usfm','90-1PEpesOPV.usfm','91-2PEpesOPV.usfm','92-1JNpesOPV.usfm','93-2JNpesOPV.usfm','94-3JNpesOPV.usfm','95-JUDpesOPV.usfm','96-REVpesOPV.usfm'
+  ];
+
   var opcbPromise = null;
   var converted = {};
   var origFetch = window.fetch.bind(window);
@@ -125,8 +131,77 @@
     });
   }
 
+  var opvCache = {};
+  var OPV_BASE = '/api/opv?id=';
+  function cleanUsfmText(value) {
+    return String(value || '')
+      .replace(/\\f[\s\S]*?\\f\*/g, ' ')
+      .replace(/\\x[\s\S]*?\\x\*/g, ' ')
+      .replace(/\\[a-zA-Z0-9]+\*?/g, ' ')
+      .replace(/\\\\/g, '\\')
+      .replace(/[{}]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  function parseOpvUsfm(source, id) {
+    var chapters = {}, currentChapter = null, currentVerse = null;
+    String(source || '').split(/\r?\n/).forEach(function(line) {
+      var c = line.match(/^\s*\\c\s+(\d+)/);
+      if (c) { currentChapter = c[1]; chapters[currentChapter] = chapters[currentChapter] || {}; currentVerse = null; return; }
+      var v = line.match(/^\s*\\v\s+([0-9]+[a-z]?(?:-[0-9]+[a-z]?)?)\s*(.*)$/i);
+      if (v && currentChapter) {
+        var start = Number((v[1].match(/^\d+/) || [])[0]);
+        if (!start) return;
+        currentVerse = String(start);
+        chapters[currentChapter][currentVerse] = cleanUsfmText(v[2]);
+        return;
+      }
+      if (currentChapter && currentVerse && line.trim() && !/^\s*\\/.test(line)) {
+        var extra = cleanUsfmText(line);
+        if (extra) chapters[currentChapter][currentVerse] = (chapters[currentChapter][currentVerse] + ' ' + extra).trim();
+      }
+    });
+    var h = String(source || '').match(/^\\h\s+(.+)$/m);
+    var payload = {};
+    payload[String(id)] = { id:id, name:h ? cleanUsfmText(h[1]) : '', chapters:chapters };
+    return payload;
+  }
+  function opvBookPayload(id) {
+    if (opvCache[id]) return opvCache[id];
+    var index = IDS.indexOf(Number(id));
+    if (index < 0 || !OPV_FILES[index]) return Promise.resolve(null);
+    opvCache[id] = origFetch(OPV_BASE + encodeURIComponent(id)).then(function(res) {
+      if (!res.ok) throw new Error('OPV source unavailable: ' + res.status);
+      return res.text();
+    }).then(function(source) {
+      var parsed = parseOpvUsfm(source, Number(id));
+      if (!Object.keys(parsed[String(id)].chapters).length) throw new Error('OPV file has no readable chapters');
+      return parsed;
+    }).catch(function(error) {
+      delete opvCache[id];
+      console.error('[bible] OPV load failed', id, error);
+      return null;
+    });
+    return opvCache[id];
+  }
+
   window.fetch = function (input, init) {
     var url = typeof input === 'string' ? input : (input && input.url) || '';
+    var isOpv = false;
+    try { isOpv = localStorage.getItem('cog_bible_fa_version') === 'opv'; } catch (e) {}
+    if (isOpv && url.indexOf('/data/bible-fa/manifest.json') >= 0) {
+      return Promise.resolve(jsonResponse(fullManifest()));
+    }
+    if (isOpv && url.indexOf('/data/bible-fa/') >= 0 &&
+        url.indexOf('manifest') < 0 && url.indexOf('meta.json') < 0 &&
+        url.indexOf('pack.json') < 0) {
+      var opvId = bookIdFromUrl(url);
+      if (opvId && IDS.indexOf(opvId) >= 0) {
+        return opvBookPayload(opvId).then(function(data) {
+          return data ? jsonResponse(data) : jsonResponse({});
+        });
+      }
+    }
     var p = origFetch(input, init);
 
     if (url.indexOf('/data/bible-fa/manifest.json') >= 0) {
