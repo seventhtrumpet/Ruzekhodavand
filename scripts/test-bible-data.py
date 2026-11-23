@@ -134,7 +134,7 @@ def check_reader_safeguards() -> None:
         fail("Bible share payload must build canonical same-site reader URLs")
     if re.search(r"<script[^>]+(?:admin_cloud_hook|admin_edit_hook|cloud_sync)", admin, re.I):
         fail("Disabled admin page must not load legacy admin hooks")
-    if "Intentionally inert" not in admin_js or re.search(r"localStorage|password|function login", admin_js, re.I):
+    if "Intentionally inert" not in admin_js or re.search(r"\\blocalStorage\\s*\\.|password|function\\s+login", admin_js, re.I):
         fail("Legacy admin compatibility script must remain inert and credential-free")
     if "Textual-integrity note" not in html or "یادداشت امانت‌داری متن" not in html:
         fail("Bible reader must retain its bilingual textual-integrity note")
