@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
     const upstream = await fetch('https://ebible.org/Scriptures/' + OPV_FILES[index]);
     if (!upstream.ok) throw new Error('Upstream returned ' + upstream.status);
     const usfm = await upstream.text();
-    if (!/\\c\\s+1/.test(usfm) || !/\\v\\s+1/.test(usfm)) throw new Error('Invalid USFM response');
+    if (!/\\c\s+1/.test(usfm) || !/\\v\s+1/.test(usfm)) throw new Error('Invalid USFM response');
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
     return res.status(200).send(usfm);
