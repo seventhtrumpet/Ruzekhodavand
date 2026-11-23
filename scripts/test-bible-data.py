@@ -295,6 +295,15 @@ def check_reader_safeguards() -> None:
             chapters = esther.get("190", {}).get("chapters", {})
             if len(chapters) != expected:
                 fail(f"{version}: Esther should have {expected} chapters, found {len(chapters)}")
+    for version, expected in (("dra",14),("webbe",12)):
+        daniel_path = ROOT / f"data/bible-en/local/{version}/b340.json"
+        daniel = load_json(daniel_path)
+        if isinstance(daniel, dict):
+            chapters = daniel.get("340", {}).get("chapters", {})
+            if len(chapters) != expected:
+                fail(f"{version}: Daniel should have {expected} chapters, found {len(chapters)}")
+    if "expandedDaniel = bookId === 340 && ['dra','odr','odr-original']" not in reader:
+        fail("DRA and Original Douay-Rheims must expose Daniel chapters 13-14 without changing WEBBE")
     if "const availableIds = availableBooks().map(b => b.id)" not in reader:
         fail("Switching to Persian must move away from books absent from Persian editions")
     if "expanded-canon-search-fix5-20261123" not in html or "odr-local-search-20261123" not in html:

@@ -80,7 +80,7 @@
     return hasDeuterocanon ? meta : meta.filter(b => b.id < 740);
   }`);
     if (code.indexOf("hasDeuterocanon") < 0) throw new Error('Bible canon filter patch did not apply');
-    code = code.replace("      const max = CHAPTER_COUNTS[bookId] || 1;", "      const selectedTranslation = localStorage.getItem('cog_bible_en_version') || 'kjv';\n      const expandedEsther = bookId === 190 && ['dra','odr','odr-original'].indexOf(selectedTranslation) >= 0;\n      const max = expandedEsther ? 16 : (CHAPTER_COUNTS[bookId] || 1);");
+    code = code.replace("      const max = CHAPTER_COUNTS[bookId] || 1;", "      const selectedTranslation = localStorage.getItem('cog_bible_en_version') || 'kjv';\n      const expandedEsther = bookId === 190 && ['dra','odr','odr-original'].indexOf(selectedTranslation) >= 0;\n      const expandedDaniel = bookId === 340 && ['dra','odr','odr-original'].indexOf(selectedTranslation) >= 0;\n      const max = expandedEsther ? 16 : (expandedDaniel ? 14 : (CHAPTER_COUNTS[bookId] || 1));");
     if (code.indexOf("const expandedEsther = bookId === 190") < 0) throw new Error('Expanded Esther chapter-count patch did not apply');
     code = code.replace("      applyChrome();\n      await renderBook(true);", "      applyChrome();\n      const availableIds = availableBooks().map(b => b.id);\n      if (!availableIds.includes(Number(bookId))) { bookId = availableIds.includes(480) ? 480 : (availableIds[0] || 480); chapter = 1; verse = 1; saveState(); }\n      await renderBook(true);");
     if (code.indexOf("const availableIds = availableBooks().map(b => b.id)") < 0) throw new Error('Language-toggle canon fallback patch did not apply');
