@@ -154,7 +154,7 @@ def check_reader_safeguards() -> None:
         fail("Pinned reader core no longer has the expected chapter-fetch anchor")
     if "Eleven English editions" not in reader or "KJV and BBE" not in reader:
         fail("Reader hosting note must distinguish local editions from remotely fetched KJV/BBE")
-    if reader.count("'msb'") < 2 or "msb:'Majority Standard Bible'" not in reader:
+    if reader.count("'msb'") < 3 or "msb:'Majority Standard Bible'" not in reader:
         fail("MSB must be accepted in both selector allowlists and have its own reader label")
     if "Geneva uses Bolls chapter delivery" in reader or "Darby and Douay-Rheims use Bible API" in reader:
         fail("Reader contains obsolete external-provider hosting notice")
