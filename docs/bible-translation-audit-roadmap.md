@@ -23,7 +23,7 @@ Keep Bible reading inside SeventhTrumpet.org, preserve useful complete translati
 ### Persian
 
 - **OPV — Old Persian Version:** served from the site's own `/data/bible-fa/opv/` files. The supplied USFM archive was structurally inspected: 66 books, 1,189 chapters, 31,090 original verse markers. The importer restores one Ezekiel 25:5 boundary that was joined to verse 25:4 in the source; two empty Job verse markers are preserved. This is a structural/import audit, not a complete linguistic or source-text collation.
-- **OPCB — Open Persian Contemporary Bible:** 66 books, 1,189 chapters, 28,731 verse entries in the pinned JSON mirror. The reader currently retrieves the pinned dataset from jsDelivr/fastly.jsdelivr.net/Raw GitHub at runtime. Its structural gate checks the expected book and chapter counts and string-array chapters. Genesis 1:1, Psalm 23:1, and John 3:16 were spot-checked against official eBible samples. This is not a full verse-by-verse comparison with the official USFM archive.
+- **OPCB — Open Persian Contemporary Bible:** 66 books, 1,189 chapters, 28,731 verse entries. A reproducible importer now converts the pinned upstream source into per-book JSON files under `/data/bible-fa/opcb/`; the reader fetches those same-origin files and no longer needs a CDN/Raw GitHub text fallback. The importer validates the complete book/chapter/verse structure and preserves verse wording. Genesis 1:1, Psalm 23:1, and John 3:16 were spot-checked against official eBible samples. This is not a full verse-by-verse comparison with the official USFM archive. The generated files are populated by the GitHub Actions import workflow after it runs on main.
 - **NMV — New Millennium Version:** not offered as a full-text option because written permission to host the complete text has not been obtained. Do not add an outbound reading link. Reconsider only after documented permission.
 
 ### English
@@ -54,7 +54,7 @@ The reader requests chapter text from these runtime sources:
 | Geneva 1599 | Bolls API | Chapter fetched on demand |
 | Original Douay-Rheims, both spelling forms | Pinned GitHub raw dataset | Pinned 76-book manifest and book JSON files |
 
-The reader does not navigate visitors to these providers. However, chapter data for these editions is not yet self-hosted. A provider outage, rate limit, CORS change, or upstream availability issue can prevent a chapter from loading.
+The reader does not navigate visitors to these providers. English chapter data for several editions and Original Douay-Rheims remain upstream runtime dependencies; Persian OPV and OPCB are designed to load from same-origin local files.
 
 The reader wrapper now retrieves the reviewed, pinned JavaScript core from the same-origin path `/js/bible-core-pinned.js`. The core itself is self-hosted; the selected Bible chapter data for several editions remains externally fetched.
 
@@ -121,7 +121,7 @@ Each verse should be linked to its source-language text and stable reference. Th
 - License-page visitor navigation: no external reading/download anchors remain in the inspected page; source names are plain text.
 - Share payloads: the dedicated share module uses the canonical SeventhTrumpet.org URL. The legacy selected-verse share fallback now also uses the canonical domain, independent of preview host.
 - OPV structure/import: previously inspected from the supplied USFM archive.
-- OPCB structure and three sample passages: recorded in the repository's audit notes; not a full collation.
+- OPCB importer and local reader path: implemented; generated local data must be confirmed by the import workflow before claiming it is available in production. Three sample passages were compared with official eBible samples; not a full collation.
 - Original Douay-Rheims manifest and representative files: checked in its implementation PR; not a full text collation.
 - Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**.
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**.

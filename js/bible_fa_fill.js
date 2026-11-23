@@ -3,11 +3,7 @@
   if (window.__faFillInit) return;
   window.__faFillInit = true;
 
-  var OPCB_URLS = [
-    'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@4c8b8a4a7bd75fee381e1b55523b152191d6a1a5/json/fa_opcb.json',
-    'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@4c8b8a4a7bd75fee381e1b55523b152191d6a1a5/json/fa_opcb.json',
-    'https://raw.githubusercontent.com/thiagobodruk/bible/4c8b8a4a7bd75fee381e1b55523b152191d6a1a5/json/fa_opcb.json'
-  ];
+  var OPCB_MANIFEST_URL = '/data/bible-fa/opcb/manifest.json';
 
   var IDS = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,190,220,230,240,250,260,290,300,310,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730];
 
@@ -29,101 +25,48 @@
 
   function loadOpcb() {
     if (!opcbPromise) {
-      opcbPromise = (async function () {
-        for (var i = 0; i < OPCB_URLS.length; i++) {
-          try {
-            var r = await origFetch(OPCB_URLS[i]);
-            if (!r.ok) continue;
-            var list = await r.json();
-            if (Array.isArray(list) && list.length === IDS.length && list.every(function (book, index) {
-              return book && Array.isArray(book.chapters) && book.chapters.length === (CH_COUNT[IDS[index]] || 0) && book.chapters.every(function (chapter) { return Array.isArray(chapter); });
-            })) return list;
-          } catch (e) {}
-        }
-        console.warn('[bible] Persian OPCB unavailable');
+      opcbPromise = origFetch(OPCB_MANIFEST_URL).then(function (response) {
+        if (!response.ok) throw new Error('Local OPCB manifest unavailable: ' + response.status);
+        return response.json();
+      }).then(function (manifest) {
+        var valid = manifest && IDS.every(function (id) {
+          return typeof manifest[String(id)] === 'string' && manifest[String(id)] === 'b' + id + '.json';
+        });
+        if (!valid) throw new Error('Local OPCB manifest is incomplete');
+        return manifest;
+      }).catch(function (error) {
         opcbPromise = null;
+        console.error('[bible] Local OPCB manifest failed', error);
         return null;
-      })();
+      });
     }
     return opcbPromise;
   }
 
-  function convertBook(list, index, bookId) {
-    if (!list || !list[index]) return null;
-    var book = list[index];
-    var chapters = {};
-    (book.chapters || []).forEach(function (verses, ci) {
-      var ch = {};
-      (verses || []).forEach(function (t, vi) {
-        ch[String(vi + 1)] = typeof t === 'string' ? t : String(t || '');
-      });
-      chapters[String(ci + 1)] = ch;
-    });
-    var payload = {};
-    payload[String(bookId)] = {
-      id: bookId,
-      name: book.name || '',
-      chapters: chapters
-    };
-    return payload;
-  }
-
-  function bookIdFromUrl(url) {
-    var m = String(url).match(/\/data\/bible-fa\/(?:b)?(\d{2,3})(?:[c.\/?]|$)/);
-    return m ? Number(m[1]) : null;
-  }
-
-  function chapterCount(chapters) {
-    if (!chapters || typeof chapters !== 'object') return 0;
-    return Object.keys(chapters).filter(function (k) {
-      var v = chapters[k];
-      return v && typeof v === 'object' && Object.keys(v).length > 0;
-    }).length;
-  }
-
-  function isIncomplete(parsed, id) {
-    if (!parsed || typeof parsed !== 'object') return true;
-    var data = parsed[String(id)] || parsed[id] || parsed;
-    if (!data || typeof data !== 'object') return true;
-    var chapters = data.chapters;
-    if (!chapters || typeof chapters !== 'object') return true;
-    var need = CH_COUNT[id] || 1;
-    var have = chapterCount(chapters);
-    if (have < need) return true;
-    var first = chapters['1'] || chapters[1];
-    if (!first || typeof first !== 'object' || !Object.keys(first).length) return true;
-    return false;
-  }
-
-  function deepMergeChapters(base, overlay) {
-    if (!overlay || typeof overlay !== 'object') return base;
-    Object.keys(overlay).forEach(function (ch) {
-      if (!base[ch]) base[ch] = {};
-      var src = overlay[ch];
-      if (!src || typeof src !== 'object') return;
-      Object.keys(src).forEach(function (v) {
-        if (typeof src[v] === 'string' && src[v].trim()) base[ch][v] = src[v];
-      });
-    });
-    return base;
-  }
-
-  function fullManifest() {
-    var man = {};
-    IDS.forEach(function (id) {
-      man[String(id)] = ['b' + id + '.json'];
-    });
-    return man;
-  }
-
   function opcbBookPayload(id) {
-    return loadOpcb().then(function (list) {
-      if (!list) return null;
-      var index = IDS.indexOf(id);
-      if (index < 0) return null;
-      if (!converted[id]) converted[id] = convertBook(list, index, id);
-      return converted[id];
-    });
+    id = Number(id);
+    if (!converted[id]) {
+      converted[id] = loadOpcb().then(function (manifest) {
+        if (!manifest || IDS.indexOf(id) < 0 || !manifest[String(id)]) return null;
+        return origFetch('/data/bible-fa/opcb/' + manifest[String(id)]).then(function (response) {
+          if (!response.ok) throw new Error('Local OPCB book unavailable: ' + response.status);
+          return response.json();
+        }).then(function (parsed) {
+          var data = parsed && (parsed[String(id)] || parsed[id] || parsed);
+          var chapters = data && data.chapters;
+          var expected = CH_COUNT[id] || 0;
+          if (!chapters || Object.keys(chapters).length !== expected) {
+            throw new Error('Local OPCB chapter count mismatch for book ' + id);
+          }
+          return parsed;
+        }).catch(function (error) {
+          delete converted[id];
+          console.error('[bible] Local OPCB book failed', id, error);
+          return null;
+        });
+      });
+    }
+    return converted[id];
   }
 
   function jsonResponse(obj) {
