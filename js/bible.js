@@ -27,9 +27,10 @@
       const isLocalEnglish = localEnglishIds.indexOf(selectedTranslation) >= 0;
       const isFreeBible = selectedTranslation === 'kjv' || selectedTranslation === 'bbe';
       const bookSlug = b.en === 'Song of Songs' ? 'song-of-solomon' : b.en.toLowerCase().replace(/\\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      const odrSlugById = {10:'genesis',20:'exodus',30:'leviticus',40:'numbers',50:'deuteronomy',60:'josue',70:'judges',80:'ruth',90:'1-kings',100:'2-kings',110:'3-kings',120:'4-kings',130:'1-paralipomenon',140:'2-paralipomenon',150:'1-esdras',160:'2-esdras',190:'esther',220:'job',230:'psalms',240:'proverbs',250:'ecclesiastes',260:'canticle-of-canticles',290:'isaie',300:'jeremie',310:'lamentations',330:'ezechiel',340:'daniel',350:'osee',360:'joel',370:'amos',380:'abdias',390:'jonas',400:'micheas',410:'nahum',420:'habacuc',430:'sophonias',440:'aggeus',450:'zacharias',460:'malachie',470:'matthew',480:'mark',490:'luke',500:'john',510:'acts',520:'romans',530:'1-corinthians',540:'2-corinthians',550:'galatians',560:'ephesians',570:'philippians',580:'colossians',590:'1-thessalonians',600:'2-thessalonians',610:'1-timothy',620:'2-timothy',630:'titus',640:'philemon',650:'hebrews',660:'james',670:'1-peter',680:'2-peter',690:'1-john',700:'2-john',710:'3-john',720:'jude',730:'apocalypse',740:'tobias',750:'judith',760:'wisdom',770:'ecclesiasticus',780:'baruch',790:'1-machabees',800:'2-machabees'};
       const odrPath = selectedTranslation === 'odr-original' ? 'original-spelling/bible/raw/' : 'bible/raw/';
       const requestUrl = isOdr
-        ? '/data/bible-en/odr/' + odrPath + b.slug + '.json'
+        ? '/data/bible-en/odr/' + odrPath + odrSlugById[id] + '.json'
         : isLocalEnglish
           ? '/data/bible-en/local/' + selectedTranslation + '/b' + id + '.json'
           : isFreeBible
@@ -67,6 +68,18 @@
     if (code.indexOf('async function loadEnChapter(id, ch)') < 0 || code.indexOf('const requestUrl = isOdr') < 0) {
       throw new Error('Reader core chapter-loader patch did not apply');
     }
+
+    // Expose the 73-book canon only for editions that actually contain it.
+    code = code.replace(/  function availableBooks\(\) \{[\s\S]*?\n  \}/, `  function availableBooks() {
+    const selectedTranslation = localStorage.getItem('cog_bible_en_version') || 'kjv';
+    const hasDeuterocanon = ['dra','webbe','odr','odr-original'].indexOf(selectedTranslation) >= 0;
+    if (currentLang === 'fa' && manifest && Object.keys(manifest).length) {
+      const list = meta.filter(b => manifest[String(b.id)]);
+      return list.length ? list : meta.filter(b => b.id < 740);
+    }
+    return hasDeuterocanon ? meta : meta.filter(b => b.id < 740);
+  }`);
+    if (code.indexOf("hasDeuterocanon") < 0) throw new Error('Bible canon filter patch did not apply');
 
     code = code.replace(/mb-sel-actions/g, 'mb-actions');
     code = code.replace(/mb-book-btn/g, 'mb-cell');
