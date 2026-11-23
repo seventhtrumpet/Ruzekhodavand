@@ -77,6 +77,21 @@
     return 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
   }
 
+  function withSelectedVersion(url) {
+    try {
+      var lang = isEn() ? 'en' : 'fa';
+      url += '&lang=' + lang;
+      if (lang === 'en') {
+        var en = localStorage.getItem('cog_bible_en_version') || 'kjv';
+        return url + '&enVersion=' + encodeURIComponent(en);
+      }
+      var fa = localStorage.getItem('cog_bible_fa_version') || 'opcb';
+      return url + '&faVersion=' + encodeURIComponent(fa === 'opv' ? 'opv' : 'opcb');
+    } catch (e) {
+      return url;
+    }
+  }
+
   function sharePageUrl() {
     try {
       var selected = document.querySelectorAll('.mb-verse.selected');
@@ -93,16 +108,24 @@
           } catch (e2) {}
         }
         if (b && ch) {
-          return SITE + '/bible.html?b=' + encodeURIComponent(b) +
+          return withSelectedVersion(SITE + '/bible.html?b=' + encodeURIComponent(b) +
             '&c=' + encodeURIComponent(ch) +
-            '&v=' + encodeURIComponent(vs || '1');
+            '&v=' + encodeURIComponent(vs || '1'));
         }
       }
       var params = getParams();
       if (params && params.bookId && params.chapter) {
-        return SITE + '/bible.html?b=' + params.bookId +
+        return withSelectedVersion(SITE + '/bible.html?b=' + params.bookId +
           '&c=' + params.chapter +
-          '&v=' + (params.verse || 1);
+          '&v=' + (params.verse || 1));
+      }
+      // The reader can also be opened from its saved reading position without
+      // query parameters; preserve that position instead of sharing the homepage.
+      var state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}');
+      if (state.bookId && state.chapter) {
+        return withSelectedVersion(SITE + '/bible.html?b=' + encodeURIComponent(state.bookId) +
+          '&c=' + encodeURIComponent(state.chapter) +
+          '&v=' + encodeURIComponent(state.verse || 1));
       }
     } catch (e) {}
     return SITE + '/';

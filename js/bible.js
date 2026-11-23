@@ -1,6 +1,21 @@
 /* Seventh Trumpet Bible — load core + safe fixes + flat JSON support */
 (async function () {
   try {
+    // A shared verse link carries the selected edition so the recipient opens
+    // the same source text, not merely the site's default translation.
+    var sharedParams = new URLSearchParams(location.search);
+    var sharedLang = sharedParams.get('lang');
+    if ((sharedLang === 'en' || sharedLang === 'fa') && localStorage.getItem('cog_lang') !== sharedLang) {
+      localStorage.setItem('cog_lang', sharedLang);
+      location.reload();
+      return;
+    }
+    var sharedEn = sharedParams.get('enVersion');
+    var sharedFa = sharedParams.get('faVersion');
+    var allowedEn = ['kjv','web','asv','rv1885','ylt','webster','bbe','bsb','webbe','darby','dra','gnv','odr','odr-original'];
+    if (sharedEn && allowedEn.indexOf(sharedEn) >= 0) localStorage.setItem('cog_bible_en_version', sharedEn);
+    if (sharedFa === 'opv' || sharedFa === 'opcb') localStorage.setItem('cog_bible_fa_version', sharedFa);
+
     // Load the reviewed, pinned reader core from this site (no CDN/GitHub runtime dependency).
     var urls = ['/js/bible-core-pinned.js'];
     var code = null;

@@ -173,7 +173,7 @@ def check_reader_safeguards() -> None:
                 fail(f"{version}: Esther should have {expected} chapters, found {len(chapters)}")
     if "const availableIds = availableBooks().map(b => b.id)" not in reader:
         fail("Switching to Persian must move away from books absent from Persian editions")
-    if "expanded-canon-fix3-20261123" not in html:
+    if "share-version-fix1-20261123" not in html:
         fail("Bible reader script URL is missing the latest cache-busting version")
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
@@ -195,6 +195,16 @@ def check_reader_safeguards() -> None:
         fail("Persian Bible search must not depend on external text/CDN providers")
     if "faLoadedVersion" not in search:
         fail("Switching between OPV and OPCB must invalidate the cached Persian search index")
+    if "if (faLoadedVersion !== version) return []" not in search:
+        fail("A stale Persian search request must not overwrite a newer edition's index")
+    if "function withSelectedVersion(url)" not in share or "enVersion=" not in share or "faVersion=" not in share:
+        fail("Shared Bible links must preserve the selected English or Persian translation")
+    if "var state = JSON.parse(localStorage.getItem('cog_bible_state')" not in share:
+        fail("Sharing from the reader's saved position must create a chapter deep link, not the homepage")
+    if "sharedParams.get('enVersion')" not in reader or "sharedParams.get('faVersion')" not in reader:
+        fail("Bible reader must restore the selected translation from a shared same-site link")
+    if "sharedParams.get('lang')" not in reader or "lang=" not in share:
+        fail("Shared Bible links must preserve the reader language as well as the translation edition")
 
 def main() -> int:
     for version in ENGLISH:
