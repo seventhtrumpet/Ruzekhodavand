@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-11-23
 Repository: seventhtrumpet/Ruzekhodavand
-Latest main reviewed: 31a524657b20e6d82360f87d95a4ca8456dae778
+Latest main reviewed: 7068731a66b6bdedb431fb04b822afa9286254ab
 
 ## Purpose
 
@@ -45,18 +45,20 @@ The selector currently exposes these 14 choices:
 13. Original Douay-Rheims — modernized spelling
 14. Original Douay-Rheims — historical spelling
 
-The reader requests chapter text from these runtime sources (the Original Douay-Rheims rows below are being migrated to same-origin data files):
+The reader requests chapter text from these runtime sources:
 
-| Translation(s) | Current chapter-data source | Runtime note |
+| Translation(s) | Current chapter-data source in main | Runtime note |
 |---|---|---|
-| KJV, WEB, ASV, BBE, ERV 1885, YLT, Webster | Free.Bible | Chapter fetched on demand |
-| BSB, WEBBE, Darby, DRA 1899 | bible-api.com | Chapter fetched on demand |
-| Geneva 1599 | Bolls API | Chapter fetched on demand |
-| Original Douay-Rheims, both spelling forms | Same-origin `/data/bible-en/odr/` files | Pinned 76-book manifest and 152 book JSON files |
+| KJV, BBE, ERV 1885 | Free.Bible | The only remaining external translation-text service in main; background fetch only |
+| WEB Classic, ASV, YLT, Webster, Darby, Geneva, BSB | Same-origin `/data/bible-en/local/{translation}/b{bookId}.json` | 66 books each |
+| DRA 1899 | Same-origin `/data/bible-en/local/dra/` | 73 books; Esther has 16 chapters and Daniel 14 |
+| WEBBE | Same-origin `/data/bible-en/local/webbe/` | 73 books |
+| Original Douay-Rheims, both spelling forms | Same-origin `/data/bible-en/odr/` files | 76 listed texts: 73 canonical books plus three appendix texts |
+| OPV, OPCB | Same-origin `/data/bible-fa/` files | 66 books each |
 
-The reader does not navigate visitors to these providers. English chapter data for several editions and Original Douay-Rheims remain upstream runtime dependencies; Persian OPV and OPCB are designed to load from same-origin local files.
+The reader does not navigate visitors to translation providers. In main, KJV, BBE, and ERV 1885 still fetch chapter text from Free.Bible in the background; the other nine English editions and both Persian editions are served from local files. No outbound provider-reading links are offered.
 
-The reader wrapper now retrieves the reviewed, pinned JavaScript core from the same-origin path `/js/bible-core-pinned.js`. The core itself is self-hosted; the selected Bible chapter data for several editions remains externally fetched.
+The reader wrapper loads the pinned JavaScript core from the same-origin path `/js/bible-core-pinned.js`. The core is self-hosted; jsDelivr, Raw GitHub, Bible-API.com, and Bolls runtime fallback URLs have been removed from the main reader code. Unknown translation IDs resolve only to same-origin local paths.
 
 ## Rights and presentation rules
 
@@ -115,17 +117,20 @@ Each verse should be linked to its source-language text and stable reference. Th
 
 ## Audit status
 
-- Reader selector and runtime source map: inspected in the latest main source.
-- Reader JavaScript core: self-hosted at `/js/bible-core-pinned.js`; new deployment and real-browser verification still required.
-- Bible reader and home-page preview metadata: external image-host URLs removed from the HTML metadata; verify production after next deployment.
-- License-page visitor navigation: no external reading/download anchors remain in the inspected page; source names are plain text.
-- Share payloads: the dedicated share module uses the canonical SeventhTrumpet.org URL. The legacy selected-verse share fallback now also uses the canonical domain, independent of preview host.
-- OPV structure/import: previously inspected from the supplied USFM archive.
-- OPCB importer and local reader path: implemented; GitHub Actions import completed successfully and generated 66 local per-book JSON files (1,189 chapters; 28,731 verses). The site still needs a successful Vercel deployment and browser test before production availability can be claimed. Three sample passages were compared with official eBible samples; not a full collation.
-- Original Douay-Rheims: GitHub Actions import completed successfully; 76 files per spelling form, 1,361 chapters, and 37,154 JSON verse entries per form are stored locally. The 73-book Catholic canon and three appendix texts remain clearly distinguished. This is structural validation, not a full scholarly verse-by-verse collation.
-- Seven English editions: official eBible VPL archive importer and same-origin reader path implemented. The importer was executed successfully in a sandbox against the seven pinned official archives. Each edition has 66 books and 1,189 chapters. Verse counts: WEB 31,103; ASV 31,102; YLT 31,102; Webster 31,102; Darby 31,099; Geneva 31,090; BSB 31,086. Empty markers and verse-number gaps are recorded and preserved, never filled from another translation. Genesis 1:1, Psalm 23:1, and John 3:16 were spot-checked against the existing provider outputs. Full verse-by-verse collation remains outstanding. GitHub Actions completed successfully and committed 462 per-book files (66 books × 7 translations), plus metadata and README; the JSON data occupies about 30.2 MB.
+- Reader selector and runtime source map: inspected in main; all 14 English selector choices remain present.
+- Reader JavaScript core: self-hosted at `/js/bible-core-pinned.js`; syntax checks pass. A live browser/device test is still required.
+- Bible reader and home-page preview metadata: third-party image-host URLs removed from the HTML metadata.
+- License-page visitor navigation: no external reading/download anchors remain; source names and licence names are plain text.
+- Share payloads: WhatsApp, Telegram, Signal, system share, copy, and generated share images use the canonical SeventhTrumpet.org URL; no Bible-provider URL is included in the share content.
+- OPV: supplied USFM structure checked (66 books, 1,189 chapters, 31,090 original verse markers); one Ezekiel 25:5 boundary is restored by the importer and two empty Job markers are preserved.
+- OPCB: 66 books, 1,189 chapters, 28,731 verse entries; GitHub Actions imported all 66 per-book files locally. Three passages were spot-checked against official eBible samples; not a full collation.
+- Original Douay-Rheims: both spelling forms imported locally; 76 listed texts, 1,361 chapters, and 37,154 JSON verse entries per form. The 73-book Catholic canon and three appendix texts are distinguished. The corpus count differs because verse-0 fragments are folded into summary continuations and Tobias chapter 0 is introductory.
+- Nine English editions are now self-hosted in main: WEB Classic (31,103 verses), ASV (31,102), YLT (31,102), Webster (31,102), Darby (31,099), Geneva (31,090), BSB (31,086), DRA 1899 (35,811), and WEBBE (35,197). The local English tree contains 608 per-book JSON files and about 40 MB of JSON text. DRA has 73 books/1,334 chapters; WEBBE has 73 books/1,326 chapters.
+- The English importer pins official eBible VPL archive SHA-256 hashes, checks the source archive's Public Domain notice, validates book/chapter structure, and records empty verse markers and verse-number gaps. It never fills an omitted verse from another translation. Genesis 1:1, Psalm 23:1, and John 3:16 were spot-checked against the previous provider; full verse-by-verse collation remains outstanding.
+- Translation fidelity: no verse text is rewritten to declare Sunday holy or to call Sunday the Sabbath. The reader's Persian/English editorial note is separate from the verse text. Source headings, including historical headings that mention the first day of the week, remain clearly identified as source material.
+- Remaining translation-text dependency in main: Free.Bible for KJV, BBE, and ERV 1885. KJV has a UK Crown copyright caveat; BBE rights vary by jurisdiction; ERV 1885 still needs a fully verified redistributable source. Do not self-host until these points are resolved.
+- Other website dependencies (for example, Google Fonts, Firebase, analytics, and unrelated site scripts) are separate from Bible translation text and have not all been localized.
 - Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**.
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**.
-- Complete self-hosting of every translation text: **not yet completed**; English versions other than Original Douay-Rheims still use upstream chapter services.
-- Elimination of all third-party runtime dependencies across the whole website (including fonts, analytics, and unrelated services): **not yet completed**.
-- Production deployment: the latest READY deployment on `seventhtrumpet.org` is commit `5c3ca44143bb6846d9821a010ff83b7457676c46` (7 local English editions plus the earlier Persian and Original Douay-Rheims work). Main is now at `f5442ca73c8b955109d7187da711972cf79b9665`, three commits ahead, including DRA 1899 and WEBBE. Vercel reports `build-rate-limit` for newer builds and the deployment API has a 24-hour daily limit; DRA/WEBBE are in main but not yet confirmed live.
+- Production deployment: latest READY deployment on `seventhtrumpet.org` is commit `5c3ca44143bb6846d9821a010ff83b7457676c46`. Main is now at `7068731a66b6bdedb431fb04b822afa9286254ab`, five commits ahead. The live deployment includes seven local English editions plus the earlier Persian and Original Douay-Rheims work; DRA 1899, WEBBE, and the removal of the final Bible-API fallback are in main but not yet confirmed live. Vercel reports `build-rate-limit` and a 24-hour daily deployment API limit, so a new production deployment is currently blocked.
+
