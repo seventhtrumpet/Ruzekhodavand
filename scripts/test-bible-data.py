@@ -123,6 +123,14 @@ def check_reader_safeguards() -> None:
     photo = (ROOT / "js/bible-share-photo.js").read_text(encoding="utf-8")
     admin = (ROOT / "admin.html").read_text(encoding="utf-8")
     admin_js = (ROOT / "js/admin.js").read_text(encoding="utf-8")
+    if "code.replace(/  async function loadEnChapter" not in reader or "const requestUrl = isOdr" not in reader:
+        fail("Runtime patch must replace the complete English chapter loader and define edition-specific request URLs")
+    if "const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885']" not in reader:
+        fail("Runtime patch must enumerate every locally hosted English edition")
+    if "const entry = (data.chapters || []).find(item => Number(item.chapter) === Number(ch))" not in reader:
+        fail("Original Douay-Rheims loader must select the requested chapter from its chapter array")
+    if "const localChapter = localBook && localBook.chapters && localBook.chapters[String(ch)]" not in reader:
+        fail("Self-hosted English loader must read the selected chapter from the per-book JSON pack")
     if "code.replace(/const ref = encodeURIComponent" not in reader:
         fail("English chapter fetch patch must target loadEnChapter, not the first generic fetch call")
     if "code.replace(/const res = await fetch" in reader:
