@@ -166,6 +166,7 @@ def main() -> None:
             "source_archive_sha256": archive_sha,
             "license": license_name,
             "counts": counts,
+            "empty_verses": empty_verses,
             "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited.",
         }
         print(f"{translation}: {counts['books']} books, {counts['chapters']} chapters, {counts['verses']} verses")
@@ -175,7 +176,7 @@ def main() -> None:
         "# Local English public-domain Bible texts\n\n"
         "Sources: official eBible.org VPL archives, pinned by SHA-256 in metadata.json.\n"
         "Included editions: WEB Classic, ASV 1901, YLT 1898, Webster 1833, Darby 1884, Geneva 1599, and BSB.\n"
-        "The VPL format contains Bible text only. The importer preserves verse wording and includes the 66 standard books.\n"
+        "The VPL format contains Bible text only. The importer preserves verse wording and includes the 66 standard books. Empty verse markers are preserved and never filled from another edition.\n"
         "The World English Bible name is retained only for the unchanged source text.\n",
         encoding="utf-8",
     )
