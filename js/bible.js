@@ -18,7 +18,7 @@
     code = code.replace(/mb-book-btn/g, 'mb-cell');
     code = code.replace(/mb-num-btn/g, 'mb-cell');
 
-    code = code.replace("version: 'هزارۀ نو (FANMV)',", "version: 'هزاره نو (FANMV)',");
+    code = code.replace("version: 'هزارۀ نو (FANMV)',", "version: (localStorage.getItem('cog_bible_fa_version') === 'opv' ? 'ترجمه قدیم فارسی (OPV)' : 'هزاره نو (FANMV)'),");
     code = code.replace("version: 'King James Version',", "version: ({kjv:'King James Version',bsb:'Berean Standard Bible',web:'World English Bible',asv:'American Standard Version',darby:'Darby Bible',dra:'Douay-Rheims 1899',bbe:'Bible in Basic English','oeb-us':'Open English Bible (US)','oeb-cw':'Open English Bible (Commonwealth)',webbe:'World English Bible (British Edition)'})[localStorage.getItem('cog_bible_en_version') || 'kjv'] || 'King James Version',");
     code = code.replace("'?translation=kjv'", "'?translation=' + encodeURIComponent(localStorage.getItem('cog_bible_en_version') || 'kjv') + '&single_chapter_book_matching=indifferent'");
 
@@ -118,7 +118,7 @@
       if (persianVersionWrap) persianVersionWrap.style.display = english ? 'none' : 'flex';
       if (persianVersionLink) persianVersionLink.style.display = english ? 'none' : 'inline-block';
       if (versionSelect) versionSelect.value = localStorage.getItem('cog_bible_en_version') || 'kjv';
-      if (persianVersionSelect) persianVersionSelect.value = 'opcb';
+      if (persianVersionSelect) persianVersionSelect.value = localStorage.getItem('cog_bible_fa_version') || 'opcb';
       var translationNote = document.getElementById('bible-translation-note');
       if (translationNote) translationNote.textContent = english
         ? "To choose your preferred Bible version, use the drop-down box next to ‘Select Version’."
@@ -132,10 +132,9 @@
       location.reload();
     });
     if (persianVersionSelect) persianVersionSelect.addEventListener('change', function () {
-      if (persianVersionSelect.value === 'opv') {
-        window.open('https://ebible.org/study/?t1=local%3ApesOPV&v1=GEN1_1&w1=bible', '_blank', 'noopener');
-        persianVersionSelect.value = 'opcb';
-      }
+      var value = persianVersionSelect.value === 'opv' ? 'opv' : 'opcb';
+      localStorage.setItem('cog_bible_fa_version', value);
+      location.reload();
     });
     window.addEventListener('cog-lang-changed', syncVersionControl);
     if (lt) lt.addEventListener('click', function () { setTimeout(syncVersionControl, 150); });
