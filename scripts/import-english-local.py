@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import ten English editions from official eBible VPL archives.
+"""Import eleven English editions from official eBible VPL archives.
 
 VPL archives contain Bible text only. The importer keeps verse wording exactly,
 uses each edition’s defined 66- or 73-book canon, validates chapter/verse structure,
