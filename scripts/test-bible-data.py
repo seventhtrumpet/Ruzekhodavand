@@ -212,8 +212,27 @@ def check_reader_safeguards() -> None:
             rows = load_json(index_path)
             if not isinstance(rows, list) or len(rows) != 37153:
                 fail(f"{index_path.relative_to(ROOT)}: expected 37,153 scripture verse search rows (excluding Tobias chapter zero)")
-            elif any(not isinstance(row, dict) or not all(k in row for k in ("id","ch","v","text","label")) for row in rows[:20]):
-                fail(f"{index_path.relative_to(ROOT)}: malformed search-index row")
+            else:
+                book_ids = set()
+                malformed = False
+                for row in rows:
+                    if not isinstance(row, dict) or not all(k in row for k in ("id","ch","v","text","label")):
+                        malformed = True
+                        break
+                    if not isinstance(row["id"], int) or not 1001 <= row["id"] <= 1076:
+                        malformed = True
+                        break
+                    if not isinstance(row["ch"], int) or row["ch"] < 1 or not isinstance(row["v"], int) or row["v"] < 1:
+                        malformed = True
+                        break
+                    if not isinstance(row["text"], str) or not isinstance(row["label"], str) or not row["label"]:
+                        malformed = True
+                        break
+                    book_ids.add(row["id"])
+                if malformed:
+                    fail(f"{index_path.relative_to(ROOT)}: malformed verse row or non-scripture chapter")
+                if len(book_ids) != 76:
+                    fail(f"{index_path.relative_to(ROOT)}: expected search coverage for all 76 listed texts, found {len(book_ids)}")
     if "cdn.jsdelivr.net" not in search or "fastly.jsdelivr.net" not in search or "raw.githubusercontent.com" not in search:
         fail("KJV fallback sources must remain available until KJV/BBE rights and local source archives are fully reviewed")
 
