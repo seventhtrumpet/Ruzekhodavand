@@ -25,6 +25,8 @@ SOURCES = {
     "darby": ("engDBY", "Darby Translation (1884)", "Public Domain"),
     "gnv": ("enggnv", "Geneva Bible (1599)", "Public Domain"),
     "bsb": ("engbsb", "Berean Standard Bible", "Public Domain"),
+    "dra": ("engDRA", "Douay-Rheims 1899", "Public Domain"),
+    "webbe": ("eng-webbe", "World English Bible British Edition", "Public Domain"),
 }
 EXPECTED_ARCHIVE_SHA256 = {
     "web": "93e867cdb2bfc84d1e997172e7773e166e718d9265985a054f8fca565f5cd21e",
@@ -34,6 +36,8 @@ EXPECTED_ARCHIVE_SHA256 = {
     "darby": "7eb1df2a434f5bbd831591aa96c08e94b900b1458fda74ccf1d1739d5af73619",
     "gnv": "faa35b12d04bdacda78b5b53b35bc241d576c63e5d6cd5bccd99bb337b8f7ade",
     "bsb": "72ecd9e0131e82737b76e1f2d706c85771d6054b6350673f80f49c839133f45e",
+    "dra": "4b7ddcaec6bcf1d973d483a14e6495657daba94056b3a9678d0002315e7e57dd",
+    "webbe": "055c1a5c21aa18c62117747ce7dd602346d587547399c89673fa7d0a511b8f14",
 }
 EXPECTED_GENESIS_1_1 = {
     "web": "In the beginning, God created the heavens and the earth.",
@@ -43,6 +47,8 @@ EXPECTED_GENESIS_1_1 = {
     "darby": "In the beginning God created the heavens and the earth.",
     "gnv": "In the beginning God created the heauen and the earth.",
     "bsb": "In the beginning God created the heavens and the earth.",
+    "dra": "In the beginning God created heaven, and earth.",
+    "webbe": "In the beginning, God created the heavens and the earth.",
 }
 BOOKS = [
     (10,"GEN","Genesis",50),(20,"EXO","Exodus",40),(30,"LEV","Leviticus",27),
@@ -73,10 +79,16 @@ CODE_ALIASES = {
     "PHP": "PHI", "JAS": "JAM", "1JN": "1JO", "2JN": "2JO",
     "3JN": "3JO", "SNG": "SOL",
 }
-CODE_MAP = {
-    CODE_ALIASES.get(code, code): (book_id, name, chapters)
+DEUTEROCANONICAL = [
+    (740,"TOB","Tobit",14),(750,"JDT","Judith",16),(760,"WIS","Wisdom",19),
+    (770,"SIR","Sirach",51),(780,"BAR","Baruch",6),(790,"1MA","1 Maccabees",16),
+    (800,"2MA","2 Maccabees",15),
+]
+BOOKS_73_WEBBE = BOOKS + DEUTEROCANONICAL
+BOOKS_73_DRA = [
+    (book_id, code, name, 16 if book_id == 190 else 14 if book_id == 340 else chapters)
     for book_id, code, name, chapters in BOOKS
-}
+] + DEUTEROCANONICAL
 LINE_RE = re.compile(r"^([A-Z0-9]{3})\s+(\d+):(\d+)\s+(.*)$")
 
 
@@ -89,8 +101,12 @@ def download(url: str) -> bytes:
     return data
 
 
-def parse_vpl(text: str, translation: str) -> tuple[dict, dict, list[str], list[str]]:
-    books = {str(book_id): {"id": book_id, "name": name, "chapters": {}} for book_id, _, name, _ in BOOKS}
+def parse_vpl(text: str, translation: str, book_defs: list[tuple]) -> tuple[dict, dict, list[str], list[str]]:
+    code_map = {
+        CODE_ALIASES.get(code, code): (book_id, name, chapters)
+        for book_id, code, name, chapters in book_defs
+    }
+    books = {str(book_id): {"id": book_id, "name": name, "chapters": {}} for book_id, _, name, _ in book_defs}
     matched = 0
     empty_verses: list[str] = []
     verse_gaps: list[str] = []
@@ -101,9 +117,9 @@ def parse_vpl(text: str, translation: str) -> tuple[dict, dict, list[str], list[
         if not match:
             raise ValueError(f"{translation}: unparsed VPL line {line_number}: {line[:100]}")
         code, chapter, verse, verse_text = match.groups()
-        if code not in CODE_MAP:
+        if code not in code_map:
             continue
-        book_id, name, expected_chapters = CODE_MAP[code]
+        book_id, name, expected_chapters = code_map[code]
         chapter_number = int(chapter)
         verse_number = int(verse)
         if not 1 <= chapter_number <= expected_chapters or verse_number < 1:
@@ -116,10 +132,12 @@ def parse_vpl(text: str, translation: str) -> tuple[dict, dict, list[str], list[
         chapter_map[str(verse_number)] = verse_text.strip()
         matched += 1
 
-    if len([b for b in books.values() if b["chapters"]]) != 66:
-        raise ValueError(f"{translation}: expected all 66 canonical books")
+    expected_books = len(book_defs)
+    expected_chapters_total = sum(item[3] for item in book_defs)
+    if len([b for b in books.values() if b["chapters"]]) != expected_books:
+        raise ValueError(f"{translation}: expected all {expected_books} books")
     chapter_total = 0
-    for book_id, code, name, expected_chapters in BOOKS:
+    for book_id, code, name, expected_chapters in book_defs:
         chapter_map = books[str(book_id)]["chapters"]
         if len(chapter_map) != expected_chapters:
             raise ValueError(f"{translation}: {name} expected {expected_chapters} chapters, got {len(chapter_map)}")
@@ -133,9 +151,9 @@ def parse_vpl(text: str, translation: str) -> tuple[dict, dict, list[str], list[
             if missing:
                 verse_gaps.append(f"{code} {chapter}: {','.join(map(str, missing))}")
         chapter_total += len(chapter_map)
-    if chapter_total != 1189:
-        raise ValueError(f"{translation}: expected 1,189 chapters, got {chapter_total}")
-    return books, {"books": 66, "chapters": chapter_total, "verses": matched, "empty_verse_markers": len(empty_verses), "chapters_with_verse_gaps": len(verse_gaps)}, empty_verses, verse_gaps
+    if chapter_total != expected_chapters_total:
+        raise ValueError(f"{translation}: expected {expected_chapters_total} chapters, got {chapter_total}")
+    return books, {"books": expected_books, "chapters": chapter_total, "verses": matched, "empty_verse_markers": len(empty_verses), "chapters_with_verse_gaps": len(verse_gaps)}, empty_verses, verse_gaps
 
 
 def main() -> None:
@@ -159,7 +177,8 @@ def main() -> None:
             if "public domain" not in about.lower():
                 raise RuntimeError(f"{translation}: source archive does not state Public Domain")
             source_text = zf.read(txt_name).decode("utf-8-sig")
-        books, counts, empty_verses, verse_gaps = parse_vpl(source_text, translation)
+        book_defs = BOOKS_73_DRA if translation == "dra" else BOOKS_73_WEBBE if translation == "webbe" else BOOKS
+        books, counts, empty_verses, verse_gaps = parse_vpl(source_text, translation, book_defs)
         if books["10"]["chapters"]["1"]["1"] != EXPECTED_GENESIS_1_1[translation]:
             raise RuntimeError(f"{translation}: Genesis 1:1 sample does not match the reviewed source")
         target = OUT / translation
@@ -186,7 +205,7 @@ def main() -> None:
     (OUT / "README.md").write_text(
         "# Local English public-domain Bible texts\n\n"
         "Sources: official eBible.org VPL archives, pinned by SHA-256 in metadata.json.\n"
-        "Included editions: WEB Classic, ASV 1901, YLT 1898, Webster 1833, Darby 1884, Geneva 1599, and BSB.\n"
+        "Included editions: WEB Classic, ASV 1901, YLT 1898, Webster 1833, Darby 1884, Geneva 1599, BSB, Douay-Rheims 1899, and WEBBE. DRA and WEBBE include the seven deuterocanonical books; DRA also includes the longer Esther and Daniel chapter divisions.\n"
         "The VPL format contains Bible text only. The importer preserves verse wording and includes the 66 standard books. Empty verse markers are preserved and never filled from another edition.\n"
         "The World English Bible name is retained only for the unchanged source text.\n",
         encoding="utf-8",
