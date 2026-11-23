@@ -68,7 +68,15 @@ BOOKS = [
     (680,"2PE","2 Peter",3),(690,"1JN","1 John",5),(700,"2JN","2 John",1),
     (710,"3JN","3 John",1),(720,"JUD","Jude",1),(730,"REV","Revelation",22),
 ]
-CODE_MAP = {code: (book_id, name, chapters) for book_id, code, name, chapters in BOOKS}
+CODE_ALIASES = {
+    "EZK": "EZE", "JOL": "JOE", "NAM": "NAH", "MRK": "MAR",
+    "PHP": "PHI", "JAS": "JAM", "1JN": "1JO", "2JN": "2JO",
+    "3JN": "3JO", "SNG": "SOL",
+}
+CODE_MAP = {
+    CODE_ALIASES.get(code, code): (book_id, name, chapters)
+    for book_id, code, name, chapters in BOOKS
+}
 LINE_RE = re.compile(r"^([A-Z0-9]{3})\s+(\d+):(\d+)\s+(.*)$")
 
 
@@ -81,10 +89,11 @@ def download(url: str) -> bytes:
     return data
 
 
-def parse_vpl(text: str, translation: str) -> tuple[dict, dict, list[str]]:
+def parse_vpl(text: str, translation: str) -> tuple[dict, dict, list[str], list[str]]:
     books = {str(book_id): {"id": book_id, "name": name, "chapters": {}} for book_id, _, name, _ in BOOKS}
     matched = 0
     empty_verses: list[str] = []
+    verse_gaps: list[str] = []
     for line_number, line in enumerate(text.splitlines(), start=1):
         if not line.strip():
             continue
@@ -120,12 +129,13 @@ def parse_vpl(text: str, translation: str) -> tuple[dict, dict, list[str]]:
             if not verses:
                 raise ValueError(f"{translation}: empty chapter {name} {chapter}")
             numbers = sorted(map(int, verses))
-            if numbers != list(range(1, max(numbers) + 1)):
-                raise ValueError(f"{translation}: verse-number gap in {name} {chapter}")
+            missing = sorted(set(range(1, max(numbers) + 1)) - set(numbers))
+            if missing:
+                verse_gaps.append(f"{code} {chapter}: {','.join(map(str, missing))}")
         chapter_total += len(chapter_map)
     if chapter_total != 1189:
         raise ValueError(f"{translation}: expected 1,189 chapters, got {chapter_total}")
-    return books, {"books": 66, "chapters": chapter_total, "verses": matched, "empty_verse_markers": len(empty_verses)}, empty_verses
+    return books, {"books": 66, "chapters": chapter_total, "verses": matched, "empty_verse_markers": len(empty_verses), "chapters_with_verse_gaps": len(verse_gaps)}, empty_verses, verse_gaps
 
 
 def main() -> None:
@@ -149,7 +159,7 @@ def main() -> None:
             if "public domain" not in about.lower():
                 raise RuntimeError(f"{translation}: source archive does not state Public Domain")
             source_text = zf.read(txt_name).decode("utf-8-sig")
-        books, counts, empty_verses = parse_vpl(source_text, translation)
+        books, counts, empty_verses, verse_gaps = parse_vpl(source_text, translation)
         if books["10"]["chapters"]["1"]["1"] != EXPECTED_GENESIS_1_1[translation]:
             raise RuntimeError(f"{translation}: Genesis 1:1 sample does not match the reviewed source")
         target = OUT / translation
@@ -166,7 +176,9 @@ def main() -> None:
             "source_archive_sha256": archive_sha,
             "license": license_name,
             "counts": counts,
-            "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited.",
+            "empty_verses": empty_verses,
+            "verse_gaps": verse_gaps,
+            "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition.",
         }
         print(f"{translation}: {counts['books']} books, {counts['chapters']} chapters, {counts['verses']} verses")
 
@@ -175,7 +187,7 @@ def main() -> None:
         "# Local English public-domain Bible texts\n\n"
         "Sources: official eBible.org VPL archives, pinned by SHA-256 in metadata.json.\n"
         "Included editions: WEB Classic, ASV 1901, YLT 1898, Webster 1833, Darby 1884, Geneva 1599, and BSB.\n"
-        "The VPL format contains Bible text only. The importer preserves verse wording and includes the 66 standard books.\n"
+        "The VPL format contains Bible text only. The importer preserves verse wording and includes the 66 standard books. Empty verse markers are preserved and never filled from another edition.\n"
         "The World English Bible name is retained only for the unchanged source text.\n",
         encoding="utf-8",
     )
