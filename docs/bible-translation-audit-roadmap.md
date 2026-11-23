@@ -3,6 +3,7 @@
 Last reviewed: 2026-11-23
 Repository: seventhtrumpet/Ruzekhodavand
 Latest code commit reviewed: 397ca1cafaadaa8372e0f1b0da75ad14076a87a2
+Latest documentation/content commits: 952dc50996461733287dde43e3bc14630321e45b (licence-page corrections), 5c60083c427a4e9891803f33f4ef26c507b26be2 (KJV rights label).
 
 ## Purpose
 
@@ -117,8 +118,11 @@ Each verse should be linked to its source-language text and stable reference. Th
 
 ## Audit status
 
-- Reader selector and runtime source map: inspected in main; all 14 English selector choices remain present.
-- Reader JavaScript core: self-hosted at `/js/bible-core-pinned.js`; syntax checks pass and the production page returns HTTP 200. Full interactive browser/device testing is still required.
+- Reader selector and runtime source map: inspected in main; all 14 English selector choices remain present. The KJV selector label now says that rights vary by jurisdiction rather than implying blanket public-domain status outside the UK.
+- Production data-file smoke test: all 964 JSON-file URLs found under the local English, Original Douay-Rheims, OPV, and OPCB data trees returned HTTP 200 from `www.seventhtrumpet.org`. All 964 files parse as JSON. The 958 per-book payload files (674 local English, 152 Original Douay-Rheims raw files across both spellings, 66 OPV, and 66 OPCB) passed book/chapter/verse structural checks; the other six files are metadata, manifest, or index JSON. This checks availability and structure, not translation accuracy.
+- Empty verse markers: 68 empty markers were found and preserved across the checked self-hosted payloads (ASV 16, ERV 1885 16, WEB 5, WEBBE 29, and OPV 2). They were not filled from another translation.
+- Original Douay-Rheims editorial material: the two spelling-form source trees contain 152 raw book files, 2,722 chapters, and 74,308 verse records. A scan found 229 historical notes containing the word “Sunday”, including lectionary labels and interpretive marginal notes. The reader's import patch extracts only each verse number and `verse.text`; it does not render `notes`, summaries, introductions, or historical front matter as Scripture. These source notes are editorial apparatus, not Bible verse text. The bilingual licence page now explicitly explains this distinction.
+- Reader JavaScript core: self-hosted at `/js/bible-core-pinned.js`; syntax checks pass and the production page returns HTTP 200. A fresh Playwright attempt still could not launch Chromium in the Vercel sandbox because the base image lacks `libglib-2.0.so.0` and the package manager could not complete dependency installation. Full interactive browser/device testing is still required.
 - Bible reader and home-page preview metadata: third-party image-host URLs removed from the HTML metadata; the live reader HTML has no external OG image.
 - License-page visitor navigation: live `/bible-licenses.html` returns HTTP 200 and has no external reading/download anchors; source names and licence names are plain text.
 - Share payloads: live share scripts return HTTP 200 and use the canonical SeventhTrumpet.org URL for WhatsApp, Telegram, Signal, system share, copy, and generated share images; no Bible-provider URL is included in the share content.
@@ -130,7 +134,7 @@ Each verse should be linked to its source-language text and stable reference. Th
 - Translation fidelity: no verse text is rewritten to declare Sunday holy or to call Sunday the Sabbath. The reader's Persian/English editorial note is separate from the verse text. Source headings, including historical headings that mention the first day of the week, remain clearly identified as source material.
 - Remaining translation-text dependency in main and production: Free.Bible for KJV and BBE only. KJV rights in the Authorized Version are vested in the Crown in the United Kingdom and administered by Cambridge University Press under Letters Patent; US public-domain status does not settle worldwide reuse. eBible.org describes BBE as public domain in the United States because it was published without a copyright notice there, but that statement does not establish worldwide public-domain status. Keep both editions as background fetches unless jurisdiction-appropriate redistribution rights are documented. ERV 1885 is self-hosted from the official eBible VPL archive, whose embedded notice identifies it as Public Domain.
 - Other website dependencies (for example, Google Fonts, Firebase, analytics, and unrelated site scripts) are separate from Bible translation text and have not all been localized.
-- Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**.
-- Real interactive browser/device testing of every selector and chapter: **not yet completed**.
+- Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**. The 964-file production smoke test and 958-payload structure check do not establish textual fidelity.
+- Real interactive browser/device testing of every selector and chapter: **not yet completed**; the current sandbox browser launch remains blocked by a missing system library.
 - Production deployment: latest deployment `dpl_F7keignFoxQcaY7FG87ysEn7PgXK` is `READY` for commit `397ca1cafaadaa8372e0f1b0da75ad14076a87a2`; aliases include `www.seventhtrumpet.org` and `seventhtrumpet.org`. Live checks on the `www` domain returned HTTP 200 for `/bible.html`, `/bible-licenses.html`, local ERV 1885 Genesis JSON, local DRA Tobit JSON, Original Douay-Rheims historical-spelling Genesis JSON, and Persian OPV/OPCB Genesis JSON. The live reader script confirms local routing for ten English editions, Free.Bible only for KJV/BBE, and no Bible-API.com or Bolls references. The apex domain redirects to `www` with HTTP 308. An interactive Playwright run could not start in the test sandbox because Chromium lacked `libglib-2.0.so.0`; static production checks passed, but interactive device testing remains outstanding.
 
