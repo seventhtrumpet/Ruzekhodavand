@@ -362,9 +362,13 @@ def check_reader_safeguards() -> None:
         fail("DRA and Original Douay-Rheims must expose Daniel chapters 13-14 without changing WEBBE")
     if "const availableIds = availableBooks().map(b => b.id)" not in reader:
         fail("Switching to Persian must move away from books absent from Persian editions")
-    if "edition-aware-bible-share-links-20261123" not in html or "odr-local-search-20261123" not in html:
+    if "persian-edition-path-fix-20261123" not in html or "odr-local-search-20261123" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
+    if r"\n    else if (route.has('b')" in reader:
+        fail("Bible reader JavaScript must not contain a literal escaped newline in executable route parsing")
+    if "=== 'opv' ? '/data/bible-fa/opv/' : '/data/bible-fa/opcb/'" not in reader:
+        fail("Persian Bible reader must load OPV and OPCB from their actual separate local directories")
     if "new URLSearchParams(window.location.search)" not in reader or "cog_bible_book_slug" not in reader:
         fail("Bible reader must restore shared book, language, and edition before loading the reader core")
     if r'code.replace("await loadMeta();\n    await loadManifest();"' not in reader:
@@ -373,7 +377,7 @@ def check_reader_safeguards() -> None:
         fail("Bible reader must resolve shared book slugs against the selected edition before rendering")
     if "route.set('lang', lang)" not in share or "route.set('version', version)" not in share or "route.set('slug', slug)" not in share:
         fail("Bible share links must preserve language, translation edition, and canonical book slug")
-    if "js/bible-share.js?v=edition-aware-bible-share-links-20261123" not in html:
+    if "js/bible-share.js?v=persian-edition-path-fix-20261123" not in html:
         fail("Bible share script URL is missing the edition-aware deep-link cache key")
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:

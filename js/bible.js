@@ -21,7 +21,8 @@
       localStorage.setItem('cog_lang', lang);
     }
     var slug = route.get('slug');
-    if (slug) localStorage.setItem('cog_bible_book_slug', slug);\n    else if (route.has('b') || route.has('book')) localStorage.removeItem('cog_bible_book_slug');
+    if (slug) localStorage.setItem('cog_bible_book_slug', slug);
+    else if (route.has('b') || route.has('book')) localStorage.removeItem('cog_bible_book_slug');
     var bookId = Number(route.get('b') || route.get('book'));
     var chapter = Number(route.get('c') || route.get('chapter'));
     var verseText = route.get('v') || route.get('verse') || '1';
@@ -150,7 +151,7 @@
       "const data = pack[String(id)] || pack[id];\n        if (!data) return;",
       "let data = pack[String(id)] || pack[id];\n        if (!data && pack.chapters) data = pack;\n        if (!data && pack.id != null && Number(pack.id) === Number(id) && pack.chapters) data = pack;\n        if (!data) return;"
     );
-    code = code.replace("const res = await fetch('/data/bible-fa/' + fname);", "const dataDir = localStorage.getItem('cog_bible_fa_version') === 'opv' ? '/data/bible-fa/opv/' : '/data/bible-fa/';\n        const res = await fetch(dataDir + fname);");
+    code = code.replace("const res = await fetch('/data/bible-fa/' + fname);", "const dataDir = localStorage.getItem('cog_bible_fa_version') === 'opv' ? '/data/bible-fa/opv/' : '/data/bible-fa/opcb/';\n        const res = await fetch(dataDir + fname);");
 
     code = code.replace(
       "bookId = Number(btn.getAttribute('data-book'));\n        chapter = 1; verse = 1;\n        closeSel();\n        await renderBook(true);",
