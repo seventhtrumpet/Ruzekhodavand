@@ -94,10 +94,9 @@
     }
     window.shareSelected = shareSelectedVerses;
     function bindShare() {
-      var btn = document.getElementById('mb-share');
-      if (!btn || btn._bound) return;
-      btn._bound = true;
-      btn.addEventListener('click', shareSelectedVerses);
+      // The dedicated bible-share.js module owns the Share button.
+      // Do not attach a second click handler here: it caused two share flows
+      // (the share panel plus the legacy direct-share handler) on one tap.
       setLabels();
     }
     bindShare();
