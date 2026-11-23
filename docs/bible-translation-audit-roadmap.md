@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-11-23 (including MSB reader fix, cache refresh, and selector/runtime regression guard)
 Repository: seventhtrumpet/Ruzekhodavand
-Latest main commit reviewed: 76630ae251cba51ac4ace419b08e692c426475fc (PR #57 selector/runtime regression guard)
+Latest main commit reviewed: 1b487916c086062b9ec6a77c59189ae5577fdb7c (PR #67 cache-refresh documentation checkpoint)
 Latest reader-code fixes: PR #55 (MSB saved-version and change-handler allowlists) and PR #56 (cache-busting refresh)
 Latest importer-code commit reviewed: 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV source archive checksum pin).
 Recent main commits: 952dc50996461733287dde43e3bc14630321e45b (licence-page corrections), 5c60083c427a4e9891803f33f4ef26c507b26be2 (KJV rights label), 1ee801b8394a5daea9b83f65b0d4574cae88299a (audit results), 87a504f3b985ac20bd281e16c1bc044426fba10f (importer scope wording), 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV archive checksum pin), and e68ede1ac758202bec74bf878cc645bef63b3ef1 (OPV data regenerated with the pinned archive).
@@ -24,7 +24,7 @@ Keep Bible reading inside SeventhTrumpet.org, preserve useful complete translati
 
 ### Persian
 
-- **OPV — Old Persian Version:** served from the site's own `/data/bible-fa/opv/` files. The supplied USFM archive was structurally inspected: 66 books, 1,189 chapters, 31,090 original verse markers. The importer restores one Ezekiel 25:5 boundary that was joined to verse 25:4 in the source; two empty Job verse markers are preserved. This is a structural/import audit, not a complete linguistic or source-text collation.
+- **OPV — Old Persian Version:** served from the site's own `/data/bible-fa/opv/` files. The supplied USFM archive was structurally inspected: 66 books, 1,189 chapters, 31,090 original verse markers; the importer restores the documented Ezekiel 25:5 boundary, yielding 31,091 imported verse records. The importer restores one Ezekiel 25:5 boundary that was joined to verse 25:4 in the source; two empty Job verse markers are preserved. This is a structural/import audit, not a complete linguistic or source-text collation.
 - **OPCB — Open Persian Contemporary Bible:** 66 books, 1,189 chapters, 28,731 verse entries. A reproducible importer now converts the pinned upstream source into per-book JSON files under `/data/bible-fa/opcb/`; the reader fetches those same-origin files and no longer needs a CDN/Raw GitHub text fallback. The importer validates the complete book/chapter/verse structure and preserves verse wording. Genesis 1:1, Psalm 23:1, and John 3:16 were spot-checked against official eBible samples. This is not a full verse-by-verse comparison with the official USFM archive. The GitHub Actions import workflow completed successfully and committed all 66 per-book files plus the manifest, metadata, and attribution README. The generated dataset contains 1,189 chapters and 28,731 verses.
 - **NMV — New Millennium Version:** not offered as a full-text option because written permission to host the complete text has not been obtained. Do not add an outbound reading link. Reconsider only after documented permission.
 
@@ -124,7 +124,7 @@ Each verse should be linked to its source-language text and stable reference. Th
 - Local runtime data: 11 English local editions (674 per-book JSON files), two Persian editions (66 files each), and two Original Douay-Rheims spellings (152 raw book files plus two local search indexes). Only KJV and BBE chapter text still fetches from Free.Bible in the background; neither is self-hosted because rights clearance is incomplete.
 - Search: Persian OPV/OPCB and locally hosted English editions use the selected edition's local files. Both Original Douay-Rheims spelling forms use separate local indexes with 37,153 actual scripture verse rows each. KJV and BBE still use the KJV fallback index. The one Tobias chapter-zero introductory line remains in source data but is excluded from scripture search.
 - Original Douay-Rheims integrity: all 152 raw book files (76 texts in two spelling forms) are pinned by SHA-256 in metadata. The builder and regression test verify these hashes before indexing. The 76 listed texts are 73 books in the Catholic canon plus three appendix texts.
-- Persian structure: OPV has 66 books, 1,189 chapters, and 31,090 original verse markers; the importer restores the documented Ezekiel 25:5 boundary and preserves two empty Job markers. OPCB has 66 books, 1,189 chapters, and 28,731 verse entries. Both remain separate editions. Spot checks are not a full verse-by-verse collation.
+- Persian structure: OPV has 66 books, 1,189 chapters, and 31,091 imported verse records after restoring the documented Ezekiel 25:5 boundary; two empty Job markers are preserved. OPCB has 66 books, 1,189 chapters, and 28,731 verse entries. Both remain separate editions. Spot checks are not a full verse-by-verse collation.
 - English source integrity: 11 local editions are generated from official eBible VPL archives pinned by SHA-256; the importer checks source notices, archive integrity, book/chapter structure, and known sample passages. Empty verse markers and omitted numbering gaps are preserved rather than filled from another translation.
 - Sunday/Sabbath fidelity: no translation wording has been changed to call Sunday holy or to label it the biblical Sabbath. Historical Sunday-related notes in the Original Douay-Rheims archive are editorial apparatus, not Scripture text; they are not rendered as verses. The bilingual site note keeps editorial explanation separate from the source translation.
 - Share and visitor navigation policy: Bible reading and shared verse links remain on SeventhTrumpet.org. Provider names may be shown as plain-text attribution, but no outbound reading links or provider URLs should be inserted into share payloads.
@@ -202,5 +202,5 @@ Each verse should be linked to its source-language text and stable reference. Th
 
 - PR #66 bumped the `bible.js` cache key in `bible.html` from `expanded-canon-search-fix5-20261123` to `expanded-canon-search-fix6-20261123` after the WEBBE and Douay Daniel reader fixes. This matters because the site serves long-lived cached JavaScript assets.
 - The Bible-data regression test now requires the fix6 cache key. GitHub Actions passed before merge.
-- Latest main commit at this checkpoint: `d1e299acd0dc9a7eb00110b82107f4bb547307d4`.
+- Latest main commit at this checkpoint: `1b487916c086062b9ec6a77c59189ae5577fdb7c` (PR #67 documentation checkpoint).
 - Vercel production deployment records still show the older production commit `d42c7fde4377daed614357e0794758cecf0ad7ca`; the latest reader fixes are not confirmed live. Do not ask for or use a user token, and do not repeatedly retry the Vercel daily deployment quota.
