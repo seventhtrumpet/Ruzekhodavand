@@ -18,6 +18,10 @@
     code = code.replace(/mb-book-btn/g, 'mb-cell');
     code = code.replace(/mb-num-btn/g, 'mb-cell');
 
+    code = code.replace("version: 'هزارۀ نو (FANMV)',", "version: 'ترجمه فارسی معاصر (OPCB)',");
+    code = code.replace("version: 'King James Version',", "version: ({kjv:'King James Version',bsb:'Berean Standard Bible',web:'World English Bible',asv:'American Standard Version',darby:'Darby Bible',dra:'Douay-Rheims 1899'})[localStorage.getItem('cog_bible_en_version') || 'kjv'] || 'King James Version',");
+    code = code.replace("'?translation=kjv'", "'?translation=' + encodeURIComponent(localStorage.getItem('cog_bible_en_version') || 'kjv')");
+
     code = code.replace(
       "const files = man[String(id)] || ['b' + id + '.json'];",
       "const files = (man[String(id)] || ['b' + id + '.json']).slice();"
@@ -102,6 +106,23 @@
     var lt = document.getElementById('lang-toggle');
     if (lt) lt.addEventListener('click', function () { setTimeout(setLabels, 150); });
     window.addEventListener('cog-lang-changed', setLabels);
+
+    var versionWrap = document.getElementById('bible-version-wrap');
+    var versionSelect = document.getElementById('bible-version-select');
+    function syncVersionControl() {
+      var english = isEn();
+      if (versionWrap) versionWrap.style.display = english ? 'flex' : 'none';
+      if (versionSelect) versionSelect.value = localStorage.getItem('cog_bible_en_version') || 'kjv';
+    }
+    syncVersionControl();
+    if (versionSelect) versionSelect.addEventListener('change', function () {
+      var allowed = ['kjv','bsb','web','asv','darby','dra'];
+      var value = allowed.indexOf(versionSelect.value) >= 0 ? versionSelect.value : 'kjv';
+      localStorage.setItem('cog_bible_en_version', value);
+      location.reload();
+    });
+    window.addEventListener('cog-lang-changed', syncVersionControl);
+    if (lt) lt.addEventListener('click', function () { setTimeout(syncVersionControl, 150); });
   } catch (e) {
     console.error(e);
     var el = document.getElementById('mb-reader') || document.body;
