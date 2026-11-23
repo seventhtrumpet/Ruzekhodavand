@@ -80,6 +80,8 @@
     return hasDeuterocanon ? meta : meta.filter(b => b.id < 740);
   }`);
     if (code.indexOf("hasDeuterocanon") < 0) throw new Error('Bible canon filter patch did not apply');
+    code = code.replace("      const max = CHAPTER_COUNTS[bookId] || 1;", "      const selectedTranslation = localStorage.getItem('cog_bible_en_version') || 'kjv';\\n      const expandedEsther = bookId === 190 && ['dra','webbe','odr','odr-original'].indexOf(selectedTranslation) >= 0;\\n      const max = expandedEsther ? 16 : (CHAPTER_COUNTS[bookId] || 1);");
+    if (code.indexOf("const expandedEsther = bookId === 190") < 0) throw new Error('Expanded Esther chapter-count patch did not apply');
 
     code = code.replace(/mb-sel-actions/g, 'mb-actions');
     code = code.replace(/mb-book-btn/g, 'mb-cell');
