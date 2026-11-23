@@ -79,7 +79,9 @@
 
   function withSelectedVersion(url) {
     try {
-      if (isEn()) {
+      var lang = isEn() ? 'en' : 'fa';
+      url += '&lang=' + lang;
+      if (lang === 'en') {
         var en = localStorage.getItem('cog_bible_en_version') || 'kjv';
         return url + '&enVersion=' + encodeURIComponent(en);
       }
