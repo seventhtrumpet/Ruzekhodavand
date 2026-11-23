@@ -12,6 +12,62 @@
     }
     if (!code) throw new Error('Could not load bible core');
 
+    // Replace the pinned core's chapter loader as one complete unit. The pinned
+    // core's historical requestUrl reference is undefined; patching a smaller
+    // fragment is fragile and can silently leave every English chapter blank.
+    code = code.replace(/  async function loadEnChapter\\(id, ch\\) \\{[\\s\\S]*?\\n  \\}\\n\\n  function escapeHtml/, `  async function loadEnChapter(id, ch) {
+    const b = meta.find(x => x.id === id);
+    if (!b) return null;
+    if (!enCache[id]) enCache[id] = { id, name: b.en, chapters: {} };
+    if (enCache[id].chapters[String(ch)]) return enCache[id];
+    try {
+      const selectedTranslation = localStorage.getItem('cog_bible_en_version') || 'kjv';
+      const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885'];
+      const isOdr = selectedTranslation === 'odr' || selectedTranslation === 'odr-original';
+      const isLocalEnglish = localEnglishIds.indexOf(selectedTranslation) >= 0;
+      const isFreeBible = selectedTranslation === 'kjv' || selectedTranslation === 'bbe';
+      const bookSlug = b.en === 'Song of Songs' ? 'song-of-solomon' : b.en.toLowerCase().replace(/\\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      const odrPath = selectedTranslation === 'odr-original' ? 'original-spelling/bible/raw/' : 'bible/raw/';
+      const requestUrl = isOdr
+        ? '/data/bible-en/odr/' + odrPath + b.slug + '.json'
+        : isLocalEnglish
+          ? '/data/bible-en/local/' + selectedTranslation + '/b' + id + '.json'
+          : isFreeBible
+            ? 'https://free.bible/bible/' + selectedTranslation + '/' + bookSlug + '/' + ch + '.json'
+            : '';
+      if (!requestUrl) throw new Error('Unsupported Bible edition: ' + selectedTranslation);
+      const res = await fetch(requestUrl);
+      if (!res.ok) throw new Error('Chapter request failed: ' + res.status);
+      const data = await res.json();
+      let rows = [];
+      if (isOdr) {
+        const entry = (data.chapters || []).find(item => Number(item.chapter) === Number(ch));
+        rows = (entry && entry.verses) || [];
+      } else if (isLocalEnglish) {
+        const localBook = data[String(id)] || data[id] || data;
+        const localChapter = localBook && localBook.chapters && localBook.chapters[String(ch)];
+        rows = Object.keys(localChapter || {}).map(n => ({ verse: n, text: localChapter[n] }));
+      } else {
+        rows = Array.isArray(data) ? data : (data.verses || []);
+      }
+      const verses = {};
+      rows.forEach(v => {
+        const n = v.verse != null ? v.verse : v.v;
+        const text = v.text != null ? v.text : v.t;
+        if (n != null && Number(n) > 0) verses[String(n)] = String(text || '').replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').trim();
+      });
+      if (Object.keys(verses).length) enCache[id].chapters[String(ch)] = verses;
+    } catch (e) {
+      console.error('Bible chapter load failed', { book: b.en, chapter: ch, edition: localStorage.getItem('cog_bible_en_version') || 'kjv', error: e });
+    }
+    return enCache[id];
+  }
+
+  function escapeHtml`);
+    if (code.indexOf('async function loadEnChapter(id, ch)') < 0 || code.indexOf('const requestUrl = isOdr') < 0) {
+      throw new Error('Reader core chapter-loader patch did not apply');
+    }
+
     code = code.replace(/mb-sel-actions/g, 'mb-actions');
     code = code.replace(/mb-book-btn/g, 'mb-cell');
     code = code.replace(/mb-num-btn/g, 'mb-cell');
