@@ -151,7 +151,7 @@ def check_reader_safeguards() -> None:
     supported_ids = set(ENGLISH) | {"kjv", "bbe", "odr", "odr-original"}
     if selector_ids != supported_ids:
         fail(f"English selector/runtime edition mismatch; missing={sorted(supported_ids-selector_ids)}, unsupported={sorted(selector_ids-supported_ids)}")
-    local_lists = re.findall(r"const localEnglishIds = \\[([^\\]]+)\\]", reader)
+    local_lists = re.findall(r"const localEnglishIds = \[([^\]]+)\]", reader)
     expected_local = set(ENGLISH)
     if len(local_lists) < 2:
         fail("Both English chapter-loader paths must declare their local edition allowlists")
@@ -164,7 +164,7 @@ def check_reader_safeguards() -> None:
     if persian_ids != {"opv", "opcb"}:
         fail(f"Persian selector must preserve both distinct local editions; found={sorted(persian_ids)}")
     for edition_id in supported_ids:
-        if not re.search(r"['\\\"]" + re.escape(edition_id) + r"['\\\"]\\s*:", reader):
+        if not re.search(r"['\"]" + re.escape(edition_id) + r"['\"]\s*:", reader):
             fail(f"Reader display-label map is missing selector edition {edition_id}")
     if "const entry = (data.chapters || []).find(item => Number(item.chapter) === Number(ch))" not in reader:
         fail("Original Douay-Rheims loader must select the requested chapter from its chapter array")
