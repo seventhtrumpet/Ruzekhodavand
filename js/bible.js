@@ -20,7 +20,7 @@
 
     code = code.replace("version: 'هزارۀ نو (FANMV)',", "version: 'هزاره نو (FANMV)',");
     code = code.replace("version: 'King James Version',", "version: ({kjv:'King James Version',bsb:'Berean Standard Bible',web:'World English Bible',asv:'American Standard Version',darby:'Darby Bible',dra:'Douay-Rheims 1899'})[localStorage.getItem('cog_bible_en_version') || 'kjv'] || 'King James Version',");
-    code = code.replace("'?translation=kjv'", "'?translation=' + encodeURIComponent(localStorage.getItem('cog_bible_en_version') || 'kjv')");
+    code = code.replace("'?translation=kjv'", "'?translation=' + encodeURIComponent(localStorage.getItem('cog_bible_en_version') || 'kjv') + '&single_chapter_book_matching=indifferent'");
 
     code = code.replace(
       "const files = man[String(id)] || ['b' + id + '.json'];",
