@@ -20,7 +20,7 @@
       "ROM 16:25"
     ],
     "verse_gaps": [],
-    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+    "format_note": "Official eBible VPL text; 66 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
   },
   "asv": {
     "title": "American Standard Version (1901)",
@@ -54,7 +54,7 @@
       "ROM 16:24"
     ],
     "verse_gaps": [],
-    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+    "format_note": "Official eBible VPL text; 66 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
   },
   "ylt": {
     "title": "Young's Literal Translation (1898)",
@@ -71,7 +71,7 @@
     },
     "empty_verses": [],
     "verse_gaps": [],
-    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+    "format_note": "Official eBible VPL text; 66 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
   },
   "webster": {
     "title": "Noah Webster Bible (1833)",
@@ -88,7 +88,7 @@
     },
     "empty_verses": [],
     "verse_gaps": [],
-    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+    "format_note": "Official eBible VPL text; 66 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
   },
   "darby": {
     "title": "Darby Translation (1884)",
@@ -109,7 +109,7 @@
       "ACT 8: 37",
       "ACT 15: 34"
     ],
-    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+    "format_note": "Official eBible VPL text; 66 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
   },
   "gnv": {
     "title": "Geneva Bible (1599)",
@@ -126,7 +126,7 @@
     },
     "empty_verses": [],
     "verse_gaps": [],
-    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+    "format_note": "Official eBible VPL text; 66 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
   },
   "bsb": {
     "title": "Berean Standard Bible",
@@ -159,6 +159,76 @@
       "ACT 28: 29",
       "ROM 16: 24"
     ],
-    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+    "format_note": "Official eBible VPL text; 66 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+  },
+  "dra": {
+    "title": "Douay-Rheims 1899",
+    "source_archive": "engDRA_vpl.zip",
+    "source_url": "https://ebible.org/Scriptures/engDRA_vpl.zip",
+    "source_archive_sha256": "4b7ddcaec6bcf1d973d483a14e6495657daba94056b3a9678d0002315e7e57dd",
+    "license": "Public Domain",
+    "counts": {
+      "books": 73,
+      "chapters": 1334,
+      "verses": 35811,
+      "empty_verse_markers": 0,
+      "chapters_with_verse_gaps": 0
+    },
+    "empty_verses": [],
+    "verse_gaps": [],
+    "format_note": "Official eBible VPL text; 73 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+  },
+  "webbe": {
+    "title": "World English Bible British Edition",
+    "source_archive": "eng-webbe_vpl.zip",
+    "source_url": "https://ebible.org/Scriptures/eng-webbe_vpl.zip",
+    "source_archive_sha256": "055c1a5c21aa18c62117747ce7dd602346d587547399c89673fa7d0a511b8f14",
+    "license": "Public Domain",
+    "counts": {
+      "books": 73,
+      "chapters": 1326,
+      "verses": 35197,
+      "empty_verse_markers": 29,
+      "chapters_with_verse_gaps": 5
+    },
+    "empty_verses": [
+      "SIR 1:5",
+      "SIR 1:7",
+      "SIR 1:21",
+      "SIR 3:19",
+      "SIR 10:21",
+      "SIR 11:15",
+      "SIR 13:14",
+      "SIR 16:15",
+      "SIR 17:5",
+      "SIR 17:9",
+      "SIR 17:16",
+      "SIR 17:18",
+      "SIR 17:21",
+      "SIR 18:3",
+      "SIR 19:18",
+      "SIR 19:21",
+      "SIR 20:3",
+      "SIR 20:32",
+      "SIR 22:9",
+      "SIR 23:28",
+      "SIR 24:18",
+      "SIR 24:24",
+      "SIR 25:12",
+      "SIR 26:19",
+      "LUK 17:36",
+      "ACT 8:37",
+      "ACT 15:34",
+      "ACT 24:7",
+      "ROM 16:25"
+    ],
+    "verse_gaps": [
+      "SIR 11: 16",
+      "SIR 16: 16",
+      "SIR 19: 19",
+      "SIR 22: 10",
+      "SIR 26: 20,21,22,23,24,25,26,27"
+    ],
+    "format_note": "Official eBible VPL text; 73 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
   }
 }
