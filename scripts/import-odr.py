@@ -18,7 +18,10 @@ COMMIT = "5bcc57fa20aae5acdc494c13b047b6287fec0b29"
 BASE = f"https://raw.githubusercontent.com/janvier-s/original-douay-rheims/{COMMIT}"
 EXPECTED_BOOKS = 76
 EXPECTED_CHAPTERS = 1361
-EXPECTED_VERSES = 37202
+EXPECTED_JSON_VERSES = 37154
+EXPECTED_MODERN_CORPUS_VERSES = 37202
+EXPECTED_ORIGINAL_CORPUS_VERSES = 37180
+EXPECTED_USFM_VERSES = 37153
 VARIANTS = {
     "modern": "bible/raw",
     "original": "original-spelling/bible/raw",
@@ -66,8 +69,21 @@ def main() -> None:
     counts = manifest.get("counts", {})
     if not isinstance(books, list) or len(books) != EXPECTED_BOOKS:
         raise SystemExit("Pinned ODR manifest must list 76 books")
-    if counts.get("chapters") != EXPECTED_CHAPTERS or counts.get("verses") != EXPECTED_VERSES:
+    if (
+        counts.get("chapters") != EXPECTED_CHAPTERS
+        or counts.get("verses") != EXPECTED_MODERN_CORPUS_VERSES
+        or counts.get("usfmVerses") != EXPECTED_USFM_VERSES
+    ):
         raise SystemExit("Pinned ODR manifest totals do not match the audited source counts")
+    original_manifest_raw = download(f"{BASE}/original-spelling/manifest.json")
+    original_manifest = json.loads(original_manifest_raw.decode("utf-8"))
+    original_counts = original_manifest.get("counts", {})
+    if (
+        original_counts.get("chapters") != EXPECTED_CHAPTERS
+        or original_counts.get("verses") != EXPECTED_ORIGINAL_CORPUS_VERSES
+        or original_counts.get("usfmVerses") != EXPECTED_USFM_VERSES
+    ):
+        raise SystemExit("Original-spelling ODR manifest totals do not match the audited source counts")
 
     jobs = []
     for variant, source_dir in VARIANTS.items():
@@ -97,7 +113,7 @@ def main() -> None:
     for variant in VARIANTS:
         if totals[variant]["chapters"] != EXPECTED_CHAPTERS:
             raise SystemExit(f"{variant}: chapter total mismatch: {totals[variant]}")
-        if totals[variant]["verses"] != EXPECTED_VERSES:
+        if totals[variant]["verses"] != EXPECTED_JSON_VERSES:
             raise SystemExit(f"{variant}: verse total mismatch: {totals[variant]}")
 
     (OUT / "manifest.json").write_bytes(manifest_raw)
@@ -106,10 +122,15 @@ def main() -> None:
         "source_repository": "janvier-s/original-douay-rheims",
         "source_commit": COMMIT,
         "source_manifest_sha256": hashlib.sha256(manifest_raw).hexdigest(),
+        "original_spelling_manifest_sha256": hashlib.sha256(original_manifest_raw).hexdigest(),
         "license": "CC0 1.0",
         "book_count_including_appendix": EXPECTED_BOOKS,
         "canon_books": 73,
         "appendix_texts": ["3 Esdras", "4 Esdras", "Prayer of Manasses"],
+        "corpus_verses": {"modern": EXPECTED_MODERN_CORPUS_VERSES, "original": EXPECTED_ORIGINAL_CORPUS_VERSES},
+        "json_verse_entries_per_variant": EXPECTED_JSON_VERSES,
+        "usfm_verse_lines": EXPECTED_USFM_VERSES,
+        "source_note": "The corpus count includes verse-0 fragments folded into summary continuations; JSON verse arrays contain 37,154 scripture verse entries. Tobias chapter 0 is introductory and is not shown as a scripture chapter.",
         "variants": totals,
         "file_sha256": file_records,
         "format_note": "Source JSON copied byte-for-byte; verse wording and annotations are unchanged in storage. Reader displays verse text only.",
@@ -124,7 +145,7 @@ def main() -> None:
         "The 76 listed texts comprise the 73-book Catholic canon plus 3 appendix texts.\n",
         encoding="utf-8",
     )
-    print(f"Imported Original Douay-Rheims: 76 books, 1,361 chapters, 37,202 verses in each spelling form.")
+    print(f"Imported Original Douay-Rheims: 76 texts, 1,361 chapters, 37,154 JSON verse entries in each spelling form. Corpus counts: 37,202 modern / 37,180 original; USFM: 37,153.")
 
 
 if __name__ == "__main__":
