@@ -121,6 +121,7 @@ def check_reader_safeguards() -> None:
     html = (ROOT / "bible.html").read_text(encoding="utf-8")
     share = (ROOT / "js/bible-share.js").read_text(encoding="utf-8")
     photo = (ROOT / "js/bible-share-photo.js").read_text(encoding="utf-8")
+    search = (ROOT / "js/bible_search.js").read_text(encoding="utf-8")
     admin = (ROOT / "admin.html").read_text(encoding="utf-8")
     admin_js = (ROOT / "js/admin.js").read_text(encoding="utf-8")
 
@@ -185,6 +186,15 @@ def check_reader_safeguards() -> None:
         fail("Legacy admin compatibility script must remain inert and credential-free")
     if "Textual-integrity note" not in html or "یادداشت امانت‌داری متن" not in html:
         fail("Bible reader must retain its bilingual textual-integrity note")
+    fa_loader_start = search.find("  function loadFa() {")
+    fa_loader_end = search.find("  function loadEn() {", fa_loader_start)
+    fa_loader = search[fa_loader_start:fa_loader_end] if fa_loader_start >= 0 and fa_loader_end > fa_loader_start else ""
+    if "function flattenLocalPersian" not in search or "data/bible-fa/' + version + '/b' + id + '.json" not in fa_loader:
+        fail("Persian Bible search must build its index from the site's own per-book OPV/OPCB files")
+    if any(host in fa_loader for host in ("cdn.jsdelivr.net", "fastly.jsdelivr.net", "raw.githubusercontent.com")):
+        fail("Persian Bible search must not depend on external text/CDN providers")
+    if "faLoadedVersion" not in search:
+        fail("Switching between OPV and OPCB must invalidate the cached Persian search index")
 
 def main() -> int:
     for version in ENGLISH:
