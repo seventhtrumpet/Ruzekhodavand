@@ -19,7 +19,7 @@
     code = code.replace(/mb-num-btn/g, 'mb-cell');
 
     code = code.replace("version: 'هزارۀ نو (FANMV)',", "version: (localStorage.getItem('cog_bible_fa_version') === 'opv' ? 'ترجمه قدیم فارسی (OPV)' : 'هزاره نو (FANMV)'),");
-    code = code.replace("version: 'King James Version',", "version: ({kjv:'King James Version',bsb:'Berean Standard Bible',web:'World English Bible',asv:'American Standard Version',darby:'Darby Bible',dra:'Douay-Rheims 1899',bbe:'Bible in Basic English','oeb-us':'Open English Bible (US)','oeb-cw':'Open English Bible (Commonwealth)',webbe:'World English Bible (British Edition)'})[localStorage.getItem('cog_bible_en_version') || 'kjv'] || 'King James Version',");
+    code = code.replace("version: 'King James Version',", "version: ({kjv:'King James Version',web:'World English Bible',asv:'American Standard Version',darby:'Darby Bible',dra:'Douay-Rheims 1899',bbe:'Bible in Basic English','oeb-us':'Open English Bible (US)','oeb-cw':'Open English Bible (Commonwealth)',webbe:'World English Bible (British Edition)'})[localStorage.getItem('cog_bible_en_version') || 'kjv'] || 'King James Version',");
     code = code.replace("'?translation=kjv'", "'?translation=' + encodeURIComponent(localStorage.getItem('cog_bible_en_version') || 'kjv') + '&single_chapter_book_matching=indifferent'");
 
     code = code.replace(
@@ -114,7 +114,9 @@
       var english = isEn();
       if (versionWrap) versionWrap.style.display = english ? 'flex' : 'none';
       if (persianVersionWrap) persianVersionWrap.style.display = english ? 'none' : 'flex';
-      if (versionSelect) versionSelect.value = localStorage.getItem('cog_bible_en_version') || 'kjv';
+      var savedEnglishVersion = localStorage.getItem('cog_bible_en_version') || 'kjv';
+      if (['kjv','web','asv','darby','dra','bbe','oeb-us','oeb-cw','webbe'].indexOf(savedEnglishVersion) < 0) savedEnglishVersion = 'kjv';
+      if (versionSelect) versionSelect.value = savedEnglishVersion;
       if (persianVersionSelect) persianVersionSelect.value = localStorage.getItem('cog_bible_fa_version') || 'opcb';
       var translationNote = document.getElementById('bible-translation-note');
       if (translationNote) translationNote.textContent = english
@@ -123,7 +125,7 @@
     }
     syncVersionControl();
     if (versionSelect) versionSelect.addEventListener('change', function () {
-      var allowed = ['kjv','bsb','web','asv','darby','dra','bbe','oeb-us','oeb-cw','webbe'];
+      var allowed = ['kjv','web','asv','darby','dra','bbe','oeb-us','oeb-cw','webbe'];
       var value = allowed.indexOf(versionSelect.value) >= 0 ? versionSelect.value : 'kjv';
       localStorage.setItem('cog_bible_en_version', value);
       location.reload();
