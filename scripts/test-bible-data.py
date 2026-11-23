@@ -142,6 +142,31 @@ def check_reader_safeguards() -> None:
         fail("Runtime patch must replace the complete English chapter loader and define edition-specific request URLs")
     if "const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885','msb']" not in reader:
         fail("Runtime patch must enumerate every locally hosted English edition")
+
+    # Keep the visible selector, local data packs, runtime loader allowlists,
+    # and bilingual edition labels in sync. This prevents a selectable option
+    # from silently falling back to an unrelated or unsupported edition.
+    english_select = re.search(r'<select id="bible-version-select">(.*?)</select>', html, re.S)
+    selector_ids = set(re.findall(r'<option value="([^"]+)"', english_select.group(1))) if english_select else set()
+    supported_ids = set(ENGLISH) | {"kjv", "bbe", "odr", "odr-original"}
+    if selector_ids != supported_ids:
+        fail(f"English selector/runtime edition mismatch; missing={sorted(supported_ids-selector_ids)}, unsupported={sorted(selector_ids-supported_ids)}")
+    local_lists = re.findall(r"const localEnglishIds = \[([^\]]+)\]", reader)
+    expected_local = set(ENGLISH)
+    if len(local_lists) < 2:
+        fail("Both English chapter-loader paths must declare their local edition allowlists")
+    for raw_list in local_lists:
+        listed = set(re.findall(r"'([^']+)'", raw_list))
+        if listed != expected_local:
+            fail(f"Local English runtime allowlist mismatch; missing={sorted(expected_local-listed)}, extra={sorted(listed-expected_local)}")
+    persian_select = re.search(r'<select id="persian-version-select"(.*?)</select>', html, re.S)
+    persian_ids = set(re.findall(r'<option value="([^"]+)"', persian_select.group(0))) if persian_select else set()
+    if persian_ids != {"opv", "opcb"}:
+        fail(f"Persian selector must preserve both distinct local editions; found={sorted(persian_ids)}")
+    for edition_id in supported_ids:
+        has_label = re.search(r"(?<![A-Za-z0-9_-])" + re.escape(edition_id) + r"\s*:", reader) or ("'" + edition_id + "':") in reader
+        if not has_label:
+            fail(f"Reader display-label map is missing selector edition {edition_id}")
     if "const entry = (data.chapters || []).find(item => Number(item.chapter) === Number(ch))" not in reader:
         fail("Original Douay-Rheims loader must select the requested chapter from its chapter array")
     if "const localChapter = localBook && localBook.chapters && localBook.chapters[String(ch)]" not in reader:
