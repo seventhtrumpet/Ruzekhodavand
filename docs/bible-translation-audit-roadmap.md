@@ -59,6 +59,16 @@ The reader wrapper also retrieves its pinned upstream JavaScript core from jsDel
 - Do not add NMV full text or an external reading link without documented permission and a clear user decision.
 - Keep source and licence information on the site's own bilingual information page. A source citation is not a reason to send the reader away from the site's Bible reader.
 
+
+## No-external-link and sharing policy
+
+- Visitors must remain on **SeventhTrumpet.org** to read every offered translation. Never add an external reading-page link, external download link, or a button that opens a translation provider.
+- The source/licence page may identify publishers, repositories, translators, and licence names as plain text for attribution. Do not make those names clickable outbound links.
+- Verse/chapter sharing must contain only a canonical URL on `https://seventhtrumpet.org` (for example, `/bible.html?b=...&c=...&v=...`). Never append, expose, or substitute the source provider's URL in WhatsApp, Telegram, Signal, the system share sheet, copied text, or generated share images.
+- Share-image branding and website text must use SeventhTrumpet.org assets and domain only. Do not use a translation provider's logo, domain, or preview image.
+- Third-party data may still be fetched invisibly by the reader while migration is in progress; this is a runtime hosting dependency, not a visitor-facing link. The long-term goal remains to self-host every translation whose rights allow it.
+- Regression checks must inspect both visible anchors and generated share payloads. A clean page with no external anchors is not sufficient if a share action can still leak a provider URL.
+
 ## Recommended engineering sequence
 
 1. **Make the runtime core local.** Vendor the exact reviewed upstream core into the repository, document its upstream commit and local patches, and stop requiring jsDelivr/Raw GitHub to boot the reader.
