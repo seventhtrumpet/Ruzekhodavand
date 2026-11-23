@@ -19,7 +19,7 @@
     code = code.replace(/mb-num-btn/g, 'mb-cell');
 
     code = code.replace("version: 'هزارۀ نو (FANMV)',", "version: 'هزاره نو (FANMV)',");
-    code = code.replace("version: 'King James Version',", "version: ({kjv:'King James Version',bsb:'Berean Standard Bible',web:'World English Bible',asv:'American Standard Version',darby:'Darby Bible',dra:'Douay-Rheims 1899'})[localStorage.getItem('cog_bible_en_version') || 'kjv'] || 'King James Version',");
+    code = code.replace("version: 'King James Version',", "version: ({kjv:'King James Version',bsb:'Berean Standard Bible',web:'World English Bible',asv:'American Standard Version',darby:'Darby Bible',dra:'Douay-Rheims 1899',bbe:'Bible in Basic English','oeb-us':'Open English Bible (US)','oeb-cw':'Open English Bible (Commonwealth)',webbe:'World English Bible (British Edition)'})[localStorage.getItem('cog_bible_en_version') || 'kjv'] || 'King James Version',");
     code = code.replace("'?translation=kjv'", "'?translation=' + encodeURIComponent(localStorage.getItem('cog_bible_en_version') || 'kjv') + '&single_chapter_book_matching=indifferent'");
 
     code = code.replace(
@@ -112,11 +112,13 @@
     function syncVersionControl() {
       var english = isEn();
       if (versionWrap) versionWrap.style.display = english ? 'flex' : 'none';
+      var persianLink = document.getElementById('persian-version-link');
+      if (persianLink) persianLink.style.display = english ? 'none' : 'block';
       if (versionSelect) versionSelect.value = localStorage.getItem('cog_bible_en_version') || 'kjv';
     }
     syncVersionControl();
     if (versionSelect) versionSelect.addEventListener('change', function () {
-      var allowed = ['kjv','bsb','web','asv','darby','dra'];
+      var allowed = ['kjv','bsb','web','asv','darby','dra','bbe','oeb-us','oeb-cw','webbe'];
       var value = allowed.indexOf(versionSelect.value) >= 0 ? versionSelect.value : 'kjv';
       localStorage.setItem('cog_bible_en_version', value);
       location.reload();
