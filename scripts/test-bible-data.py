@@ -164,7 +164,8 @@ def check_reader_safeguards() -> None:
     if persian_ids != {"opv", "opcb"}:
         fail(f"Persian selector must preserve both distinct local editions; found={sorted(persian_ids)}")
     for edition_id in supported_ids:
-        if not re.search(r"['\"]" + re.escape(edition_id) + r"['\"]\s*:", reader):
+        has_label = re.search(r"(?<![A-Za-z0-9_-])" + re.escape(edition_id) + r"\s*:", reader) or ("'" + edition_id + "':") in reader
+        if not has_label:
             fail(f"Reader display-label map is missing selector edition {edition_id}")
     if "const entry = (data.chapters || []).find(item => Number(item.chapter) === Number(ch))" not in reader:
         fail("Original Douay-Rheims loader must select the requested chapter from its chapter array")
