@@ -70,6 +70,17 @@
   </div>
 
   <main class="mb-reader" id="mb-reader">
+    <div id="bible-version-wrap" style="display:flex;align-items:center;gap:.5rem;margin:0 0 1rem;">
+      <label for="bible-version-select" style="font-size:.9rem;">English Bible version</label>
+      <select id="bible-version-select" style="max-width:100%;padding:.45rem .65rem;border:1px solid var(--border-color,#ccc);border-radius:.5rem;background:var(--card-bg,#fff);color:inherit;">
+        <option value="kjv">King James Version (KJV)</option>
+        <option value="bsb">Berean Standard Bible (BSB)</option>
+        <option value="web">World English Bible (WEB)</option>
+        <option value="asv">American Standard Version (ASV)</option>
+        <option value="darby">Darby Bible</option>
+        <option value="dra">Douay-Rheims 1899 (DRA)</option>
+      </select>
+    </div>
     <h1 id="bible-heading" class="mb-heading"></h1>
     <div id="bible-verses" class="mb-text">
       <p class="mb-loading" data-i18n="loading">در حال بارگذاری…</p>
@@ -82,7 +93,7 @@
 
   <script src="js/lang_fix.js"></script>
   <script src="js/bible_fa_fill.js?v=integrity-fix-20261122"></script>
-  <script src="js/bible.js?v=load-once-20261122"></script>
+  <script src="js/bible.js?v=english-translations-20261122"></script>
   <script src="js/bible_search.js?v=escape-fix-20261122"></script>
   <script src="js/bible-share.js"></script>
   <script src="js/bible-share-photo.js"></script>
