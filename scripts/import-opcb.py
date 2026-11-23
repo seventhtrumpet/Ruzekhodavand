@@ -50,6 +50,7 @@ def main() -> None:
     if not isinstance(books, list) or len(books) != len(BOOK_IDS):
         raise SystemExit("OPCB source must contain exactly 66 books")
 
+    OUT.mkdir(parents=True, exist_ok=True)
     manifest: dict[str, str] = {}
     total_chapters = 0
     total_verses = 0
