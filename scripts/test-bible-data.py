@@ -6,6 +6,7 @@ Run from the repository root: python scripts/test-bible-data.py
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
@@ -85,6 +86,18 @@ def check_odr() -> None:
     books = manifest["books"]
     if len(books) != 76:
         fail(f"Original Douay-Rheims: expected 76 listed texts, found {len(books)}")
+    metadata = load_json(base / "metadata.json")
+    hashes = metadata.get("file_sha256", {}) if isinstance(metadata, dict) else {}
+    if len(hashes) != 152:
+        fail(f"Original Douay-Rheims: expected 152 pinned source-file hashes, found {len(hashes)}")
+    for relative, expected_hash in hashes.items():
+        source_path = base / relative
+        if not source_path.is_file():
+            fail(f"Original Douay-Rheims: missing hashed source file {relative}")
+            continue
+        actual_hash = hashlib.sha256(source_path.read_bytes()).hexdigest()
+        if actual_hash != expected_hash:
+            fail(f"Original Douay-Rheims: source text integrity hash mismatch for {relative}")
     for spelling in ("bible/raw", "original-spelling/bible/raw"):
         raw_dir = base / spelling
         files = {p.stem for p in raw_dir.glob("*.json")}
