@@ -1,0 +1,104 @@
+# Bible Reader Audit and Translation Roadmap
+
+Last reviewed: 2026-11-23
+Repository: seventhtrumpet/Ruzekhodavand
+Production baseline reviewed: 18be4ab88e5a31db0b843fd9c26ffaa5e2ee0961
+
+## Purpose
+
+Keep Bible reading inside SeventhTrumpet.org, preserve useful complete translations when their reuse terms allow it, disclose the source and limitations of every edition, and progressively reduce dependence on third-party runtime services. Do not describe a translation as fully audited until a complete text-level comparison has actually been completed.
+
+## Current reader inventory
+
+### Persian
+
+- **OPV — Old Persian Version:** served from the site's own `/data/bible-fa/opv/` files. The supplied USFM archive was structurally inspected: 66 books, 1,189 chapters, 31,090 original verse markers. The importer restores one Ezekiel 25:5 boundary that was joined to verse 25:4 in the source; two empty Job verse markers are preserved. This is a structural/import audit, not a complete linguistic or source-text collation.
+- **OPCB — Open Persian Contemporary Bible:** 66 books, 1,189 chapters, 28,731 verse entries in the pinned JSON mirror. The reader currently retrieves the pinned dataset from jsDelivr/fastly.jsdelivr.net/Raw GitHub at runtime. Its structural gate checks the expected book and chapter counts and string-array chapters. Genesis 1:1, Psalm 23:1, and John 3:16 were spot-checked against official eBible samples. This is not a full verse-by-verse comparison with the official USFM archive.
+- **NMV — New Millennium Version:** not offered as a full-text option because written permission to host the complete text has not been obtained. Do not add an outbound reading link. Reconsider only after documented permission.
+
+### English
+
+The selector currently exposes these 14 choices:
+
+1. KJV — King James Version
+2. WEB — World English Bible
+3. ASV — American Standard Version (1901)
+4. ERV 1885 — English Revised Version
+5. YLT — Young's Literal Translation (1898)
+6. Webster — Webster's Bible (1833)
+7. BBE — Bible in Basic English
+8. BSB — Berean Standard Bible
+9. WEBBE — World English Bible, British Edition
+10. Darby — Darby Translation (1884)
+11. DRA — Douay-Rheims 1899 (73-book Catholic canon)
+12. Geneva — Geneva Bible 1599 (66 books)
+13. Original Douay-Rheims — modernized spelling
+14. Original Douay-Rheims — historical spelling
+
+The reader requests chapter text from these runtime sources:
+
+| Translation(s) | Current chapter-data source | Runtime note |
+|---|---|---|
+| KJV, WEB, ASV, BBE, ERV 1885, YLT, Webster | Free.Bible | Chapter fetched on demand |
+| BSB, WEBBE, Darby, DRA 1899 | bible-api.com | Chapter fetched on demand |
+| Geneva 1599 | Bolls API | Chapter fetched on demand |
+| Original Douay-Rheims, both spelling forms | Pinned GitHub raw dataset | Pinned 76-book manifest and book JSON files |
+
+The reader does not intentionally navigate visitors to these providers. However, these versions are not yet all self-hosted. A provider outage, rate limit, CORS change, or upstream availability issue can prevent a chapter from loading.
+
+The reader wrapper also retrieves its pinned upstream JavaScript core from jsDelivr, with Raw GitHub as fallback. This is an additional runtime dependency that should be removed by vendoring the reviewed core into the repository and testing the patched version locally.
+
+## Rights and presentation rules
+
+- Never assume that free-to-read means free to redistribute. Confirm the exact edition, source, licence, attribution, and any trademark or jurisdiction caveat before self-hosting.
+- Preserve OPV and OPCB as separate Persian options. Never merge their text or silently substitute one for the other.
+- Keep the 1899 Douay-Rheims and the original 1582/1609–1610 Douay-Rheims as separate editions.
+- The original Douay-Rheims dataset has 76 listed texts: 73 in the Catholic canon plus three appendix texts (3 Esdras, 4 Esdras, and the Prayer of Manasses). Label the appendix clearly; do not imply that all 76 are part of the 73-book canon.
+- Keep Geneva, Darby, and Catholic historical editions available for comparison when their complete texts and reuse terms permit. Explain historical context without treating a tradition label as proof that a translation is wrong or right.
+- Do not add incomplete corpora to the full-Bible selector. If a partial corpus is ever shown, label it conspicuously as partial.
+- Do not add NMV full text or an external reading link without documented permission and a clear user decision.
+- Keep source and licence information on the site's own bilingual information page. A source citation is not a reason to send the reader away from the site's Bible reader.
+
+## Recommended engineering sequence
+
+1. **Make the runtime core local.** Vendor the exact reviewed upstream core into the repository, document its upstream commit and local patches, and stop requiring jsDelivr/Raw GitHub to boot the reader.
+2. **Create a reproducible data-import pipeline.** Prefer authorized downloadable source archives or repositories with clear redistribution terms. Do not scrape chapter APIs to build local copies when the provider's terms or documentation prohibit bulk extraction.
+3. **Self-host eligible texts one edition at a time.** Begin with sources that provide a clear reusable complete dataset. Preserve exact source version, licence, attribution, checksum, book/chapter counts, and import script for each edition.
+4. **Add automated integrity tests.** Verify every expected book and chapter, verse numbering, duplicate/missing verse keys, empty records, and selected known passages. Report anomalies rather than silently filling or dropping them.
+5. **Keep an honest dependency table.** Until a translation is self-hosted and tested, state that chapter data is fetched from its named provider in the background. Do not call the reader fully independent while a live third-party dependency remains.
+6. **Test real use.** Test Persian/English switching, OPV/OPCB selection, all book and chapter selectors, historical canon differences, mobile layout, offline/provider-failure behavior, and direct deep links. Code syntax checks alone do not establish browser correctness.
+
+## Future project: translation from the original languages
+
+This is a separate, long-term scholarly project, not a quick conversion of an existing English or Persian translation.
+
+### Source-language scope
+
+- **Hebrew:** the Hebrew portions of the Old Testament.
+- **Aramaic:** the Aramaic portions of the Old Testament, including the relevant passages in Ezra and Daniel and other Aramaic passages.
+- **Koine Greek:** the New Testament.
+
+### Decisions required before translating
+
+1. Select a specific base text edition for each language only after checking its textual basis, editorial method, manuscript policy, and licence. Do not silently mix editions.
+2. Decide how textual variants will be represented: main reading, footnote, or apparatus note. Record meaningful differences rather than hiding them.
+3. Publish a transparent translation philosophy: formal/dynamic balance, treatment of idioms, names, poetry, quotations, and theological terms.
+4. Build a versioned glossary for key Hebrew, Aramaic, and Greek terms, with consistent Persian and English renderings where appropriate.
+5. Keep source text, morphology/lexical notes, draft translation, reviewer comments, and final published text as separate data layers.
+6. Require review by qualified readers of the original languages and independent theological/language review. AI may assist with comparison, consistency checks, and draft suggestions, but must not be presented as a substitute for qualified human review.
+7. Where the source text or translation is disputed, show the issue and the reason for the chosen rendering in a concise note. Do not disguise interpretation as a certain lexical fact.
+8. Version every published revision and keep a public changelog and correction process.
+
+### Publication format
+
+Each verse should be linked to its source-language text and stable reference. The reader should be able to view the Persian translation, English translation, original-language text, and concise translator notes without leaving SeventhTrumpet.org. The first release should be a clearly labelled pilot passage, not a claim that the entire Bible has already been translated.
+
+## Audit status
+
+- Reader selector and runtime source map: inspected in the production-baseline source.
+- OPV structure/import: previously inspected from the supplied USFM archive.
+- OPCB structure and three sample passages: recorded in the repository's audit notes; not a full collation.
+- Original Douay-Rheims manifest and representative files: checked in its implementation PR; not a full text collation.
+- Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**.
+- Real interactive browser/device testing of every selector and chapter: **not yet completed**.
+- Complete self-hosting and elimination of third-party runtime dependencies: **not yet completed**.
