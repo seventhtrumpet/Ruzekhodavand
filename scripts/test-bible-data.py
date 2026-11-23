@@ -147,7 +147,7 @@ def check_reader_safeguards() -> None:
         fail("Book metadata must include the seven additional deuterocanonical books")
     core_counts = core[core.find("const CHAPTER_COUNTS"):core.find("const I18N")]
     for book_id, chapters in {740:14,750:16,760:19,770:51,780:6,790:16,800:15}.items():
-        if not re.search(rf"\\b{book_id}:{chapters}\\b", core_counts):
+        if not re.search(rf"\b{book_id}:{chapters}\b", core_counts):
             fail(f"Reader chapter-count map is missing book {book_id} ({chapters} chapters)")
     if "odrSlugById[id]" not in reader:
         fail("Original Douay-Rheims reader must map book IDs to source file slugs")
