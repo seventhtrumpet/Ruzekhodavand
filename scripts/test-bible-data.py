@@ -173,8 +173,8 @@ def check_reader_safeguards() -> None:
                 fail(f"{version}: Esther should have {expected} chapters, found {len(chapters)}")
     if "const availableIds = availableBooks().map(b => b.id)" not in reader:
         fail("Switching to Persian must move away from books absent from Persian editions")
-    if "expanded-canon-fix3-20261123" not in html:
-        fail("Bible reader script URL is missing the latest cache-busting version")
+    if "expanded-canon-search-fix4-20261123" not in html or "odr-local-search-20261123" not in html:
+        fail("Bible reader or search script URL is missing the latest cache-busting version")
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
         fail("Bible share scripts must use the canonical site origin")
@@ -205,6 +205,10 @@ def check_reader_safeguards() -> None:
         fail("English search scopes must include deuterocanonical books in All Bible and Old Testament")
     if "flattenOriginalDouaySearch" not in search or "original-spelling/search-index.json" not in search or "bookId >= 1001 && bookId <= 1076" not in search:
         fail("Both Original Douay-Rheims spelling variants must use their own local search index and expanded-canon scopes")
+    if "Search remains KJV-based." in reader or "Original Douay-Rheims use the KJV fallback index" in reader:
+        fail("Reader notes must not describe Original Douay-Rheims search as using the KJV fallback")
+    if "both Original Douay-Rheims spelling forms still use the KJV fallback search index" in (ROOT / "bible-licenses.html").read_text(encoding="utf-8"):
+        fail("Licence page must describe the new local Original Douay-Rheims search indexes accurately")
     if not (ROOT / "scripts/build-odr-search-index.py").is_file():
         fail("Original Douay-Rheims local search-index builder is missing")
     for index_path in (ROOT / "data/bible-en/odr/search-index.json", ROOT / "data/bible-en/odr/original-spelling/search-index.json"):
