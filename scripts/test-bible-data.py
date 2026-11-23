@@ -19,7 +19,7 @@ BOOK_IDS = [
     550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,
     700,710,720,730,
 ]
-ENGLISH = ["web", "asv", "ylt", "webster", "darby", "gnv", "bsb", "rv1885", "dra", "webbe"]
+ENGLISH = ["web", "asv", "ylt", "webster", "darby", "gnv", "bsb", "rv1885", "dra", "webbe", "msb"]
 ERRORS: list[str] = []
 CHECKED_JSON = 0
 
@@ -127,7 +127,7 @@ def check_reader_safeguards() -> None:
 
     if "code.replace(/  async function loadEnChapter" not in reader or "const requestUrl = isOdr" not in reader:
         fail("Runtime patch must replace the complete English chapter loader and define edition-specific request URLs")
-    if "const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885']" not in reader:
+    if "const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885','msb']" not in reader:
         fail("Runtime patch must enumerate every locally hosted English edition")
     if "const entry = (data.chapters || []).find(item => Number(item.chapter) === Number(ch))" not in reader:
         fail("Original Douay-Rheims loader must select the requested chapter from its chapter array")
@@ -139,7 +139,7 @@ def check_reader_safeguards() -> None:
         fail("English chapter fetch patch must not replace the first generic fetch call")
     if "const ref = encodeURIComponent(b.en + ' ' + ch);" not in core:
         fail("Pinned reader core no longer has the expected chapter-fetch anchor")
-    if "Ten English editions" not in reader or "KJV and BBE" not in reader:
+    if "Eleven English editions" not in reader or "KJV and BBE" not in reader:
         fail("Reader hosting note must distinguish local editions from remotely fetched KJV/BBE")
     if "Geneva uses Bolls chapter delivery" in reader or "Darby and Douay-Rheims use Bible API" in reader:
         fail("Reader contains obsolete external-provider hosting notice")
@@ -210,7 +210,7 @@ def main() -> int:
         if len(ERRORS) > 100:
             print(f" - ... and {len(ERRORS)-100} more")
         return 1
-    print(f"PASS: parsed {CHECKED_JSON} JSON files; 10 English packs, 2 Persian packs, both 76-text Original Douay-Rheims spelling forms, and reader safeguards validated.")
+    print(f"PASS: parsed {CHECKED_JSON} JSON files; 11 English packs, 2 Persian packs, both 76-text Original Douay-Rheims spelling forms, and reader safeguards validated.")
     print("NOTE: structural validation does not establish verse-by-verse translation accuracy or legal redistribution rights.")
     return 0
 
