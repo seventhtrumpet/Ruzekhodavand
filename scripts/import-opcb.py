@@ -38,6 +38,16 @@ CHAPTER_COUNTS = {
 EXPECTED_VERSES = 28731
 
 
+def reject_duplicate_keys(pairs):
+    """Reject repeated JSON object keys in the upstream source."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON object key: {key!r}")
+        result[key] = value
+    return result
+
+
 def main() -> None:
     request = urllib.request.Request(
         SOURCE_URL, headers={"User-Agent": "SeventhTrumpet-OPCB-import/1.0"}
@@ -45,7 +55,7 @@ def main() -> None:
     with urllib.request.urlopen(request, timeout=90) as response:
         raw = response.read()
     source_hash = hashlib.sha256(raw).hexdigest()
-    books = json.loads(raw.decode("utf-8"))
+    books = json.loads(raw.decode("utf-8"), object_pairs_hook=reject_duplicate_keys)
 
     if not isinstance(books, list) or len(books) != len(BOOK_IDS):
         raise SystemExit("OPCB source must contain exactly 66 books")
