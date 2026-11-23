@@ -1,9 +1,9 @@
 # Bible Reader Audit and Translation Roadmap
 
-Last reviewed: 2026-11-23 (including MSB reader fix, cache refresh, and selector/runtime regression guard)
+Last reviewed: 2026-11-23 (including structural-count checks, expanded-canon fixes, and reader cache refresh)
 Repository: seventhtrumpet/Ruzekhodavand
 Latest main commit reviewed: 1b487916c086062b9ec6a77c59189ae5577fdb7c (PR #67 cache-refresh documentation checkpoint)
-Latest reader-code fixes: PR #55 (MSB saved-version and change-handler allowlists) and PR #56 (cache-busting refresh)
+Latest reader-code fixes: PR #62 (WEBBE expanded-canon visibility), PR #64 (Douay Daniel chapter visibility), and PR #66 (cache-busting refresh); PR #55 also fixed MSB saved-version and change-handler allowlists
 Latest importer-code commit reviewed: 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV source archive checksum pin).
 Recent main commits: 952dc50996461733287dde43e3bc14630321e45b (licence-page corrections), 5c60083c427a4e9891803f33f4ef26c507b26be2 (KJV rights label), 1ee801b8394a5daea9b83f65b0d4574cae88299a (audit results), 87a504f3b985ac20bd281e16c1bc044426fba10f (importer scope wording), 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV archive checksum pin), and e68ede1ac758202bec74bf878cc645bef63b3ef1 (OPV data regenerated with the pinned archive).
 
@@ -24,7 +24,7 @@ Keep Bible reading inside SeventhTrumpet.org, preserve useful complete translati
 
 ### Persian
 
-- **OPV — Old Persian Version:** served from the site's own `/data/bible-fa/opv/` files. The supplied USFM archive was structurally inspected: 66 books, 1,189 chapters, 31,090 original verse markers; the importer restores the documented Ezekiel 25:5 boundary, yielding 31,091 imported verse records. The importer restores one Ezekiel 25:5 boundary that was joined to verse 25:4 in the source; two empty Job verse markers are preserved. This is a structural/import audit, not a complete linguistic or source-text collation.
+- **OPV — Old Persian Version:** served from the site's own `/data/bible-fa/opv/` files. The supplied USFM archive was structurally inspected: 66 books, 1,189 chapters, and 31,090 original verse markers. The importer restores one Ezekiel 25:5 boundary that was joined to verse 25:4 in the source, yielding 31,091 imported verse records; two empty Job verse markers are preserved. This is a structural/import audit, not a complete linguistic or source-text collation.
 - **OPCB — Open Persian Contemporary Bible:** 66 books, 1,189 chapters, 28,731 verse entries. A reproducible importer now converts the pinned upstream source into per-book JSON files under `/data/bible-fa/opcb/`; the reader fetches those same-origin files and no longer needs a CDN/Raw GitHub text fallback. The importer validates the complete book/chapter/verse structure and preserves verse wording. Genesis 1:1, Psalm 23:1, and John 3:16 were spot-checked against official eBible samples. This is not a full verse-by-verse comparison with the official USFM archive. The GitHub Actions import workflow completed successfully and committed all 66 per-book files plus the manifest, metadata, and attribution README. The generated dataset contains 1,189 chapters and 28,731 verses.
 - **NMV — New Millennium Version:** not offered as a full-text option because written permission to host the complete text has not been obtained. Do not add an outbound reading link. Reconsider only after documented permission.
 
