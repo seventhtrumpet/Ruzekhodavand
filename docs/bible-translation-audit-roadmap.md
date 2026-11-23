@@ -54,7 +54,7 @@ The reader requests chapter text from these runtime sources (the Original Douay-
 | Geneva 1599 | Bolls API | Chapter fetched on demand |
 | Original Douay-Rheims, both spelling forms | Same-origin `/data/bible-en/odr/` files | Pinned 76-book manifest and 152 book JSON files |
 
-The reader does not navigate visitors to these providers. English chapter data for several editions and Original Douay-Rheims remain upstream runtime dependencies; Persian OPV and OPCB are designed to load from same-origin local files.
+The reader does not navigate visitors to these providers. KJV, BBE, and ERV 1885 are the only remaining translation IDs that fetch chapter text from Free.Bible. The former Bible-API.com fallback has been removed; unrecognized IDs now resolve only to same-origin local paths. English chapter data for several editions and Original Douay-Rheims remain upstream runtime dependencies; Persian OPV and OPCB are designed to load from same-origin local files.
 
 The reader wrapper now retrieves the reviewed, pinned JavaScript core from the same-origin path `/js/bible-core-pinned.js`. The core itself is self-hosted; the selected Bible chapter data for several editions remains externally fetched.
 
