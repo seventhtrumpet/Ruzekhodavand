@@ -90,6 +90,7 @@ def main() -> None:
         total_chapters = 0
         total_verses = 0
         empty_verses: list[str] = []
+        all_books: list[dict] = []
 
         for filename, book_id in zip(names, IDS):
             source = zf.read(filename).decode("utf-8-sig")
@@ -137,6 +138,7 @@ def main() -> None:
                     "chapters": chapters,
                 }
             }
+            all_books.append(payload[str(book_id)])
             output_path = OUT_DIR / f"b{book_id}.json"
             output_path.write_text(
                 json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
@@ -156,12 +158,17 @@ def main() -> None:
         if set(empty_verses) != expected_empty:
             raise RuntimeError(f"Unexpected empty source verses: {empty_verses}")
 
+        (OUT_DIR / "index.json").write_text(
+            json.dumps({"version": "OPV", "books": all_books}, ensure_ascii=False, separators=(",", ":")),
+            encoding="utf-8",
+        )
+
         readme = (
             "# Persian Old Persian Version (OPV) data\n\n"
             "Source: https://ebible.org/bible/details.php?id=pesOPV\n\n"
             "The source identifies OPV as public domain and credits Wycliffe Bible Translators.\n"
             "Original USFM archive: https://ebible.org/Scriptures/pesOPV_usfm.zip\n\n"
-            "Generated as one JSON file per Bible book for the Seventh Trumpet reader.\n"
+            "Generated as one JSON file per Bible book for the reader, plus index.json for full-text search.\n"
             "The source has two intentionally preserved empty verse markers in Job 35:1 and 40:1.\n"
             "The source placed the wording of Ezekiel 25:5 at the end of 25:4; the build restores "
             "that verse boundary without changing the wording.\n"
