@@ -29,10 +29,23 @@ def fail(message: str) -> None:
     ERRORS.append(message)
 
 
+def reject_duplicate_keys(pairs):
+    """Reject duplicate JSON object keys instead of silently keeping the last value."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate object key {key!r}")
+        result[key] = value
+    return result
+
+
 def load_json(path: Path):
     global CHECKED_JSON
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=reject_duplicate_keys,
+        )
         CHECKED_JSON += 1
         return data
     except Exception as exc:
