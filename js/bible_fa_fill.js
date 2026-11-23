@@ -135,38 +135,35 @@
   var OPV_BASE = 'https://ebible.org/Scriptures/';
   function cleanUsfmText(value) {
     return String(value || '')
-      .replace(/\\\\f[\\s\\S]*?\\\\f\\*/g, ' ')
-      .replace(/\\\\x[\\s\\S]*?\\\\x\\*/g, ' ')
-      .replace(/\\\\[a-zA-Z0-9]+\\*?/g, ' ')
-      .replace(/\\\\\\\\/g, '\\\\')
+      .replace(/\\f[\s\S]*?\\f\*/g, ' ')
+      .replace(/\\x[\s\S]*?\\x\*/g, ' ')
+      .replace(/\\[a-zA-Z0-9]+\*?/g, ' ')
+      .replace(/\\\\/g, '\\')
       .replace(/[{}]/g, '')
-      .replace(/\\s+/g, ' ')
+      .replace(/\s+/g, ' ')
       .trim();
   }
-  function parseOpvUsfm(text, id) {
+  function parseOpvUsfm(source, id) {
     var chapters = {}, currentChapter = null, currentVerse = null;
-    String(text || '').split(/\\r?\\n/).forEach(function(line) {
-      var c = line.match(/^\\s*\\\\c\\s+(\\d+)/);
+    String(source || '').split(/\r?\n/).forEach(function(line) {
+      var c = line.match(/^\s*\\c\s+(\d+)/);
       if (c) { currentChapter = c[1]; chapters[currentChapter] = chapters[currentChapter] || {}; currentVerse = null; return; }
-      var v = line.match(/^\\s*\\\\v\\s+([0-9]+[a-z]?(?:-[0-9]+[a-z]?)?)\\s*(.*)$/i);
+      var v = line.match(/^\s*\\v\s+([0-9]+[a-z]?(?:-[0-9]+[a-z]?)?)\s*(.*)$/i);
       if (v && currentChapter) {
-        var start = Number((v[1].match(/^\\d+/) || [])[0]);
+        var start = Number((v[1].match(/^\d+/) || [])[0]);
         if (!start) return;
         currentVerse = String(start);
-        var body = cleanUsfmText(v[2]);
-        chapters[currentChapter][currentVerse] = body;
+        chapters[currentChapter][currentVerse] = cleanUsfmText(v[2]);
         return;
       }
-      if (currentChapter && currentVerse && line.trim() && !/^\\s*\\\\/.test(line)) {
+      if (currentChapter && currentVerse && line.trim() && !/^\s*\\/.test(line)) {
         var extra = cleanUsfmText(line);
         if (extra) chapters[currentChapter][currentVerse] = (chapters[currentChapter][currentVerse] + ' ' + extra).trim();
       }
     });
-    var name = '';
-    var h = String(text || '').match(/^\\\\h\\s+(.+)$/m);
-    if (h) name = cleanUsfmText(h[1]);
+    var h = String(source || '').match(/^\\h\s+(.+)$/m);
     var payload = {};
-    payload[String(id)] = { id:id, name:name, chapters:chapters };
+    payload[String(id)] = { id:id, name:h ? cleanUsfmText(h[1]) : '', chapters:chapters };
     return payload;
   }
   function opvBookPayload(id) {
@@ -178,7 +175,7 @@
       return res.text();
     }).then(function(source) {
       var parsed = parseOpvUsfm(source, Number(id));
-      if (!parsed[String(id)] || !Object.keys(parsed[String(id)].chapters).length) throw new Error('OPV file has no readable chapters');
+      if (!Object.keys(parsed[String(id)].chapters).length) throw new Error('OPV file has no readable chapters');
       return parsed;
     }).catch(function(error) {
       delete opvCache[id];
