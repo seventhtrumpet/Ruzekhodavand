@@ -56,7 +56,21 @@
       "document.getElementById('mb-close')?.addEventListener('click', function(){ closeSel(); Promise.resolve(renderBook(true)).then(function(){ scrollToRef(chapter, verse, true); }); });"
     );
 
+    code = code.replace(
+      "document.getElementById('lang-toggle')?.addEventListener('click', async () => {\n      currentLang = currentLang === 'fa' ? 'en' : 'fa';\n      localStorage.setItem(LANG_KEY, currentLang);\n      applyChrome();\n      await renderBook(true);\n    });",
+      "window.__stSetBibleLanguage = async function (lang) {\n      currentLang = lang === 'en' ? 'en' : 'fa';\n      localStorage.setItem(LANG_KEY, currentLang);\n      applyChrome();\n      await renderBook(true);\n    };"
+    );
+
     (0, eval)(code);
+
+    // lang_fix.js handles the visible toggle in capture phase; mirror its event
+    // into the Bible reader's private language state and reload the selected text.
+    window.addEventListener('cog-lang-changed', function (event) {
+      var language = event && event.detail && event.detail.lang || localStorage.getItem('cog_lang') || 'fa';
+      if (typeof window.__stSetBibleLanguage === 'function') {
+        window.__stSetBibleLanguage(language);
+      }
+    });
 
     function isEn() {
       try { return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en'; }
@@ -124,8 +138,8 @@
       if (persianVersionSelect) persianVersionSelect.value = localStorage.getItem('cog_bible_fa_version') || 'opcb';
       var translationNote = document.getElementById('bible-translation-note');
       if (translationNote) translationNote.textContent = english
-        ? "Choose from the full English translations listed here. The list excludes denominational editions and incomplete translations."
-        : 'از میان ترجمه‌های کامل فارسی انتخاب کنید. نسخه‌هایی که برای انتشار کامل به مجوز جداگانه نیاز دارند، در این فهرستِ متنِ قابل میزبانی قرار نمی‌گیرند.';
+        ? "This list contains full English translations whose texts can be hosted under their stated licences. See sources and licences for details."
+        : 'این فهرست شامل ترجمه‌های کامل فارسی است که متن آن‌ها با مجوز اعلام‌شده قابل میزبانی است. برای آگاهی از منبع و شرایط استفاده، صفحهٔ منابع و مجوزها را ببینید.';
       var nmvLink = document.getElementById('nmv-external-link');
       if (nmvLink) nmvLink.textContent = english
         ? 'New Millennium Version (NMV) — read on the publisher’s website'
