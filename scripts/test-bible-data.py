@@ -152,6 +152,8 @@ def check_reader_safeguards() -> None:
     if "odrSlugById[id]" not in reader:
         fail("Original Douay-Rheims reader must map book IDs to source file slugs")
     if "hasDeuterocanon" not in reader or "return hasDeuterocanon ? meta : meta.filter(b => b.id < 740)" not in reader:
+    if "const expandedEsther = bookId === 190" not in reader or "expandedEsther ? 16" not in reader:
+        fail("73-book editions must expose all 16 Esther chapters")
         fail("Reader must show the expanded canon only for editions that contain it")
     if "expanded-canon-fix-20261123" not in html:
         fail("Bible reader script URL is missing the hosting-note cache-busting version")
