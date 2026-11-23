@@ -373,3 +373,15 @@ body.dark #bible-translation-note { color: #d8e2ee; }
 .persian-version-item a { display: inline-block; margin-top: .2rem; font-weight: 650; text-decoration: underline; }
 body.dark .persian-version-item { background: #1b2b3c; border-color: #52677d; color: #f8fafc; }
 body.dark .persian-version-item span { color: #d0dbe7; }
+
+
+/* Persian Bible version selector */
+#persian-version-wrap label { color: var(--text, #172536); font-weight: 650; }
+#persian-version-select {
+  width: 100%; min-height: 2.65rem; padding: .55rem .75rem;
+  border: 1px solid var(--border, #66788c); border-radius: .55rem;
+  background: var(--bg-card, #fff); color: var(--text, #172536);
+  font: inherit; font-size: .92rem; cursor: pointer;
+}
+body.dark #persian-version-wrap label { color: #f1f5f9; }
+body.dark #persian-version-select { background: #1b2b3c; color: #f8fafc; border-color: #9aafc4; }
