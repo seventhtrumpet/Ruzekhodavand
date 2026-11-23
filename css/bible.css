@@ -345,3 +345,31 @@ body.dark #bible-translation-note { color: #d8e2ee; }
 @media (max-width: 480px) {
   #bible-version-select { flex: 1 1 100%; width: 100%; min-width: 0; }
 }
+
+
+/* Persian Bible versions — show both available translations clearly */
+.persian-version-list {
+  flex-direction: column;
+  align-items: stretch;
+  gap: .65rem;
+  margin: 0 0 1rem;
+}
+.persian-version-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .28rem;
+  padding: .75rem .85rem;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: .65rem;
+  background: var(--bg-card, #fff);
+  color: var(--text, #172536);
+  line-height: 1.65;
+  font-size: .9rem;
+}
+.persian-version-item strong { font-size: .98rem; }
+.persian-version-item span { color: var(--text-muted, #526174); font-size: .82rem; }
+.persian-version-active { border-inline-start: 4px solid #27835d; }
+.persian-version-item a { display: inline-block; margin-top: .2rem; font-weight: 650; text-decoration: underline; }
+body.dark .persian-version-item { background: #1b2b3c; border-color: #52677d; color: #f8fafc; }
+body.dark .persian-version-item span { color: #d0dbe7; }
