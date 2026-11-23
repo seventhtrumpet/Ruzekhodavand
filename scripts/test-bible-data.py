@@ -199,6 +199,10 @@ def check_reader_safeguards() -> None:
         fail("English Bible search must use the selected locally hosted edition when available")
     if "enLoadedVersion" not in search or "msb" not in search:
         fail("Switching English editions must refresh the selected local search index, including MSB")
+    if "searchIds = searchIds.concat([740,750,760,770,780,790,800])" not in search or "flattenLocalEnglish(packs, searchIds)" not in search:
+        fail("DRA and WEBBE English search must include all seven deuterocanonical books")
+    if "bookId >= 740 && bookId <= 800" not in search:
+        fail("English search scopes must include deuterocanonical books in All Bible and Old Testament")
     if "cdn.jsdelivr.net" not in search or "fastly.jsdelivr.net" not in search or "raw.githubusercontent.com" not in search:
         fail("KJV fallback sources must remain available until KJV/BBE rights and local source archives are fully reviewed")
 
