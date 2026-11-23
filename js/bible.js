@@ -115,6 +115,10 @@
       var persianLink = document.getElementById('persian-version-link');
       if (persianLink) persianLink.style.display = english ? 'none' : 'block';
       if (versionSelect) versionSelect.value = localStorage.getItem('cog_bible_en_version') || 'kjv';
+      var translationNote = document.getElementById('bible-translation-note');
+      if (translationNote) translationNote.textContent = english
+        ? 'Translations reflect different textual and interpretive choices. No translation is completely free of interpretation. WEB and OEB describe their projects as ecumenical/open; Darby and Douay-Rheims have distinct historical church backgrounds. Compare translations rather than assuming they teach identical theology.'
+        : 'ترجمه‌ها ممکن است بر پایهٔ متون و انتخاب‌های تفسیری متفاوت باشند؛ هیچ ترجمه‌ای کاملاً خالی از تفسیر نیست. پروژه‌های WEB و OEB خود را فرافرقه‌ای/متن‌باز معرفی می‌کنند؛ داربی و دوئه‌رِیمز پیشینهٔ کلیسایی مشخصی دارند. ترجمه‌ها را با هم مقایسه کنید و فرض نکنید که همگی دقیقاً یک برداشت الهیاتی دارند.';
     }
     syncVersionControl();
     if (versionSelect) versionSelect.addEventListener('change', function () {
