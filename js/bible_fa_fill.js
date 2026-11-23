@@ -4,9 +4,9 @@
   window.__faFillInit = true;
 
   var OPCB_URLS = [
-    'https://cdn.jsdelivr.net/gh/thiagobodruk/bible/json/fa_opcb.json',
-    'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/fa_opcb.json',
-    'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/fa_opcb.json'
+    'https://cdn.jsdelivr.net/gh/thiagobodruk/bible@4c8b8a4a7bd75fee381e1b55523b152191d6a1a5/json/fa_opcb.json',
+    'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@4c8b8a4a7bd75fee381e1b55523b152191d6a1a5/json/fa_opcb.json',
+    'https://raw.githubusercontent.com/thiagobodruk/bible/4c8b8a4a7bd75fee381e1b55523b152191d6a1a5/json/fa_opcb.json'
   ];
 
   var IDS = [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,190,220,230,240,250,260,290,300,310,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730];
@@ -35,7 +35,9 @@
             var r = await origFetch(OPCB_URLS[i]);
             if (!r.ok) continue;
             var list = await r.json();
-            if (Array.isArray(list) && list.length >= 66) return list;
+            if (Array.isArray(list) && list.length === IDS.length && list.every(function (book, index) {
+              return book && Array.isArray(book.chapters) && book.chapters.length === (CH_COUNT[IDS[index]] || 0) && book.chapters.every(function (chapter) { return Array.isArray(chapter); });
+            })) return list;
           } catch (e) {}
         }
         console.warn('[bible] Persian OPCB unavailable');
