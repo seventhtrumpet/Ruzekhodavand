@@ -203,6 +203,17 @@ def check_reader_safeguards() -> None:
         fail("DRA and WEBBE English search must include all seven deuterocanonical books")
     if "bookId >= 740 && bookId <= 800" not in search:
         fail("English search scopes must include deuterocanonical books in All Bible and Old Testament")
+    if "flattenOriginalDouaySearch" not in search or "original-spelling/search-index.json" not in search or "bookId >= 1001 && bookId <= 1076" not in search:
+        fail("Both Original Douay-Rheims spelling variants must use their own local search index and expanded-canon scopes")
+    if not (ROOT / "scripts/build-odr-search-index.py").is_file():
+        fail("Original Douay-Rheims local search-index builder is missing")
+    for index_path in (ROOT / "data/bible-en/odr/search-index.json", ROOT / "data/bible-en/odr/original-spelling/search-index.json"):
+        if index_path.is_file():
+            rows = load_json(index_path)
+            if not isinstance(rows, list) or len(rows) != 37154:
+                fail(f"{index_path.relative_to(ROOT)}: expected 37,154 verse search rows")
+            elif any(not isinstance(row, dict) or not all(k in row for k in ("id","ch","v","text","label")) for row in rows[:20]):
+                fail(f"{index_path.relative_to(ROOT)}: malformed search-index row")
     if "cdn.jsdelivr.net" not in search or "fastly.jsdelivr.net" not in search or "raw.githubusercontent.com" not in search:
         fail("KJV fallback sources must remain available until KJV/BBE rights and local source archives are fully reviewed")
 
