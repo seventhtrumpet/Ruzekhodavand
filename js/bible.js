@@ -111,12 +111,10 @@
     var versionSelect = document.getElementById('bible-version-select');
     var persianVersionWrap = document.getElementById('persian-version-wrap');
     var persianVersionSelect = document.getElementById('persian-version-select');
-    var persianVersionLink = document.getElementById('persian-version-link');
     function syncVersionControl() {
       var english = isEn();
       if (versionWrap) versionWrap.style.display = english ? 'flex' : 'none';
       if (persianVersionWrap) persianVersionWrap.style.display = english ? 'none' : 'flex';
-      if (persianVersionLink) persianVersionLink.style.display = english ? 'none' : 'inline-block';
       if (versionSelect) versionSelect.value = localStorage.getItem('cog_bible_en_version') || 'kjv';
       if (persianVersionSelect) persianVersionSelect.value = localStorage.getItem('cog_bible_fa_version') || 'opcb';
       var translationNote = document.getElementById('bible-translation-note');
