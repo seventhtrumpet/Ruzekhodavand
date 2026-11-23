@@ -123,6 +123,7 @@ def check_reader_safeguards() -> None:
     photo = (ROOT / "js/bible-share-photo.js").read_text(encoding="utf-8")
     admin = (ROOT / "admin.html").read_text(encoding="utf-8")
     admin_js = (ROOT / "js/admin.js").read_text(encoding="utf-8")
+
     if "code.replace(/  async function loadEnChapter" not in reader or "const requestUrl = isOdr" not in reader:
         fail("Runtime patch must replace the complete English chapter loader and define edition-specific request URLs")
     if "const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885']" not in reader:
@@ -141,13 +142,15 @@ def check_reader_safeguards() -> None:
         fail("Reader hosting note must distinguish local editions from remotely fetched KJV/BBE")
     if "Geneva uses Bolls chapter delivery" in reader or "Darby and Douay-Rheims use Bible API" in reader:
         fail("Reader contains obsolete external-provider hosting notice")
+
     meta = json.loads((ROOT / "data/bible-fa/meta.json").read_text(encoding="utf-8"))
     extra_ids = {740,750,760,770,780,790,800}
     persian_manifest = json.loads((ROOT / "data/bible-fa/manifest.json").read_text(encoding="utf-8"))
     if len(persian_manifest) != 66 or extra_ids.intersection({int(k) for k in persian_manifest}):
         fail("Persian OPV/OPCB availability must remain limited to their 66-book datasets")
-    if not extra_ids.issubset({item.get("id") for item in meta}):
-        fail("Book metadata must include the seven additional deuterocanonical books")
+    if len(meta) != 73 or not extra_ids.issubset({item.get("id") for item in meta}):
+        fail("Book metadata must include 66 common books plus seven additional deuterocanonical books")
+
     core_counts = core[core.find("const CHAPTER_COUNTS"):core.find("const I18N")]
     for book_id, chapters in {740:14,750:16,760:19,770:51,780:6,790:16,800:15}.items():
         if not re.search(rf"\b{book_id}:{chapters}\b", core_counts):
@@ -155,9 +158,9 @@ def check_reader_safeguards() -> None:
     if "odrSlugById[id]" not in reader:
         fail("Original Douay-Rheims reader must map book IDs to source file slugs")
     if "hasDeuterocanon" not in reader or "return hasDeuterocanon ? meta : meta.filter(b => b.id < 740)" not in reader:
+        fail("Reader must show the expanded canon only for editions that contain it")
     if "const expandedEsther = bookId === 190" not in reader or "expandedEsther ? 16" not in reader:
-    if "const availableIds = availableBooks().map(b => b.id)" not in reader:
-        fail("Switching to Persian must move away from books absent from Persian editions")
+        fail("Douay-Rheims editions with expanded Esther must expose all 16 chapters")
     if "['dra','odr','odr-original'].indexOf(selectedTranslation)" not in reader:
         fail("Expanded Esther must be limited to DRA and Original Douay-Rheims, not WEBBE")
     for version, expected in (("dra",16),("webbe",10)):
@@ -167,21 +170,21 @@ def check_reader_safeguards() -> None:
             chapters = esther.get("190", {}).get("chapters", {})
             if len(chapters) != expected:
                 fail(f"{version}: Esther should have {expected} chapters, found {len(chapters)}")
-        fail("Douay-Rheims editions with expanded Esther must expose all 16 chapters")
-        fail("Reader must show the expanded canon only for editions that contain it")
-    if "expanded-canon-fix2-20261123" not in html:
-        fail("Bible reader script URL is missing the hosting-note cache-busting version")
+    if "const availableIds = availableBooks().map(b => b.id)" not in reader:
+        fail("Switching to Persian must move away from books absent from Persian editions")
+    if "expanded-canon-fix3-20261123" not in html:
+        fail("Bible reader script URL is missing the latest cache-busting version")
+
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
         fail("Bible share scripts must use the canonical site origin")
     if "bible.html?b=" not in share or "return SITE + '/'" not in share:
         fail("Bible share payload must build canonical same-site reader URLs")
     if re.search(r"<script[^>]+(?:admin_cloud_hook|admin_edit_hook|cloud_sync)", admin, re.I):
         fail("Disabled admin page must not load legacy admin hooks")
-    if "Intentionally inert" not in admin_js or re.search(r"\\blocalStorage\\s*\\.|password|function\\s+login", admin_js, re.I):
+    if "Intentionally inert" not in admin_js or re.search(r"\blocalStorage\s*\.|password|function\s+login", admin_js, re.I):
         fail("Legacy admin compatibility script must remain inert and credential-free")
     if "Textual-integrity note" not in html or "یادداشت امانت‌داری متن" not in html:
         fail("Bible reader must retain its bilingual textual-integrity note")
-
 
 def main() -> int:
     for version in ENGLISH:
