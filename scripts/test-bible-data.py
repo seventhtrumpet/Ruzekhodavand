@@ -365,6 +365,8 @@ def check_reader_safeguards() -> None:
     if "edition-aware-bible-share-links-20261123" not in html or "odr-local-search-20261123" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
+    if r"\\n    else if (route.has('b')" in reader:
+        fail("Bible reader JavaScript must not contain a literal escaped newline in executable route parsing")
     if "new URLSearchParams(window.location.search)" not in reader or "cog_bible_book_slug" not in reader:
         fail("Bible reader must restore shared book, language, and edition before loading the reader core")
     if r'code.replace("await loadMeta();\n    await loadManifest();"' not in reader:
