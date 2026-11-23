@@ -1,6 +1,7 @@
 # Persian Old Persian Version (OPV) data
 
 Source: https://ebible.org/bible/details.php?id=pesOPV
+Source archive SHA-256: dfadecb7be54dbde66059cb113c46b03586f11ff0adee57493ec2c75e7bf9769
 
 The source identifies OPV as public domain and credits Wycliffe Bible Translators.
 Original USFM archive: https://ebible.org/Scriptures/pesOPV_usfm.zip
