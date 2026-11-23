@@ -72,7 +72,7 @@
     // Expose the 73-book canon only for editions that actually contain it.
     code = code.replace(/  function availableBooks\(\) \{[\s\S]*?\n  \}/, `  function availableBooks() {
     const selectedTranslation = localStorage.getItem('cog_bible_en_version') || 'kjv';
-    const hasDeuterocanon = ['dra','webbe','odr','odr-original'].indexOf(selectedTranslation) >= 0;
+    const hasDeuterocanon = ['dra','odr','odr-original'].indexOf(selectedTranslation) >= 0;
     if (currentLang === 'fa' && manifest && Object.keys(manifest).length) {
       const list = meta.filter(b => manifest[String(b.id)]);
       return list.length ? list : meta.filter(b => b.id < 740);
