@@ -173,7 +173,7 @@ def check_reader_safeguards() -> None:
                 fail(f"{version}: Esther should have {expected} chapters, found {len(chapters)}")
     if "const availableIds = availableBooks().map(b => b.id)" not in reader:
         fail("Switching to Persian must move away from books absent from Persian editions")
-    if "expanded-canon-fix3-20261123" not in html:
+    if "share-version-fix1-20261123" not in html:
         fail("Bible reader script URL is missing the latest cache-busting version")
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
