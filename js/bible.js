@@ -1,10 +1,8 @@
 /* Seventh Trumpet Bible — load core + safe fixes + flat JSON support */
 (async function () {
   try {
-    var urls = [
-      'https://cdn.jsdelivr.net/gh/seventhtrumpet/Ruzekhodavand@5b705c41b170e9bf44d18bc046ce2ddfe7547f5d/js/bible.js',
-      'https://raw.githubusercontent.com/seventhtrumpet/Ruzekhodavand/5b705c41b170e9bf44d18bc046ce2ddfe7547f5d/js/bible.js'
-    ];
+    // Load the reviewed, pinned reader core from this site (no CDN/GitHub runtime dependency).
+    var urls = ['/js/bible-core-pinned.js'];
     var code = null;
     for (var i = 0; i < urls.length; i++) {
       try {
