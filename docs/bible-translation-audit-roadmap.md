@@ -6,6 +6,16 @@ Production baseline reviewed: 18be4ab88e5a31db0b843fd9c26ffaa5e2ee0961
 
 ## Purpose
 
+## Translation fidelity: Sabbath and Sunday
+
+- Preserve every translation faithfully; never insert, delete, or alter wording to force a denominational position.
+- Do not label Sunday as the biblical Sabbath or add a claim that Sunday is holy when that claim is not present in the source text.
+- Keep the distinction visible in editorial notes: Genesis 2:2–3 and Exodus 20:8–11 identify the seventh day with the Sabbath; Mark 16:2 and Acts 20:7 refer to Sunday as the first day of the week.
+- If a translation or edition contains a Sunday-related editorial heading, footnote, or interpretive gloss, distinguish it from the translated biblical text and identify it as editorial material. Do not silently rewrite it.
+- Present translation history and church tradition neutrally. Readers may compare editions, but the site's own notes must not misrepresent what the source text says.
+- Provide this explanation in Persian and English, separate from the verse text.
+
+
 Keep Bible reading inside SeventhTrumpet.org, preserve useful complete translations when their reuse terms allow it, disclose the source and limitations of every edition, and progressively reduce dependence on third-party runtime services. Do not describe a translation as fully audited until a complete text-level comparison has actually been completed.
 
 ## Current reader inventory
