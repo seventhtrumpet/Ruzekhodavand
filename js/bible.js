@@ -151,7 +151,7 @@
       "const data = pack[String(id)] || pack[id];\n        if (!data) return;",
       "let data = pack[String(id)] || pack[id];\n        if (!data && pack.chapters) data = pack;\n        if (!data && pack.id != null && Number(pack.id) === Number(id) && pack.chapters) data = pack;\n        if (!data) return;"
     );
-    code = code.replace("const res = await fetch('/data/bible-fa/' + fname);", "const dataDir = localStorage.getItem('cog_bible_fa_version') === 'opv' ? '/data/bible-fa/opv/' : '/data/bible-fa/';\n        const res = await fetch(dataDir + fname);");
+    code = code.replace("const res = await fetch('/data/bible-fa/' + fname);", "const dataDir = localStorage.getItem('cog_bible_fa_version') === 'opv' ? '/data/bible-fa/opv/' : '/data/bible-fa/opcb/';\n        const res = await fetch(dataDir + fname);");
 
     code = code.replace(
       "bookId = Number(btn.getAttribute('data-book'));\n        chapter = 1; verse = 1;\n        closeSel();\n        await renderBook(true);",
