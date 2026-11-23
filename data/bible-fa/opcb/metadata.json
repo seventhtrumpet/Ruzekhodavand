@@ -1,0 +1,13 @@
+{
+  "translation": "Biblica Open Persian Contemporary Bible (2022)",
+  "copyright": "© 1995, 2005, 2018, 2022 Biblica, Inc.",
+  "text_license": "CC BY-SA 4.0",
+  "source_repository": "thiagobodruk/bible",
+  "source_commit": "4c8b8a4a7bd75fee381e1b55523b152191d6a1a5",
+  "source_url": "https://raw.githubusercontent.com/thiagobodruk/bible/4c8b8a4a7bd75fee381e1b55523b152191d6a1a5/json/fa_opcb.json",
+  "source_sha256": "6e339642444c55c85940ff3de862227b9cb3b2abf4c36c80fda2c164d15ea879",
+  "format_note": "Per-book JSON conversion; verse wording preserved.",
+  "books": 66,
+  "chapters": 1189,
+  "verses": 28731
+}
