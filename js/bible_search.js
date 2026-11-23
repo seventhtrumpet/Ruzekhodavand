@@ -19,6 +19,7 @@
   var faLoadPromise = null;
   var faLoadedVersion = null;
   var enLoadPromise = null;
+  var enLoadedVersion = null;
   var _allItems = [];
   var _shown = 0;
   var _statusMsg = '';
@@ -60,7 +61,8 @@
     if (isEn()) {
       var version = 'kjv';
       try { version = localStorage.getItem('cog_bible_en_version') || 'kjv'; } catch (e) {}
-      return version === 'kjv' ? 'Index: KJV' : 'Index: KJV (reader: ' + version.toUpperCase() + ')';
+      var localVersions = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885','msb'];
+      return localVersions.indexOf(version) >= 0 ? 'Index: ' + version.toUpperCase() : (version === 'kjv' ? 'Index: KJV' : 'Index: KJV (reader: ' + version.toUpperCase() + ')');
     }
     var persianVersion = 'opcb';
     try { persianVersion = localStorage.getItem('cog_bible_fa_version') || 'opcb'; } catch (e2) {}
@@ -466,42 +468,88 @@
           if (!response.ok) throw new Error('Persian Bible data request failed: ' + id + ' (' + response.status + ')');
           return await response.json();
         }));
+        if (faLoadedVersion !== version) return [];
         FA_VERSES = flattenLocalPersian(packs);
         return FA_VERSES;
       } catch (e) {
         console.warn('Persian Bible search data could not be loaded', e);
-        FA_VERSES = null;
-        faLoadPromise = null;
+        if (faLoadedVersion === version) {
+          FA_VERSES = null;
+          faLoadPromise = null;
+        }
         return [];
       }
     })();
     return faLoadPromise;
   }
 
+  function flattenLocalEnglish(packs) {
+    var out = [];
+    for (var i = 0; i < IDS.length; i++) {
+      var id = IDS[i], pack = packs[i];
+      if (!pack) throw new Error('Missing English Bible book file: ' + id);
+      var book = pack[String(id)] || pack[id] || pack;
+      if (!book || !book.chapters) throw new Error('Malformed English Bible book file: ' + id);
+      var label = book.name || ('Book ' + id);
+      Object.keys(book.chapters).sort(function (a, b) { return Number(a) - Number(b); }).forEach(function (ch) {
+        var verses = book.chapters[ch] || {};
+        Object.keys(verses).sort(function (a, b) { return Number(a) - Number(b); }).forEach(function (v) {
+          var text = String(verses[v] == null ? '' : verses[v]);
+          if (!text.trim()) return;
+          out.push({ id: id, ch: Number(ch), v: Number(v), text: text, label: label, norm: normalize(text) });
+        });
+      });
+    }
+    return out;
+  }
+
   function loadEn() {
-    if (EN_VERSES) return Promise.resolve(EN_VERSES);
-    if (enLoadPromise) return enLoadPromise;
-    var urls = [
-      'https://cdn.jsdelivr.net/gh/thiagobodruk/bible/json/en_kjv.json',
-      'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json',
-      'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_kjv.json'
-    ];
+    var version = 'kjv';
+    try { version = localStorage.getItem('cog_bible_en_version') || 'kjv'; } catch (e) {}
+    var localVersions = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885','msb'];
+    if (EN_VERSES && enLoadedVersion === version) return Promise.resolve(EN_VERSES);
+    if (enLoadPromise && enLoadedVersion === version) return enLoadPromise;
+    EN_VERSES = null;
+    enLoadedVersion = version;
     enLoadPromise = (async function () {
-      var meta = [];
       try {
-        var mr = await fetch('/data/bible-fa/meta.json');
-        if (mr.ok) meta = await mr.json();
-      } catch (e) {}
-      for (var i = 0; i < urls.length; i++) {
-        try {
-          var r = await fetch(urls[i]);
-          if (!r.ok) continue;
-          var list = await r.json();
-          EN_VERSES = flattenKjv(list, meta || []);
+        if (localVersions.indexOf(version) >= 0) {
+          var packs = await Promise.all(IDS.map(async function (id) {
+            var response = await fetch('/data/bible-en/local/' + version + '/b' + id + '.json');
+            if (!response.ok) throw new Error('English Bible search data request failed: ' + version + '/' + id + ' (' + response.status + ')');
+            return await response.json();
+          }));
+          if (enLoadedVersion !== version) return [];
+          EN_VERSES = flattenLocalEnglish(packs);
           return EN_VERSES;
+        }
+        var urls = [
+          'https://cdn.jsdelivr.net/gh/thiagobodruk/bible/json/en_kjv.json',
+          'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json',
+          'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_kjv.json'
+        ];
+        var meta = [];
+        try {
+          var mr = await fetch('/data/bible-fa/meta.json');
+          if (mr.ok) meta = await mr.json();
         } catch (e) {}
+        for (var i = 0; i < urls.length; i++) {
+          try {
+            var r = await fetch(urls[i]);
+            if (!r.ok) continue;
+            var list = await r.json();
+            if (enLoadedVersion !== version) return [];
+            EN_VERSES = flattenKjv(list, meta || []);
+            return EN_VERSES;
+          } catch (e) {}
+        }
+      } catch (e) {
+        console.warn('English Bible search data could not be loaded', e);
       }
-      enLoadPromise = null;
+      if (enLoadedVersion === version) {
+        enLoadPromise = null;
+        EN_VERSES = null;
+      }
       return [];
     })();
     return enLoadPromise;
