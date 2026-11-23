@@ -128,4 +128,4 @@ Each verse should be linked to its source-language text and stable reference. Th
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**.
 - Complete self-hosting of every translation text: **not yet completed**; English versions other than Original Douay-Rheims still use upstream chapter services.
 - Elimination of all third-party runtime dependencies across the whole website (including fonts, analytics, and unrelated services): **not yet completed**.
-- Production deployment of the latest main commits: **blocked by Vercel build/API usage limits at the last check; verify before claiming live**.
+- Production deployment: the latest READY deployment on `seventhtrumpet.org` is commit `5c3ca44143bb6846d9821a010ff83b7457676c46` (7 local English editions plus the earlier Persian and Original Douay-Rheims work). Main is now at `f5442ca73c8b955109d7187da711972cf79b9665`, three commits ahead, including DRA 1899 and WEBBE. Vercel reports `build-rate-limit` for newer builds and the deployment API has a 24-hour daily limit; DRA/WEBBE are in main but not yet confirmed live.
