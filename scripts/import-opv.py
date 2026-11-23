@@ -165,10 +165,15 @@ def main() -> None:
         if set(empty_verses) != expected_empty:
             raise RuntimeError(f"Unexpected empty source verses: {empty_verses}")
 
-        (OUT_DIR / "index.json").write_text(
-            json.dumps({"version": "OPV", "books": all_books}, ensure_ascii=False, separators=(",", ":")),
-            encoding="utf-8",
+        index_path = OUT_DIR / "index.json"
+        index_text = json.dumps(
+            {"version": "OPV", "books": all_books},
+            ensure_ascii=False,
+            separators=(",", ":"),
         )
+        if len(index_text) < 100_000:
+            raise RuntimeError("Generated OPV search index is unexpectedly small")
+        index_path.write_text(index_text, encoding="utf-8")
 
         readme = (
             "# Persian Old Persian Version (OPV) data\n\n"

@@ -17,6 +17,7 @@
   var FA_VERSES = null;
   var EN_VERSES = null;
   var faLoadPromise = null;
+  var faLoadedVersion = null;
   var enLoadPromise = null;
   var _allItems = [];
   var _shown = 0;
@@ -429,30 +430,50 @@
     return out;
   }
 
+  function flattenLocalPersian(packs) {
+    var out = [];
+    for (var i = 0; i < IDS.length; i++) {
+      var id = IDS[i];
+      var pack = packs[i];
+      if (!pack) throw new Error('Missing Persian Bible book file: ' + id);
+      var book = pack[String(id)] || pack[id] || pack;
+      if (!book || !book.chapters) throw new Error('Malformed Persian Bible book file: ' + id);
+      var label = book.name || ('Book ' + id);
+      var chapters = book.chapters;
+      Object.keys(chapters).sort(function (a, b) { return Number(a) - Number(b); }).forEach(function (ch) {
+        var verses = chapters[ch] || {};
+        Object.keys(verses).sort(function (a, b) { return Number(a) - Number(b); }).forEach(function (v) {
+          var text = String(verses[v] == null ? '' : verses[v]);
+          if (!text.trim()) return;
+          out.push({ id: id, ch: Number(ch), v: Number(v), text: text, label: label, norm: normalize(text) });
+        });
+      });
+    }
+    return out;
+  }
+
   function loadFa() {
-    if (FA_VERSES) return Promise.resolve(FA_VERSES);
-    if (faLoadPromise) return faLoadPromise;
-    var opv = false;
-    try { opv = localStorage.getItem('cog_bible_fa_version') === 'opv'; } catch (e) {}
-    var urls = opv
-      ? ['/data/bible-fa/opv/index.json']
-      : [
-          'https://cdn.jsdelivr.net/gh/thiagobodruk/bible/json/fa_opcb.json',
-          'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/fa_opcb.json',
-          'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/fa_opcb.json'
-        ];
+    var version = 'opcb';
+    try { version = localStorage.getItem('cog_bible_fa_version') === 'opv' ? 'opv' : 'opcb'; } catch (e) {}
+    if (FA_VERSES && faLoadedVersion === version) return Promise.resolve(FA_VERSES);
+    if (faLoadPromise && faLoadedVersion === version) return faLoadPromise;
+    FA_VERSES = null;
+    faLoadedVersion = version;
     faLoadPromise = (async function () {
-      for (var i = 0; i < urls.length; i++) {
-        try {
-          var r = await fetch(urls[i]);
-          if (!r.ok) continue;
-          var list = await r.json();
-          FA_VERSES = opv ? flattenOpv(list) : flattenOpcb(list);
-          return FA_VERSES;
-        } catch (e) {}
+      try {
+        var packs = await Promise.all(IDS.map(async function (id) {
+          var response = await fetch('/data/bible-fa/' + version + '/b' + id + '.json');
+          if (!response.ok) throw new Error('Persian Bible data request failed: ' + id + ' (' + response.status + ')');
+          return await response.json();
+        }));
+        FA_VERSES = flattenLocalPersian(packs);
+        return FA_VERSES;
+      } catch (e) {
+        console.warn('Persian Bible search data could not be loaded', e);
+        FA_VERSES = null;
+        faLoadPromise = null;
+        return [];
       }
-      faLoadPromise = null;
-      return [];
     })();
     return faLoadPromise;
   }
