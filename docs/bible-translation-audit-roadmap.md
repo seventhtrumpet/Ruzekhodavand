@@ -123,6 +123,7 @@ Each verse should be linked to its source-language text and stable reference. Th
 - OPV structure/import: previously inspected from the supplied USFM archive.
 - OPCB importer and local reader path: implemented; GitHub Actions import completed successfully and generated 66 local per-book JSON files (1,189 chapters; 28,731 verses). The site still needs a successful Vercel deployment and browser test before production availability can be claimed. Three sample passages were compared with official eBible samples; not a full collation.
 - Original Douay-Rheims: GitHub Actions import completed successfully; 76 files per spelling form, 1,361 chapters, and 37,154 JSON verse entries per form are stored locally. The 73-book Catholic canon and three appendix texts remain clearly distinguished. This is structural validation, not a full scholarly verse-by-verse collation.
+- Seven English editions: official eBible VPL archive importer and same-origin reader path implemented. The importer validates all 66 books and 1,189 chapters and records verse counts and archive hashes; GitHub Actions will populate the local files after merge.
 - Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**.
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**.
 - Complete self-hosting of every translation text: **not yet completed**; English versions other than Original Douay-Rheims still use upstream chapter services.
