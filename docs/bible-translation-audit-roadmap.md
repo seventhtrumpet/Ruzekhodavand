@@ -140,3 +140,11 @@ Each verse should be linked to its source-language text and stable reference. Th
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**; the current sandbox browser launch remains blocked by a missing system library.
 - Latest production deployment `dpl_HUcJJeQMyrvjdEXMBTxpZdrL6ME9` is `READY` for commit `2ea342c5c7ba6c7d5e82665f4e4ed9aebe107d1d`; aliases include `www.seventhtrumpet.org` and `seventhtrumpet.org`. This deployment includes the corrected bilingual licence page, the jurisdiction-qualified KJV selector label, the OPV archive checksum pin, and the updated audit/importer documentation. The current main branch has subsequent audit-document-only updates; the website content in the latest production deployment has been verified live. Both `/bible.html` and `/bible-licenses.html` return HTTP 200, the KJV label and Original Douay-Rheims editorial-note explanation are present, neither page has external anchor links, and the stale Bible API/Bolls descriptions are gone. All 964 local Bible JSON endpoints returned HTTP 200 on the deployed site. The apex domain redirects to `www` with HTTP 308. A Playwright browser attempt could not launch because the sandbox lacks `libglib-2.0.so.0`; interactive device testing remains outstanding.
 
+
+
+## Additional security finding (2026-11-23)
+
+- The legacy README exposed an admin password. The credential has been removed from the README, but repository history and the client-side JavaScript may still contain it; treat it as compromised and rotate it anywhere it was reused.
+- js/admin.js currently embeds the login password in browser-delivered JavaScript and uses a client-side sessionStorage flag as its only gate. Anyone can inspect or bypass this check. This is not secure authentication and must not protect sensitive or shared data.
+- The legacy admin panel stores posts and live-state data in the visitor's browser localStorage, rather than a protected server-side database. A secure replacement requires server-side authentication/authorization and protected storage. Do not describe the current panel as securely password-protected.
+- Until that replacement is implemented and tested, restrict or disable public access to /admin.html if the panel is still deployed. Do not put a replacement secret in static JavaScript, HTML, README files, or Git history.
