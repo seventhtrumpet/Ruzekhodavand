@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - .github/workflows/import-opv.yml
+      - scripts/import-opv.py
 
 permissions:
   contents: write
