@@ -1,8 +1,9 @@
 # Bible Reader Audit and Translation Roadmap
 
-Last reviewed: 2026-11-23 (updated after local MSB and Original Douay-Rheims search work)
+Last reviewed: 2026-11-23 (including MSB reader fix, cache refresh, and selector/runtime regression guard)
 Repository: seventhtrumpet/Ruzekhodavand
-Latest reader-code commit reviewed: 397ca1cafaadaa8372e0f1b0da75ad14076a87a2
+Latest main commit reviewed: 76630ae251cba51ac4ace419b08e692c426475fc (PR #57 selector/runtime regression guard)
+Latest reader-code fixes: PR #55 (MSB saved-version and change-handler allowlists) and PR #56 (cache-busting refresh)
 Latest importer-code commit reviewed: 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV source archive checksum pin).
 Recent main commits: 952dc50996461733287dde43e3bc14630321e45b (licence-page corrections), 5c60083c427a4e9891803f33f4ef26c507b26be2 (KJV rights label), 1ee801b8394a5daea9b83f65b0d4574cae88299a (audit results), 87a504f3b985ac20bd281e16c1bc044426fba10f (importer scope wording), 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV archive checksum pin), and e68ede1ac758202bec74bf878cc645bef63b3ef1 (OPV data regenerated with the pinned archive).
 
@@ -119,6 +120,7 @@ Each verse should be linked to its source-language text and stable reference. Th
 ## Audit status (repository state after the November 23, 2026 updates)
 
 - English selector: 15 choices are present: 11 locally hosted editions (WEB, ASV, YLT, Webster, Darby, Geneva, BSB, MSB, ERV 1885, DRA 1899, WEBBE), KJV, BBE, and two Original Douay-Rheims spelling forms. The MSB option must remain accepted by both the saved-version restore list and the change handler; regression tests now guard this.
+- Selector/runtime alignment: regression tests now compare all 15 visible English option IDs against supported editions, check both local-English loader allowlists against the 11 local packs, preserve OPV and OPCB as distinct Persian options, and require a display label for every English selector option. PR #57 is merged; its GitHub Actions Bible-data regression run passed.
 - Local runtime data: 11 English local editions (674 per-book JSON files), two Persian editions (66 files each), and two Original Douay-Rheims spellings (152 raw book files plus two local search indexes). Only KJV and BBE chapter text still fetches from Free.Bible in the background; neither is self-hosted because rights clearance is incomplete.
 - Search: Persian OPV/OPCB and locally hosted English editions use the selected edition's local files. Both Original Douay-Rheims spelling forms use separate local indexes with 37,153 actual scripture verse rows each. KJV and BBE still use the KJV fallback index. The one Tobias chapter-zero introductory line remains in source data but is excluded from scripture search.
 - Original Douay-Rheims integrity: all 152 raw book files (76 texts in two spelling forms) are pinned by SHA-256 in metadata. The builder and regression test verify these hashes before indexing. The 76 listed texts are 73 books in the Catholic canon plus three appendix texts.
