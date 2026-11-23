@@ -367,7 +367,9 @@ def check_reader_safeguards() -> None:
 
     if "new URLSearchParams(window.location.search)" not in reader or "cog_bible_book_slug" not in reader:
         fail("Bible reader must restore shared book, language, and edition before loading the reader core")
-    if reader.count("const savedBookSlug = localStorage.getItem('cog_bible_book_slug')") < 2:
+    if r'code.replace("await loadMeta();\n    await loadManifest();"' not in reader:
+        fail("Runtime boot patch must retain the pinned core's original loadMeta/loadManifest anchor")
+    if "const savedBookSlug = localStorage.getItem('cog_bible_book_slug')" not in reader:
         fail("Bible reader must resolve shared book slugs against the selected edition before rendering")
     if "route.set('lang', lang)" not in share or "route.set('version', version)" not in share or "route.set('slug', slug)" not in share:
         fail("Bible share links must preserve language, translation edition, and canonical book slug")
