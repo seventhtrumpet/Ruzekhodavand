@@ -109,16 +109,20 @@
 
     var versionWrap = document.getElementById('bible-version-wrap');
     var versionSelect = document.getElementById('bible-version-select');
+    var persianVersionWrap = document.getElementById('persian-version-wrap');
+    var persianVersionSelect = document.getElementById('persian-version-select');
+    var persianVersionLink = document.getElementById('persian-version-link');
     function syncVersionControl() {
       var english = isEn();
       if (versionWrap) versionWrap.style.display = english ? 'flex' : 'none';
-      var persianLink = document.getElementById('persian-version-link');
-      if (persianLink) persianLink.style.display = english ? 'none' : 'block';
+      if (persianVersionWrap) persianVersionWrap.style.display = english ? 'none' : 'flex';
+      if (persianVersionLink) persianVersionLink.style.display = english ? 'none' : 'inline-block';
       if (versionSelect) versionSelect.value = localStorage.getItem('cog_bible_en_version') || 'kjv';
+      if (persianVersionSelect) persianVersionSelect.value = 'opcb';
       var translationNote = document.getElementById('bible-translation-note');
       if (translationNote) translationNote.textContent = english
-        ? 'You can choose another available Bible translation, or select the version you prefer from this list. Each translation may reflect different textual and interpretive choices, so comparing versions can be helpful.'
-        : 'شما می‌توانید از میان ترجمه‌های موجود، نسخه‌های دیگر کتاب مقدس را انتخاب کنید یا نسخهٔ دلخواه خود را از این فهرست برگزینید. هر ترجمه ممکن است انتخاب‌های متنی و تفسیری متفاوتی داشته باشد؛ بنابراین مقایسهٔ ترجمه‌ها می‌تواند مفید باشد.';
+        ? "To choose your preferred Bible version, use the drop-down box next to ‘Select Version’."
+        : 'برای انتخاب نسخهٔ دلخواه کتاب مقدس، از کادر کشویی روبه‌روی عبارت «انتخاب نسخهٔ فارسی» استفاده کنید.';
     }
     syncVersionControl();
     if (versionSelect) versionSelect.addEventListener('change', function () {
@@ -126,6 +130,12 @@
       var value = allowed.indexOf(versionSelect.value) >= 0 ? versionSelect.value : 'kjv';
       localStorage.setItem('cog_bible_en_version', value);
       location.reload();
+    });
+    if (persianVersionSelect) persianVersionSelect.addEventListener('change', function () {
+      if (persianVersionSelect.value === 'opv') {
+        window.open('https://ebible.org/study/?t1=local%3ApesOPV&v1=GEN1_1&w1=bible', '_blank', 'noopener');
+        persianVersionSelect.value = 'opcb';
+      }
     });
     window.addEventListener('cog-lang-changed', syncVersionControl);
     if (lt) lt.addEventListener('click', function () { setTimeout(syncVersionControl, 150); });
