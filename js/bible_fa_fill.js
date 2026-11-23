@@ -132,7 +132,7 @@
   }
 
   var opvCache = {};
-  var OPV_BASE = 'https://ebible.org/Scriptures/';
+  var OPV_BASE = '/api/opv?id=';
   function cleanUsfmText(value) {
     return String(value || '')
       .replace(/\\f[\s\S]*?\\f\*/g, ' ')
@@ -170,7 +170,7 @@
     if (opvCache[id]) return opvCache[id];
     var index = IDS.indexOf(Number(id));
     if (index < 0 || !OPV_FILES[index]) return Promise.resolve(null);
-    opvCache[id] = origFetch(OPV_BASE + OPV_FILES[index]).then(function(res) {
+    opvCache[id] = origFetch(OPV_BASE + encodeURIComponent(id)).then(function(res) {
       if (!res.ok) throw new Error('OPV source unavailable: ' + res.status);
       return res.text();
     }).then(function(source) {
