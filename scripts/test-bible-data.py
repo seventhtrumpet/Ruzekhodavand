@@ -77,6 +77,24 @@ def check_pack(pack: str, book_ids: list[int]) -> None:
                     fail(f"{path.relative_to(ROOT)} chapter {chapter} verse {verse}: verse text must be a string")
 
 
+def check_persian_verse_totals() -> None:
+    expected_totals = {"opv": 31090, "opcb": 28731}
+    for edition, expected in expected_totals.items():
+        base = ROOT / f"data/bible-fa/{edition}"
+        actual = 0
+        for book_id in BOOK_IDS:
+            path = base / f"b{book_id}.json"
+            if not path.is_file():
+                continue
+            payload = load_json(path)
+            book = payload.get(str(book_id), {}) if isinstance(payload, dict) else {}
+            chapters = book.get("chapters", {}) if isinstance(book, dict) else {}
+            if isinstance(chapters, dict):
+                actual += sum(len(verses) for verses in chapters.values() if isinstance(verses, dict))
+        if actual != expected:
+            fail(f"{edition}: expected {expected:,} source verse markers, found {actual:,}")
+
+
 def check_english_metadata(available_english: list[str]) -> None:
     metadata = load_json(ROOT / "data/bible-en/local/metadata.json")
     if not isinstance(metadata, dict):
@@ -334,6 +352,7 @@ def main() -> int:
         check_pack(f"data/bible-en/local/{version}", BOOK_IDS + ([740,750,760,770,780,790,800] if version in ("dra", "webbe") else []))
     check_pack("data/bible-fa/opcb", BOOK_IDS)
     check_pack("data/bible-fa/opv", BOOK_IDS)
+    check_persian_verse_totals()
     check_odr()
     check_reader_safeguards()
     if ERRORS:
