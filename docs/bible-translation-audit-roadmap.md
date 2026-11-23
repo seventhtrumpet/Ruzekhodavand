@@ -190,3 +190,10 @@ Each verse should be linked to its source-language text and stable reference. Th
 - The reader now exposes the expanded 73-book catalogue for WEBBE as well as DRA and both Original Douay-Rheims spellings. The separate 16-chapter Esther rule remains limited to DRA and Original Douay-Rheims; WEBBE retains its source-specific 10-chapter Esther structure.
 - A regression assertion for WEBBE's expanded canon passed in GitHub Actions before PR #62 was merged. No verse text was modified.
 - Production deployment records have not yet advanced to the current main commit. Do not claim this reader correction is live until a READY production deployment contains the current commit and the live reader is checked.
+
+## Douay-Rheims Daniel chapter visibility correction (2026-11-23)
+
+- PR #64 fixed a second expanded-canon reader issue: the local DRA pack and Original Douay-Rheims source contain 14 Daniel chapters, but the reader had applied the standard 12-chapter map to every English edition.
+- The reader now exposes Daniel chapters 13–14 only for DRA and both Original Douay-Rheims spelling forms. WEBBE remains at its source-specific 12 chapters.
+- Regression checks validate DRA Daniel has 14 chapters, WEBBE has 12, and the runtime chapter-count rule is edition-specific. The workflow passed before merge.
+- No Scripture wording or source files were changed. Production deployment and live-reader verification remain pending for the current main branch.
