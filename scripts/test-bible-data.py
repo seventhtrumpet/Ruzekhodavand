@@ -201,6 +201,8 @@ def check_reader_safeguards() -> None:
         fail("Shared Bible links must preserve the selected English or Persian translation")
     if "sharedParams.get('enVersion')" not in reader or "sharedParams.get('faVersion')" not in reader:
         fail("Bible reader must restore the selected translation from a shared same-site link")
+    if "sharedParams.get('lang')" not in reader or "lang=" not in share:
+        fail("Shared Bible links must preserve the reader language as well as the translation edition")
 
 def main() -> int:
     for version in ENGLISH:
