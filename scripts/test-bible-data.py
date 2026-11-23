@@ -376,7 +376,7 @@ def check_reader_safeguards() -> None:
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
         fail("Bible share scripts must use the canonical site origin")
-    if "bible.html?b=" not in share or "return SITE + '/'" not in share:
+    if "SITE + '/bible.html?'" not in share or "return SITE + '/'" not in share:
         fail("Bible share payload must build canonical same-site reader URLs")
     if re.search(r"<script[^>]+(?:admin_cloud_hook|admin_edit_hook|cloud_sync)", admin, re.I):
         fail("Disabled admin page must not load legacy admin hooks")
