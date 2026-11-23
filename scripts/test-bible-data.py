@@ -77,6 +77,53 @@ def check_pack(pack: str, book_ids: list[int]) -> None:
                     fail(f"{path.relative_to(ROOT)} chapter {chapter} verse {verse}: verse text must be a string")
 
 
+def check_english_metadata(available_english: list[str]) -> None:
+    metadata = load_json(ROOT / "data/bible-en/local/metadata.json")
+    if not isinstance(metadata, dict):
+        fail("English local metadata must be a JSON object")
+        return
+    expected_ids = set(ENGLISH)
+    if set(metadata) != expected_ids:
+        fail(f"English metadata edition set mismatch; missing={sorted(expected_ids-set(metadata))}, extra={sorted(set(metadata)-expected_ids)}")
+    if set(available_english) != expected_ids:
+        fail(f"English local data-pack set mismatch; missing={sorted(expected_ids-set(available_english))}, extra={sorted(set(available_english)-expected_ids)}")
+    for edition in ENGLISH:
+        entry = metadata.get(edition)
+        if not isinstance(entry, dict):
+            continue
+        counts = entry.get("counts")
+        if not isinstance(counts, dict):
+            fail(f"{edition}: metadata counts are missing")
+            continue
+        book_ids = BOOK_IDS + ([740,750,760,770,780,790,800] if edition in ("dra", "webbe") else [])
+        actual_books = actual_chapters = actual_verses = actual_empty = 0
+        for book_id in book_ids:
+            path = ROOT / f"data/bible-en/local/{edition}/b{book_id}.json"
+            if not path.is_file():
+                continue
+            payload = load_json(path)
+            book = payload.get(str(book_id), {}) if isinstance(payload, dict) else {}
+            chapters = book.get("chapters", {}) if isinstance(book, dict) else {}
+            if not isinstance(chapters, dict):
+                continue
+            actual_books += 1
+            actual_chapters += len(chapters)
+            for verses in chapters.values():
+                if not isinstance(verses, dict):
+                    continue
+                actual_verses += len(verses)
+                actual_empty += sum(1 for verse_text in verses.values() if verse_text == "")
+        actual = {
+            "books": actual_books,
+            "chapters": actual_chapters,
+            "verses": actual_verses,
+            "empty_verse_markers": actual_empty,
+        }
+        for key, value in actual.items():
+            if counts.get(key) != value:
+                fail(f"{edition}: metadata {key}={counts.get(key)!r} does not match local data ({value})")
+
+
 def check_odr() -> None:
     base = ROOT / "data/bible-en/odr"
     manifest = load_json(base / "manifest.json")
@@ -282,6 +329,7 @@ def check_reader_safeguards() -> None:
 
 def main() -> int:
     available_english = [version for version in ENGLISH if (ROOT / f"data/bible-en/local/{version}").is_dir()]
+    check_english_metadata(available_english)
     for version in available_english:
         check_pack(f"data/bible-en/local/{version}", BOOK_IDS + ([740,750,760,770,780,790,800] if version in ("dra", "webbe") else []))
     check_pack("data/bible-fa/opcb", BOOK_IDS)
