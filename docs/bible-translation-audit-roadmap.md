@@ -3,7 +3,7 @@
 Last reviewed: 2026-11-23
 Repository: seventhtrumpet/Ruzekhodavand
 Latest code commit reviewed: 397ca1cafaadaa8372e0f1b0da75ad14076a87a2
-Latest documentation/content commits: 952dc50996461733287dde43e3bc14630321e45b (licence-page corrections), 5c60083c427a4e9891803f33f4ef26c507b26be2 (KJV rights label).
+Latest documentation/content commits: 952dc50996461733287dde43e3bc14630321e45b (licence-page corrections), 5c60083c427a4e9891803f33f4ef26c507b26be2 (KJV rights label), 1ee801b8394a5daea9b83f65b0d4574cae88299a (audit results).
 
 ## Purpose
 
@@ -136,5 +136,5 @@ Each verse should be linked to its source-language text and stable reference. Th
 - Other website dependencies (for example, Google Fonts, Firebase, analytics, and unrelated site scripts) are separate from Bible translation text and have not all been localized.
 - Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**. The 964-file production smoke test and 958-payload structure check do not establish textual fidelity.
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**; the current sandbox browser launch remains blocked by a missing system library.
-- Production deployment: latest deployment `dpl_F7keignFoxQcaY7FG87ysEn7PgXK` is `READY` for commit `397ca1cafaadaa8372e0f1b0da75ad14076a87a2`; aliases include `www.seventhtrumpet.org` and `seventhtrumpet.org`. Live checks on the `www` domain returned HTTP 200 for `/bible.html`, `/bible-licenses.html`, local ERV 1885 Genesis JSON, local DRA Tobit JSON, Original Douay-Rheims historical-spelling Genesis JSON, and Persian OPV/OPCB Genesis JSON. The live reader script confirms local routing for ten English editions, Free.Bible only for KJV/BBE, and no Bible-API.com or Bolls references. The apex domain redirects to `www` with HTTP 308. An interactive Playwright run could not start in the test sandbox because Chromium lacked `libglib-2.0.so.0`; static production checks passed, but interactive device testing remains outstanding.
+- Previous production deployment `dpl_EXayXuLrtogvYYMLZzGYcjqxP1dV` is `READY` for commit `6733ab744afd034fa76ee606c6c1e5fe0d7f3a26`; aliases include `www.seventhtrumpet.org` and `seventhtrumpet.org`. The latest main content commits (`952dc50`, `5c60083`, and `1ee801b`) are committed but not yet deployed. A new production deployment request was rejected by Vercel's `api-deployments-free-per-day` limit (retry after 24 hours); the CLI fallback could not authenticate in the sandbox. Therefore the live licence page and KJV label still reflect the prior deployment until a new deployment can be made. The previous live site returned HTTP 200 for `/bible.html`, `/bible-licenses.html`, and sampled local data endpoints; the full 964-file data endpoint smoke test also returned HTTP 200 for every JSON URL. The apex domain redirects to `www` with HTTP 308. A Playwright browser attempt could not launch because the sandbox lacks `libglib-2.0.so.0`; interactive device testing remains outstanding.
 
