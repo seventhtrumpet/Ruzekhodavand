@@ -362,7 +362,7 @@ def check_reader_safeguards() -> None:
         fail("DRA and Original Douay-Rheims must expose Daniel chapters 13-14 without changing WEBBE")
     if "const availableIds = availableBooks().map(b => b.id)" not in reader:
         fail("Switching to Persian must move away from books absent from Persian editions")
-    if "expanded-canon-search-fix6-20261123" not in html or "odr-local-search-20261123" not in html:
+    if "odr-manifest-slug-fix-20261123" not in html or "odr-local-search-20261123" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
