@@ -143,6 +143,9 @@ def check_reader_safeguards() -> None:
         fail("Reader contains obsolete external-provider hosting notice")
     meta = json.loads((ROOT / "data/bible-fa/meta.json").read_text(encoding="utf-8"))
     extra_ids = {740,750,760,770,780,790,800}
+    persian_manifest = json.loads((ROOT / "data/bible-fa/manifest.json").read_text(encoding="utf-8"))
+    if len(persian_manifest) != 66 or extra_ids.intersection({int(k) for k in persian_manifest}):
+        fail("Persian OPV/OPCB availability must remain limited to their 66-book datasets")
     if not extra_ids.issubset({item.get("id") for item in meta}):
         fail("Book metadata must include the seven additional deuterocanonical books")
     core_counts = core[core.find("const CHAPTER_COUNTS"):core.find("const I18N")]
