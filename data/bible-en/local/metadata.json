@@ -264,5 +264,27 @@
       "SIR 26: 20,21,22,23,24,25,26,27"
     ],
     "format_note": "Official eBible VPL text; 73 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+  },
+  "msb": {
+    "title": "Majority Standard Bible",
+    "source_archive": "engmsb_vpl.zip",
+    "source_url": "https://ebible.org/Scriptures/engmsb_vpl.zip",
+    "source_archive_sha256": "bd45e7df5705d7ce5285d1faed61142f680234ec5ee57130a89c28d52062fb16",
+    "license": "Public Domain",
+    "counts": {
+      "books": 66,
+      "chapters": 1189,
+      "verses": 31102,
+      "empty_verse_markers": 4,
+      "chapters_with_verse_gaps": 0
+    },
+    "empty_verses": [
+      "LUK 17:36",
+      "ACT 8:37",
+      "ACT 15:34",
+      "ACT 24:7"
+    ],
+    "verse_gaps": [],
+    "format_note": "Official eBible VPL text; 66 books are included according to this edition's catalogue. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
   }
 }
