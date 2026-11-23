@@ -49,14 +49,14 @@ The reader requests chapter text from these runtime sources:
 
 | Translation(s) | Current chapter-data source in main | Runtime note |
 |---|---|---|
-| KJV, BBE, ERV 1885 | Free.Bible | The only remaining external translation-text service in main; background fetch only |
+| KJV, BBE | Free.Bible | The only remaining external translation-text service in main; background fetch only |
 | WEB Classic, ASV, YLT, Webster, Darby, Geneva, BSB, ERV 1885 | Same-origin `/data/bible-en/local/{translation}/b{bookId}.json` | 66 books each |
 | DRA 1899 | Same-origin `/data/bible-en/local/dra/` | 73 books; Esther has 16 chapters and Daniel 14 |
 | WEBBE | Same-origin `/data/bible-en/local/webbe/` | 73 books |
 | Original Douay-Rheims, both spelling forms | Same-origin `/data/bible-en/odr/` files | 76 listed texts: 73 canonical books plus three appendix texts |
 | OPV, OPCB | Same-origin `/data/bible-fa/` files | 66 books each |
 
-The reader does not navigate visitors to translation providers. In main, only KJV and BBE still fetch chapter text from Free.Bible in the background; the other nine English editions and both Persian editions are served from local files. No outbound provider-reading links are offered.
+The reader does not navigate visitors to translation providers. In main, only KJV and BBE still fetch chapter text from Free.Bible in the background. Ten English editions are served from local files, alongside both original Douay-Rheims spelling forms and the two Persian editions. No outbound provider-reading links are offered.
 
 The reader wrapper loads the pinned JavaScript core from the same-origin path `/js/bible-core-pinned.js`. The core is self-hosted; jsDelivr, Raw GitHub, Bible-API.com, and Bolls runtime fallback URLs have been removed from the main reader code. Unknown translation IDs resolve only to same-origin local paths.
 
@@ -128,7 +128,7 @@ Each verse should be linked to its source-language text and stable reference. Th
 - Ten English editions are now self-hosted in main and the current production deployment: WEB Classic (31,103 verses), ASV (31,102), YLT (31,102), Webster (31,102), Darby (31,099), Geneva (31,090), BSB (31,086), ERV 1885 (31,102), DRA 1899 (35,811), and WEBBE (35,197). The local English tree contains 674 per-book JSON files and about 43 MB of JSON text. DRA has 73 books/1,334 chapters; WEBBE has 73 books/1,326 chapters.
 - The English importer pins official eBible VPL archive SHA-256 hashes, checks the source archive's Public Domain notice, validates book/chapter structure, and records empty verse markers and verse-number gaps. It never fills an omitted verse from another translation. Genesis 1:1, Psalm 23:1, and John 3:16 were spot-checked against the previous provider; full verse-by-verse collation remains outstanding.
 - Translation fidelity: no verse text is rewritten to declare Sunday holy or to call Sunday the Sabbath. The reader's Persian/English editorial note is separate from the verse text. Source headings, including historical headings that mention the first day of the week, remain clearly identified as source material.
-- Remaining translation-text dependency in main and production: Free.Bible for KJV and BBE only. KJV has a UK Crown copyright caveat; BBE rights vary by jurisdiction. ERV 1885 is now self-hosted from the official eBible VPL archive, whose embedded notice identifies it as Public Domain. Do not self-host until these points are resolved.
+- Remaining translation-text dependency in main and production: Free.Bible for KJV and BBE only. KJV rights in the Authorized Version are vested in the Crown in the United Kingdom and administered by Cambridge University Press under Letters Patent; US public-domain status does not settle worldwide reuse. eBible.org describes BBE as public domain in the United States because it was published without a copyright notice there, but that statement does not establish worldwide public-domain status. Keep both editions as background fetches unless jurisdiction-appropriate redistribution rights are documented. ERV 1885 is self-hosted from the official eBible VPL archive, whose embedded notice identifies it as Public Domain.
 - Other website dependencies (for example, Google Fonts, Firebase, analytics, and unrelated site scripts) are separate from Bible translation text and have not all been localized.
 - Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**.
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**.
