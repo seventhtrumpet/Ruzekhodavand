@@ -117,8 +117,8 @@
       if (versionSelect) versionSelect.value = localStorage.getItem('cog_bible_en_version') || 'kjv';
       var translationNote = document.getElementById('bible-translation-note');
       if (translationNote) translationNote.textContent = english
-        ? 'Translations reflect different textual and interpretive choices. No translation is completely free of interpretation. WEB and OEB describe their projects as ecumenical/open; Darby and Douay-Rheims have distinct historical church backgrounds. Compare translations rather than assuming they teach identical theology.'
-        : 'ترجمه‌ها ممکن است بر پایهٔ متون و انتخاب‌های تفسیری متفاوت باشند؛ هیچ ترجمه‌ای کاملاً خالی از تفسیر نیست. پروژه‌های WEB و OEB خود را فرافرقه‌ای/متن‌باز معرفی می‌کنند؛ داربی و دوئه‌رِیمز پیشینهٔ کلیسایی مشخصی دارند. ترجمه‌ها را با هم مقایسه کنید و فرض نکنید که همگی دقیقاً یک برداشت الهیاتی دارند.';
+        ? 'You can choose another available Bible translation, or select the version you prefer from this list. Each translation may reflect different textual and interpretive choices, so comparing versions can be helpful.'
+        : 'شما می‌توانید از میان ترجمه‌های موجود، نسخه‌های دیگر کتاب مقدس را انتخاب کنید یا نسخهٔ دلخواه خود را از این فهرست برگزینید. هر ترجمه ممکن است انتخاب‌های متنی و تفسیری متفاوتی داشته باشد؛ بنابراین مقایسهٔ ترجمه‌ها می‌تواند مفید باشد.';
     }
     syncVersionControl();
     if (versionSelect) versionSelect.addEventListener('change', function () {
