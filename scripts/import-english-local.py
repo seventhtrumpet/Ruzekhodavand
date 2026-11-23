@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Import seven public-domain English translations from official eBible VPL archives.
+"""Import ten English editions from official eBible VPL archives.
 
 VPL archives contain Bible text only. The importer keeps verse wording exactly,
-filters only non-canon books for the 66-book reader grid, and writes local JSON.
+uses each edition’s defined 66- or 73-book canon, validates chapter/verse structure,
+and writes reproducible per-book JSON files without filling missing source markers.
 """
 from __future__ import annotations
 
