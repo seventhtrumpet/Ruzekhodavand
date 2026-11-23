@@ -334,8 +334,8 @@ def check_reader_safeguards() -> None:
     for book_id, chapters in {740:14,750:16,760:19,770:51,780:6,790:16,800:15}.items():
         if not re.search(rf"\b{book_id}:{chapters}\b", core_counts):
             fail(f"Reader chapter-count map is missing book {book_id} ({chapters} chapters)")
-    if "odrSlugById[id]" not in reader:
-        fail("Original Douay-Rheims reader must map book IDs to source file slugs")
+    if "odrSlugById[id]" not in reader or "const odrBookSlug = b.slug || odrSlugById[id]" not in reader:
+        fail("Original Douay-Rheims reader must prefer manifest slugs for dynamically numbered books and retain the legacy ID map as fallback")
     if "hasDeuterocanon" not in reader or "return hasDeuterocanon ? meta : meta.filter(b => b.id < 740)" not in reader:
         fail("Reader must show the expanded canon only for editions that contain it")
     if "hasDeuterocanon = ['dra','webbe','odr','odr-original']" not in reader:
