@@ -1,6 +1,5 @@
 /* Ruzekhodavand - Admin Panel */
 
-const PASSWORD = 'Godiswithus321';
 const STORAGE_KEY = 'cog_posts_v1';
 const LIVE_KEY = 'cog_live_v1';
 const AUTH_KEY = 'cog_auth';
@@ -154,24 +153,21 @@ function toggleLanguage() {
 }
 
 function checkAuth() {
-  const isAuth = sessionStorage.getItem(AUTH_KEY) === 'true';
-  document.getElementById('login-box').classList.toggle('hidden', isAuth);
-  document.getElementById('admin-panel').classList.toggle('hidden', !isAuth);
-  if (isAuth) {
-    renderLiveControls();
-    renderPostsList();
-    loadVisitorCount();
-  }
+  // Fail closed: this legacy static panel has no server-side authentication.
+  sessionStorage.removeItem(AUTH_KEY);
+  const loginBox = document.getElementById('login-box');
+  const panel = document.getElementById('admin-panel');
+  if (loginBox) loginBox.classList.remove('hidden');
+  if (panel) panel.classList.add('hidden');
+  const form = document.getElementById('login-form');
+  if (form) form.classList.add('hidden');
+  const msg = document.getElementById('admin-disabled-message');
+  if (msg) msg.classList.remove('hidden');
 }
 
 function login(e) {
-  e.preventDefault();
-  if (document.getElementById('password').value === PASSWORD) {
-    sessionStorage.setItem(AUTH_KEY, 'true');
-    checkAuth();
-  } else {
-    showStatus(T[currentLang].wrongPass, 'error');
-  }
+  if (e) e.preventDefault();
+  checkAuth();
 }
 
 function logout() {
