@@ -2,7 +2,8 @@
 
 Last reviewed: 2026-11-23
 Repository: seventhtrumpet/Ruzekhodavand
-Latest code commit reviewed: 397ca1cafaadaa8372e0f1b0da75ad14076a87a2
+Latest reader-code commit reviewed: 397ca1cafaadaa8372e0f1b0da75ad14076a87a2
+Latest importer-code commit reviewed: 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV source archive checksum pin).
 Recent main commits: 952dc50996461733287dde43e3bc14630321e45b (licence-page corrections), 5c60083c427a4e9891803f33f4ef26c507b26be2 (KJV rights label), 1ee801b8394a5daea9b83f65b0d4574cae88299a (audit results), 87a504f3b985ac20bd281e16c1bc044426fba10f (importer scope wording), 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV archive checksum pin), and e68ede1ac758202bec74bf878cc645bef63b3ef1 (OPV data regenerated with the pinned archive).
 
 ## Purpose
