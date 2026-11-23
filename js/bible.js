@@ -4,6 +4,12 @@
     // A shared verse link carries the selected edition so the recipient opens
     // the same source text, not merely the site's default translation.
     var sharedParams = new URLSearchParams(location.search);
+    var sharedLang = sharedParams.get('lang');
+    if ((sharedLang === 'en' || sharedLang === 'fa') && localStorage.getItem('cog_lang') !== sharedLang) {
+      localStorage.setItem('cog_lang', sharedLang);
+      location.reload();
+      return;
+    }
     var sharedEn = sharedParams.get('enVersion');
     var sharedFa = sharedParams.get('faVersion');
     var allowedEn = ['kjv','web','asv','rv1885','ylt','webster','bbe','bsb','webbe','darby','dra','gnv','odr','odr-original'];
