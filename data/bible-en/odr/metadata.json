@@ -18,7 +18,7 @@
   },
   "json_verse_entries_per_variant": 37154,
   "usfm_verse_lines": 37153,
-  "source_note": "The corpus count includes verse-0 fragments folded into summary continuations; JSON verse arrays contain 37,154 scripture verse entries. Tobias chapter 0 is introductory and is not shown as a scripture chapter.",
+  "source_note": "The raw JSON verse arrays contain 37,154 numbered entries per spelling, including one chapter-zero introductory line in Tobias. There are 37,153 scripture verse entries per spelling. Tobias chapter 0 is introductory and is not shown or indexed as a scripture chapter.",
   "variants": {
     "modern": {
       "chapters": 1361,
@@ -183,5 +183,6 @@
     "original-spelling/bible/raw/jude.json": "b2faa9fbf67335bd0a490856485847015502876761c02e82240e3457fc71f6e3",
     "original-spelling/bible/raw/apocalypse.json": "cb1324b9489f14dad7dc79cd1784a10667789b603dd127822a73dbe29e6b080a"
   },
-  "format_note": "Source JSON copied byte-for-byte; verse wording and annotations are unchanged in storage. Reader displays verse text only."
+  "format_note": "Source JSON copied byte-for-byte; verse wording and annotations are unchanged in storage. Reader displays verse text only.",
+  "scripture_verse_entries_per_variant": 37153
 }
