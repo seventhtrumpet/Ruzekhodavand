@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-11-23
 Repository: seventhtrumpet/Ruzekhodavand
-Latest main reviewed: 7068731a66b6bdedb431fb04b822afa9286254ab
+Latest main reviewed: 3e44475ce90b909d99aede242fd0484286cd1f62
 
 ## Purpose
 
@@ -132,5 +132,5 @@ Each verse should be linked to its source-language text and stable reference. Th
 - Other website dependencies (for example, Google Fonts, Firebase, analytics, and unrelated site scripts) are separate from Bible translation text and have not all been localized.
 - Full verse-by-verse accuracy audit across every English and Persian edition: **not yet completed**.
 - Real interactive browser/device testing of every selector and chapter: **not yet completed**.
-- Production deployment: latest READY deployment on `seventhtrumpet.org` is commit `5c3ca44143bb6846d9821a010ff83b7457676c46`. Main is now at `7068731a66b6bdedb431fb04b822afa9286254ab`, five commits ahead. The live deployment includes seven local English editions plus the earlier Persian and Original Douay-Rheims work; DRA 1899, WEBBE, and the removal of the final Bible-API fallback are in main but not yet confirmed live. Vercel reports `build-rate-limit` and a 24-hour daily deployment API limit, so a new production deployment is currently blocked.
+- Production deployment: latest READY deployment on `seventhtrumpet.org` is commit `5c3ca44143bb6846d9821a010ff83b7457676c46`. Main is now at `3e44475ce90b909d99aede242fd0484286cd1f62`, nine commits ahead. The live deployment includes seven local English editions plus the earlier Persian and Original Douay-Rheims work; DRA 1899, WEBBE, and the removal of the final Bible-API fallback are in main but not yet confirmed live. Vercel reports `build-rate-limit` and a 24-hour daily deployment API limit, so a new production deployment is currently blocked.
 
