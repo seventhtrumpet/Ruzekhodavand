@@ -77,6 +77,41 @@ def check_pack(pack: str, book_ids: list[int]) -> None:
                     fail(f"{path.relative_to(ROOT)} chapter {chapter} verse {verse}: verse text must be a string")
 
 
+def check_persian_verse_totals() -> None:
+    expected_totals = {"opv": 31091, "opcb": 28731}
+    for edition, expected in expected_totals.items():
+        base = ROOT / f"data/bible-fa/{edition}"
+        actual = 0
+        empty_markers = []
+        for book_id in BOOK_IDS:
+            path = base / f"b{book_id}.json"
+            if not path.is_file():
+                continue
+            payload = load_json(path)
+            book = payload.get(str(book_id), {}) if isinstance(payload, dict) else {}
+            chapters = book.get("chapters", {}) if isinstance(book, dict) else {}
+            if isinstance(chapters, dict):
+                for chapter, verses in chapters.items():
+                    if not isinstance(verses, dict):
+                        continue
+                    actual += len(verses)
+                    empty_markers.extend(
+                        f"{book_id}:{chapter}:{verse}"
+                        for verse, text in verses.items() if text == ""
+                    )
+        if actual != expected:
+            fail(f"{edition}: expected {expected:,} imported verse markers, found {actual:,}")
+        if edition == "opv" and set(empty_markers) != {"220:35:1", "220:40:1"}:
+            fail(f"OPV: expected only the two documented empty Job markers, found {sorted(empty_markers)}")
+    opv_ezekiel = load_json(ROOT / "data/bible-fa/opv/b330.json")
+    chapters = opv_ezekiel.get("330", {}).get("chapters", {}) if isinstance(opv_ezekiel, dict) else {}
+    verse_four = chapters.get("25", {}).get("4", "")
+    verse_five = chapters.get("25", {}).get("5", "")
+    restored_boundary = "و ربه را آرامگاه شتران و (زمین ) بنی عمون را خوابگاه گله ها"
+    if restored_boundary in verse_four or not verse_five.startswith(restored_boundary):
+        fail("OPV: Ezekiel 25:5 must remain a separate restored verse without duplicating its wording in 25:4")
+
+
 def check_english_metadata(available_english: list[str]) -> None:
     metadata = load_json(ROOT / "data/bible-en/local/metadata.json")
     if not isinstance(metadata, dict):
@@ -334,6 +369,7 @@ def main() -> int:
         check_pack(f"data/bible-en/local/{version}", BOOK_IDS + ([740,750,760,770,780,790,800] if version in ("dra", "webbe") else []))
     check_pack("data/bible-fa/opcb", BOOK_IDS)
     check_pack("data/bible-fa/opv", BOOK_IDS)
+    check_persian_verse_totals()
     check_odr()
     check_reader_safeguards()
     if ERRORS:
