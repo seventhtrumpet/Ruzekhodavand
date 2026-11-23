@@ -1,0 +1,43 @@
+name: Import Original Douay-Rheims local data
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/import-odr.yml
+      - scripts/import-odr.py
+
+permissions:
+  contents: write
+
+jobs:
+  import-odr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Download and validate both pinned ODR spelling datasets
+        run: python scripts/import-odr.py
+
+      - name: Commit generated ODR data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/bible-en/odr
+          if git diff --cached --quiet; then
+            echo "Original Douay-Rheims data is already up to date."
+            exit 0
+          fi
+          git commit -m "Add locally hosted Original Douay-Rheims Bible data"
+          git pull --rebase origin main
+          git push origin HEAD:main

@@ -45,14 +45,14 @@ The selector currently exposes these 14 choices:
 13. Original Douay-Rheims — modernized spelling
 14. Original Douay-Rheims — historical spelling
 
-The reader requests chapter text from these runtime sources:
+The reader requests chapter text from these runtime sources (the Original Douay-Rheims rows below are being migrated to same-origin data files):
 
 | Translation(s) | Current chapter-data source | Runtime note |
 |---|---|---|
 | KJV, WEB, ASV, BBE, ERV 1885, YLT, Webster | Free.Bible | Chapter fetched on demand |
 | BSB, WEBBE, Darby, DRA 1899 | bible-api.com | Chapter fetched on demand |
 | Geneva 1599 | Bolls API | Chapter fetched on demand |
-| Original Douay-Rheims, both spelling forms | Pinned GitHub raw dataset | Pinned 76-book manifest and book JSON files |
+| Original Douay-Rheims, both spelling forms | Same-origin `/data/bible-en/odr/` files (after importer run) | Pinned 76-book manifest and 152 book JSON files |
 
 The reader does not navigate visitors to these providers. English chapter data for several editions and Original Douay-Rheims remain upstream runtime dependencies; Persian OPV and OPCB are designed to load from same-origin local files.
 
