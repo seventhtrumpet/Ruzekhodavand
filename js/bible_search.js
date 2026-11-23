@@ -52,10 +52,10 @@
   function inScope(bookId) {
     var s = getScope();
     bookId = Number(bookId) || 0;
-    if (s === 'ot') return bookId >= 10 && bookId < NT_MIN;
+    if (s === 'ot') return (bookId >= 10 && bookId < NT_MIN) || (bookId >= 740 && bookId <= 800);
     if (s === 'nt') return bookId >= NT_MIN && bookId <= 730;
     if (s === 'book') return bookId === currentBookId();
-    return bookId >= 10 && bookId <= 730;
+    return (bookId >= 10 && bookId <= 730) || (bookId >= 740 && bookId <= 800);
   }
   function searchSourceLabel() {
     if (isEn()) {
@@ -483,10 +483,11 @@
     return faLoadPromise;
   }
 
-  function flattenLocalEnglish(packs) {
+  function flattenLocalEnglish(packs, ids) {
     var out = [];
-    for (var i = 0; i < IDS.length; i++) {
-      var id = IDS[i], pack = packs[i];
+    ids = ids || IDS;
+    for (var i = 0; i < ids.length; i++) {
+      var id = ids[i], pack = packs[i];
       if (!pack) throw new Error('Missing English Bible book file: ' + id);
       var book = pack[String(id)] || pack[id] || pack;
       if (!book || !book.chapters) throw new Error('Malformed English Bible book file: ' + id);
@@ -514,13 +515,15 @@
     enLoadPromise = (async function () {
       try {
         if (localVersions.indexOf(version) >= 0) {
-          var packs = await Promise.all(IDS.map(async function (id) {
+          var searchIds = IDS.slice();
+          if (version === 'dra' || version === 'webbe') searchIds = searchIds.concat([740,750,760,770,780,790,800]);
+          var packs = await Promise.all(searchIds.map(async function (id) {
             var response = await fetch('/data/bible-en/local/' + version + '/b' + id + '.json');
             if (!response.ok) throw new Error('English Bible search data request failed: ' + version + '/' + id + ' (' + response.status + ')');
             return await response.json();
           }));
           if (enLoadedVersion !== version) return [];
-          EN_VERSES = flattenLocalEnglish(packs);
+          EN_VERSES = flattenLocalEnglish(packs, searchIds);
           return EN_VERSES;
         }
         var urls = [
