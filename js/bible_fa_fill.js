@@ -232,10 +232,21 @@
     return origFetch(input, init);
   };
 
-  setTimeout(function () { loadOpcb(); }, 400);
-  setTimeout(function () { loadOpcb(); }, 2000);
+  function preloadSelectedPersianVersion() {
+    try {
+      if (localStorage.getItem('cog_bible_fa_version') === 'opv') return;
+    } catch (e) {}
+    loadOpcb();
+  }
+
+  // OPV is served from the local, per-book files; do not download OPCB in the background.
+  setTimeout(preloadSelectedPersianVersion, 400);
+  setTimeout(preloadSelectedPersianVersion, 2000);
 
   window.__stPersianBibleReady = function () {
+    var isOpv = false;
+    try { isOpv = localStorage.getItem('cog_bible_fa_version') === 'opv'; } catch (e) {}
+    if (isOpv) return Promise.resolve(true);
     return loadOpcb().then(function (list) {
       return !!(list && list.length >= 66);
     });
