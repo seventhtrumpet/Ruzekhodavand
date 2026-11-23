@@ -19,8 +19,21 @@ EXPECTED_SCRIPTURE_VERSES = 37153
 EXPECTED_INTRO_ENTRIES = 1
 
 
+def reject_duplicate_keys(pairs):
+    """Reject repeated JSON object keys instead of silently overwriting them."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON object key: {key!r}")
+        result[key] = value
+    return result
+
+
 def read_json(path: Path):
-    return json.loads(path.read_text(encoding="utf-8"))
+    return json.loads(
+        path.read_text(encoding="utf-8"),
+        object_pairs_hook=reject_duplicate_keys,
+    )
 
 
 def build_variant(source_dir: Path, target: Path, books: list[dict], file_hashes: dict[str, str]) -> int:
