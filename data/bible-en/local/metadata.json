@@ -1,0 +1,164 @@
+{
+  "web": {
+    "title": "World English Bible (Classic)",
+    "source_archive": "eng-web_vpl.zip",
+    "source_url": "https://ebible.org/Scriptures/eng-web_vpl.zip",
+    "source_archive_sha256": "93e867cdb2bfc84d1e997172e7773e166e718d9265985a054f8fca565f5cd21e",
+    "license": "Public Domain",
+    "counts": {
+      "books": 66,
+      "chapters": 1189,
+      "verses": 31103,
+      "empty_verse_markers": 5,
+      "chapters_with_verse_gaps": 0
+    },
+    "empty_verses": [
+      "LUK 17:36",
+      "ACT 8:37",
+      "ACT 15:34",
+      "ACT 24:7",
+      "ROM 16:25"
+    ],
+    "verse_gaps": [],
+    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+  },
+  "asv": {
+    "title": "American Standard Version (1901)",
+    "source_archive": "eng-asv_vpl.zip",
+    "source_url": "https://ebible.org/Scriptures/eng-asv_vpl.zip",
+    "source_archive_sha256": "6c41b8020cba9cf7041689f2356c55859e28023405537388be08bad93df2b050",
+    "license": "Public Domain",
+    "counts": {
+      "books": 66,
+      "chapters": 1189,
+      "verses": 31102,
+      "empty_verse_markers": 16,
+      "chapters_with_verse_gaps": 0
+    },
+    "empty_verses": [
+      "MAT 17:21",
+      "MAT 18:11",
+      "MAT 23:14",
+      "MAR 7:16",
+      "MAR 9:44",
+      "MAR 9:46",
+      "MAR 11:26",
+      "MAR 15:28",
+      "LUK 17:36",
+      "LUK 23:17",
+      "JOH 5:4",
+      "ACT 8:37",
+      "ACT 15:34",
+      "ACT 24:7",
+      "ACT 28:29",
+      "ROM 16:24"
+    ],
+    "verse_gaps": [],
+    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+  },
+  "ylt": {
+    "title": "Young's Literal Translation (1898)",
+    "source_archive": "engylt_vpl.zip",
+    "source_url": "https://ebible.org/Scriptures/engylt_vpl.zip",
+    "source_archive_sha256": "653e9f1d8487de46e11574165a6355d3135ae378fb2198ee4128dedc06c8ca56",
+    "license": "Public Domain",
+    "counts": {
+      "books": 66,
+      "chapters": 1189,
+      "verses": 31102,
+      "empty_verse_markers": 0,
+      "chapters_with_verse_gaps": 0
+    },
+    "empty_verses": [],
+    "verse_gaps": [],
+    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+  },
+  "webster": {
+    "title": "Noah Webster Bible (1833)",
+    "source_archive": "engwebster_vpl.zip",
+    "source_url": "https://ebible.org/Scriptures/engwebster_vpl.zip",
+    "source_archive_sha256": "402240da209b017c67a31b63773b42471ef7e2513aa76ef067f34af907537270",
+    "license": "Public Domain",
+    "counts": {
+      "books": 66,
+      "chapters": 1189,
+      "verses": 31102,
+      "empty_verse_markers": 0,
+      "chapters_with_verse_gaps": 0
+    },
+    "empty_verses": [],
+    "verse_gaps": [],
+    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+  },
+  "darby": {
+    "title": "Darby Translation (1884)",
+    "source_archive": "engDBY_vpl.zip",
+    "source_url": "https://ebible.org/Scriptures/engDBY_vpl.zip",
+    "source_archive_sha256": "7eb1df2a434f5bbd831591aa96c08e94b900b1458fda74ccf1d1739d5af73619",
+    "license": "Public Domain",
+    "counts": {
+      "books": 66,
+      "chapters": 1189,
+      "verses": 31099,
+      "empty_verse_markers": 0,
+      "chapters_with_verse_gaps": 3
+    },
+    "empty_verses": [],
+    "verse_gaps": [
+      "MAT 23: 14",
+      "ACT 8: 37",
+      "ACT 15: 34"
+    ],
+    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+  },
+  "gnv": {
+    "title": "Geneva Bible (1599)",
+    "source_archive": "enggnv_vpl.zip",
+    "source_url": "https://ebible.org/Scriptures/enggnv_vpl.zip",
+    "source_archive_sha256": "faa35b12d04bdacda78b5b53b35bc241d576c63e5d6cd5bccd99bb337b8f7ade",
+    "license": "Public Domain",
+    "counts": {
+      "books": 66,
+      "chapters": 1189,
+      "verses": 31090,
+      "empty_verse_markers": 0,
+      "chapters_with_verse_gaps": 0
+    },
+    "empty_verses": [],
+    "verse_gaps": [],
+    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+  },
+  "bsb": {
+    "title": "Berean Standard Bible",
+    "source_archive": "engbsb_vpl.zip",
+    "source_url": "https://ebible.org/Scriptures/engbsb_vpl.zip",
+    "source_archive_sha256": "72ecd9e0131e82737b76e1f2d706c85771d6054b6350673f80f49c839133f45e",
+    "license": "Public Domain",
+    "counts": {
+      "books": 66,
+      "chapters": 1189,
+      "verses": 31086,
+      "empty_verse_markers": 0,
+      "chapters_with_verse_gaps": 15
+    },
+    "empty_verses": [],
+    "verse_gaps": [
+      "MAT 17: 21",
+      "MAT 18: 11",
+      "MAT 23: 14",
+      "MRK 7: 16",
+      "MRK 9: 44,46",
+      "MRK 11: 26",
+      "MRK 15: 28",
+      "LUK 17: 36",
+      "LUK 23: 17",
+      "JOH 5: 4",
+      "ACT 8: 37",
+      "ACT 15: 34",
+      "ACT 24: 7",
+      "ACT 28: 29",
+      "ROM 16: 24"
+    ],
+    "format_note": "Official eBible VPL text; only the 66 standard books are included in this reader. Verse wording is not edited. Empty verse markers and omitted verse-number gaps are preserved exactly as found; no text is borrowed from another edition."
+  }
+}
