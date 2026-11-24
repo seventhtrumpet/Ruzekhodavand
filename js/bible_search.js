@@ -52,10 +52,10 @@
   function inScope(bookId) {
     var s = getScope();
     bookId = Number(bookId) || 0;
-    if (s === 'ot') return (bookId >= 10 && bookId < NT_MIN) || (bookId >= 740 && bookId <= 800) || (bookId >= 1001 && bookId <= 1049);
+    if (s === 'ot') return (bookId >= 10 && bookId < NT_MIN) || (bookId >= 740 && bookId <= 800) || (bookId >= 810 && bookId <= 880) || (bookId >= 1001 && bookId <= 1049);
     if (s === 'nt') return (bookId >= NT_MIN && bookId <= 730) || (bookId >= 1050 && bookId <= 1076);
     if (s === 'book') return bookId === currentBookId();
-    return (bookId >= 10 && bookId <= 730) || (bookId >= 740 && bookId <= 800) || (bookId >= 1001 && bookId <= 1076);
+    return (bookId >= 10 && bookId <= 730) || (bookId >= 740 && bookId <= 800) || (bookId >= 810 && bookId <= 880) || (bookId >= 1001 && bookId <= 1076);
   }
   function searchSourceLabel() {
     if (isEn()) {
@@ -537,7 +537,7 @@
         }
         if (localVersions.indexOf(version) >= 0) {
           var searchIds = IDS.slice();
-          if (version === 'dra' || version === 'webbe') searchIds = searchIds.concat([740,750,760,770,780,790,800]);
+          if (version === 'dra' || version === 'webbe') searchIds = searchIds.concat([740,750,760,770,780,790,800]);\n          if (version === 'web') searchIds = searchIds.concat([740,750,760,770,780,790,800,810,820,830,840,850,860,870,880]);
           var packs = await Promise.all(searchIds.map(async function (id) {
             var response = await fetch('/data/bible-en/local/' + version + '/b' + id + '.json');
             if (!response.ok) throw new Error('English Bible search data request failed: ' + version + '/' + id + ' (' + response.status + ')');
