@@ -42,6 +42,9 @@ jobs:
           node --check js/bible_search.js
           node --check js/bible-share.js
           node --check js/bible-share-photo.js
+          node --check js/app_media.js
+          node --check js/bugfixes.js
+          node scripts/test-html-escaping.js
       - name: Validate Bible datasets and reader safeguards
         run: python scripts/test-bible-data.py
       - name: Collate every local English verse against pinned source archives
