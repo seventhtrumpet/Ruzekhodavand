@@ -41,6 +41,7 @@ jobs:
           node --check js/bible-core-pinned.js
           node --check js/bible_search.js
           node --check js/bible-share.js
+          node scripts/test-bible-share.js
           node --check js/bible-share-photo.js
       - name: Validate Bible datasets and reader safeguards
         run: python scripts/test-bible-data.py
