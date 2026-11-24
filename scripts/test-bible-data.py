@@ -456,8 +456,8 @@ def check_reader_safeguards() -> None:
         fail("Persian Bible reader must load OPV and OPCB from their actual separate local directories")
     if "new URLSearchParams(window.location.search)" not in reader or "cog_bible_book_slug" not in reader:
         fail("Bible reader must restore shared book, language, and edition before loading the reader core")
-    if "if (ch === chapter) requestAnimationFrame(() => scrollToRef(chapter, verse, false))" not in reader:
-        fail("English shared links to chapters after chapter 1 must scroll to the requested verse after its chapter is inserted")
+    if "const selectedChapter = Math.min(Math.max(Number(chapter) || chapterStart, chapterStart), max);" not in reader or "requestAnimationFrame(() => scrollToRef(selectedChapter, verse, false))" not in reader:
+        fail("English shared links must load the selected chapter and scroll to the requested verse")
     if r'code.replace("await loadMeta();\n    await loadManifest();"' not in reader:
         fail("Runtime boot patch must retain the pinned core's original loadMeta/loadManifest anchor")
     if "const savedBookSlug = localStorage.getItem('cog_bible_book_slug')" not in reader:
