@@ -248,14 +248,14 @@
       list.forEach(function (pl) {
         html +=
           '<div class="my-pl-card" data-pl="' +
-          pl.id +
+          escape(pl.id) +
           '" style="background:#fff;border:1px solid #e8e4dc;border-radius:12px;padding:1rem;margin-bottom:0.8rem;">' +
           '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;">' +
           '<strong style="font-size:1.05rem;">' +
           escape(pl.name) +
           '</strong>' +
           '<button type="button" class="btn btn-outline btn-sm pl-del" data-pl="' +
-          pl.id +
+          escape(pl.id) +
           '" style="font-size:0.85rem;">' +
           t('\u062d\u0630\u0641', 'Delete') +
           '</button></div>';
@@ -277,7 +277,7 @@
               '<li style="display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0;border-top:1px solid #f0ece4;">' +
               (canPlay
                 ? '<button type="button" class="btn btn-primary btn-sm pl-play" data-id="' +
-                  pid +
+                  escape(pid) +
                   '" style="font-size:0.85rem;">' +
                   t('\u067e\u062e\u0634', 'Play') +
                   '</button>'
@@ -286,9 +286,9 @@
               escape(label) +
               '</span>' +
               '<button type="button" class="btn btn-outline btn-sm pl-remove" data-pl="' +
-              pl.id +
+              escape(pl.id) +
               '" data-id="' +
-              pid +
+              escape(pid) +
               '" style="font-size:0.8rem;">' +
               t('\u062d\u0630\u0641', 'Remove') +
               '</button></li>';
