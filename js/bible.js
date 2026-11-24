@@ -161,7 +161,6 @@
       "bookId = Number(btn.getAttribute('data-book'));\n        chapter = 1; verse = 1;\n        closeSel();\n        await renderBook(true);",
       "bookId = Number(btn.getAttribute('data-book'));\n        chapter = CHAPTER_STARTS[bookId] || 1; verse = 1;\n        closeSel();\n        await renderBook(true);"
     );
-    );
 
     code = code.replace(
       "showTab('verses');\n        renderVerseGrid();\n        scrollToRef(chapter, verse, true);",
