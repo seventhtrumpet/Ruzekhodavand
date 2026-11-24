@@ -99,8 +99,7 @@
       url: SITE
     }).catch(function (err) {
       if (err && err.name === 'AbortError') return;
-      navigator.share({ title: brand, text: caption + '\n\n' + SITE })
-        .catch(function () {});
+      copyFallback(caption + '\n\n' + SITE);
     });
   }
 
