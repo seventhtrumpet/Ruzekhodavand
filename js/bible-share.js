@@ -64,7 +64,9 @@
       var first = selected[0];
       var ch = first.getAttribute('data-chapter') || '';
       var vs = first.getAttribute('data-verse') || '';
-      if (ch || vs) ref = ch + ':' + vs;
+      var heading = document.getElementById('bible-heading');
+      var bookName = heading ? (heading.textContent || '').trim() : '';
+      if (ch || vs) ref = (bookName ? bookName + ' ' : '') + ch + ':' + vs;
     }
     if (!text) {
       var main = document.querySelector('.mb-verse.active, .verse-body, article p');
