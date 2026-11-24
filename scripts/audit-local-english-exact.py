@@ -95,10 +95,31 @@ def compare_edition(edition: str, archive_id: str) -> tuple[int, int, bool]:
         actual = actual_pack.get(str(book_id), actual_pack.get(book_id, actual_pack))
         compared_verses += sum(len(verses) for verses in expected["chapters"].values())
 
-        for field in ("id", "name", "chapter_start", "chapters"):
+        for field in ("id", "name", "chapter_start"):
             if actual.get(field) != expected.get(field):
-                errors.append(f"{edition}: book {book_id} field {field} differs from pinned VPL")
-                break
+                errors.append(
+                    f"{edition}: book {book_id} field {field} differs "
+                    f"(local={actual.get(field)!r}, source={expected.get(field)!r})"
+                )
+
+        local_chapters = actual.get("chapters", {})
+        source_chapters = expected.get("chapters", {})
+        for chapter in sorted(set(local_chapters) | set(source_chapters), key=lambda value: int(value)):
+            if chapter not in local_chapters:
+                errors.append(f"{edition}: book {book_id} missing local chapter {chapter}")
+                continue
+            if chapter not in source_chapters:
+                errors.append(f"{edition}: book {book_id} has extra local chapter {chapter}")
+                continue
+            local_verses = local_chapters[chapter]
+            source_verses = source_chapters[chapter]
+            for verse in sorted(set(local_verses) | set(source_verses), key=lambda value: int(value)):
+                if verse not in local_verses:
+                    errors.append(f"{edition}: book {book_id} chapter {chapter} missing local verse {verse}")
+                elif verse not in source_verses:
+                    errors.append(f"{edition}: book {book_id} chapter {chapter} has extra local verse {verse}")
+                elif local_verses[verse] != source_verses[verse]:
+                    errors.append(f"{edition}: text mismatch at book {book_id} {chapter}:{verse}")
 
         expected_file_sha = expected_metadata.get(str(book_id))
         if not expected_file_sha:
