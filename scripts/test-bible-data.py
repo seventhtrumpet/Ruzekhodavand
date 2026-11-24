@@ -279,6 +279,13 @@ def check_odr() -> None:
                         break
 
 
+def check_import_workflow_audit_triggers() -> None:
+    workflow = (ROOT / ".github/workflows/import-english-local.yml").read_text(encoding="utf-8")
+    for path in ("scripts/inspect-web-classic-vpl.py", "scripts/audit-all-english-vpl-coverage.py"):
+        if path not in workflow:
+            fail(f"English VPL coverage audit is not triggered when {path} changes")
+
+
 def check_reader_safeguards() -> None:
     reader = (ROOT / "js/bible.js").read_text(encoding="utf-8")
     core = (ROOT / "js/bible-core-pinned.js").read_text(encoding="utf-8")
@@ -484,6 +491,7 @@ def main() -> int:
     check_pack("data/bible-fa/opv", BOOK_IDS)
     check_persian_verse_totals()
     check_runtime_chapter_catalogue()
+    check_import_workflow_audit_triggers()
     check_odr()
     check_reader_safeguards()
     if ERRORS:
