@@ -81,19 +81,33 @@ function updateLiveBadge() {
   else badge.classList.add('hidden');
 }
 
+function safeLiveStreamUrl(value) {
+  try {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    const parsed = new URL(raw, window.location.href);
+    if (parsed.protocol !== 'https:' && parsed.origin !== window.location.origin) return '';
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return '';
+    return parsed.href;
+  } catch (e) {
+    return '';
+  }
+}
+
 function renderLive() {
   const section = document.getElementById('live-section');
   if (!section) return;
   const offline = document.getElementById('live-offline');
   const iframe = document.getElementById('live-iframe');
-  if (liveData && liveData.isLive && liveData.streamUrl) {
+  const safeStreamUrl = safeLiveStreamUrl(liveData && liveData.streamUrl);
+  if (liveData && liveData.isLive && safeStreamUrl) {
     section.classList.remove('hidden');
     if (offline) offline.style.display = 'none';
     if (iframe) iframe.style.display = 'block';
     const titleEl = document.getElementById('live-title');
     if (titleEl) titleEl.textContent = liveData.title || (T[currentLang] && T[currentLang].liveNow) || 'LIVE';
     if (iframe) {
-      let src = liveData.streamUrl;
+      let src = safeStreamUrl;
       const yt = getYouTubeEmbedUrl(src);
       if (yt) src = yt + '?autoplay=1';
       iframe.src = src;
