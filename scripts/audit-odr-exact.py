@@ -60,10 +60,10 @@ def compare_variant(
     books: list[dict],
     pinned_file_hashes: dict[str, str],
 ) -> tuple[int, int, int]:
-    jobs = [(book["slug"], int(book["chapters"])) for book in books]
+    jobs = [(index, book["slug"], int(book["chapters"])) for index, book in enumerate(books)]
 
     def fetch_and_compare(job):
-        slug, expected_chapters = job
+        book_index, slug, expected_chapters = job
         relative = f"{source_dir}/{slug}.json"
         source_raw = download(relative)
         expected_sha = pinned_file_hashes.get(relative)
@@ -118,7 +118,7 @@ def compare_variant(
                     intro_entries += 1
                     continue
                 rows.append({
-                    "id": 1001 + books.index(next(book for book in books if book["slug"] == slug)),
+                    "id": 1001 + book_index,
                     "ch": chapter_number,
                     "v": verse_number,
                     "text": text,
