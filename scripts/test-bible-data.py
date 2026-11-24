@@ -424,6 +424,14 @@ def check_reader_safeguards() -> None:
         fail("ERV 1885 additional text chapter catalogue is incomplete")
     if "const chapterStart = currentLang === 'en' ? (CHAPTER_STARTS[bookId] || 1) : 1" not in reader or "const chapterStart = CHAPTER_STARTS[bookId] || 1" not in reader:
         fail("Reader chapter navigation must preserve non-1 source chapter starts")
+    if "CHAPTER_STARTS[810] = 1" not in reader or "CHAPTER_STARTS[810] = 10" not in reader:
+        fail("Greek Esther chapter starts must be edition-specific for WEB/WEBBE versus ERV 1885")
+    if "max - chapterStart + 1" not in reader or "const n = i + chapterStart" not in reader or "if (next < chapterStart) next = chapterStart" not in reader:
+        fail("Chapter grids and previous/next navigation must honor source chapter starts")
+    if "loadEnChapter(bookId, selectedChapter)" not in reader or "const selectedChapter = Math.min(Math.max(Number(chapter) || chapterStart, chapterStart), max)" not in reader:
+        fail("Reader must load the selected source chapter instead of assuming chapter 1")
+    if "chapter = CHAPTER_STARTS[bookId] || 1" not in reader:
+        fail("Selecting a book with a non-1 source chapter start must open its first available source chapter")
     if "js/bible.js?v=english-expanded-source-books-20261124" not in html or "js/bible_search.js?v=english-expanded-source-books-20261124" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
@@ -466,7 +474,7 @@ def check_reader_safeguards() -> None:
     if "enLoadedVersion" not in search or "msb" not in search:
         fail("Switching English editions must refresh the selected local search index, including MSB")
     if "searchIds = searchIds.concat([740,750,760,770,780,790,800])" not in search or "flattenLocalEnglish(packs, searchIds)" not in search:
-        fail("DRA and WEBBE English search must include all seven deuterocanonical books")
+        fail("DRA English search must include its seven deuterocanonical books")
     if "searchIds = searchIds.concat([740,750,760,770,780,790,800,810,820,830,840,850,860,870,880])" not in search:
         fail("WEB Classic and WEBBE English search must include all 15 additional source texts")
     if "searchIds = searchIds.concat([740,750,760,770,780,790,800,810,830,840,870,890,900,910])" not in search:
