@@ -142,7 +142,8 @@
       btn._stLangBound = true;
       btn.addEventListener('click', function (e) {
         e.preventDefault();
-        e.stopImmediatePropagation();
+        // Let the Bible reader's own click handler run after this shared language
+        // handler updates localStorage. The reader must also reload the verse text.
         toggle();
       }, true);
     });
