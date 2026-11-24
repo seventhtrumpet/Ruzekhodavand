@@ -100,6 +100,12 @@ The reader wrapper loads the pinned JavaScript core from the same-origin path `/
 4. Finish jurisdiction-specific rights review for KJV and BBE before considering independent self-hosting.
 5. Keep all existing translations and same-origin SeventhTrumpet.org sharing behavior; do not replace editions or introduce external Bible-reading URLs.
 
+## KJV and BBE jurisdictional rights review (2026-11-24)
+
+- **KJV:** Digital Bible Society's edition notice describes the King James Version as Public Domain worldwide except in the United Kingdom. It states that UK rights are vested in the Crown and administered by Cambridge University Press. The site remains globally accessible, so the UK exception is material. Keep KJV text on its existing external-fetch path rather than copying the complete text into the local repository until distribution scope and any applicable UK permissions are resolved.
+- **BBE:** eBible.org currently labels Bible in Basic English Public Domain and explains the 1965 U.S. publication without a copyright notice. However, the eBible.org WEB FAQ itself recounts historical uncertainty, including a possible GATT restoration of copyright, before saying the status now appears to be Public Domain. That is not a blanket worldwide legal opinion. Keep BBE on its existing external-fetch path and do not self-host the complete text until jurisdiction-specific review is complete.
+- These are rights/hosting decisions only. They do not remove either translation from the selector, alter Scripture text, or add external provider links to verse sharing.
+
 ## Additional official English VPL source coverage findings (2026-11-24)
 
 The all-edition source audit found two more silent omissions in the previous import catalogue. PR #86 imported the full data and the import workflow validated all generated packs before committing them. PR #87 exposes the expanded catalogues in the reader. A follow-up integrity change pins SHA-256 hashes for every generated local book JSON file.
