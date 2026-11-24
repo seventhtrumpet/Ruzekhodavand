@@ -1,6 +1,5 @@
-/* Fresh Bread share — like before:
-   WhatsApp shows OG profile image + white link card (tappable) + verse text under it.
-   Do NOT attach a custom image file (that kills the link card). */
+/* Fresh Bread share — OG profile card + tappable link (no image file).
+   This is the only Daily Bread share button on the home page. */
 (function () {
   'use strict';
 
@@ -83,10 +82,7 @@
   function copyFallback(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(function () {
-        alert(msg(
-          'Verse and website link copied.',
-          '\u0622\u06cc\u0647 \u0648 \u0644\u06cc\u0646\u06a9 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a \u06a9\u067e\u06cc \u0634\u062f.'
-        ));
+        alert(msg('Verse and website link copied.', '\u0622\u06cc\u0647 \u0648 \u0644\u06cc\u0646\u06a9 \u0648\u0628\u200c\u0633\u0627\u06cc\u062a \u06a9\u067e\u06cc \u0634\u062f.'));
       }).catch(function () {
         try { prompt(msg('Copy:', '\u06a9\u067e\u06cc:'), text); } catch (e) {}
       });
@@ -98,47 +94,40 @@
   function shareFreshBread() {
     var p = buildSharePayload();
     if (!p) {
-      alert(msg(
-        'The daily verse is not ready yet. Please try again.',
-        '\u0622\u06cc\u0647 \u0627\u0645\u0631\u0648\u0632 \u0647\u0646\u0648\u0632 \u0622\u0645\u0627\u062f\u0647 \u0646\u06cc\u0633\u062a. \u0644\u0637\u0641\u0627\u064b \u062f\u0648\u0628\u0627\u0631\u0647 \u062a\u0644\u0627\u0634 \u06a9\u0646\u06cc\u062f.'
-      ));
+      alert(msg('The daily verse is not ready yet. Please try again.', '\u0622\u06cc\u0647 \u0627\u0645\u0631\u0648\u0632 \u0647\u0646\u0648\u0632 \u0622\u0645\u0627\u062f\u0647 \u0646\u06cc\u0633\u062a. \u0644\u0637\u0641\u0627\u064b \u062f\u0648\u0628\u0627\u0631\u0647 \u062a\u0644\u0627\u0634 \u06a9\u0646\u06cc\u062f.'));
       return;
     }
 
     if (navigator.share) {
-      navigator.share({
-        title: p.title,
-        text: p.text,
-        url: p.url
-      }).catch(function (err) {
+      navigator.share({ title: p.title, text: p.text, url: p.url }).catch(function (err) {
         if (err && err.name === 'AbortError') return;
-        try {
-          window.location.href = 'https://wa.me/?text=' + encodeURIComponent(p.full);
-        } catch (e) {
-          copyFallback(p.full);
-        }
+        try { window.location.href = 'https://wa.me/?text=' + encodeURIComponent(p.full); }
+        catch (e) { copyFallback(p.full); }
       });
       return;
     }
 
-    try {
-      window.location.href = 'https://wa.me/?text=' + encodeURIComponent(p.full);
-    } catch (e) {
-      copyFallback(p.full);
-    }
+    try { window.location.href = 'https://wa.me/?text=' + encodeURIComponent(p.full); }
+    catch (e) { copyFallback(p.full); }
   }
 
   window.ST_shareFreshBread = shareFreshBread;
+
+  function removeRivals() {
+    ['daily-share', 'daily-status-share', 'daily-status-share-image'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) try { el.remove(); } catch (e) {}
+    });
+  }
 
   function addButton() {
     var section = document.getElementById('daily-verse');
     var refresh = document.getElementById('verse-refresh');
     if (!section || !refresh) return;
 
-    ['daily-status-share-card', 'daily-share', 'daily-status-share', 'daily-status-share-image'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) try { el.remove(); } catch (e) {}
-    });
+    removeRivals();
+    var existing = document.getElementById(BUTTON_ID);
+    if (existing) return;
 
     var button = document.createElement('button');
     button.type = 'button';
@@ -160,6 +149,12 @@
 
   function boot() {
     addButton();
+    [200, 600, 1500].forEach(function (ms) {
+      setTimeout(function () {
+        removeRivals();
+        if (!document.getElementById(BUTTON_ID)) addButton();
+      }, ms);
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
