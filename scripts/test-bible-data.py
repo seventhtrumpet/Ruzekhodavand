@@ -454,6 +454,13 @@ def check_reader_safeguards() -> None:
         fail("Bible reader JavaScript must not contain a literal escaped newline in executable route parsing")
     if "=== 'opv' ? '/data/bible-fa/opv/' : '/data/bible-fa/opcb/'" not in reader:
         fail("Persian Bible reader must load OPV and OPCB from their actual separate local directories")
+    persian_fill = (ROOT / "js/bible_fa_fill.js").read_text(encoding="utf-8")
+    if "function fullManifest()" not in persian_fill or "function bookIdFromUrl(url)" not in persian_fill:
+        fail("Persian Bible fetch adapter must define its manifest and per-book URL helpers")
+    if "match(/b([0-9]+)[.]json(?:[?#]|$)/i)" not in persian_fill:
+        fail("Persian Bible fetch adapter must resolve book IDs from local bNN.json paths")
+    if "Object.keys(manifest).length >= 66" not in persian_fill:
+        fail("Persian readiness check must count the 66 manifest entries, not an array length")
     if "new URLSearchParams(window.location.search)" not in reader or "cog_bible_book_slug" not in reader:
         fail("Bible reader must restore shared book, language, and edition before loading the reader core")
     if "window.__stBibleRoute = { lang: routeLanguage, version: version || null }" not in reader:
