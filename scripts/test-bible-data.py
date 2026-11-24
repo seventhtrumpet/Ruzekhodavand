@@ -506,6 +506,8 @@ def check_reader_safeguards() -> None:
         fail("Bible share links must preserve language, translation edition, and canonical book slug")
     if "localStorage.setItem('cog_bible_share_route', JSON.stringify(sharedRoute))" not in reader:
         fail("Reader must preserve the exact incoming deep-link verse before core state normalization")
+    if "setLang(bibleRoute.lang, true)" not in welcome_tip:
+        fail("An explicit Bible-link language must be remembered to prevent a later version reload from reopening the language gate")
     if "function getShareRoute()" not in share or "var params = getShareRoute();" not in share:
         fail("Share links must recover the exact incoming verse after the reader removes URL parameters")
     if "linkedVerse" not in share or "route.chapter + ':' + route.verse" not in share:
