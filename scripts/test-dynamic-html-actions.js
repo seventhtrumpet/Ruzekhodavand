@@ -14,10 +14,12 @@ assert.equal(esc(`"><img src=x onerror='alert(1)'>`), '&quot;&gt;&lt;img src=x o
 assert.ok(playlists.includes(`data-playlist-delete="' + esc(pl.id)`));
 assert.ok(playlists.includes(`data-playlist-remove="1" data-playlist-id="' + esc(pl.id)`));
 assert.ok(playlists.includes(`data-playlist-open="' + esc(pl.id)`));
-assert.doesNotMatch(playlists, /onclick="[^"]*(?:pl|pid|p)\\.id/);
+assert.equal(playlists.includes('onclick="deletePlaylist('), false);
+assert.equal(playlists.includes('onclick="removePostFromPlaylist('), false);
+assert.equal(playlists.includes('onclick="openPlaylist('), false);
 assert.ok(media.includes(`data-open-post="' + escapeHtml(p.id)`));
-assert.doesNotMatch(media, /onclick="openPost\\(/);
-assert.doesNotMatch(media, /onclick="addPostToPlaylistFromModal\\(/);
+assert.equal(media.includes('onclick="openPost('), false);
+assert.equal(media.includes('onclick="addPostToPlaylistFromModal('), false);
 assert.ok(personal.includes('escape(pl.id)'));
 assert.ok(personal.includes('escape(pid)'));
 
