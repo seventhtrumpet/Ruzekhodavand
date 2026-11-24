@@ -27,7 +27,9 @@ def definitions(edition: str):
     if edition == "dra":
         return IMPORTER.BOOKS_73_DRA
     if edition == "webbe":
-        return IMPORTER.BOOKS_73_WEBBE
+        return IMPORTER.BOOKS_81_WEBBE
+    if edition == "rv1885":
+        return IMPORTER.BOOKS_80_ERV
     return IMPORTER.BOOKS
 
 failures = []
@@ -87,7 +89,10 @@ for edition, (archive_id, title, licence) in IMPORTER.SOURCES.items():
         }
         for code in unknown:
             item = actual[code]
-            print(f"  UNKNOWN_DETAIL {code} ({labels.get(code, 'unmapped source text')}): "
+            label = labels.get(code, 'unmapped source text')
+            if edition == "rv1885" and code == "ESG":
+                label = "Esther (Greek additions, source chapters 10–16)"
+            print(f"  UNKNOWN_DETAIL {code} ({label}): "
                   f"chapters={len(item['chapters'])} verses={item['verses']} "
                   f"chapter_numbers={','.join(map(str, sorted(item['chapters'])))}")
     if unknown or missing:
