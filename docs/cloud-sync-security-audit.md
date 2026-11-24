@@ -21,6 +21,7 @@ The browser also initiates cloud pushes without checking the signed-in user in `
 7. **Personal playlists are separate:** `js/user_playlists.js` stores `cog_my_playlists_v1` locally and is not included in the shared cloud snapshot. Users should not be led to expect those personal lists to sync across devices.
 8. **Authentication and authorization are separate:** the media page initializes Firebase Auth, but the sync module itself does not gate reads or writes on a signed-in user. Firestore Security Rules must enforce the actual access policy; hiding or showing sign-in UI is not an authorization boundary.
 9. **Public client configuration:** Firebase web configuration is present in browser JavaScript. A Firebase web API key is not a server secret; security must come from correctly restricted Firebase services, Authentication, and Security Rules. Never put service-account credentials or privileged server secrets in client code.
+10. **Admin route remains disabled:** the current `admin.html` is a static maintenance page with no script includes, and `js/admin.js` is intentionally inert. Legacy admin hook files remain in the repository but are not loaded by the current admin route. They should not be re-enabled as a substitute for server-side authorization.
 
 ## Required checks before implementation
 
