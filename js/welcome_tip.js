@@ -92,6 +92,11 @@
   }
 
   function bootLangFirst() {
+    var bibleRoute = window.__stBibleRoute;
+    if (bibleRoute && (bibleRoute.lang === 'fa' || bibleRoute.lang === 'en')) {
+      setLang(bibleRoute.lang, false);
+      return;
+    }
     if (hasChosenLang()) return;
     var suggested = detectLang();
     setLang(suggested, false);
