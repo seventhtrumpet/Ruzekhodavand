@@ -489,6 +489,13 @@ def check_reader_safeguards() -> None:
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
     if "var CACHE = 'st-v6';" not in service_worker or "/js/menu.js?v=menu-language-labels-20261124" not in service_worker:
         fail("Service worker cache and precache must refresh the updated menu script")
+    licenses = (ROOT / "bible-licenses.html").read_text(encoding="utf-8")
+    if "500,616 Scripture verse records" not in licenses or "۵۰۰٬۶۱۶ رکورد آیه" not in licenses:
+        fail("Bilingual Bible source page must disclose the verified local verse-collation totals")
+    if "Thirteen English editions" not in licenses or "سیزده نسخهٔ انگلیسی" not in licenses:
+        fail("Bilingual Bible source page must distinguish all 13 locally hosted English editions")
+    if "This structural and sample check is not a full verse-by-verse collation" in licenses or "این بررسی ساختاری و نمونه‌ای، مقابلهٔ کامل" in licenses:
+        fail("Bible source page must not retain the outdated statement that exact collation is incomplete")
     if "const selectedChapter = Math.min(Math.max(Number(chapter) || chapterStart, chapterStart), max);" not in reader or "requestAnimationFrame(() => scrollToRef(selectedChapter, verse, false))" not in reader:
         fail("English shared links must load the selected chapter and scroll to the requested verse")
     if r'code.replace("await loadMeta();\n    await loadManifest();"' not in reader:
