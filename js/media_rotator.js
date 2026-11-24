@@ -44,22 +44,34 @@
   }
 
   function isYouTube(url) {
-    return /youtu\.be|youtube\.com/i.test(url || '');
+    return !!ytId(url);
   }
 
   function ytId(url) {
-    if (!url) return null;
+    if (typeof url !== 'string' || !url.trim()) return null;
     try {
-      var u = new URL(url);
-      if (u.hostname.indexOf('youtu.be') >= 0) return u.pathname.slice(1).split('/')[0] || null;
-      if (u.searchParams.get('v')) return u.searchParams.get('v');
-      var parts = u.pathname.split('/').filter(Boolean);
-      var i = parts.indexOf('embed');
-      if (i >= 0 && parts[i + 1]) return parts[i + 1];
-      i = parts.indexOf('shorts');
-      if (i >= 0 && parts[i + 1]) return parts[i + 1];
-    } catch (e) {}
-    return null;
+      var u = new URL(url.trim());
+      if ((u.protocol !== 'https:' && u.protocol !== 'http:') || u.username || u.password) return null;
+      var host = u.hostname.toLowerCase();
+      var shortHosts = ['youtu.be', 'www.youtu.be'];
+      var youtubeHosts = ['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtube-nocookie.com', 'www.youtube-nocookie.com'];
+      var id = '';
+      if (shortHosts.indexOf(host) >= 0) {
+        id = u.pathname.split('/').filter(Boolean)[0] || '';
+      } else if (youtubeHosts.indexOf(host) >= 0) {
+        id = u.searchParams.get('v') || '';
+        if (!id) {
+          var parts = u.pathname.split('/').filter(Boolean);
+          var i = parts.findIndex(function (part) { return ['embed', 'shorts', 'live'].indexOf(part) >= 0; });
+          if (i >= 0) id = parts[i + 1] || '';
+        }
+      } else {
+        return null;
+      }
+      return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : null;
+    } catch (e) {
+      return null;
+    }
   }
 
   function isAudio(p, url) {

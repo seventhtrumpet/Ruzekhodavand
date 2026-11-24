@@ -13,8 +13,9 @@
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
   }
   function esc(str) {
-    if (!str) return '';
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
   function lang() {
     return localStorage.getItem('cog_lang') || 'fa';
@@ -96,44 +97,40 @@
   window.renderPlaylistsAdmin = function () {
     const box = document.getElementById('playlists-admin-list');
     if (!box) return;
-    const tr = t();
-    const L = lang();
-    const list = loadPlaylists();
-    const posts = loadPosts();
-    if (!list.length) {
-      box.innerHTML = '<p style="color:#888">' + tr.plEmpty + '</p>';
-      return;
-    }
+    const tr = t(), L = lang(), list = loadPlaylists(), posts = loadPosts();
+    if (!list.length) { box.innerHTML = '<p style="color:#888">' + tr.plEmpty + '</p>'; return; }
     box.innerHTML = list.map(pl => {
       const name = L === 'fa' ? (pl.name_fa || pl.name_en) : (pl.name_en || pl.name_fa);
       const opts = posts.map(p => {
         const pt = L === 'fa' ? (p.title_fa || p.title_en || tr.untitled) : (p.title_en || p.title_fa || tr.untitled);
-        return '<option value="' + p.id + '">' + esc(pt) + '</option>';
+        return '<option value="' + esc(p.id) + '">' + esc(pt) + '</option>';
       }).join('');
       const items = (pl.postIds || []).map(pid => {
         const p = posts.find(x => x.id === pid);
         const pt = p ? (L === 'fa' ? (p.title_fa || p.title_en || tr.untitled) : (p.title_en || p.title_fa || tr.untitled)) : pid;
-        return '<li style="display:flex;justify-content:space-between;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid #eee;"><span>' + esc(pt) + '</span><button type="button" class="btn btn-outline btn-sm" style="color:#c62828;border-color:#c62828;" onclick="removePostFromPlaylist(\'' + pl.id + '\',\'' + pid + '\')">' + tr.plRemovePost + '</button></li>';
+        return '<li style="display:flex;justify-content:space-between;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid #eee;"><span>' + esc(pt) + '</span><button type="button" class="btn btn-outline btn-sm" style="color:#c62828;border-color:#c62828;" data-playlist-remove="1" data-playlist-id="' + esc(pl.id) + '" data-post-id="' + esc(pid) + '">' + tr.plRemovePost + '</button></li>';
       }).join('') || '<li style="color:#888;padding:0.4rem 0;">\u2014</li>';
-      return '<div style="background:#fff;border:1px solid #e0dcd4;border-radius:12px;padding:1.2rem;margin-bottom:1rem;"><div style="display:flex;justify-content:space-between;gap:0.8rem;flex-wrap:wrap;margin-bottom:0.8rem;"><h4 style="margin:0;color:var(--primary);">' + esc(name) + '</h4><button type="button" class="btn btn-outline btn-sm" style="color:#c62828;border-color:#c62828;" onclick="deletePlaylist(\'' + pl.id + '\')">' + tr.plDelete + '</button></div><div style="font-size:0.85rem;color:#666;margin-bottom:0.6rem;">' + tr.plPosts + ' (' + (pl.postIds||[]).length + ')</div><ul style="list-style:none;padding:0;margin:0 0 1rem;">' + items + '</ul><div style="display:flex;gap:0.5rem;flex-wrap:wrap;"><select id="add-sel-' + pl.id + '" style="flex:1;min-width:160px;padding:0.45rem;"><option value="">' + tr.plSelectPost + '</option>' + opts + '</select><button type="button" class="btn btn-primary btn-sm" onclick="(function(){var s=document.getElementById(\'add-sel-' + pl.id + '\');if(s&&s.value)addPostToPlaylist(\'' + pl.id + '\',s.value);})()">' + tr.plAddPost + '</button></div></div>';
+      return '<div data-playlist-card="1" style="background:#fff;border:1px solid #e0dcd4;border-radius:12px;padding:1.2rem;margin-bottom:1rem;"><div style="display:flex;justify-content:space-between;gap:0.8rem;flex-wrap:wrap;margin-bottom:0.8rem;"><h4 style="margin:0;color:var(--primary);">' + esc(name) + '</h4><button type="button" class="btn btn-outline btn-sm" style="color:#c62828;border-color:#c62828;" data-playlist-delete="' + esc(pl.id) + '">' + tr.plDelete + '</button></div><div style="font-size:0.85rem;color:#666;margin-bottom:0.6rem;">' + tr.plPosts + ' (' + (pl.postIds||[]).length + ')</div><ul style="list-style:none;padding:0;margin:0 0 1rem;">' + items + '</ul><div style="display:flex;gap:0.5rem;flex-wrap:wrap;"><select style="flex:1;min-width:160px;padding:0.45rem;"><option value="">' + tr.plSelectPost + '</option>' + opts + '</select><button type="button" class="btn btn-primary btn-sm" data-playlist-add="' + esc(pl.id) + '">' + tr.plAddPost + '</button></div></div>';
     }).join('');
+    box.querySelectorAll('[data-playlist-delete]').forEach(button => button.addEventListener('click', () => deletePlaylist(button.getAttribute('data-playlist-delete'))));
+    box.querySelectorAll('[data-playlist-remove]').forEach(button => button.addEventListener('click', () => removePostFromPlaylist(button.getAttribute('data-playlist-id'), button.getAttribute('data-post-id'))));
+    box.querySelectorAll('[data-playlist-add]').forEach(button => button.addEventListener('click', () => {
+      const card = button.closest('[data-playlist-card]'), select = card && card.querySelector('select');
+      if (select && select.value) addPostToPlaylist(button.getAttribute('data-playlist-add'), select.value);
+    }));
   };
 
   window.renderPlaylistsPublic = function () {
     const grid = document.getElementById('playlists-grid');
     if (!grid) return;
-    const tr = t();
-    const L = lang();
-    const list = loadPlaylists();
-    if (!list.length) {
-      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>' + tr.plEmpty + '</p></div>';
-      return;
-    }
+    const tr = t(), L = lang(), list = loadPlaylists();
+    if (!list.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>' + tr.plEmpty + '</p></div>'; return; }
     grid.innerHTML = list.map(pl => {
       const name = L === 'fa' ? (pl.name_fa || pl.name_en) : (pl.name_en || pl.name_fa);
       const count = (pl.postIds || []).length;
-      return '<article class="media-card" style="cursor:pointer;" onclick="openPlaylist(\'' + pl.id + '\')"><div class="media-thumb" style="font-size:2.5rem;">\ud83c\udfb5</div><div class="media-body"><h3 class="media-title">' + esc(name) + '</h3><p class="media-desc">' + count + ' ' + tr.plItems + '</p><div class="media-actions"><button class="btn btn-primary media-view-btn" onclick="event.stopPropagation();openPlaylist(\'' + pl.id + '\')">' + tr.plOpen + '</button></div></div></article>';
+      return '<article class="media-card"><div class="media-thumb" style="font-size:2.5rem;">\ud83c\udfb5</div><div class="media-body"><h3 class="media-title">' + esc(name) + '</h3><p class="media-desc">' + count + ' ' + tr.plItems + '</p><div class="media-actions"><button type="button" class="btn btn-primary media-view-btn" data-playlist-open="' + esc(pl.id) + '">' + tr.plOpen + '</button></div></div></article>';
     }).join('');
+    grid.querySelectorAll('[data-playlist-open]').forEach(button => button.addEventListener('click', () => openPlaylist(button.getAttribute('data-playlist-open'))));
   };
 
   window.openPlaylist = function (plId) {
@@ -166,7 +163,7 @@
         }
         const title = L === 'fa' ? (p.title_fa || p.title_en || tr.untitled) : (p.title_en || p.title_fa || tr.untitled);
         const typeIcon = p.type === 'photo' ? '\ud83d\uddbc\ufe0f' : p.type === 'video' ? '\ud83c\udfac' : p.type === 'audio' ? '\ud83d\udd0a' : p.type === 'text' ? '\ud83d\udcdd' : '\ud83d\udcc4';
-        items += '<button type="button" class="playlist-item-btn" data-post-id="' + p.id + '" style="display:flex;align-items:center;gap:0.8rem;padding:0.9rem 0.75rem;border:none;border-bottom:1px solid #eee;background:transparent;width:100%;text-align:inherit;font:inherit;cursor:pointer;color:inherit;">' +
+        items += '<button type="button" class="playlist-item-btn" data-post-id="' + esc(p.id) + '" style="display:flex;align-items:center;gap:0.8rem;padding:0.9rem 0.75rem;border:none;border-bottom:1px solid #eee;background:transparent;width:100%;text-align:inherit;font:inherit;cursor:pointer;color:inherit;">' +
           '<span style="font-weight:700;color:var(--primary);min-width:1.5rem;">' + (idx + 1) + '</span>' +
           '<span style="font-size:1.3rem;">' + typeIcon + '</span>' +
           '<span style="flex:1;font-size:1.05rem;font-weight:500;">' + esc(title) + '</span>' +

@@ -8,26 +8,41 @@ function isAudioFile(post) {
 }
 
 function getYouTubeEmbedUrl(url) {
-  if (!url) return null;
+  if (typeof url !== 'string' || !url.trim()) return null;
   try {
     const u = new URL(url.trim());
-    if (u.hostname.includes('youtu.be')) {
-      const id = u.pathname.slice(1).split('/')[0].split('?')[0];
-      if (id) return 'https://www.youtube.com/embed/' + id;
+    if ((u.protocol !== 'https:' && u.protocol !== 'http:') || u.username || u.password) return null;
+
+    const host = u.hostname.toLowerCase();
+    const shortHosts = ['youtu.be', 'www.youtu.be'];
+    const youtubeHosts = [
+      'youtube.com', 'www.youtube.com', 'm.youtube.com',
+      'youtube-nocookie.com', 'www.youtube-nocookie.com'
+    ];
+    let id = '';
+
+    if (shortHosts.includes(host)) {
+      id = u.pathname.split('/').filter(Boolean)[0] || '';
+    } else if (youtubeHosts.includes(host)) {
+      const videoParam = u.searchParams.get('v');
+      if (videoParam) {
+        id = videoParam;
+      } else {
+        const parts = u.pathname.split('/').filter(Boolean);
+        const marker = parts.findIndex(part => ['embed', 'shorts', 'live'].includes(part));
+        if (marker >= 0) id = parts[marker + 1] || '';
+      }
+    } else {
+      return null;
     }
-    if (u.hostname.includes('youtube.com') || u.hostname.includes('youtube-nocookie.com')) {
-      const v = u.searchParams.get('v');
-      if (v) return 'https://www.youtube.com/embed/' + v;
-      const parts = u.pathname.split('/').filter(Boolean);
-      const idx = parts.indexOf('embed');
-      if (idx >= 0 && parts[idx + 1]) return 'https://www.youtube.com/embed/' + parts[idx + 1];
-      const sidx = parts.indexOf('shorts');
-      if (sidx >= 0 && parts[sidx + 1]) return 'https://www.youtube.com/embed/' + parts[sidx + 1];
-      const lidx = parts.indexOf('live');
-      if (lidx >= 0 && parts[lidx + 1]) return 'https://www.youtube.com/embed/' + parts[lidx + 1];
-    }
-  } catch (e) {}
-  return null;
+
+    // YouTube video IDs are exactly 11 URL-safe characters. Reject anything
+    // that could break the generated iframe markup or point to a malformed ID.
+    if (!/^[A-Za-z0-9_-]{11}$/.test(id)) return null;
+    return 'https://www.youtube.com/embed/' + id;
+  } catch (e) {
+    return null;
+  }
 }
 
 function postTitle(p) {
@@ -43,6 +58,24 @@ function postDesc(p) {
 
 function postMediaUrl(p) {
   return (p.externalUrl || p.dataUrl || p.fileUrl || p.url || '').trim();
+}
+
+function safeMediaUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+
+  // Preserve supported uploaded media data URLs, but never allow active HTML/SVG.
+  const safeDataUrl = /^data:(?:image\/(?:png|jpeg|gif|webp)|video\/(?:mp4|webm|ogg)|audio\/(?:mpeg|mp3|ogg|wav|webm|mp4|aac|flac)|application\/pdf);base64,[A-Za-z0-9+/]+={0,2}$/i;
+  if (/^data:/i.test(raw)) return safeDataUrl.test(raw) ? raw : '';
+
+  try {
+    const parsed = new URL(raw, window.location.href);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return '';
+    if (parsed.username || parsed.password) return '';
+    return parsed.href;
+  } catch (e) {
+    return '';
+  }
 }
 
 function postSortTime(p) {
@@ -148,9 +181,14 @@ function renderMedia() {
       (bookLabel ? '<div class="media-meta" style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.4rem;">' + bookLabel + '</div>' : '') +
       (desc ? '<p class="media-desc" style="flex:1;">' + desc + '</p>' : '') +
       '<div class="media-actions" style="margin-top:0.8rem;">' +
-      '<button type="button" class="btn btn-primary media-view-btn" onclick="openPost(\'' + p.id + '\')">' + (t.view || 'View') + '</button>' +
+      '<button type="button" class="btn btn-primary media-view-btn" data-open-post="' + escapeHtml(p.id) + '">' + (t.view || 'View') + '</button>' +
       '</div></div></article>';
   }).join('');
+  grid.querySelectorAll('[data-open-post]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      openPost(button.getAttribute('data-open-post'));
+    });
+  });
 }
 
 function openPost(id) {
@@ -160,7 +198,7 @@ function openPost(id) {
   const content = document.getElementById('modal-content');
   if (!modal || !content) return;
   const t = (T && T[currentLang]) || (T && T.en) || {};
-  const mediaUrl = postMediaUrl(post);
+  const mediaUrl = safeMediaUrl(postMediaUrl(post));
   let body = '<button class="modal-close" type="button" onclick="closeModal()">&times;</button>';
   body += '<h2 style="margin-top:0.5rem;padding-right:2rem;padding-left:2rem;">' + escapeHtml(postTitle(post)) + '</h2>';
   const d = postDesc(post);
@@ -198,10 +236,16 @@ function openPost(id) {
       '<label style="font-size:0.9rem;font-weight:600;">' + plLabel + '</label>' +
       '<select id="modal-pl-select" style="flex:1;min-width:140px;padding:0.55rem 0.7rem;font-size:1rem;border-radius:8px;border:1px solid #ccc;">' +
       '<option value="">—</option>' + opts + '</select>' +
-      '<button type="button" class="btn btn-primary" style="padding:0.55rem 1.1rem;font-size:1rem;" onclick="addPostToPlaylistFromModal(\'' + post.id + '\')">' + addLbl + '</button></div>';
+      '<button type="button" class="btn btn-primary" style="padding:0.55rem 1.1rem;font-size:1rem;" data-add-post-to-playlist="' + escapeHtml(post.id) + '">' + addLbl + '</button></div>';
   }
 
   content.innerHTML = body;
+  const addToPlaylistButton = content.querySelector('[data-add-post-to-playlist]');
+  if (addToPlaylistButton) {
+    addToPlaylistButton.addEventListener('click', function () {
+      addPostToPlaylistFromModal(addToPlaylistButton.getAttribute('data-add-post-to-playlist'));
+    });
+  }
   modal.classList.add('open');
 
   const player = document.getElementById('post-player');
@@ -264,10 +308,11 @@ function addComment(postId) {
 
 function escapeHtml(str) {
   return String(str == null ? '' : str)
-    .replace(/&/g, '&')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
-    .replace(/"/g, '"');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function setupEventListeners() {
