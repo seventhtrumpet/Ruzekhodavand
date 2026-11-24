@@ -537,7 +537,8 @@
         }
         if (localVersions.indexOf(version) >= 0) {
           var searchIds = IDS.slice();
-          if (version === 'dra' || version === 'webbe') searchIds = searchIds.concat([740,750,760,770,780,790,800]);\n          if (version === 'web') searchIds = searchIds.concat([740,750,760,770,780,790,800,810,820,830,840,850,860,870,880]);
+          if (version === 'dra' || version === 'webbe') searchIds = searchIds.concat([740,750,760,770,780,790,800]);
+          if (version === 'web') searchIds = searchIds.concat([740,750,760,770,780,790,800,810,820,830,840,850,860,870,880]);
           var packs = await Promise.all(searchIds.map(async function (id) {
             var response = await fetch('/data/bible-en/local/' + version + '/b' + id + '.json');
             if (!response.ok) throw new Error('English Bible search data request failed: ' + version + '/' + id + ' (' + response.status + ')');
