@@ -200,8 +200,8 @@ def check_english_metadata(available_english: list[str]) -> None:
         for key, value in actual.items():
             if counts.get(key) != value:
                 fail(f"{edition}: metadata {key}={counts.get(key)!r} does not match local data ({value})")
-        if edition == "rv1885" and (base / "b810.json").is_file():
-            esther_additions = load_json(base / "b810.json").get("810", {})
+        if edition == "rv1885" and (ROOT / "data/bible-en/local/rv1885/b810.json").is_file():
+            esther_additions = load_json(ROOT / "data/bible-en/local/rv1885/b810.json").get("810", {})
             if esther_additions.get("chapter_start") != 10 or sorted(map(int, esther_additions.get("chapters", {}))) != list(range(10, 17)):
                 fail("ERV 1885 Greek Esther additions must preserve source chapter numbers 10–16")
 
