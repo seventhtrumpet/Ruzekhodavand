@@ -119,8 +119,8 @@ def compare_edition(edition: str, archive_id: str) -> tuple[int, int, bool]:
                 elif verse not in source_verses:
                     errors.append(f"{edition}: book {book_id} chapter {chapter} has extra local verse {verse}")
                 elif local_verses[verse] != source_verses[verse]:
-                    local_text = local_verses[verse].replace("\\n", " ")[:180]
-                    source_text = source_verses[verse].replace("\\n", " ")[:180]
+                    local_text = local_verses[verse].replace("\\n", " ")
+                    source_text = source_verses[verse].replace("\\n", " ")
                     errors.append(
                         f"{edition}: text mismatch at book {book_id} {chapter}:{verse}; "
                         f"local={local_text!r}; source={source_text!r}"
