@@ -526,7 +526,7 @@ def check_reader_safeguards() -> None:
     save_handler = photo[save_start:save_end] if save_start >= 0 and save_end > save_start else ""
     if "a.download = 'seventh-trumpet-share.jpg'" not in save_handler or "doFileShare()" in save_handler:
         fail("Save picture must only download the generated image and must not trigger a second share action")
-    if 'js/bible-share-photo.js?v=photo-save-action-20261124' not in html:
+    if 'js/bible-share-photo.js?v=share-profile-logo-20261124' not in html:
         fail("Bible photo-share script URL is missing the save-action cache key")
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
@@ -537,8 +537,12 @@ def check_reader_safeguards() -> None:
         fail("Disabled admin page must not load legacy admin hooks")
     if "Intentionally inert" not in admin_js or re.search(r"\blocalStorage\s*\.|password|function\s+login", admin_js, re.I):
         fail("Legacy admin compatibility script must remain inert and credential-free")
-    if "Textual-integrity note" not in html or "یادداشت امانت‌داری متن" not in html:
-        fail("Bible reader must retain its bilingual textual-integrity note")
+    if "Textual-integrity note" in html or "یادداشت امانت‌داری متن" in html:
+        fail("Editorial translation-review notes must stay out of the Bible reader UI")
+    if "js/logo_data.js?v=share-profile-logo-20261124" not in html:
+        fail("The assembled profile logo must load before the Bible share-photo module")
+    if "waitForSiteLogo" not in photo or "window.ST_LOGO" not in photo:
+        fail("Bible share-photo generation must wait for the site's assembled profile logo")
     fa_loader_start = search.find("  function loadFa() {")
     fa_loader_end = search.find("  function loadEn() {", fa_loader_start)
     fa_loader = search[fa_loader_start:fa_loader_end] if fa_loader_start >= 0 and fa_loader_end > fa_loader_start else ""
