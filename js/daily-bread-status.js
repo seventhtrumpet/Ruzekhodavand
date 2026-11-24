@@ -57,6 +57,19 @@
     };
   }
 
+  function copyFallback(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        alert(msg('The verse and website link have been copied.',
+          'آیه و لینک وب‌سایت کپی شد.'));
+      }).catch(function () {
+        try { prompt(msg('Copy the verse and website link:', 'آیه و لینک وب‌سایت را کپی کنید:'), text); } catch (e) {}
+      });
+    } else {
+      try { prompt(msg('Copy the verse and website link:', 'آیه و لینک وب‌سایت را کپی کنید:'), text); } catch (e) {}
+    }
+  }
+
   function shareFreshBread() {
     var data = verseData();
     var english = isEn();
@@ -74,12 +87,7 @@
 
     if (!navigator.share) {
       var fallback = caption + '\n\n' + SITE;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(fallback).then(function () {
-          alert(msg('The English verse and website link have been copied.',
-            'آیه فارسی و لینک وب‌سایت کپی شد.'));
-        }).catch(function () {});
-      }
+      copyFallback(fallback);
       return;
     }
 
@@ -91,8 +99,7 @@
       url: SITE
     }).catch(function (err) {
       if (err && err.name === 'AbortError') return;
-      navigator.share({ title: brand, text: caption + '\n\n' + SITE })
-        .catch(function () {});
+      copyFallback(caption + '\n\n' + SITE);
     });
   }
 

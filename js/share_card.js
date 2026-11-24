@@ -202,7 +202,8 @@
         var file = new File([blob], opts.filename || 'seventh-trumpet.png', { type: 'image/png' });
         var shareData = { files: [file], title: opts.title || SITE_NAME_EN, text: url, url: url };
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share(shareData).catch(function () {
+          navigator.share(shareData).catch(function (err) {
+            if (err && err.name === 'AbortError') return;
             var a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = opts.filename || 'seventh-trumpet.png';
