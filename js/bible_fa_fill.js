@@ -139,7 +139,7 @@
   }
 
   function bookIdFromUrl(url) {
-    var match = String(url || '').match(/(?:^|\\/)b(\\d+)\\.json(?:[?#]|$)/i);
+    var match = String(url || '').match(/b([0-9]+)[.]json(?:[?#]|$)/i);
     return match ? Number(match[1]) : 0;
   }
 
