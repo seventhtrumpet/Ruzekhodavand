@@ -111,9 +111,11 @@
     if (!host) {
       host = document.createElement('div');
       host.id = 'footer-social';
-      host.className = 'footer-social';
       footer.appendChild(host);
     }
+    // The homepage already contains #footer-social without this class.
+    // Add it in both cases so the compact footer icon styles always apply.
+    host.classList.add('footer-social');
     host.innerHTML = '';
     LINKS.forEach(function (item) { host.appendChild(makeLink(item)); });
   }
