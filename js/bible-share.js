@@ -234,15 +234,16 @@
           title: parts.title,
           text: parts.text,
           url: parts.url
-        }).catch(function () {
-          copyText(parts.full).then(function () {
-            toast(en ? 'Copied \u2014 paste in Signal' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0633\u06cc\u06af\u0646\u0627\u0644 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
+        }).catch(function (err) {
+          if (err && err.name === 'AbortError') return;
+          copyText(parts.full).then(function (ok) {
+            if (ok) toast(en ? 'Copied \\u2014 paste in Signal' : '\\u06a9\\u067e\\u06cc \\u0634\\u062f \\u2014 \\u062f\\u0631 \\u0633\\u06cc\\u06af\\u0646\\u0627\\u0644 \\u062c\\u0627\\u06cc\\u200c\\u06af\\u0630\\u0627\\u0631\\u06cc');
+            try { window.location.href = 'sgnl://send?text=' + encodeURIComponent(parts.full); } catch (e) {}
           });
-          try { window.location.href = 'sgnl://send?text=' + encodeURIComponent(parts.full); } catch (e) {}
         });
       } else {
-        copyText(parts.full).then(function () {
-          toast(en ? 'Copied \u2014 paste in Signal' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0633\u06cc\u06af\u0646\u0627\u0644 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
+        copyText(parts.full).then(function (ok) {
+          if (ok) toast(en ? 'Copied \\u2014 paste in Signal' : '\\u06a9\\u067e\\u06cc \\u0634\\u062f \\u2014 \\u062f\\u0631 \\u0633\\u06cc\\u06af\\u0646\\u0627\\u0644 \\u062c\\u0627\\u06cc\\u200c\\u06af\\u0630\\u0627\\u0631\\u06cc');
         });
         try { window.location.href = 'sgnl://send?text=' + encodeURIComponent(parts.full); } catch (e2) {}
       }
