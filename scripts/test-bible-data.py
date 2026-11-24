@@ -504,6 +504,12 @@ def check_reader_safeguards() -> None:
         fail("Bible reader must resolve shared book slugs against the selected edition before rendering")
     if "route.set('lang', lang)" not in share or "route.set('version', version)" not in share or "route.set('slug', slug)" not in share:
         fail("Bible share links must preserve language, translation edition, and canonical book slug")
+    if "localStorage.setItem('cog_bible_share_route', JSON.stringify(sharedRoute))" not in reader:
+        fail("Reader must preserve the exact incoming deep-link verse before core state normalization")
+    if "function getShareRoute()" not in share or "var params = getShareRoute();" not in share:
+        fail("Share links must recover the exact incoming verse after the reader removes URL parameters")
+    if "linkedVerse" not in share or "route.chapter + ':' + route.verse" not in share:
+        fail("Share payload must include the linked verse text and reference when no verse is reselected")
     if "js/bible-share.js?v=verse-reference-20261124" not in html:
         fail("Bible share script URL is missing the edition-aware deep-link cache key")
 
