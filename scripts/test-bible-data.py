@@ -390,7 +390,7 @@ def check_reader_safeguards() -> None:
             fail(f"WEB Classic reader chapter map is missing {book_id} ({chapters} chapters)")
     if "selectedEnglishVersion === 'web') Object.assign(CHAPTER_COUNTS" not in reader:
         fail("WEB Classic additional chapters must be registered in the reader")
-    if "web-classic-81-book-coverage-20261124" not in html or "odr-local-search-20261123" not in html:
+    if "js/bible.js?v=web-classic-81-book-coverage-20261124" not in html or "js/bible_search.js?v=web-classic-81-book-coverage-20261124" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
     if r"\n    else if (route.has('b')" in reader:
