@@ -29,8 +29,27 @@
     return null;
   }
 
-  function applyDeepLink() {
+  function getShareRoute() {
     var params = getParams();
+    if (params) return params;
+    try {
+      var route = JSON.parse(localStorage.getItem('cog_bible_share_route') || 'null');
+      var state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}');
+      if (route && Number(route.bookId) > 0 && Number(route.chapter) > 0 &&
+          Number(state.bookId) === Number(route.bookId) &&
+          Number(state.chapter) === Number(route.chapter)) {
+        return {
+          bookId: Number(route.bookId),
+          chapter: Number(route.chapter),
+          verse: Number(route.verse) > 0 ? Number(route.verse) : 1
+        };
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function applyDeepLink() {
+    var params = getShareRoute();
     if (!params) return;
     try { localStorage.setItem('cog_bible_state', JSON.stringify(params)); } catch (e) {}
     var tries = 0;
@@ -68,6 +87,20 @@
       var bookName = heading ? (heading.textContent || '').trim() : '';
       if (ch || vs) ref = (bookName ? bookName + ' ' : '') + ch + ':' + vs;
     }
+    if (!text || !ref) {
+      var route = getShareRoute();
+      if (route) {
+        var linkedVerse = document.getElementById('v-' + route.chapter + '-' + route.verse);
+        if (linkedVerse) {
+          if (!text) text = (linkedVerse.textContent || '').trim();
+          if (!ref) {
+            var linkedHeading = document.getElementById('bible-heading');
+            var linkedBook = linkedHeading ? (linkedHeading.textContent || '').trim() : '';
+            ref = (linkedBook ? linkedBook + ' ' : '') + route.chapter + ':' + route.verse;
+          }
+        }
+      }
+    }
     if (!text) {
       var main = document.querySelector('.mb-verse.active, .verse-body, article p');
       if (main) text = (main.textContent || '').trim().slice(0, 600);
@@ -82,7 +115,7 @@
   function sharePageUrl() {
     try {
       var selected = document.querySelectorAll('.mb-verse.selected');
-      var params = getParams();
+      var params = getShareRoute();
       var state = {};
       try { state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}'); } catch (e) {}
       var isBiblePage = /\/bible\.html$/i.test(location.pathname || '');
