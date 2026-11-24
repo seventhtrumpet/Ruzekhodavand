@@ -11,6 +11,10 @@
     var version = route.get('version');
     var englishVersions = ['kjv','web','asv','rv1885','ylt','webster','bbe','bsb','msb','webbe','darby','dra','gnv','odr','odr-original'];
     var persianVersions = ['opv','opcb'];
+    var routeLanguage = (lang === 'fa' || lang === 'en') ? lang
+      : englishVersions.indexOf(version) >= 0 ? 'en'
+      : persianVersions.indexOf(version) >= 0 ? 'fa' : null;
+    if (routeLanguage) window.__stBibleRoute = { lang: routeLanguage, version: version || null };
     if (englishVersions.indexOf(version) >= 0 && (!lang || lang === 'en')) {
       localStorage.setItem('cog_lang', 'en');
       localStorage.setItem('cog_bible_en_version', version);
