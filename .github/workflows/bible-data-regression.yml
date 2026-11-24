@@ -46,6 +46,7 @@ jobs:
           node scripts/test-youtube-embed-url.js
           node --check js/bugfixes.js
           node scripts/test-html-escaping.js
+          node scripts/test-safe-media-url.js
       - name: Validate Bible datasets and reader safeguards
         run: python scripts/test-bible-data.py
       - name: Collate every local English verse against pinned source archives
