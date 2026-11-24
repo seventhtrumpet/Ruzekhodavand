@@ -522,7 +522,7 @@ def check_reader_safeguards() -> None:
         fail("Selected Bible verses must build a complete reference, not only cite the first selected verse")
     if "references.join(', ')" not in share or "end > start ? '-' + end : ''" not in share:
         fail("Selected Bible verse references must preserve ranges and non-contiguous selections")
-    if "js/bible-share.js?v=deep-link-share-20261124-native-share-cancel" not in html:
+    if "js/bible-share.js?v=selected-reference-ranges-20261124" not in html:
         fail("Bible share script URL is missing the edition-aware deep-link cache key")
 
     save_start = photo.find("document.getElementById('st-photo-save').onclick")
