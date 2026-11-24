@@ -75,6 +75,15 @@ The reader wrapper loads the pinned JavaScript core from the same-origin path `/
 - Do not add NMV full text or an external reading link without documented permission and a clear user decision.
 - Keep source and licence information on the site's own bilingual information page. A source citation is not a reason to send the reader away from the site's Bible reader.
 
+## Additional official English VPL source coverage findings (2026-11-24)
+
+The all-edition source audit found two more silent omissions in the previous import catalogue:
+
+- **ERV 1885:** the official VPL archive has 80 source book/text codes and 36,878 verse rows. The previous local pack contained only the 66 common books. The 14 additional texts are Tobit, Judith, Wisdom, Sirach, Baruch, 1/2 Maccabees, 1 Esdras, 2 Esdras, Greek Esther additions (source chapters 10–16), Prayer of Manasses, Prayer of Azariah, Susanna, and Bel and the Dragon.
+- **WEBBE:** the official VPL archive has 81 source book/text codes and 38,058 verse rows. The previous local pack contained 73; it omitted 1 Esdras, 2 Esdras, Greek Esther, Greek Daniel, Prayer of Manasses, Psalm 151, 3 Maccabees, and 4 Maccabees.
+- The other eight English archives matched their declared source code catalogues in this audit. DRA's 73-book source set is complete.
+- PR #86 expands the importer to 80 ERV and 81 WEBBE source texts, preserves ERV Greek Esther source chapter numbers 10–16, rejects any unregistered VPL code rather than silently skipping it, and validates generated datasets before committing them. The reader selector/search update follows only after the generated local data is present.
+
 ## WEB Classic full-source coverage correction (2026-11-24)
 
 - A diagnostic downloaded the exact pinned official eBible.org archive `eng-web_vpl.zip` (SHA-256 `93e867cdb2bfc84d1e997172e7773e166e718d9265985a054f8fca565f5cd21e`) and enumerated all 81 distinct VPL book codes. The previous importer intentionally selected only the 66 common-book definitions, omitting 15 source text units.

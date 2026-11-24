@@ -23,13 +23,22 @@ BOOK_IDS = [
 ENGLISH = ["web", "asv", "ylt", "webster", "darby", "gnv", "bsb", "rv1885", "dra", "webbe", "msb"]
 WEB_EXTRA_IDS = [810,820,830,840,850,860,870,880]
 WEB_EXTRA_CHAPTERS = {810:10,820:14,830:9,840:1,850:1,860:7,870:16,880:18}
+ERV_EXTRA_IDS = [810,830,840,870,890,900,910]
+ERV_EXTRA_CHAPTERS = {810:7,830:9,840:1,870:16,890:1,900:1,910:1}
 
 
 def local_english_book_ids(edition: str) -> list[int]:
-    if edition in ("dra", "webbe"):
-        return BOOK_IDS + [740,750,760,770,780,790,800]
+    shared = [740,750,760,770,780,790,800]
+    if edition == "dra":
+        return BOOK_IDS + shared
     if edition == "web":
-        return BOOK_IDS + [740,750,760,770,780,790,800] + WEB_EXTRA_IDS
+        return BOOK_IDS + shared + WEB_EXTRA_IDS
+    if edition == "webbe" and (ROOT / "data/bible-en/local/webbe/b810.json").is_file():
+        return BOOK_IDS + shared + WEB_EXTRA_IDS
+    if edition == "webbe":
+        return BOOK_IDS + shared
+    if edition == "rv1885" and (ROOT / "data/bible-en/local/rv1885/b740.json").is_file():
+        return BOOK_IDS + shared + ERV_EXTRA_IDS
     return BOOK_IDS
 
 ERRORS: list[str] = []
@@ -97,8 +106,9 @@ def check_pack(pack: str, book_ids: list[int]) -> None:
         except (TypeError, ValueError):
             fail(f"{path.relative_to(ROOT)}: non-numeric chapter key")
             continue
-        if chapter_numbers != list(range(1, len(chapter_numbers) + 1)):
-            fail(f"{path.relative_to(ROOT)}: chapter numbering is not contiguous from 1")
+        chapter_start = int(book.get("chapter_start", 1))
+        if chapter_numbers != list(range(chapter_start, chapter_start + len(chapter_numbers))):
+            fail(f"{path.relative_to(ROOT)}: chapter numbering is not contiguous from source start {chapter_start}")
         for chapter, verses in chapters.items():
             if not isinstance(verses, dict):
                 fail(f"{path.relative_to(ROOT)} chapter {chapter}: verses must be an object")
@@ -190,6 +200,10 @@ def check_english_metadata(available_english: list[str]) -> None:
         for key, value in actual.items():
             if counts.get(key) != value:
                 fail(f"{edition}: metadata {key}={counts.get(key)!r} does not match local data ({value})")
+        if edition == "rv1885" and (ROOT / "data/bible-en/local/rv1885/b810.json").is_file():
+            esther_additions = load_json(ROOT / "data/bible-en/local/rv1885/b810.json").get("810", {})
+            if esther_additions.get("chapter_start") != 10 or sorted(map(int, esther_additions.get("chapters", {}))) != list(range(10, 17)):
+                fail("ERV 1885 Greek Esther additions must preserve source chapter numbers 10–16")
 
 
 
@@ -220,8 +234,10 @@ def check_runtime_chapter_catalogue() -> None:
                 expected = 16
             if edition == "dra" and book_id == 340:
                 expected = 14
-            if edition == "web" and book_id in WEB_EXTRA_CHAPTERS:
+            if edition in ("web", "webbe") and book_id in WEB_EXTRA_CHAPTERS:
                 expected = WEB_EXTRA_CHAPTERS[book_id]
+            if edition == "rv1885" and book_id in ERV_EXTRA_CHAPTERS:
+                expected = ERV_EXTRA_CHAPTERS[book_id]
             if expected is None:
                 fail(f"{relative}/{path.name}: book {book_id} is absent from the reader chapter catalogue")
             elif len(chapters) != expected:
@@ -284,6 +300,8 @@ def check_import_workflow_audit_triggers() -> None:
     for path in ("scripts/inspect-web-classic-vpl.py", "scripts/audit-all-english-vpl-coverage.py"):
         if path not in workflow:
             fail(f"English VPL coverage audit is not triggered when {path} changes")
+    if "python scripts/test-bible-data.py" not in workflow:
+        fail("English VPL import workflow must validate generated datasets before committing them")
 
 
 def check_reader_safeguards() -> None:
@@ -338,7 +356,11 @@ def check_reader_safeguards() -> None:
     importer = (ROOT / "scripts/import-english-local.py").read_text(encoding="utf-8")
     if "BOOKS_81_WEB = BOOKS + DEUTEROCANONICAL + WEB_EXTRA_BOOKS" not in importer:
         fail("WEB Classic importer must retain all 81 official VPL book/text units")
-    if not all(f'"{code}"' in importer for code in ("ESG","DNG","PRM","PSX","3MA","4ES","4MA")):
+    if "BOOKS_81_WEBBE = BOOKS + DEUTEROCANONICAL + WEB_EXTRA_BOOKS" not in importer or "BOOKS_80_ERV = BOOKS + DEUTEROCANONICAL + ERV_EXTRA_BOOKS" not in importer:
+        fail("WEBBE and ERV 1885 importers must retain all source text units")
+    if "raise ValueError(f\"{translation}: source contains unregistered book code" not in importer:
+        fail("Importer must reject unregistered source book codes rather than silently omit them")
+    if not all(f'"{code}"' in importer for code in ("ESG","DNG","PRM","PSX","3MA","4ES","4MA","BEL","PRA","SUS")):
         fail("WEB Classic importer is missing one or more additional source book codes")
     if "Eleven English editions" not in reader or "KJV and BBE" not in reader:
         fail("Reader hosting note must distinguish local editions from remotely fetched KJV/BBE")
@@ -350,8 +372,9 @@ def check_reader_safeguards() -> None:
     meta = json.loads((ROOT / "data/bible-fa/meta.json").read_text(encoding="utf-8"))
     extra_ids = {740,750,760,770,780,790,800}
     web_extra_ids = set(WEB_EXTRA_IDS)
+    erv_extra_ids = set(ERV_EXTRA_IDS)
     persian_manifest = json.loads((ROOT / "data/bible-fa/manifest.json").read_text(encoding="utf-8"))
-    if len(persian_manifest) != 66 or (extra_ids | web_extra_ids).intersection({int(k) for k in persian_manifest}):
+    if len(persian_manifest) != 66 or (extra_ids | web_extra_ids | erv_extra_ids).intersection({int(k) for k in persian_manifest}):
         fail("Persian OPV/OPCB availability must remain limited to their 66-book datasets")
     if len(meta) != 73 or not extra_ids.issubset({item.get("id") for item in meta}):
         fail("Book metadata must include 66 common books plus seven additional deuterocanonical books")
