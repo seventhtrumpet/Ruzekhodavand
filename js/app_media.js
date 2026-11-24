@@ -181,9 +181,14 @@ function renderMedia() {
       (bookLabel ? '<div class="media-meta" style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.4rem;">' + bookLabel + '</div>' : '') +
       (desc ? '<p class="media-desc" style="flex:1;">' + desc + '</p>' : '') +
       '<div class="media-actions" style="margin-top:0.8rem;">' +
-      '<button type="button" class="btn btn-primary media-view-btn" onclick="openPost(\'' + p.id + '\')">' + (t.view || 'View') + '</button>' +
+      '<button type="button" class="btn btn-primary media-view-btn" data-open-post="' + escapeHtml(p.id) + '">' + (t.view || 'View') + '</button>' +
       '</div></div></article>';
   }).join('');
+  grid.querySelectorAll('[data-open-post]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      openPost(button.getAttribute('data-open-post'));
+    });
+  });
 }
 
 function openPost(id) {
@@ -231,10 +236,16 @@ function openPost(id) {
       '<label style="font-size:0.9rem;font-weight:600;">' + plLabel + '</label>' +
       '<select id="modal-pl-select" style="flex:1;min-width:140px;padding:0.55rem 0.7rem;font-size:1rem;border-radius:8px;border:1px solid #ccc;">' +
       '<option value="">—</option>' + opts + '</select>' +
-      '<button type="button" class="btn btn-primary" style="padding:0.55rem 1.1rem;font-size:1rem;" onclick="addPostToPlaylistFromModal(\'' + post.id + '\')">' + addLbl + '</button></div>';
+      '<button type="button" class="btn btn-primary" style="padding:0.55rem 1.1rem;font-size:1rem;" data-add-post-to-playlist="' + escapeHtml(post.id) + '">' + addLbl + '</button></div>';
   }
 
   content.innerHTML = body;
+  const addToPlaylistButton = content.querySelector('[data-add-post-to-playlist]');
+  if (addToPlaylistButton) {
+    addToPlaylistButton.addEventListener('click', function () {
+      addPostToPlaylistFromModal(addToPlaylistButton.getAttribute('data-add-post-to-playlist'));
+    });
+  }
   modal.classList.add('open');
 
   const player = document.getElementById('post-player');
