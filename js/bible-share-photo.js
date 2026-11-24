@@ -306,7 +306,6 @@
       document.body.appendChild(a);
       a.click();
       setTimeout(function () { try { a.remove(); } catch (e) {} }, 400);
-      doFileShare();
     };
     document.getElementById('st-photo-open').onclick = function () {
       if (isFb) window.open('https://www.facebook.com/', '_blank', 'noopener');
