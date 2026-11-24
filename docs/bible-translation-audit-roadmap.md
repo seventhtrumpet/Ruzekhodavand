@@ -74,6 +74,14 @@ The reader wrapper loads the pinned JavaScript core from the same-origin path `/
 - Do not add NMV full text or an external reading link without documented permission and a clear user decision.
 - Keep source and licence information on the site's own bilingual information page. A source citation is not a reason to send the reader away from the site's Bible reader.
 
+## Additional translation-candidate review (2026-11-23)
+
+- **World Messianic Bible (WMB / HNV):** the official eBible source identifies the text as public domain, but explicitly describes it as modern English used among Messianic Jews and as an edition of the WEB with distinct choices (Hebrew-form New Testament names, “immerse” for “baptize,” Hebrew book order, and omission of Deuterocanon/Apocrypha). It is therefore not added to the main general-purpose selector under the current scope, which avoids presenting a tradition-specific adaptation as a neutral base edition. This is not a theological judgment; the source and licence may be retained for a separately labelled comparison category if the project later chooses one.
+- **JPS Tanakh 1917:** a complete Jewish Tanakh/Old Testament, not a complete Christian Bible. It may be evaluated for a separately labelled supplementary Jewish-text section, not counted among full Christian-Bible translations.
+- **BBE:** eBible.org's public-domain explanation is expressly based on the 1965 U.S. publication without a copyright notice. That is not sufficient evidence of worldwide public-domain status. Keep the existing background-fetch arrangement; do not self-host the full text until jurisdictional review supports it.
+- **KJV:** Cambridge University Press states that rights in the Authorized Version are vested in the Crown and administered under Royal Letters Patent in the UK. Treat this as a jurisdiction-specific restriction; do not infer that global public-domain status removes the UK issue. Review UK accessibility and international distribution before self-hosting.
+- These findings do not authorize changing, replacing, or removing any edition already in the selector. Existing translations remain distinct and unmodified.
+
 ## No-external-link and sharing policy
 
 - Visitors must remain on **SeventhTrumpet.org** to read every offered translation. Never add an external reading-page link, external download link, or a button that opens a translation provider.
