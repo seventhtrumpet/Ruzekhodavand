@@ -1,4 +1,4 @@
-/* Neutral language choices — Persian is a language label, not a national flag */
+/* Neutral language choices — Persian / English labels in header */
 (function () {
   if (window.__stFlagsInit) return;
   window.__stFlagsInit = true;
@@ -39,8 +39,6 @@
     });
   }
 
-
-
   function ensureCss() {
     if (document.getElementById('st-lang-flags-css')) return;
     var st = document.createElement('style');
@@ -48,63 +46,47 @@
     st.textContent =
       '.header-inner{display:flex!important;align-items:center!important;flex-wrap:nowrap!important;gap:0.25rem!important}' +
       '#header-social.header-social{display:flex!important;flex-shrink:0!important;gap:0.2rem!important;order:2}' +
-      '#header-social.header-social a{width:1.6rem!important;height:1.6rem!important}' +
+      '#header-social.header-social a{width:1.5rem!important;height:1.5rem!important}' +
       '.header-actions{display:flex!important;align-items:center!important;gap:0.2rem!important;margin-inline-start:auto!important;flex-shrink:0!important;order:5}' +
-      '.st-lang-flags{display:inline-flex;align-items:flex-end;gap:0.2rem;flex-shrink:0;order:4}' +
-      '.st-lang-flag{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:0.08rem;padding:0.12rem 0.2rem;border:1px solid rgba(255,255,255,0.3);border-radius:8px;background:rgba(255,255,255,0.12);cursor:pointer;font-family:inherit;color:#fff;line-height:1;min-width:3.2rem}' +
-      '.st-lang-flag span{display:block!important;font-size:0.68rem;font-weight:800;letter-spacing:0;max-width:none;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
-      '.st-lang-flag svg{display:block;border-radius:2px}' +
-      '.st-lang-flag.is-active{box-shadow:0 0 0 2px rgba(201,162,39,0.55);border-color:#c9a227}' +
-      '.lang-toggle.st-lang-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}' +
-      '#auth-header-wrap{order:6;flex-shrink:0}' +
-      '.nav-burger,.menu-btn{order:0;flex-shrink:0}' +
-      'a.logo,#header-brand{order:1;flex-shrink:1;min-width:0}';
+      '.st-lang-flags{display:inline-flex!important;align-items:flex-end;gap:0.2rem;flex-shrink:0;order:4;visibility:visible!important;opacity:1!important}' +
+      '.lang-toggle.st-lang-hidden,#lang-toggle.st-lang-hidden{display:none!important}' +
+      '.st-lang-flag{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:0.08rem;padding:0.12rem 0.2rem;border:1px solid rgba(255,255,255,0.3);border-radius:8px;background:rgba(255,255,255,0.08);color:#fff;cursor:pointer;font-family:inherit;min-width:2.4rem}' +
+      '.st-lang-flag .st-lang-emoji{font-size:1rem;line-height:1}' +
+      '.st-lang-flag .st-lang-label{font-size:0.62rem;font-weight:700;letter-spacing:0.02em}' +
+      '.st-lang-flag.is-active{background:rgba(201,162,39,0.35);border-color:#c9a227}';
     document.head.appendChild(st);
   }
 
   function paint() {
     ensureCss();
-    var old = document.getElementById('lang-toggle');
-    if (document.getElementById('st-lang-flags')) {
-      syncActive();
-      return;
-    }
-    if (old) {
-      old.classList.add('st-lang-hidden');
-      old.setAttribute('aria-hidden', 'true');
-    }
+    var actions = document.querySelector('.header-actions');
+    if (!actions) return;
 
-    var wrap = document.createElement('div');
-    wrap.id = 'st-lang-flags';
-    wrap.className = 'st-lang-flags';
-    wrap.setAttribute('role', 'group');
-    wrap.setAttribute('aria-label', 'Language');
+    var wrap = document.getElementById('st-lang-flags');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.id = 'st-lang-flags';
+      wrap.className = 'st-lang-flags';
+      actions.insertBefore(wrap, actions.firstChild);
+    }
+    wrap.innerHTML = '';
 
     var btnFa = document.createElement('button');
     btnFa.type = 'button';
     btnFa.className = 'st-lang-flag';
     btnFa.setAttribute('data-lang', 'fa');
-    btnFa.setAttribute('title', '\u0641\u0627\u0631\u0633\u06cc');
     btnFa.setAttribute('aria-label', '\u0641\u0627\u0631\u0633\u06cc');
-    btnFa.innerHTML = '<span>\u0641\u0627\u0631\u0633\u06cc</span>';
+    btnFa.innerHTML = '<span class="st-lang-emoji" aria-hidden="true">\uD83C\uDDEE\uD83C\uDDF7</span><span class="st-lang-label">\u0641\u0627\u0631\u0633\u06cc</span>';
 
     var btnEn = document.createElement('button');
     btnEn.type = 'button';
     btnEn.className = 'st-lang-flag';
     btnEn.setAttribute('data-lang', 'en');
-    btnEn.setAttribute('title', 'English');
     btnEn.setAttribute('aria-label', 'English');
-    btnEn.innerHTML = '<span>English</span>';
+    btnEn.innerHTML = '<span class="st-lang-emoji" aria-hidden="true">\uD83C\uDDFA\uD83C\uDDF8</span><span class="st-lang-label">English</span>';
 
     wrap.appendChild(btnFa);
     wrap.appendChild(btnEn);
-
-    var actions = document.querySelector('.header-actions');
-    var inner = document.querySelector('.header-inner');
-    if (actions) actions.appendChild(wrap);
-    else if (inner) inner.appendChild(wrap);
-    else if (old && old.parentNode) old.parentNode.insertBefore(wrap, old.nextSibling);
-    else document.body.appendChild(wrap);
 
     btnFa.addEventListener('click', function (e) {
       e.preventDefault();
@@ -114,6 +96,13 @@
       e.preventDefault();
       if (readLang() !== 'en') setLang('en');
     });
+
+    var oldToggle = document.getElementById('lang-toggle');
+    if (oldToggle) {
+      oldToggle.classList.add('st-lang-hidden');
+      oldToggle.style.display = 'none';
+    }
+
     syncActive();
   }
 
