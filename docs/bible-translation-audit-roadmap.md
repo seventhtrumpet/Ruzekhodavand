@@ -1,8 +1,8 @@
 # Bible Reader Audit and Translation Roadmap
 
-Last reviewed: 2026-11-23 (including ODR slug resolution, edition-aware sharing, live asset checks, and Persian reader-path correction)
+Last reviewed: 2026-11-24 (including rights-candidate review, full WEB Classic VPL source coverage, and local import of all 81 WEB Classic text units)
 Repository: seventhtrumpet/Ruzekhodavand
-Latest main commit reviewed: b31bf8b368d9df11a89a352743c14deccfa607d6 (PR #76 reader parser and OPCB path hotfix)
+Latest main commit reviewed: 602c2ae48a1f7cb59262ba6dcd42f7e8e93d1fdc (WEB Classic 81-text local data import)
 Latest reader-code fixes: PR #62 (WEBBE expanded-canon visibility), PR #64 (Douay Daniel chapter visibility), and PR #66 (cache-busting refresh); PR #55 also fixed MSB saved-version and change-handler allowlists
 Latest importer-code commit reviewed: 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV source archive checksum pin).
 Recent main commits: 952dc50996461733287dde43e3bc14630321e45b (licence-page corrections), 5c60083c427a4e9891803f33f4ef26c507b26be2 (KJV rights label), 1ee801b8394a5daea9b83f65b0d4574cae88299a (audit results), 87a504f3b985ac20bd281e16c1bc044426fba10f (importer scope wording), 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV archive checksum pin), and e68ede1ac758202bec74bf878cc645bef63b3ef1 (OPV data regenerated with the pinned archive).
@@ -53,7 +53,8 @@ The reader requests chapter text from these runtime sources:
 | Translation(s) | Current chapter-data source in main | Runtime note |
 |---|---|---|
 | KJV, BBE | Free.Bible | The only remaining external translation-text service in main; background fetch only |
-| WEB Classic, ASV, YLT, Webster, Darby, Geneva, BSB, MSB, ERV 1885 | Same-origin `/data/bible-en/local/{translation}/b{bookId}.json` | 66 books each |
+| WEB Classic | Same-origin `/data/bible-en/local/web/b{bookId}.json` | 81 source book/text units: 66 common books plus 15 separate Deuterocanonical/Apocryphal texts; 1,402 chapters and 38,058 verse entries |
+| ASV, YLT, Webster, Darby, Geneva, BSB, MSB, ERV 1885 | Same-origin `/data/bible-en/local/{translation}/b{bookId}.json` | 66 books each |
 | DRA 1899 | Same-origin `/data/bible-en/local/dra/` | 73 books; Esther has 16 chapters and Daniel 14 |
 | WEBBE | Same-origin `/data/bible-en/local/webbe/` | 73 books |
 | Original Douay-Rheims, modern and historical spelling | Same-origin `/data/bible-en/odr/` chapter files and separate local search indexes | 76 listed texts: 73 canonical books plus three appendix texts; 37,153 scripture verse rows per search index |
@@ -73,6 +74,14 @@ The reader wrapper loads the pinned JavaScript core from the same-origin path `/
 - Do not add incomplete corpora to the full-Bible selector. If a partial corpus is ever shown, label it conspicuously as partial.
 - Do not add NMV full text or an external reading link without documented permission and a clear user decision.
 - Keep source and licence information on the site's own bilingual information page. A source citation is not a reason to send the reader away from the site's Bible reader.
+
+## WEB Classic full-source coverage correction (2026-11-24)
+
+- A diagnostic downloaded the exact pinned official eBible.org archive `eng-web_vpl.zip` (SHA-256 `93e867cdb2bfc84d1e997172e7773e166e718d9265985a054f8fca565f5cd21e`) and enumerated all 81 distinct VPL book codes. The previous importer intentionally selected only the 66 common-book definitions, omitting 15 source text units.
+- PR #80 expanded the importer to preserve all 81 source units. The generated local WEB Classic dataset now contains 81 books/text units, 1,402 chapters, 38,058 verse entries, 29 empty markers, and seven chapters with source verse-number gaps. All source wording, empty markers, and gaps are retained; no text is filled from another edition.
+- The 15 additional texts are Tobit, Judith, Greek Esther, Greek Daniel, Wisdom, Sirach, Baruch, 1 Maccabees, 2 Maccabees, 1 Esdras, Prayer of Manasses, Psalm 151, 3 Maccabees, 2 Esdras, and 4 Maccabees. The eight text units not already represented by the seven shared deuterocanonical IDs use distinct IDs 810–880.
+- The reader selector, search scope, and sharing/deep-link behavior must be updated to expose these texts only when WEB Classic is selected. The existing 66-book translations and the 73-book DRA/WEBBE editions must retain their own source catalogues.
+- This is a structural/source-coverage correction, not a full verse-by-verse accuracy collation.
 
 ## Additional translation-candidate review (2026-11-23)
 
