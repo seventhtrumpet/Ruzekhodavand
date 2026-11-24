@@ -58,25 +58,38 @@
     var st = document.createElement('style');
     st.id = 'st-social-css';
     st.textContent =
-      '.header-social a, .footer-social a{' +
+      /* Header icons */
+      '.header-social a{' +
       'display:inline-flex;align-items:center;justify-content:center;' +
       'width:1.5rem!important;height:1.5rem!important;max-width:1.75rem!important;max-height:1.75rem!important;border-radius:50%;' +
       'text-decoration:none;background:rgba(255,255,255,0.12);overflow:hidden;flex-shrink:0;}' +
-      '.footer-social{display:flex;flex-wrap:wrap;justify-content:center;gap:0.55rem;padding:0.75rem 0;}' +
-      '.footer-social a{width:1.75rem!important;height:1.75rem!important;max-width:1.75rem!important;max-height:1.75rem!important;}' +
-      '.header-social a svg, .footer-social a svg{width:0.9rem!important;height:0.9rem!important;display:block;max-width:1rem!important;max-height:1rem!important;}' +
-      '.footer-social a svg{width:1rem!important;height:1rem!important;}' +
-      '.header-social a.social-yt, .footer-social a.social-yt{color:#FF0000!important;}' +
-      '.header-social a.social-yt svg, .footer-social a.social-yt svg{fill:#FF0000!important;}' +
-      '.header-social a.social-ig, .footer-social a.social-ig{' +
+      '.header-social a svg{width:0.85rem!important;height:0.85rem!important;display:block;}' +
+
+      /* FOOTER icons — much smaller + single row */
+      '#footer-social, .footer-social{' +
+      'display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;' +
+      'justify-content:center!important;align-items:center!important;' +
+      'gap:0.3rem!important;padding:0.6rem 0!important;margin:0.5rem auto 0!important;}' +
+      '#footer-social a, .footer-social a{' +
+      'display:inline-flex!important;align-items:center!important;justify-content:center!important;' +
+      'width:22px!important;height:22px!important;min-width:22px!important;min-height:22px!important;' +
+      'max-width:22px!important;max-height:22px!important;border-radius:50%!important;' +
+      'text-decoration:none;background:rgba(255,255,255,0.14)!important;overflow:hidden;flex:0 0 22px!important;padding:0!important;margin:0!important;}' +
+      '#footer-social a svg, .footer-social a svg{' +
+      'width:12px!important;height:12px!important;max-width:12px!important;max-height:12px!important;display:block;}' +
+
+      /* Colors */
+      '.header-social a.social-yt, #footer-social a.social-yt, .footer-social a.social-yt{color:#FF0000!important;}' +
+      '.header-social a.social-yt svg, #footer-social a.social-yt svg, .footer-social a.social-yt svg{fill:#FF0000!important;}' +
+      '.header-social a.social-ig, #footer-social a.social-ig, .footer-social a.social-ig{' +
       'background:linear-gradient(45deg,#f9ce34 0%,#ee2a7b 50%,#6228d7 100%)!important;color:#fff!important;}' +
-      '.header-social a.social-ig svg, .footer-social a.social-ig svg{fill:#fff!important;}' +
-      '.header-social a.social-tt, .footer-social a.social-tt{color:#111!important;}' +
-      '.header-social a.social-tt svg, .footer-social a.social-tt svg{fill:#111!important;}' +
-      '.header-social a.social-fb, .footer-social a.social-fb{color:#1877F2!important;}' +
-      '.header-social a.social-fb svg, .footer-social a.social-fb svg{fill:#1877F2!important;}' +
-      '.header-social a.social-wa, .footer-social a.social-wa{background:#25D366!important;color:#fff!important;}' +
-      '.header-social a.social-wa svg, .footer-social a.social-wa svg{fill:#fff!important;}';
+      '.header-social a.social-ig svg, #footer-social a.social-ig svg, .footer-social a.social-ig svg{fill:#fff!important;}' +
+      '.header-social a.social-tt, #footer-social a.social-tt, .footer-social a.social-tt{color:#111!important;}' +
+      '.header-social a.social-tt svg, #footer-social a.social-tt svg, .footer-social a.social-tt svg{fill:#111!important;}' +
+      '.header-social a.social-fb, #footer-social a.social-fb, .footer-social a.social-fb{color:#1877F2!important;}' +
+      '.header-social a.social-fb svg, #footer-social a.social-fb svg, .footer-social a.social-fb svg{fill:#1877F2!important;}' +
+      '.header-social a.social-wa, #footer-social a.social-wa, .footer-social a.social-wa{background:#25D366!important;color:#fff!important;}' +
+      '.header-social a.social-wa svg, #footer-social a.social-wa svg, .footer-social a.social-wa svg{fill:#fff!important;}';
     document.head.appendChild(st);
   }
 
