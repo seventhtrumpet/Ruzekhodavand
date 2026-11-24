@@ -318,6 +318,7 @@ def check_reader_safeguards() -> None:
     core = (ROOT / "js/bible-core-pinned.js").read_text(encoding="utf-8")
     html = (ROOT / "bible.html").read_text(encoding="utf-8")
     share = (ROOT / "js/bible-share.js").read_text(encoding="utf-8")
+    welcome_tip = (ROOT / "js/welcome_tip.js").read_text(encoding="utf-8")
     photo = (ROOT / "js/bible-share-photo.js").read_text(encoding="utf-8")
     search = (ROOT / "js/bible_search.js").read_text(encoding="utf-8")
     admin = (ROOT / "admin.html").read_text(encoding="utf-8")
