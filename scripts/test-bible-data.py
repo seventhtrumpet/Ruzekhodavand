@@ -443,7 +443,7 @@ def check_reader_safeguards() -> None:
         fail("Reader must load the selected source chapter instead of assuming chapter 1")
     if "chapter = CHAPTER_STARTS[bookId] || 1" not in reader:
         fail("Selecting a book with a non-1 source chapter start must open its first available source chapter")
-    if "js/bible.js?v=english-edition-canon-20261124" not in html or "js/bible_search.js?v=english-edition-canon-20261124" not in html:
+    if "js/bible.js?v=bible-reader-runtime-fix-20261124" not in html or "js/bible_search.js?v=english-edition-canon-20261124" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
     for label in ("ERV — English Revised Version (1885, 80 texts)", "WEBBE — World English Bible British Edition (81 texts)"):
@@ -483,8 +483,8 @@ def check_reader_safeguards() -> None:
     if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=bible-reader-runtime-fix-20261124" not in bible_html:
         fail("Bible page must request cache-busted Persian and Bible reader scripts")
     for page in ROOT.glob("*.html"):
-        html = page.read_text(encoding="utf-8")
-        if "js/menu.js" in html and "menu-language-labels-20261124" not in html:
+        page_html = page.read_text(encoding="utf-8")
+        if "js/menu.js" in page_html and "menu-language-labels-20261124" not in page_html:
             fail(f"{page.name} must request the cache-busted menu script")
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
     if "var CACHE = 'st-v6';" not in service_worker or "/js/menu.js?v=menu-language-labels-20261124" not in service_worker:
