@@ -43,6 +43,7 @@ jobs:
           node --check js/bible-share.js
           node --check js/bible-share-photo.js
           node --check js/app_media.js
+          node scripts/test-youtube-embed-url.js
           node --check js/bugfixes.js
           node scripts/test-html-escaping.js
       - name: Validate Bible datasets and reader safeguards
