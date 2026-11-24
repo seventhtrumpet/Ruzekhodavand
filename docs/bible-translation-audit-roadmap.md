@@ -77,7 +77,9 @@ The reader wrapper loads the pinned JavaScript core from the same-origin path `/
 
 ## Additional official English VPL source coverage findings (2026-11-24)
 
-The all-edition source audit found two more silent omissions in the previous import catalogue:
+The all-edition source audit found two more silent omissions in the previous import catalogue. PR #86 imported the full data and the import workflow validated all generated packs before committing them. PR #87 exposes the expanded catalogues in the reader. A follow-up integrity change pins SHA-256 hashes for every generated local book JSON file.
+
+The audit findings were:
 
 - **ERV 1885:** the official VPL archive has 80 source book/text codes and 36,878 verse rows. The previous local pack contained only the 66 common books. The 14 additional texts are Tobit, Judith, Wisdom, Sirach, Baruch, 1/2 Maccabees, 1 Esdras, 2 Esdras, Greek Esther additions (source chapters 10–16), Prayer of Manasses, Prayer of Azariah, Susanna, and Bel and the Dragon.
 - **WEBBE:** the official VPL archive has 81 source book/text codes and 38,058 verse rows. The previous local pack contained 73; it omitted 1 Esdras, 2 Esdras, Greek Esther, Greek Daniel, Prayer of Manasses, Psalm 151, 3 Maccabees, and 4 Maccabees.
