@@ -8,6 +8,10 @@
 
   function detectLang() {
     try {
+      var route = window.__stBibleRoute;
+      if (route && (route.lang === 'fa' || route.lang === 'en')) return route.lang;
+    } catch (e0) {}
+    try {
       var list = navigator.languages || [navigator.language || ''];
       for (var i = 0; i < list.length; i++) {
         var l = String(list[i] || '').toLowerCase();
