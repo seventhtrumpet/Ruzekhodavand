@@ -2,9 +2,9 @@
 
 Last reviewed: 2026-11-24 (including full WEB Classic, WEBBE, and ERV source coverage; ERV chapter-number preservation; and all-English VPL archive audits)
 Repository: seventhtrumpet/Ruzekhodavand
-Latest main commit reviewed: f16d06debd08ab13e705f0c97fe8ecc214c89b35 (PR #81: WEB Classic 81-text reader and search integration)
-Latest reader-code fixes: PR #81 (WEB Classic 81-text reader/search integration), PR #62 (WEBBE expanded-canon visibility), PR #64 (Douay Daniel chapter visibility), and PR #66 (cache-busting refresh); PR #55 also fixed MSB saved-version and change-handler allowlists
-Latest importer-code commit reviewed: da7fd3db59ae46533d6b40b6f856434feddb0a81 (WEB Classic 81-text import expansion).
+Latest main commit reviewed: 4c184be4ca68e57be0afdec50e9c170f9be8235f (post-import commit with per-book SHA-256 integrity catalogue)
+Latest reader-code fixes: PR #87 (complete WEB Classic/WEBBE/ERV source catalogues, ERV source chapter starts, and expanded search), PR #82 (search cache-busting), PR #81 (WEB Classic 81-text reader/search integration), PR #64 (Douay Daniel chapter visibility), and PR #66 (cache-busting refresh); PR #55 also fixed MSB saved-version and change-handler allowlists
+Latest importer-code commit reviewed: 90f0a43afc068e972aae6e90c36053bfcfbbb285 (PR #88: per-book SHA-256 pinning; PR #86: full ERV/WEBBE import coverage).
 Recent main commits: 952dc50996461733287dde43e3bc14630321e45b (licence-page corrections), 5c60083c427a4e9891803f33f4ef26c507b26be2 (KJV rights label), 1ee801b8394a5daea9b83f65b0d4574cae88299a (audit results), 87a504f3b985ac20bd281e16c1bc044426fba10f (importer scope wording), 6a2e748ee37f2d295696f975f404263adeff6ce7 (OPV archive checksum pin), and e68ede1ac758202bec74bf878cc645bef63b3ef1 (OPV data regenerated with the pinned archive).
 
 ## Purpose
@@ -35,13 +35,13 @@ The selector currently exposes these 15 choices (11 locally hosted editions, two
 1. KJV — King James Version
 2. WEB — World English Bible Classic (81 source book/text units: 66 common books plus 15 additional texts)
 3. ASV — American Standard Version (1901)
-4. ERV 1885 — English Revised Version
+4. ERV 1885 — English Revised Version (80 source book/text units; Greek Esther additions retain source chapters 10–16)
 5. YLT — Young's Literal Translation (1898)
 6. Webster — Webster's Bible (1833)
 7. BBE — Bible in Basic English
 8. BSB — Berean Standard Bible
 9. MSB — Majority Standard Bible (Public Domain)
-10. WEBBE — World English Bible, British Edition
+10. WEBBE — World English Bible, British Edition (81 source book/text units)
 11. Darby — Darby Translation (1884)
 12. DRA — Douay-Rheims 1899 (73-book Catholic canon)
 13. Geneva — Geneva Bible 1599 (66 books)
@@ -74,6 +74,31 @@ The reader wrapper loads the pinned JavaScript core from the same-origin path `/
 - Do not add incomplete corpora to the full-Bible selector. If a partial corpus is ever shown, label it conspicuously as partial.
 - Do not add NMV full text or an external reading link without documented permission and a clear user decision.
 - Keep source and licence information on the site's own bilingual information page. A source citation is not a reason to send the reader away from the site's Bible reader.
+
+## Current verified status — 2026-11-24
+
+### Source coverage and local data integrity
+
+- All 11 official eBible English VPL archives pass the all-edition source-code audit. Every source book code is accounted for; the importer now fails instead of silently skipping an unknown source code.
+- Local English inventory: WEB Classic 81 source text units / 1,402 chapters / 38,058 verse rows; WEBBE 81 / 1,402 / 38,058; ERV 1885 80 / 1,362 / 36,878; DRA 73; the other seven local English editions each retain their 66-book source catalogue.
+- ERV 1885's separate Greek Esther additions preserve the source chapter numbers 10–16. The reader chapter grid, selection, and previous/next navigation account for that non-1 chapter start.
+- PR #86 imported the full ERV/WEBBE text sets. PR #87 added them to the reader and local search. PR #88 pins a SHA-256 digest for every generated per-book English JSON file; the import workflow verifies all generated files before committing.
+- The import workflow's latest run passed the 11-archive audit, generated-pack regression checks, and per-book SHA-256 verification. This validates source coverage and faithful local import structure; it is not a full independent linguistic comparison of every translation against another edition.
+
+### Production deployment — not yet current
+
+- The latest confirmed production deployment is READY for commit `f16d06debd08ab13e705f0c97fe8ecc214c89b35` (PR #81). It predates PR #82 and PRs #86–#88.
+- Live `/bible.html` still references `bible.js?v=web-classic-81-book-coverage-20261124` and `bible_search.js?v=odr-local-search-20261123`; it does not contain the new WEBBE 81-text or ERV 80-text selector labels.
+- Live smoke checks returned HTTP 404 for `/data/bible-en/local/rv1885/b740.json` and `/data/bible-en/local/webbe/b810.json`. The new ERV/WEBBE data and reader changes are in GitHub main, but are not yet live on the production domain.
+- The last manual production deployment attempt was rejected with HTTP 402 `api-deployments-free-per-day` and `retryAfter: 86400`. Do not repeatedly retry within that quota window. Retry the production deployment after the quota resets, then verify READY status, aliases, all new data files, cache keys, reader/search selection, deep links, and mobile behavior.
+
+### Remaining audit work
+
+1. Deploy the current main commit to production once the Vercel deployment quota permits.
+2. Complete interactive browser/device testing for all edition selectors, ERV Greek Esther chapters 10–16, search scopes, deep links, and share links.
+3. Continue the full verse-by-verse source fidelity and linguistic review; structural validation and pinned file hashes do not by themselves prove translation accuracy.
+4. Finish jurisdiction-specific rights review for KJV and BBE before considering independent self-hosting.
+5. Keep all existing translations and same-origin SeventhTrumpet.org sharing behavior; do not replace editions or introduce external Bible-reading URLs.
 
 ## Additional official English VPL source coverage findings (2026-11-24)
 
