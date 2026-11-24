@@ -8,7 +8,7 @@ const personal = fs.readFileSync('js/user_playlists.js', 'utf8');
 
 const start = playlists.indexOf('function esc(str) {');
 assert.notEqual(start, -1, 'playlist escaping helper must exist');
-const end = playlists.indexOf('\\n  }', start) + 4;
+const end = playlists.indexOf('\n  }', start) + 4;
 assert.ok(end > start, 'playlist escaping helper must end');
 const esc = vm.runInNewContext('(' + playlists.slice(start, end) + ')');
 assert.equal(esc(`"><img src=x onerror='alert(1)'>`), '&quot;&gt;&lt;img src=x onerror=&#39;alert(1)&#39;&gt;');
