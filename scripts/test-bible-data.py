@@ -31,8 +31,12 @@ def local_english_book_ids(edition: str) -> list[int]:
     shared = [740,750,760,770,780,790,800]
     if edition == "dra":
         return BOOK_IDS + shared
-    if edition in ("web", "webbe"):
+    if edition == "web":
         return BOOK_IDS + shared + WEB_EXTRA_IDS
+    if edition == "webbe" and (ROOT / "data/bible-en/local/webbe/b810.json").is_file():
+        return BOOK_IDS + shared + WEB_EXTRA_IDS
+    if edition == "webbe":
+        return BOOK_IDS + shared
     if edition == "rv1885" and (ROOT / "data/bible-en/local/rv1885/b740.json").is_file():
         return BOOK_IDS + shared + ERV_EXTRA_IDS
     return BOOK_IDS
@@ -362,8 +366,9 @@ def check_reader_safeguards() -> None:
     meta = json.loads((ROOT / "data/bible-fa/meta.json").read_text(encoding="utf-8"))
     extra_ids = {740,750,760,770,780,790,800}
     web_extra_ids = set(WEB_EXTRA_IDS)
+    erv_extra_ids = set(ERV_EXTRA_IDS)
     persian_manifest = json.loads((ROOT / "data/bible-fa/manifest.json").read_text(encoding="utf-8"))
-    if len(persian_manifest) != 66 or (extra_ids | web_extra_ids).intersection({int(k) for k in persian_manifest}):
+    if len(persian_manifest) != 66 or (extra_ids | web_extra_ids | erv_extra_ids).intersection({int(k) for k in persian_manifest}):
         fail("Persian OPV/OPCB availability must remain limited to their 66-book datasets")
     if len(meta) != 73 or not extra_ids.issubset({item.get("id") for item in meta}):
         fail("Book metadata must include 66 common books plus seven additional deuterocanonical books")
