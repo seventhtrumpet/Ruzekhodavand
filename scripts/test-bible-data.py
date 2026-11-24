@@ -443,7 +443,7 @@ def check_reader_safeguards() -> None:
         fail("Reader must load the selected source chapter instead of assuming chapter 1")
     if "chapter = CHAPTER_STARTS[bookId] || 1" not in reader:
         fail("Selecting a book with a non-1 source chapter start must open its first available source chapter")
-    if "js/bible.js?v=english-edition-canon-20261124" not in html or "js/bible_search.js?v=english-edition-canon-20261124" not in html:
+    if "js/bible.js?v=bible-reader-runtime-fix-20261124" not in html or "js/bible_search.js?v=english-edition-canon-20261124" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
     for label in ("ERV — English Revised Version (1885, 80 texts)", "WEBBE — World English Bible British Edition (81 texts)"):
@@ -476,6 +476,19 @@ def check_reader_safeguards() -> None:
         fail("Welcome language prompt must respect an explicit Bible share route and not override its language")
     if "var route = window.__stBibleRoute" not in first_visit or "if (route && (route.lang === 'fa' || route.lang === 'en')) return;" not in first_visit:
         fail("First-visit language fallback must respect a Bible share route without overriding a later user choice")
+    menu = (ROOT / "js/menu.js").read_text(encoding="utf-8")
+    if "first_visit_bilingual.js?v=bible-route-language-20261124" not in menu or "lang_flags.js?v=neutral-language-labels-20261124" not in menu or "welcome_tip.js?v=bible-route-language-20261124" not in menu:
+        fail("Menu must request cache-busted language and first-visit scripts")
+    bible_html = (ROOT / "bible.html").read_text(encoding="utf-8")
+    if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=bible-reader-runtime-fix-20261124" not in bible_html:
+        fail("Bible page must request cache-busted Persian and Bible reader scripts")
+    for page in ROOT.glob("*.html"):
+        page_html = page.read_text(encoding="utf-8")
+        if "js/menu.js" in page_html and "menu-language-labels-20261124" not in page_html:
+            fail(f"{page.name} must request the cache-busted menu script")
+    service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
+    if "var CACHE = 'st-v6';" not in service_worker or "/js/menu.js?v=menu-language-labels-20261124" not in service_worker:
+        fail("Service worker cache and precache must refresh the updated menu script")
     if "const selectedChapter = Math.min(Math.max(Number(chapter) || chapterStart, chapterStart), max);" not in reader or "requestAnimationFrame(() => scrollToRef(selectedChapter, verse, false))" not in reader:
         fail("English shared links must load the selected chapter and scroll to the requested verse")
     if r'code.replace("await loadMeta();\n    await loadManifest();"' not in reader:
