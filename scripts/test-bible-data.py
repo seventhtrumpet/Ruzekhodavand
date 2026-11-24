@@ -200,6 +200,10 @@ def check_english_metadata(available_english: list[str]) -> None:
         for key, value in actual.items():
             if counts.get(key) != value:
                 fail(f"{edition}: metadata {key}={counts.get(key)!r} does not match local data ({value})")
+        if edition == "rv1885" and (base / "b810.json").is_file():
+            esther_additions = load_json(base / "b810.json").get("810", {})
+            if esther_additions.get("chapter_start") != 10 or sorted(map(int, esther_additions.get("chapters", {}))) != list(range(10, 17)):
+                fail("ERV 1885 Greek Esther additions must preserve source chapter numbers 10–16")
 
 
 
@@ -354,7 +358,7 @@ def check_reader_safeguards() -> None:
         fail("WEBBE and ERV 1885 importers must retain all source text units")
     if "raise ValueError(f\"{translation}: source contains unregistered book code" not in importer:
         fail("Importer must reject unregistered source book codes rather than silently omit them")
-    if not all(f'"{code}"' in importer for code in ("ESG","DNG","PRM","PSX","3MA","4ES","4MA")):
+    if not all(f'"{code}"' in importer for code in ("ESG","DNG","PRM","PSX","3MA","4ES","4MA","BEL","PRA","SUS")):
         fail("WEB Classic importer is missing one or more additional source book codes")
     if "Eleven English editions" not in reader or "KJV and BBE" not in reader:
         fail("Reader hosting note must distinguish local editions from remotely fetched KJV/BBE")
