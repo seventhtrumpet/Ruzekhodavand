@@ -122,8 +122,8 @@
     } catch (e) {}
   }
 
-  loadScript('js/first_visit_bilingual.js?v=bible-route-language-20261124', 'data-first-bilingual');
-  loadScript('js/lang_flags.js?v=neutral-language-labels-20261124', 'data-lang-flags');
+  loadScript('js/first_visit_bilingual.js', 'data-first-bilingual');
+  loadScript('js/lang_flags.js?v=flags-fix-20261124', 'data-lang-flags');
   loadScript('js/css_restore.js', 'data-css-restore');
   loadScript('js/ads.js', 'data-ads-js');
   loadScript('js/menu_overlay_fix.js', 'data-menu-overlay-fix');
@@ -135,7 +135,7 @@
   loadScript('js/text_size.js', 'data-text-size');
   loadScript('js/profile_bg.js', 'data-profile-bg');
   loadScript('js/share.js', 'data-share');
-  loadScript('js/bible-share.js?v=fix8', 'data-bible-share');
+  loadScript('js/bible-share.js?v=one-share-20261124', 'data-bible-share');
   loadScript('js/bible-share-photo.js?v=fix8', 'data-bible-share-photo');
   loadScript('js/page-share.js?v=fix8', 'data-page-share');
   loadScript('js/page_back.js', 'data-page-back');
@@ -143,7 +143,7 @@
   loadScript('js/bible_bar_fix.js', 'data-bible-bar-fix');
   loadScript('js/bible_search.js?v=fix8', 'data-bible-search');
   loadScript('js/home_polish.js', 'data-home-polish');
-  loadScript('js/welcome_tip.js?v=language-choice-persist-20261124', 'data-welcome-tip');
+  loadScript('js/welcome_tip.js', 'data-welcome-tip');
   loadScript('js/loading.js', 'data-loading');
   loadScript('js/cloud_sync.js', 'data-cloud-sync');
   loadScript('js/media_public_fix.js', 'data-media-public-fix');
@@ -155,7 +155,7 @@
   loadCss('css/social.css', 'data-social-css');
   loadCss('css/quality.css', 'data-quality-css');
   loadCss('css/player_expand.css', 'data-player-expand-css');
-  loadScript('js/social.js', 'data-social-js');
+  loadScript('js/social.js?v=icons-size-20261124', 'data-social-js');
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
