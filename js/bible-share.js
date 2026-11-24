@@ -269,9 +269,10 @@
           title: parts.title,
           text: parts.text,
           url: parts.url
-        }).catch(function () {
+        }).catch(function (err) {
+          if (err && err.name === 'AbortError') return;
           copyText(parts.full).then(function (ok) {
-            if (ok) toast(en ? 'Copied verse + link' : '\u06a9\u067e\u06cc \u0634\u062f: \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9');
+            if (ok) toast(en ? 'Copied verse + link' : 'کپی شد: آیه + لینک');
           });
         });
       } else {
