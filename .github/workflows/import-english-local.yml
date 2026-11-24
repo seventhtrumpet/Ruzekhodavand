@@ -38,6 +38,9 @@ jobs:
       - name: Download and validate official public-domain VPL archives
         run: python scripts/import-english-local.py
 
+      - name: Verify every imported English verse against its pinned source
+        run: python scripts/audit-local-english-exact.py
+
       - name: Build compact Original Douay-Rheims search indexes
         run: python scripts/build-odr-search-index.py
 
