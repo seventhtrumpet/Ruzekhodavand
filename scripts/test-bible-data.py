@@ -432,8 +432,12 @@ def check_reader_safeguards() -> None:
         fail("Reader must load the selected source chapter instead of assuming chapter 1")
     if "chapter = CHAPTER_STARTS[bookId] || 1" not in reader:
         fail("Selecting a book with a non-1 source chapter start must open its first available source chapter")
-    if "js/bible.js?v=english-expanded-source-books-20261124" not in html or "js/bible_search.js?v=english-expanded-source-books-20261124" not in html:
+    if "js/bible.js?v=english-edition-canon-20261124" not in html or "js/bible_search.js?v=english-edition-canon-20261124" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
+
+    for label in ("ERV — English Revised Version (1885, 80 texts)", "WEBBE — World English Bible British Edition (81 texts)"):
+        if label not in html:
+            fail(f"English edition selector is missing its verified source-coverage label: {label}")
 
     if r"\n    else if (route.has('b')" in reader:
         fail("Bible reader JavaScript must not contain a literal escaped newline in executable route parsing")
