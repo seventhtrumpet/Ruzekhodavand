@@ -24,7 +24,11 @@ jobs:
       - name: Check Python importer and audit syntax
         run: |
           python -m py_compile scripts/import-english-local.py
+          python -m py_compile scripts/import-opv.py
+          python -m py_compile scripts/import-opcb.py
           python -m py_compile scripts/audit-all-english-vpl-coverage.py
+          python -m py_compile scripts/audit-local-english-exact.py
+          python -m py_compile scripts/audit-persian-exact.py
           python -m py_compile scripts/inspect-web-classic-vpl.py
           python -m py_compile scripts/test-bible-data.py
 
@@ -37,3 +41,7 @@ jobs:
           node --check js/bible-share-photo.js
       - name: Validate Bible datasets and reader safeguards
         run: python scripts/test-bible-data.py
+      - name: Collate every local English verse against pinned source archives
+        run: python scripts/audit-local-english-exact.py
+      - name: Collate every local Persian verse against pinned source files
+        run: python scripts/audit-persian-exact.py
