@@ -28,7 +28,7 @@ WEB_EXTRA_CHAPTERS = {810:10,820:14,830:9,840:1,850:1,860:7,870:16,880:18}
 def local_english_book_ids(edition: str) -> list[int]:
     if edition in ("dra", "webbe"):
         return BOOK_IDS + [740,750,760,770,780,790,800]
-    if edition == "web" and (ROOT / "data/bible-en/local/web/b740.json").is_file():
+    if edition == "web":
         return BOOK_IDS + [740,750,760,770,780,790,800] + WEB_EXTRA_IDS
     return BOOK_IDS
 
@@ -342,8 +342,9 @@ def check_reader_safeguards() -> None:
 
     meta = json.loads((ROOT / "data/bible-fa/meta.json").read_text(encoding="utf-8"))
     extra_ids = {740,750,760,770,780,790,800}
+    web_extra_ids = set(WEB_EXTRA_IDS)
     persian_manifest = json.loads((ROOT / "data/bible-fa/manifest.json").read_text(encoding="utf-8"))
-    if len(persian_manifest) != 66 or extra_ids.intersection({int(k) for k in persian_manifest}):
+    if len(persian_manifest) != 66 or (extra_ids | web_extra_ids).intersection({int(k) for k in persian_manifest}):
         fail("Persian OPV/OPCB availability must remain limited to their 66-book datasets")
     if len(meta) != 73 or not extra_ids.issubset({item.get("id") for item in meta}):
         fail("Book metadata must include 66 common books plus seven additional deuterocanonical books")
@@ -356,8 +357,8 @@ def check_reader_safeguards() -> None:
         fail("Original Douay-Rheims reader must prefer manifest slugs for dynamically numbered books and retain the legacy ID map as fallback")
     if "hasDeuterocanon" not in reader or "return hasDeuterocanon ? meta : meta.filter(b => b.id < 740)" not in reader:
         fail("Reader must show the expanded canon only for editions that contain it")
-    if "hasDeuterocanon = ['dra','webbe','odr','odr-original']" not in reader:
-        fail("WEBBE must expose its seven included deuterocanonical books in the reader")
+    if "hasDeuterocanon = ['dra','webbe','web','odr','odr-original']" not in reader:
+        fail("DRA, WEBBE, and WEB Classic must expose their edition-specific expanded canons in the reader")
     if "const expandedEsther = bookId === 190" not in reader or "expandedEsther ? 16" not in reader:
         fail("Douay-Rheims editions with expanded Esther must expose all 16 chapters")
     if "['dra','odr','odr-original'].indexOf(selectedTranslation)" not in reader:
@@ -380,6 +381,15 @@ def check_reader_safeguards() -> None:
         fail("DRA and Original Douay-Rheims must expose Daniel chapters 13-14 without changing WEBBE")
     if "const availableIds = availableBooks().map(b => b.id)" not in reader:
         fail("Switching to Persian must move away from books absent from Persian editions")
+    if "meta = meta.filter(b => b.id < 740 || b.id > 880)" not in reader or "meta.splice(39, 0, ...expandedBooks)" not in reader:
+        fail("Edition-specific book labels must be de-duplicated and inserted in canonical reader order")
+    if "selectedEnglishVersion === 'web' ? [" not in reader or "id:880,fa:'مکابیان چهارم',en:'4 Maccabees'" not in reader:
+        fail("WEB Classic must expose all 15 additional source texts in its reader catalogue")
+    for book_id, chapters in WEB_EXTRA_CHAPTERS.items():
+        if f"{book_id}:{chapters}" not in reader:
+            fail(f"WEB Classic reader chapter map is missing {book_id} ({chapters} chapters)")
+    if "selectedEnglishVersion === 'web') Object.assign(CHAPTER_COUNTS" not in reader:
+        fail("WEB Classic additional chapters must be registered in the reader")
     if "persian-edition-path-fix-20261123" not in html or "odr-local-search-20261123" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
@@ -423,8 +433,10 @@ def check_reader_safeguards() -> None:
         fail("Switching English editions must refresh the selected local search index, including MSB")
     if "searchIds = searchIds.concat([740,750,760,770,780,790,800])" not in search or "flattenLocalEnglish(packs, searchIds)" not in search:
         fail("DRA and WEBBE English search must include all seven deuterocanonical books")
-    if "bookId >= 740 && bookId <= 800" not in search:
-        fail("English search scopes must include deuterocanonical books in All Bible and Old Testament")
+    if "searchIds = searchIds.concat([740,750,760,770,780,790,800,810,820,830,840,850,860,870,880])" not in search:
+        fail("WEB Classic English search must include all 15 additional source texts")
+    if "bookId >= 740 && bookId <= 800" not in search or "bookId >= 810 && bookId <= 880" not in search:
+        fail("English search scopes must include every deuterocanonical/apocryphal text in All Bible and Old Testament")
     if "flattenOriginalDouaySearch" not in search or "original-spelling/search-index.json" not in search or "bookId >= 1001 && bookId <= 1076" not in search:
         fail("Both Original Douay-Rheims spelling variants must use their own local search index and expanded-canon scopes")
     if "Search remains KJV-based." in reader or "Original Douay-Rheims use the KJV fallback index" in reader:
