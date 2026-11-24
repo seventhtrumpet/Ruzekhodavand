@@ -26,6 +26,9 @@ jobs:
           python -m py_compile scripts/import-english-local.py
           python -m py_compile scripts/import-opv.py
           python -m py_compile scripts/import-opcb.py
+          python -m py_compile scripts/import-odr.py
+          python -m py_compile scripts/build-odr-search-index.py
+          python -m py_compile scripts/audit-odr-exact.py
           python -m py_compile scripts/audit-all-english-vpl-coverage.py
           python -m py_compile scripts/audit-local-english-exact.py
           python -m py_compile scripts/audit-persian-exact.py
@@ -45,3 +48,5 @@ jobs:
         run: python scripts/audit-local-english-exact.py
       - name: Collate every local Persian verse against pinned source files
         run: python scripts/audit-persian-exact.py
+      - name: Collate both local Original Douay-Rheims spellings against pinned sources
+        run: python scripts/audit-odr-exact.py
