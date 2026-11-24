@@ -300,6 +300,8 @@ def check_import_workflow_audit_triggers() -> None:
     for path in ("scripts/inspect-web-classic-vpl.py", "scripts/audit-all-english-vpl-coverage.py"):
         if path not in workflow:
             fail(f"English VPL coverage audit is not triggered when {path} changes")
+    if "python scripts/test-bible-data.py" not in workflow:
+        fail("English VPL import workflow must validate generated datasets before committing them")
 
 
 def check_reader_safeguards() -> None:
