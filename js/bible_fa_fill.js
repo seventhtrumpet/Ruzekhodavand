@@ -132,6 +132,17 @@
     return opvCache[id];
   }
 
+  function fullManifest() {
+    var manifest = {};
+    IDS.forEach(function (id) { manifest[String(id)] = 'b' + id + '.json'; });
+    return manifest;
+  }
+
+  function bookIdFromUrl(url) {
+    var match = String(url || '').match(/(?:^|\\/)b(\\d+)\\.json(?:[?#]|$)/i);
+    return match ? Number(match[1]) : 0;
+  }
+
   window.fetch = function (input, init) {
     var url = typeof input === 'string' ? input : (input && input.url) || '';
     var isOpv = false;
@@ -192,8 +203,8 @@
     var isOpv = false;
     try { isOpv = localStorage.getItem('cog_bible_fa_version') === 'opv'; } catch (e) {}
     if (isOpv) return Promise.resolve(true);
-    return loadOpcb().then(function (list) {
-      return !!(list && list.length >= 66);
+    return loadOpcb().then(function (manifest) {
+      return !!(manifest && Object.keys(manifest).length >= 66);
     });
   };
 })();
