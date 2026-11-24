@@ -47,6 +47,8 @@ jobs:
       - name: Collate every local English verse against pinned source archives
         run: python scripts/audit-local-english-exact.py
       - name: Collate every local Persian verse against pinned source files
+        if: always()
         run: python scripts/audit-persian-exact.py
       - name: Collate both local Original Douay-Rheims spellings against pinned sources
+        if: always()
         run: python scripts/audit-odr-exact.py
