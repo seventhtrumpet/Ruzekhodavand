@@ -387,12 +387,10 @@ def check_reader_safeguards() -> None:
         fail("Original Douay-Rheims reader must prefer manifest slugs for dynamically numbered books and retain the legacy ID map as fallback")
     if "hasDeuterocanon" not in reader or "return hasDeuterocanon ? meta : meta.filter(b => b.id < 740)" not in reader:
         fail("Reader must show the expanded canon only for editions that contain it")
-    if "hasDeuterocanon = ['dra','webbe','web','odr','odr-original']" not in reader:
+    if "hasDeuterocanon = ['dra','webbe','web','rv1885','odr','odr-original']" not in reader:
         fail("DRA, WEBBE, and WEB Classic must expose their edition-specific expanded canons in the reader")
-    if "const expandedEsther = bookId === 190" not in reader or "expandedEsther ? 16" not in reader:
-        fail("Douay-Rheims editions with expanded Esther must expose all 16 chapters")
-    if "['dra','odr','odr-original'].indexOf(selectedTranslation)" not in reader:
-        fail("Expanded Esther must be limited to DRA and Original Douay-Rheims, not WEBBE")
+    if "if (selectedEnglishVersion === 'dra') { CHAPTER_COUNTS[190] = 16; CHAPTER_COUNTS[340] = 14; }" not in reader:
+        fail("DRA must retain its expanded Esther and Daniel chapter counts without changing WEB/WEBBE/ERV")
     for version, expected in (("dra",16),("webbe",10)):
         esther_path = ROOT / f"data/bible-en/local/{version}/b190.json"
         esther = load_json(esther_path)
@@ -407,21 +405,39 @@ def check_reader_safeguards() -> None:
             chapters = daniel.get("340", {}).get("chapters", {})
             if len(chapters) != expected:
                 fail(f"{version}: Daniel should have {expected} chapters, found {len(chapters)}")
-    if "expandedDaniel = bookId === 340 && ['dra','odr','odr-original']" not in reader:
-        fail("DRA and Original Douay-Rheims must expose Daniel chapters 13-14 without changing WEBBE")
+    if "if (selectedEnglishVersion === 'dra') { CHAPTER_COUNTS[190] = 16; CHAPTER_COUNTS[340] = 14; }" not in reader:
+        fail("DRA must expose its longer Esther and Daniel chapter divisions without changing other editions")
     if "const availableIds = availableBooks().map(b => b.id)" not in reader:
         fail("Switching to Persian must move away from books absent from Persian editions")
-    if "meta = meta.filter(b => b.id < 740 || b.id > 880)" not in reader or "meta.splice(39, 0, ...expandedBooks)" not in reader:
+    if "meta = meta.filter(b => b.id < 740 || b.id > 910)" not in reader or "meta.splice(39, 0, ...expandedBooks)" not in reader:
         fail("Edition-specific book labels must be de-duplicated and inserted in canonical reader order")
-    if "selectedEnglishVersion === 'web' ? [" not in reader or "id:880,fa:'مکابیان چهارم',en:'4 Maccabees'" not in reader:
+    if "['web','webbe'].includes(selectedEnglishVersion) ? webBooks" not in reader or "id:880,fa:'مکابیان چهارم',en:'4 Maccabees'" not in reader:
         fail("WEB Classic must expose all 15 additional source texts in its reader catalogue")
     for book_id, chapters in WEB_EXTRA_CHAPTERS.items():
         if f"{book_id}:{chapters}" not in reader:
             fail(f"WEB Classic reader chapter map is missing {book_id} ({chapters} chapters)")
-    if "selectedEnglishVersion === 'web') Object.assign(CHAPTER_COUNTS" not in reader:
-        fail("WEB Classic additional chapters must be registered in the reader")
-    if "js/bible.js?v=web-classic-81-book-coverage-20261124" not in html or "js/bible_search.js?v=web-classic-81-book-coverage-20261124" not in html:
+    if "['web','webbe'].includes(selectedEnglishVersion)) { CHAPTER_STARTS[810] = 1; Object.assign(CHAPTER_COUNTS" not in reader:
+        fail("WEB Classic and WEBBE additional chapters must be registered in the reader")
+    if "selectedEnglishVersion === 'rv1885' ? ervBooks" not in reader or "CHAPTER_STARTS[810] = 10" not in reader:
+        fail("ERV 1885 must expose its separate Greek Esther additions with source chapters 10–16")
+    if "Object.assign(CHAPTER_COUNTS, {810:16,830:9,840:1,870:16,890:1,900:1,910:1})" not in reader:
+        fail("ERV 1885 additional text chapter catalogue is incomplete")
+    if "const chapterStart = currentLang === 'en' ? (CHAPTER_STARTS[bookId] || 1) : 1" not in reader or "const chapterStart = CHAPTER_STARTS[bookId] || 1" not in reader:
+        fail("Reader chapter navigation must preserve non-1 source chapter starts")
+    if "CHAPTER_STARTS[810] = 1" not in reader or "CHAPTER_STARTS[810] = 10" not in reader:
+        fail("Greek Esther chapter starts must be edition-specific for WEB/WEBBE versus ERV 1885")
+    if "max - chapterStart + 1" not in reader or "const n = i + chapterStart" not in reader or "if (next < chapterStart) next = chapterStart" not in reader:
+        fail("Chapter grids and previous/next navigation must honor source chapter starts")
+    if "loadEnChapter(bookId, selectedChapter)" not in reader or "const selectedChapter = Math.min(Math.max(Number(chapter) || chapterStart, chapterStart), max)" not in reader:
+        fail("Reader must load the selected source chapter instead of assuming chapter 1")
+    if "chapter = CHAPTER_STARTS[bookId] || 1" not in reader:
+        fail("Selecting a book with a non-1 source chapter start must open its first available source chapter")
+    if "js/bible.js?v=english-edition-canon-20261124" not in html or "js/bible_search.js?v=english-edition-canon-20261124" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
+
+    for label in ("ERV — English Revised Version (1885, 80 texts)", "WEBBE — World English Bible British Edition (81 texts)"):
+        if label not in html:
+            fail(f"English edition selector is missing its verified source-coverage label: {label}")
 
     if r"\n    else if (route.has('b')" in reader:
         fail("Bible reader JavaScript must not contain a literal escaped newline in executable route parsing")
@@ -462,10 +478,12 @@ def check_reader_safeguards() -> None:
     if "enLoadedVersion" not in search or "msb" not in search:
         fail("Switching English editions must refresh the selected local search index, including MSB")
     if "searchIds = searchIds.concat([740,750,760,770,780,790,800])" not in search or "flattenLocalEnglish(packs, searchIds)" not in search:
-        fail("DRA and WEBBE English search must include all seven deuterocanonical books")
+        fail("DRA English search must include its seven deuterocanonical books")
     if "searchIds = searchIds.concat([740,750,760,770,780,790,800,810,820,830,840,850,860,870,880])" not in search:
-        fail("WEB Classic English search must include all 15 additional source texts")
-    if "bookId >= 740 && bookId <= 800" not in search or "bookId >= 810 && bookId <= 880" not in search:
+        fail("WEB Classic and WEBBE English search must include all 15 additional source texts")
+    if "searchIds = searchIds.concat([740,750,760,770,780,790,800,810,830,840,870,890,900,910])" not in search:
+        fail("ERV 1885 English search must include all 14 additional source texts")
+    if "bookId >= 740 && bookId <= 800" not in search or "bookId >= 810 && bookId <= 910" not in search:
         fail("English search scopes must include every deuterocanonical/apocryphal text in All Bible and Old Testament")
     if "flattenOriginalDouaySearch" not in search or "original-spelling/search-index.json" not in search or "bookId >= 1001 && bookId <= 1076" not in search:
         fail("Both Original Douay-Rheims spelling variants must use their own local search index and expanded-canon scopes")
