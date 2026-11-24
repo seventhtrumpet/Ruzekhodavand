@@ -467,6 +467,9 @@ def check_reader_safeguards() -> None:
         fail("Bible reader must restore shared book, language, and edition before loading the reader core")
     if "window.__stBibleRoute = { lang: routeLanguage, version: version || null }" not in reader:
         fail("Bible deep links must expose explicit route language before first-visit scripts initialize")
+    lang_flags = (ROOT / "js/lang_flags.js").read_text(encoding="utf-8")
+    if "IRAN_SVG" in lang_flags or "US_SVG" in lang_flags or "btnFa.innerHTML = '<span>" not in lang_flags:
+        fail("Language choices must use neutral Persian and English labels, not national flags")
     welcome = (ROOT / "js/welcome_tip.js").read_text(encoding="utf-8")
     first_visit = (ROOT / "js/first_visit_bilingual.js").read_text(encoding="utf-8")
     if "var bibleRoute = window.__stBibleRoute" not in welcome or "setLang(bibleRoute.lang, false)" not in welcome:
