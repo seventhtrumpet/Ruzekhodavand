@@ -21,6 +21,17 @@ BOOK_IDS = [
     700,710,720,730,
 ]
 ENGLISH = ["web", "asv", "ylt", "webster", "darby", "gnv", "bsb", "rv1885", "dra", "webbe", "msb"]
+WEB_EXTRA_IDS = [810,820,830,840,850,860,870,880]
+WEB_EXTRA_CHAPTERS = {810:10,820:14,830:9,840:1,850:1,860:7,870:16,880:18}
+
+
+def local_english_book_ids(edition: str) -> list[int]:
+    if edition in ("dra", "webbe"):
+        return BOOK_IDS + [740,750,760,770,780,790,800]
+    if edition == "web" and (ROOT / "data/bible-en/local/web/b740.json").is_file():
+        return BOOK_IDS + [740,750,760,770,780,790,800] + WEB_EXTRA_IDS
+    return BOOK_IDS
+
 ERRORS: list[str] = []
 CHECKED_JSON = 0
 
@@ -152,7 +163,7 @@ def check_english_metadata(available_english: list[str]) -> None:
         if not isinstance(counts, dict):
             fail(f"{edition}: metadata counts are missing")
             continue
-        book_ids = BOOK_IDS + ([740,750,760,770,780,790,800] if edition in ("dra", "webbe") else [])
+        book_ids = local_english_book_ids(edition)
         actual_books = actual_chapters = actual_verses = actual_empty = 0
         for book_id in book_ids:
             path = ROOT / f"data/bible-en/local/{edition}/b{book_id}.json"
@@ -209,6 +220,8 @@ def check_runtime_chapter_catalogue() -> None:
                 expected = 16
             if edition == "dra" and book_id == 340:
                 expected = 14
+            if edition == "web" and book_id in WEB_EXTRA_CHAPTERS:
+                expected = WEB_EXTRA_CHAPTERS[book_id]
             if expected is None:
                 fail(f"{relative}/{path.name}: book {book_id} is absent from the reader chapter catalogue")
             elif len(chapters) != expected:
@@ -315,6 +328,11 @@ def check_reader_safeguards() -> None:
         fail("English chapter fetch patch must not replace the first generic fetch call")
     if "const ref = encodeURIComponent(b.en + ' ' + ch);" not in core:
         fail("Pinned reader core no longer has the expected chapter-fetch anchor")
+    importer = (ROOT / "scripts/import-english-local.py").read_text(encoding="utf-8")
+    if "BOOKS_81_WEB = BOOKS + DEUTEROCANONICAL + WEB_EXTRA_BOOKS" not in importer:
+        fail("WEB Classic importer must retain all 81 official VPL book/text units")
+    if not all(f'"{code}"' in importer for code in ("ESG","DNG","PRM","PSX","3MA","4ES","4MA")):
+        fail("WEB Classic importer is missing one or more additional source book codes")
     if "Eleven English editions" not in reader or "KJV and BBE" not in reader:
         fail("Reader hosting note must distinguish local editions from remotely fetched KJV/BBE")
     if reader.count("'msb'") < 3 or "msb:'Majority Standard Bible'" not in reader:
@@ -449,7 +467,7 @@ def main() -> int:
     available_english = [version for version in ENGLISH if (ROOT / f"data/bible-en/local/{version}").is_dir()]
     check_english_metadata(available_english)
     for version in available_english:
-        check_pack(f"data/bible-en/local/{version}", BOOK_IDS + ([740,750,760,770,780,790,800] if version in ("dra", "webbe") else []))
+        check_pack(f"data/bible-en/local/{version}", local_english_book_ids(version))
     check_pack("data/bible-fa/opcb", BOOK_IDS)
     check_pack("data/bible-fa/opv", BOOK_IDS)
     check_persian_verse_totals()
