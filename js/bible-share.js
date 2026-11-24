@@ -7,153 +7,57 @@
 
   function isEn() {
     try {
-      return (localStorage.getItem('cog_lang') || document.documentElement.lang || 'fa') === 'en';
+      return ((typeof currentLang !== 'undefined' && currentLang) || localStorage.getItem('cog_lang') || 'fa') === 'en';
     } catch (e) { return false; }
   }
 
-  function getParams() {
-    try {
-      var p = new URLSearchParams(location.search);
-      var b = p.get('b') || p.get('book');
-      var c = p.get('c') || p.get('chapter');
-      var v = p.get('v') || p.get('verse');
-      if (b && c) {
-        var verse = 1;
-        if (v) {
-          var m = String(v).match(/^(\d+)/);
-          if (m) verse = Number(m[1]);
-        }
-        return { bookId: Number(b), chapter: Number(c), verse: verse };
-      }
-    } catch (e) {}
-    return null;
-  }
-
-  function getShareRoute() {
-    var params = getParams();
-    if (params) return params;
-    try {
-      var route = JSON.parse(localStorage.getItem('cog_bible_share_route') || 'null');
-      var state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}');
-      if (route && Number(route.bookId) > 0 && Number(route.chapter) > 0 &&
-          Number(state.bookId) === Number(route.bookId) &&
-          Number(state.chapter) === Number(route.chapter)) {
-        return {
-          bookId: Number(route.bookId),
-          chapter: Number(route.chapter),
-          verse: Number(route.verse) > 0 ? Number(route.verse) : 1
-        };
-      }
-    } catch (e) {}
-    return null;
-  }
-
-  function applyDeepLink() {
-    var params = getShareRoute();
-    if (!params) return;
-    try { localStorage.setItem('cog_bible_state', JSON.stringify(params)); } catch (e) {}
-    var tries = 0;
-    function tryScroll() {
-      tries++;
-      var el = document.getElementById('v-' + params.chapter + '-' + params.verse);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('highlight');
-        setTimeout(function () { el.classList.remove('highlight'); }, 2500);
-        return;
-      }
-      if (tries < 40) setTimeout(tryScroll, 250);
-    }
-    setTimeout(tryScroll, 700);
+  function brandLine() {
+    return isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
   }
 
   function versePayload() {
     var text = '', ref = '';
     try {
-      var vt = document.getElementById('verse-text');
-      if (vt) text = (vt.textContent || '').trim();
-      var vr = document.getElementById('verse-ref');
-      if (vr) ref = (vr.textContent || '').trim();
-    } catch (e) {}
-    var selected = document.querySelectorAll('.mb-verse.selected');
-    if (selected.length) {
-      var lines = [];
-      selected.forEach(function (el) { lines.push((el.textContent || '').trim()); });
-      text = lines.join('\n');
-      var first = selected[0];
-      var ch = first.getAttribute('data-chapter') || '';
-      var vs = first.getAttribute('data-verse') || '';
-      var heading = document.getElementById('bible-heading');
-      var bookName = heading ? (heading.textContent || '').trim() : '';
-      if (ch || vs) ref = (bookName ? bookName + ' ' : '') + ch + ':' + vs;
-    }
-    if (!text || !ref) {
-      var route = getShareRoute();
-      if (route) {
-        var linkedVerse = document.getElementById('v-' + route.chapter + '-' + route.verse);
-        if (linkedVerse) {
-          if (!text) text = (linkedVerse.textContent || '').trim();
-          if (!ref) {
-            var linkedHeading = document.getElementById('bible-heading');
-            var linkedBook = linkedHeading ? (linkedHeading.textContent || '').trim() : '';
-            ref = (linkedBook ? linkedBook + ' ' : '') + route.chapter + ':' + route.verse;
-          }
-        }
+      var selected = document.querySelectorAll('.mb-verse.selected');
+      if (selected.length) {
+        var lines = [];
+        selected.forEach(function (el) {
+          lines.push((el.textContent || '').replace(/^\d+\s*/, '').trim());
+        });
+        text = lines.join('\n');
+        var first = selected[0];
+        var last = selected[selected.length - 1];
+        var ch = first.getAttribute('data-chapter') || '';
+        var v1 = first.getAttribute('data-verse') || '';
+        var v2 = last.getAttribute('data-verse') || '';
+        if (ch) ref = ch + ':' + v1 + (v2 && v2 !== v1 ? '-' + v2 : '');
       }
-    }
+    } catch (e) {}
     if (!text) {
-      var main = document.querySelector('.mb-verse.active, .verse-body, article p');
-      if (main) text = (main.textContent || '').trim().slice(0, 600);
+      try {
+        var vt = document.getElementById('verse-text');
+        if (vt) text = (vt.textContent || '').trim();
+        var vr = document.getElementById('verse-ref');
+        if (vr) ref = (vr.textContent || '').trim();
+      } catch (e2) {}
     }
     return { text: (text || '').trim(), ref: (ref || '').trim() };
   }
 
-  function brandLine() {
-    return 'Seventh Trumpet | \u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
-  }
-
   function sharePageUrl() {
     try {
-      var selected = document.querySelectorAll('.mb-verse.selected');
-      var params = getShareRoute();
+      var p = versePayload();
       var state = {};
       try { state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}'); } catch (e) {}
-      var isBiblePage = /\/bible\.html$/i.test(location.pathname || '');
-      var bookId = '';
-      var chapter = '';
-      var verse = '1';
-      if (selected.length) {
-        var first = selected[0];
-        chapter = first.getAttribute('data-chapter') || '';
-        verse = first.getAttribute('data-verse') || '1';
-        bookId = state.bookId || (params && params.bookId) || '';
-      } else if (params && params.bookId && params.chapter) {
-        bookId = params.bookId;
-        chapter = params.chapter;
-        verse = params.verse || 1;
-      } else if (isBiblePage && state.bookId && state.chapter) {
-        bookId = state.bookId;
-        chapter = state.chapter;
-        verse = state.verse || 1;
+      var b = state.bookId || '';
+      var route = new URLSearchParams();
+      if (b) route.set('b', b);
+      if (p.ref && p.ref.indexOf(':') > 0) {
+        var parts = p.ref.split(':');
+        route.set('c', parts[0]);
+        route.set('v', parts[1].split('-')[0]);
       }
-      if (bookId && chapter) {
-        var lang = isEn() ? 'en' : 'fa';
-        var version = lang === 'en'
-          ? (localStorage.getItem('cog_bible_en_version') || 'kjv')
-          : (localStorage.getItem('cog_bible_fa_version') || 'opcb');
-        var slug = localStorage.getItem('cog_bible_book_slug') || '';
-        if (!slug && window.__stBibleSlugByCanonicalId) {
-          slug = window.__stBibleSlugByCanonicalId[bookId] || '';
-        }
-        var route = new URLSearchParams();
-        route.set('b', String(bookId));
-        route.set('c', String(chapter));
-        route.set('v', String(verse));
-        route.set('lang', lang);
-        route.set('version', version);
-        if (slug) route.set('slug', slug);
-        return SITE + '/bible.html?' + route.toString();
-      }
+      if (route.toString()) return SITE + '/bible.html?' + route.toString();
     } catch (e) {}
     return SITE + '/';
   }
@@ -169,8 +73,9 @@
     if (p.text) textLines.push(p.text);
     if (p.ref) textLines.push(p.ref);
     textLines.push(brand);
+    textLines.push(pageUrl);
     var text = textLines.join('\n\n');
-    var full = text + '\n\n' + pageUrl;
+    var full = text;
 
     return {
       title: title,
@@ -273,7 +178,7 @@
         }).catch(function (err) {
           if (err && err.name === 'AbortError') return;
           copyText(parts.full).then(function (ok) {
-            if (ok) toast(en ? 'Copied verse + link' : 'کپی شد: آیه + لینک');
+            if (ok) toast(en ? 'Copied verse + link' : '\u06a9\u067e\u06cc \u0634\u062f: \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9');
           });
         });
       } else {
@@ -290,24 +195,23 @@
   }
 
   function ensureCss() {
-    if (document.getElementById('vshare-icons-css')) return;
-    var st = document.createElement('style');
-    st.id = 'vshare-icons-css';
-    st.textContent =
-      '.vshare-overlay{position:fixed;inset:0;z-index:5000;background:rgba(8,16,28,0.55);display:flex;align-items:flex-end;justify-content:center;padding:0.75rem}' +
-      '.vshare-panel{width:100%;max-width:400px;background:#fff;border-radius:16px;padding:1.15rem 1rem 1rem;box-shadow:0 -8px 32px rgba(0,0,0,0.25)}' +
+    if (document.getElementById('vshare-css')) return;
+    var s = document.createElement('style');
+    s.id = 'vshare-css';
+    s.textContent =
+      '.vshare-overlay{position:fixed;inset:0;z-index:5500;background:rgba(10,20,35,.45);display:flex;align-items:flex-end;justify-content:center;padding:1rem}' +
+      '.vshare-panel{width:100%;max-width:420px;background:#fff;border-radius:18px 18px 12px 12px;padding:1rem 1rem 1.2rem;box-shadow:0 -8px 32px rgba(0,0,0,.2)}' +
       'body.dark .vshare-panel{background:#152536;color:#e8eef5}' +
-      '.vshare-title{font-weight:800;font-size:1.15rem;margin:0 0 0.4rem;text-align:center;color:#0a2540}' +
-      'body.dark .vshare-title{color:#9ec5ea}' +
-      '.vshare-desc{font-size:0.78rem;color:#5a6a7a;text-align:center;margin:0 0 0.85rem;line-height:1.4}' +
-      'body.dark .vshare-desc{color:#9aabbc}' +
-      '.vshare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}' +
-      '.vshare-btn{display:flex;align-items:center;justify-content:center;padding:0.85rem 0.35rem;border:none;border-radius:12px;font-family:inherit;font-weight:800;font-size:0.9rem;cursor:pointer;color:#fff}' +
+      '.vshare-title{font-weight:800;font-size:1rem;margin:0 0 0.35rem}' +
+      '.vshare-hint{font-size:0.78rem;opacity:0.75;margin:0 0 0.85rem;line-height:1.4}' +
+      '.vshare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.55rem}' +
+      '.vshare-btn{border:none;border-radius:12px;padding:0.75rem 0.5rem;font-family:inherit;font-weight:800;font-size:0.88rem;cursor:pointer;color:#fff}' +
       '.vshare-btn.wa{background:#25D366}.vshare-btn.tg{background:#0088cc}' +
       '.vshare-btn.signal{background:#3A76F0}.vshare-btn.photo{background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)}' +
-      '.vshare-btn.more{background:#5b6b7c;grid-column:1/-1}' +
-      '.vshare-close{display:block;width:100%;margin-top:0.55rem;border:none;background:transparent;color:#6b7785;font-weight:600;font-size:0.95rem;padding:0.5rem;cursor:pointer;font-family:inherit}';
-    document.head.appendChild(st);
+      '.vshare-btn.more{background:#0a2540;grid-column:1/-1}' +
+      '.vshare-cancel{margin-top:0.7rem;width:100%;border:1px solid #d0d7e0;background:transparent;border-radius:12px;padding:0.65rem;font-family:inherit;font-weight:700;cursor:pointer}' +
+      'body.dark .vshare-cancel{border-color:#2a3a4c;color:#dbe7f3}';
+    document.head.appendChild(s);
   }
 
   function openSharePanel() {
@@ -319,36 +223,34 @@
     overlay.id = 'vshare-overlay';
     overlay.className = 'vshare-overlay';
     overlay.innerHTML =
-      '<div class="vshare-panel" role="dialog">' +
+      '<div class="vshare-panel" role="dialog" aria-modal="true">' +
       '<p class="vshare-title">' + (en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9') + '</p>' +
-      '<p class="vshare-desc">' +
+      '<p class="vshare-hint">' +
       (en
         ? 'Verse + profile preview + tappable website link'
-        : '\u0622\u06cc\u0647 + \u067e\u06cc\u0634\u200c\u0646\u0645\u0627\u06cc\u0634 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0644\u06cc\u0646\u06a9 \u0642\u0627\u0628\u0644\u0650 \u0644\u0645\u0633') +
+        : '\u0622\u06cc\u0647 + \u067e\u06cc\u0634\u200c\u0646\u0645\u0627\u06cc\u0634 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0644\u06cc\u0646\u06a9 \u0642\u0627\u0628\u0644 \u0644\u0645\u0633') +
       '</p>' +
       '<div class="vshare-grid">' +
       '<button type="button" class="vshare-btn wa" data-go="wa">WhatsApp</button>' +
       '<button type="button" class="vshare-btn tg" data-go="tg">Telegram</button>' +
       '<button type="button" class="vshare-btn signal" data-go="signal">Signal</button>' +
       '<button type="button" class="vshare-btn photo" data-go="photo">' +
-      (en ? 'Photo' : '\u0639\u06a9\u0633') +
-      '</button>' +
+      (en ? 'Photo' : '\u0639\u06a9\u0633') + '</button>' +
       '<button type="button" class="vshare-btn more" data-go="more">' +
-      (en ? 'More apps\u2026' : '\u0628\u0631\u0646\u0627\u0645\u0647\u200c\u0647\u0627\u06cc \u0628\u06cc\u0634\u062a\u0631\u2026') +
-      '</button>' +
+      (en ? 'More apps' : '\u0628\u0631\u0646\u0627\u0645\u0647\u200c\u0647\u0627\u06cc \u0628\u06cc\u0634\u062a\u0631') + '</button>' +
       '</div>' +
-      '<button type="button" class="vshare-close" id="vs-close">' +
-      (en ? 'Close' : '\u0628\u0633\u062a\u0646') +
-      '</button></div>';
+      '<button type="button" class="vshare-cancel" data-go="cancel">' +
+      (en ? 'Cancel' : '\u0644\u063a\u0648') + '</button>' +
+      '</div>';
     document.body.appendChild(overlay);
-    function close() { try { overlay.remove(); } catch (e) {} }
-    overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
-    var cl = document.getElementById('vs-close');
-    if (cl) cl.addEventListener('click', close);
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) overlay.remove();
+    });
     overlay.querySelectorAll('[data-go]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var go = btn.getAttribute('data-go');
-        close();
+        if (go === 'cancel') { overlay.remove(); return; }
+        overlay.remove();
         setTimeout(function () { doShare(go); }, 80);
       });
     });
@@ -357,13 +259,13 @@
   function setLabels() {
     var en = isEn();
     var label = en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9';
-    var share = document.getElementById('mb-share');
     var daily = document.getElementById('daily-share');
-    if (share) share.textContent = label;
+    var mb = document.getElementById('mb-share');
     if (daily) daily.textContent = label;
+    if (mb) mb.textContent = label;
   }
 
-  function initDailyShare() {
+  function bindDaily() {
     var section = document.getElementById('daily-verse');
     if (!section) return;
     var btn = document.getElementById('daily-share');
@@ -372,37 +274,38 @@
       btn.type = 'button';
       btn.id = 'daily-share';
       btn.className = 'verse-refresh';
-      btn.style.marginInlineStart = '0.5rem';
+      btn.style.marginInlineStart = '0.45rem';
+      var inner = section.querySelector('.daily-verse-inner');
       var refresh = document.getElementById('verse-refresh');
       if (refresh && refresh.parentNode) refresh.parentNode.insertBefore(btn, refresh.nextSibling);
-      else {
-        var inner = section.querySelector('.daily-verse-inner');
-        if (inner) inner.appendChild(btn);
-      }
+      else if (inner) inner.appendChild(btn);
     }
     btn.onclick = function (e) { e.preventDefault(); openSharePanel(); };
     setLabels();
   }
 
-  function bindBibleShare() {
+  function bindBible() {
     var btn = document.getElementById('mb-share');
-    if (!btn || btn._stShareBound) return;
-    btn._stShareBound = true;
+    if (!btn) return;
     btn.addEventListener('click', function (e) {
       e.preventDefault();
-      e.stopPropagation();
       openSharePanel();
-    }, true);
+    });
+    setLabels();
   }
 
   function boot() {
-    applyDeepLink();
-    bindBibleShare();
-    setLabels();
-    setTimeout(bindBibleShare, 400);
-    setTimeout(bindBibleShare, 1200);
+    bindDaily();
+    bindBible();
+    setTimeout(setLabels, 400);
+    var lt = document.getElementById('lang-toggle');
+    if (lt) lt.addEventListener('click', function () { setTimeout(setLabels, 150); });
+    window.addEventListener('cog-lang-changed', setLabels);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
+
+  window.ST_openVerseShare = openSharePanel;
+  window.ST_shareVerse = function (app) { doShare(app || 'more'); };
 })();
