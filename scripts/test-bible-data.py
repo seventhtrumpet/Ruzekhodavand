@@ -471,8 +471,8 @@ def check_reader_safeguards() -> None:
     first_visit = (ROOT / "js/first_visit_bilingual.js").read_text(encoding="utf-8")
     if "var bibleRoute = window.__stBibleRoute" not in welcome or "setLang(bibleRoute.lang, false)" not in welcome:
         fail("Welcome language prompt must respect an explicit Bible share route and not override its language")
-    if "var route = window.__stBibleRoute" not in first_visit:
-        fail("First-visit language fallback must respect an explicit Bible share route")
+    if "var route = window.__stBibleRoute" not in first_visit or "if (route && (route.lang === 'fa' || route.lang === 'en')) return;" not in first_visit:
+        fail("First-visit language fallback must respect a Bible share route without overriding a later user choice")
     if "const selectedChapter = Math.min(Math.max(Number(chapter) || chapterStart, chapterStart), max);" not in reader or "requestAnimationFrame(() => scrollToRef(selectedChapter, verse, false))" not in reader:
         fail("English shared links must load the selected chapter and scroll to the requested verse")
     if r'code.replace("await loadMeta();\n    await loadManifest();"' not in reader:
