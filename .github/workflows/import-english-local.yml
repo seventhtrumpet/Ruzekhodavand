@@ -30,6 +30,9 @@ jobs:
       - name: Audit all WEB Classic VPL book codes before import
         run: python scripts/inspect-web-classic-vpl.py
 
+      - name: Audit every English VPL archive against the declared catalogue
+        run: python scripts/audit-all-english-vpl-coverage.py
+
       - name: Download and validate official public-domain VPL archives
         run: python scripts/import-english-local.py
 
