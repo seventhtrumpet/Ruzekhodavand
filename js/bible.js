@@ -187,7 +187,7 @@
     // the requested chapter's DOM has actually been inserted.
     code = code.replace(
       "          box.insertAdjacentHTML('beforeend', buildChapterHtml(ch, chData));",
-      "          box.insertAdjacentHTML('beforeend', buildChapterHtml(ch, chData));\\n          if (ch === chapter) requestAnimationFrame(() => scrollToRef(chapter, verse, false));"
+      "          box.insertAdjacentHTML('beforeend', buildChapterHtml(ch, chData));\n          if (ch === chapter) requestAnimationFrame(() => scrollToRef(chapter, verse, false));"
     );
     if (code.indexOf("if (ch === chapter) requestAnimationFrame(() => scrollToRef(chapter, verse, false))") < 0) {
       throw new Error('Shared English chapter deep-link scroll patch did not apply');
