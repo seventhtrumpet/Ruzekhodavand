@@ -21,6 +21,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Check Python importer and audit syntax
+        run: |
+          python -m py_compile scripts/import-english-local.py
+          python -m py_compile scripts/audit-all-english-vpl-coverage.py
+          python -m py_compile scripts/inspect-web-classic-vpl.py
+          python -m py_compile scripts/test-bible-data.py
+
       - name: Check Bible reader JavaScript syntax
         run: |
           node --check js/bible.js
