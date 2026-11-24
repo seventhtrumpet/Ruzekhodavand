@@ -134,7 +134,7 @@
 
   function fullManifest() {
     var manifest = {};
-    IDS.forEach(function (id) { manifest[String(id)] = 'b' + id + '.json'; });
+    IDS.forEach(function (id) { manifest[String(id)] = ['b' + id + '.json']; });
     return manifest;
   }
 
