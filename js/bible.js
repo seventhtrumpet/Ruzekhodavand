@@ -182,6 +182,17 @@
       "window.__stSetBibleLanguage = async function (lang) {\n      var nextLanguage = lang === 'en' ? 'en' : 'fa';\n      if (nextLanguage !== currentLang && ['odr','odr-original'].includes(localStorage.getItem('cog_bible_en_version'))) { localStorage.setItem(LANG_KEY, nextLanguage); location.reload(); return; }\n      currentLang = nextLanguage;\n      if (currentLang === 'fa' && [740,750,760,770,780,790,800,810,820,830,840,850,860,870,880,890,900,910].includes(bookId)) { bookId = 480; chapter = 1; verse = 1; }\n      localStorage.setItem(LANG_KEY, currentLang);\n      applyChrome();\n      await renderBook(true);\n    };"
     );
 
+    // Shared English links may target a chapter after chapter 1. The pinned
+    // core appends English chapters lazily during renderBook; scroll only after
+    // the requested chapter's DOM has actually been inserted.
+    code = code.replace(
+      "          box.insertAdjacentHTML('beforeend', buildChapterHtml(ch, chData));",
+      "          box.insertAdjacentHTML('beforeend', buildChapterHtml(ch, chData));\n          if (ch === chapter) requestAnimationFrame(() => scrollToRef(chapter, verse, false));"
+    );
+    if (code.indexOf("if (ch === chapter) requestAnimationFrame(() => scrollToRef(chapter, verse, false))") < 0) {
+      throw new Error('Shared English chapter deep-link scroll patch did not apply');
+    }
+
     (0, eval)(code);
 
     // lang_fix.js handles the visible toggle in capture phase; mirror its event
