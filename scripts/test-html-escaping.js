@@ -4,8 +4,8 @@ const vm = require('node:vm');
 
 const mediaSource = fs.readFileSync('js/app_media.js', 'utf8');
 const runtimeSource = fs.readFileSync('js/bugfixes.js', 'utf8');
-const mediaMatch = mediaSource.match(/function escapeHtml\\(str\\) \\{[\\s\\S]*?\\n\\}/);
-const runtimeMatch = runtimeSource.match(/window\\.escapeHtml = function \\(str\\) \\{[\\s\\S]*?\\n  \\};/);
+const mediaMatch = mediaSource.match(/function escapeHtml\(str\) \{[\s\S]*?\n\}/);
+const runtimeMatch = runtimeSource.match(/window\.escapeHtml = function \(str\) \{[\s\S]*?\n  \};/);
 
 assert.ok(mediaMatch, 'app_media.js must define escapeHtml');
 assert.ok(runtimeMatch, 'bugfixes.js must define window.escapeHtml');
