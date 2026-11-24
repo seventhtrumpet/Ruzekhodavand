@@ -160,6 +160,15 @@
       "let data = pack[String(id)] || pack[id];\n        if (!data && pack.chapters) data = pack;\n        if (!data && pack.id != null && Number(pack.id) === Number(id) && pack.chapters) data = pack;\n        if (!data) return;"
     );
     code = code.replace("const res = await fetch('/data/bible-fa/' + fname);", "const dataDir = localStorage.getItem('cog_bible_fa_version') === 'opv' ? '/data/bible-fa/opv/' : '/data/bible-fa/opcb/';\n        const res = await fetch(dataDir + fname);");
+    code = code.replace(
+      "const files = man[String(id)] || ['b' + id + '.json'];",
+      "const files = man[String(id)] || ['b' + id + '.json'];\\n    const fileList = Array.isArray(files) ? files : [files];"
+    );
+    code = code.replace("await Promise.all(files.map(async (fname) => {", "await Promise.all(fileList.map(async (fname) => {");
+    if (code.indexOf("const fileList = Array.isArray(files) ? files : [files]") < 0 || code.indexOf("Promise.all(fileList.map") < 0) {
+      throw new Error('Persian manifest filename normalization patch did not apply');
+    }
+
 
     code = code.replace(
       "bookId = Number(btn.getAttribute('data-book'));\n        chapter = 1; verse = 1;\n        closeSel();\n        await renderBook(true);",
