@@ -510,7 +510,7 @@ def check_reader_safeguards() -> None:
         fail("Share links must recover the exact incoming verse after the reader removes URL parameters")
     if "linkedVerse" not in share or "route.chapter + ':' + route.verse" not in share:
         fail("Share payload must include the linked verse text and reference when no verse is reselected")
-    if "js/bible-share.js?v=verse-reference-20261124" not in html:
+    if "js/bible-share.js?v=deep-link-share-20261124" not in html:
         fail("Bible share script URL is missing the edition-aware deep-link cache key")
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
