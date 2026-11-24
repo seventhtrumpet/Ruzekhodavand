@@ -162,7 +162,7 @@
     code = code.replace("const res = await fetch('/data/bible-fa/' + fname);", "const dataDir = localStorage.getItem('cog_bible_fa_version') === 'opv' ? '/data/bible-fa/opv/' : '/data/bible-fa/opcb/';\n        const res = await fetch(dataDir + fname);");
     code = code.replace(
       "const files = man[String(id)] || ['b' + id + '.json'];",
-      "const files = man[String(id)] || ['b' + id + '.json'];\\n    const fileList = Array.isArray(files) ? files : [files];"
+      "const files = man[String(id)] || ['b' + id + '.json'];\n    const fileList = Array.isArray(files) ? files : [files];"
     );
     code = code.replace("await Promise.all(files.map(async (fname) => {", "await Promise.all(fileList.map(async (fname) => {");
     if (code.indexOf("const fileList = Array.isArray(files) ? files : [files]") < 0 || code.indexOf("Promise.all(fileList.map") < 0) {
