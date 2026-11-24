@@ -175,6 +175,81 @@ body.dark .media-card {
   transform: translateY(-3px);
 }
 
+/* ===== Footer social icons: smaller + side by side ===== */
+#footer-social,
+.footer #footer-social,
+.footer-social {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  margin-top: 1rem !important;
+}
+#footer-social a,
+.footer #footer-social a,
+.footer-social a {
+  width: 1.85rem !important;
+  height: 1.85rem !important;
+  min-width: 1.85rem !important;
+  min-height: 1.85rem !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  flex-shrink: 0 !important;
+  padding: 0 !important;
+}
+#footer-social a svg,
+.footer #footer-social a svg,
+.footer-social a svg {
+  width: 0.95rem !important;
+  height: 0.95rem !important;
+}
+
+/* ===== Language buttons: small flags ===== */
+.st-lang-flags {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+}
+.st-lang-flag {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.28rem !important;
+  font-size: 0.78rem !important;
+  padding: 0.28rem 0.55rem !important;
+  border-radius: 999px !important;
+  line-height: 1.2 !important;
+}
+.st-lang-flag span {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.28rem !important;
+}
+
+/* US flag on English button */
+.st-lang-flag[data-lang="en"] span::before {
+  content: "🇺🇸";
+  font-size: 0.95em;
+  line-height: 1;
+}
+
+/* Pahlavi (Lion & Sun) flag on Persian button – small image */
+.st-lang-flag[data-lang="fa"] span::before {
+  content: "";
+  display: inline-block;
+  width: 1.05em;
+  height: 0.75em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 20'%3E%3Crect width='30' height='20' fill='%23fff'/%3E%3Crect y='6.67' width='30' height='6.66' fill='%23c8102e'/%3E%3Ccircle cx='15' cy='10' r='3.2' fill='%23c8102e'/%3E%3Cpath d='M12 8.5 L15 6.5 L18 8.5 L16.5 12 L13.5 12 Z' fill='%23ffd700'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
 .mission-section,
 .daily-verse,
 main.container {
@@ -210,5 +285,15 @@ main.container {
   }
   .media-card:hover {
     transform: none;
+  }
+  #footer-social a,
+  .footer #footer-social a {
+    width: 1.7rem !important;
+    height: 1.7rem !important;
+    min-width: 1.7rem !important;
+  }
+  #footer-social a svg {
+    width: 0.85rem !important;
+    height: 0.85rem !important;
   }
 }
