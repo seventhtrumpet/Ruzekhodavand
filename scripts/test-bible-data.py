@@ -200,6 +200,15 @@ def check_english_metadata(available_english: list[str]) -> None:
         for key, value in actual.items():
             if counts.get(key) != value:
                 fail(f"{edition}: metadata {key}={counts.get(key)!r} does not match local data ({value})")
+        file_hashes = entry.get("book_file_sha256")
+        if file_hashes is not None:
+            expected_hash_ids = {str(book_id) for book_id in book_ids}
+            if set(file_hashes) != expected_hash_ids:
+                fail(f"{edition}: per-book SHA-256 catalogue does not cover exactly the local book files")
+            for book_id in book_ids:
+                digest = hashlib.sha256((ROOT / f"data/bible-en/local/{edition}/b{book_id}.json").read_bytes()).hexdigest()
+                if digest != file_hashes[str(book_id)]:
+                    fail(f"{edition}: local book file b{book_id}.json does not match its pinned SHA-256")
         if edition == "rv1885" and (ROOT / "data/bible-en/local/rv1885/b810.json").is_file():
             esther_additions = load_json(ROOT / "data/bible-en/local/rv1885/b810.json").get("810", {})
             if esther_additions.get("chapter_start") != 10 or sorted(map(int, esther_additions.get("chapters", {}))) != list(range(10, 17)):
@@ -356,6 +365,8 @@ def check_reader_safeguards() -> None:
     importer = (ROOT / "scripts/import-english-local.py").read_text(encoding="utf-8")
     if "BOOKS_81_WEB = BOOKS + DEUTEROCANONICAL + WEB_EXTRA_BOOKS" not in importer:
         fail("WEB Classic importer must retain all 81 official VPL book/text units")
+    if '"book_file_sha256": book_file_sha256' not in importer or 'hashlib.sha256(serialized.encode("utf-8")).hexdigest()' not in importer:
+        fail("Importer must pin a SHA-256 digest for every generated local English book file")
     if "BOOKS_81_WEBBE = BOOKS + DEUTEROCANONICAL + WEB_EXTRA_BOOKS" not in importer or "BOOKS_80_ERV = BOOKS + DEUTEROCANONICAL + ERV_EXTRA_BOOKS" not in importer:
         fail("WEBBE and ERV 1885 importers must retain all source text units")
     if "raise ValueError(f\"{translation}: source contains unregistered book code" not in importer:
