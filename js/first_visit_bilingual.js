@@ -27,6 +27,8 @@
 
   function softApply() {
     if (!notChosen()) return;
+    var route = window.__stBibleRoute;
+    if (route && (route.lang === 'fa' || route.lang === 'en')) return;
     var lang = detectLang();
     try {
       localStorage.setItem('cog_lang', lang);
