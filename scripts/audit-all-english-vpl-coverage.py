@@ -74,6 +74,22 @@ for edition, (archive_id, title, licence) in IMPORTER.SOURCES.items():
           f"verses={sum(v['verses'] for v in actual.values())} sha256={digest}")
     print(f"  UNKNOWN_SOURCE_CODES={','.join(unknown) if unknown else 'none'}")
     print(f"  MISSING_EXPECTED_CODES={','.join(missing) if missing else 'none'}")
+    if unknown:
+        labels = {
+            "BEL": "Bel and the Dragon", "SUS": "Susanna",
+            "PRA": "Prayer of Azariah", "PRM": "Prayer of Manasses",
+            "ESG": "Esther (Greek)", "DNG": "Daniel (Greek)",
+            "1ES": "1 Esdras", "4ES": "2 Esdras",
+            "3MA": "3 Maccabees", "4MA": "4 Maccabees",
+            "PSX": "Psalm 151", "TOB": "Tobit", "JDT": "Judith",
+            "WIS": "Wisdom", "SIR": "Sirach", "BAR": "Baruch",
+            "1MA": "1 Maccabees", "2MA": "2 Maccabees",
+        }
+        for code in unknown:
+            item = actual[code]
+            print(f"  UNKNOWN_DETAIL {code} ({labels.get(code, 'unmapped source text')}): "
+                  f"chapters={len(item['chapters'])} verses={item['verses']} "
+                  f"chapter_numbers={','.join(map(str, sorted(item['chapters'])))}")
     if unknown or missing:
         failures.append(f"{edition}: source/import catalogue mismatch")
 if failures:
