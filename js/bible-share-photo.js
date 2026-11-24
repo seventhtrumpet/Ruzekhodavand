@@ -73,17 +73,32 @@
   var logoPromise = null;
 
   function preloadLogo() {
-    if (logoImg && logoImg.complete) return Promise.resolve(logoImg);
+    if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) return Promise.resolve(logoImg);
     if (logoPromise) return logoPromise;
     logoPromise = new Promise(function (resolve) {
-      var img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = function () { logoImg = img; resolve(img); };
-      img.onerror = function () { resolve(null); };
-      try {
-        if (window.ST_LOGO) img.src = window.ST_LOGO;
-        else img.src = SITE + '/logo.png';
-      } catch (e) { resolve(null); }
+      var attempts = 0;
+      function load(src) {
+        if (!src) return resolve(null);
+        var img = new Image();
+        img.onload = function () { logoImg = img; resolve(img); };
+        img.onerror = function () { resolve(null); };
+        img.src = src;
+      }
+      function waitForSiteLogo() {
+        // logo_data.js assembles the real profile image asynchronously.
+        if (typeof window.ST_LOGO === 'string' && window.ST_LOGO.length > 200) {
+          load(window.ST_LOGO);
+          return;
+        }
+        attempts++;
+        if (attempts < 60) {
+          setTimeout(waitForSiteLogo, 100);
+        } else {
+          // Retain compatibility with older deployments that expose a standalone logo file.
+          load(SITE + '/logo.png');
+        }
+      }
+      waitForSiteLogo();
     });
     return logoPromise;
   }
