@@ -67,7 +67,7 @@ for edition, (archive_id, title, licence) in IMPORTER.SOURCES.items():
         actual[code]["verses"] += 1
     expected_codes = {
         IMPORTER.CODE_ALIASES.get(code, code)
-        for _, code, _, _ in definitions(edition)
+        for item in definitions(edition) for code in (item[1],)
     }
     actual_codes = set(actual)
     unknown = sorted(actual_codes - expected_codes)
