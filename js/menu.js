@@ -102,9 +102,19 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
+  function hasResource(selector, attribute, value) {
+    var wanted = String(value || '').split('?')[0];
+    var nodes = document.querySelectorAll(selector);
+    for (var i = 0; i < nodes.length; i++) {
+      var current = nodes[i].getAttribute(attribute) || '';
+      if (current.split('?')[0] === wanted) return true;
+    }
+    return false;
+  }
+
   function loadScript(src, attr) {
     try {
-      if (document.querySelector('script[' + attr + ']')) return;
+      if (document.querySelector('script[' + attr + ']') || hasResource('script[src]', 'src', src)) return;
       var s = document.createElement('script');
       s.src = src;
       s.setAttribute(attr, '1');
@@ -113,7 +123,7 @@
   }
   function loadCss(href, attr) {
     try {
-      if (document.querySelector('link[' + attr + ']')) return;
+      if (document.querySelector('link[' + attr + ']') || hasResource('link[rel="stylesheet"][href]', 'href', href)) return;
       var l = document.createElement('link');
       l.rel = 'stylesheet';
       l.href = href;
