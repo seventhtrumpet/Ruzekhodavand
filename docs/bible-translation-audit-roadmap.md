@@ -1,6 +1,6 @@
 # Bible Reader Audit and Translation Roadmap
 
-Last reviewed: 2026-11-24 (including full WEB Classic reader/search integration, production smoke checks, rights-candidate review, and local import of all 81 source text units)
+Last reviewed: 2026-11-24 (including full WEB Classic, WEBBE, and ERV source coverage; ERV chapter-number preservation; and all-English VPL archive audits)
 Repository: seventhtrumpet/Ruzekhodavand
 Latest main commit reviewed: f16d06debd08ab13e705f0c97fe8ecc214c89b35 (PR #81: WEB Classic 81-text reader and search integration)
 Latest reader-code fixes: PR #81 (WEB Classic 81-text reader/search integration), PR #62 (WEBBE expanded-canon visibility), PR #64 (Douay Daniel chapter visibility), and PR #66 (cache-busting refresh); PR #55 also fixed MSB saved-version and change-handler allowlists
@@ -89,7 +89,7 @@ The all-edition source audit found two more silent omissions in the previous imp
 - A diagnostic downloaded the exact pinned official eBible.org archive `eng-web_vpl.zip` (SHA-256 `93e867cdb2bfc84d1e997172e7773e166e718d9265985a054f8fca565f5cd21e`) and enumerated all 81 distinct VPL book codes. The previous importer intentionally selected only the 66 common-book definitions, omitting 15 source text units.
 - PR #80 expanded the importer to preserve all 81 source units. The generated local WEB Classic dataset now contains 81 books/text units, 1,402 chapters, 38,058 verse entries, 29 empty markers, and seven chapters with source verse-number gaps. All source wording, empty markers, and gaps are retained; no text is filled from another edition.
 - The 15 additional texts are Tobit, Judith, Greek Esther, Greek Daniel, Wisdom, Sirach, Baruch, 1 Maccabees, 2 Maccabees, 1 Esdras, Prayer of Manasses, Psalm 151, 3 Maccabees, 2 Esdras, and 4 Maccabees. The eight text units not already represented by the seven shared deuterocanonical IDs use distinct IDs 810–880.
-- PR #81 adds the 81-text WEB Classic catalogue to the reader and search scope only when WEB Classic is selected. The 66-book translations and the 73-book DRA/WEBBE editions retain their own source catalogues; deep links continue to use the local numeric book IDs and the canonical SeventhTrumpet.org URL. Production deployment for commit f16d06d is READY on seventhtrumpet.org; static smoke checks confirmed the reader, licence page, metadata, all 15 additional book files, and reader/search scripts return HTTP 200.
+- PR #81 adds the 81-text WEB Classic catalogue to the reader and search scope only when WEB Classic is selected. PR #86 imports the complete 81-text WEBBE and 80-text ERV source sets. PR #87 will expose the edition-specific ERV/WEBBE catalogues, including ERV Greek Esther source chapters 10–16. The 66-book translations and 73-book DRA catalogue retain their own boundaries.
 - This is a structural/source-coverage correction, not a full verse-by-verse accuracy collation.
 
 ## Additional translation-candidate review (2026-11-23)
