@@ -90,7 +90,6 @@ DEUTEROCANONICAL = [
     (770,"SIR","Sirach",51),(780,"BAR","Baruch",6),(790,"1MA","1 Maccabees",16),
     (800,"2MA","2 Maccabees",15),
 ]
-BOOKS_73_WEBBE = BOOKS + DEUTEROCANONICAL
 WEB_EXTRA_BOOKS = [
     (810,"ESG","Esther (Greek)",10),(820,"DNG","Daniel (Greek)",14),
     (830,"1ES","1 Esdras",9),(840,"PRM","Prayer of Manasses",1),
@@ -98,6 +97,14 @@ WEB_EXTRA_BOOKS = [
     (870,"4ES","2 Esdras",16),(880,"4MA","4 Maccabees",18),
 ]
 BOOKS_81_WEB = BOOKS + DEUTEROCANONICAL + WEB_EXTRA_BOOKS
+BOOKS_81_WEBBE = BOOKS + DEUTEROCANONICAL + WEB_EXTRA_BOOKS
+ERV_EXTRA_BOOKS = [
+    (810,"ESG","Additions to Esther (Greek)",7,10),
+    (830,"1ES","1 Esdras",9),(840,"PRM","Prayer of Manasses",1),
+    (870,"4ES","2 Esdras",16),(890,"BEL","Bel and the Dragon",1),
+    (900,"PRA","Prayer of Azariah",1),(910,"SUS","Susanna",1),
+]
+BOOKS_80_ERV = BOOKS + DEUTEROCANONICAL + ERV_EXTRA_BOOKS
 BOOKS_73_DRA = [
     (book_id, code, name, 16 if book_id == 190 else 14 if book_id == 340 else chapters)
     for book_id, code, name, chapters in BOOKS
@@ -115,11 +122,15 @@ def download(url: str) -> bytes:
 
 
 def parse_vpl(text: str, translation: str, book_defs: list[tuple]) -> tuple[dict, dict, list[str], list[str]]:
-    code_map = {
-        CODE_ALIASES.get(code, code): (book_id, name, chapters)
-        for book_id, code, name, chapters in book_defs
-    }
-    books = {str(book_id): {"id": book_id, "name": name, "chapters": {}} for book_id, _, name, _ in book_defs}
+    code_map = {}
+    books = {}
+    for item in book_defs:
+        book_id, code, name, chapters, *extra = item
+        chapter_start = extra[0] if extra else 1
+        code_map[CODE_ALIASES.get(code, code)] = (book_id, name, chapters, chapter_start)
+        books[str(book_id)] = {"id": book_id, "name": name, "chapters": {}}
+        if chapter_start != 1:
+            books[str(book_id)]["chapter_start"] = chapter_start
     matched = 0
     empty_verses: list[str] = []
     verse_gaps: list[str] = []
@@ -131,11 +142,11 @@ def parse_vpl(text: str, translation: str, book_defs: list[tuple]) -> tuple[dict
             raise ValueError(f"{translation}: unparsed VPL line {line_number}: {line[:100]}")
         code, chapter, verse, verse_text = match.groups()
         if code not in code_map:
-            continue
-        book_id, name, expected_chapters = code_map[code]
+            raise ValueError(f"{translation}: source contains unregistered book code {code} at line {line_number}")
+        book_id, name, expected_chapters, chapter_start = code_map[code]
         chapter_number = int(chapter)
         verse_number = int(verse)
-        if not 1 <= chapter_number <= expected_chapters or verse_number < 1:
+        if not chapter_start <= chapter_number < chapter_start + expected_chapters or verse_number < 1:
             raise ValueError(f"{translation}: out-of-range reference {code} {chapter}:{verse}")
         chapter_map = books[str(book_id)]["chapters"].setdefault(str(chapter_number), {})
         if str(verse_number) in chapter_map:
@@ -150,12 +161,15 @@ def parse_vpl(text: str, translation: str, book_defs: list[tuple]) -> tuple[dict
     if len([b for b in books.values() if b["chapters"]]) != expected_books:
         raise ValueError(f"{translation}: expected all {expected_books} books")
     chapter_total = 0
-    for book_id, code, name, expected_chapters in book_defs:
+    for item in book_defs:
+        book_id, code, name, expected_chapters, *extra = item
+        chapter_start = extra[0] if extra else 1
         chapter_map = books[str(book_id)]["chapters"]
         if len(chapter_map) != expected_chapters:
             raise ValueError(f"{translation}: {name} expected {expected_chapters} chapters, got {len(chapter_map)}")
-        if sorted(map(int, chapter_map)) != list(range(1, expected_chapters + 1)):
-            raise ValueError(f"{translation}: non-contiguous chapters in {name}")
+        expected_numbers = list(range(chapter_start, chapter_start + expected_chapters))
+        if sorted(map(int, chapter_map)) != expected_numbers:
+            raise ValueError(f"{translation}: non-contiguous chapters in {name}; expected {expected_numbers[0]}–{expected_numbers[-1]}")
         for chapter, verses in chapter_map.items():
             if not verses:
                 raise ValueError(f"{translation}: empty chapter {name} {chapter}")
@@ -195,7 +209,7 @@ def main() -> None:
             if "public domain" not in about.lower():
                 raise RuntimeError(f"{translation}: source archive does not state Public Domain")
             source_text = zf.read(txt_name).decode("utf-8-sig")
-        book_defs = BOOKS_73_DRA if translation == "dra" else BOOKS_73_WEBBE if translation == "webbe" else BOOKS_81_WEB if translation == "web" else BOOKS
+        book_defs = BOOKS_73_DRA if translation == "dra" else BOOKS_81_WEBBE if translation == "webbe" else BOOKS_80_ERV if translation == "rv1885" else BOOKS_81_WEB if translation == "web" else BOOKS
         books, counts, empty_verses, verse_gaps = parse_vpl(source_text, translation, book_defs)
         if books["10"]["chapters"]["1"]["1"] != EXPECTED_GENESIS_1_1[translation]:
             raise RuntimeError(f"{translation}: Genesis 1:1 sample does not match the reviewed source")
@@ -223,8 +237,8 @@ def main() -> None:
     (OUT / "README.md").write_text(
         "# Local English public-domain Bible texts\n\n"
         "Sources: official eBible.org VPL archives, pinned by SHA-256 in metadata.json.\n"
-        "Included editions: WEB Classic, ASV 1901, YLT 1898, Webster 1833, Darby 1884, Geneva 1599, BSB, ERV 1885, Douay-Rheims 1899, WEBBE, and MSB. The official WEB Classic VPL archive contains 81 book/text units (66 common books plus 15 Deuterocanonical/Apocryphal texts); DRA and WEBBE each contain 73 books (66 plus seven deuterocanonical books). DRA also includes the longer Esther and Daniel chapter divisions.\n"
-        "The VPL format contains Bible text only. The importer preserves source verse wording, empty verse markers, and verse-number gaps; it never fills missing text from another edition. WEB Classic's additional texts are separate source books/sections and are not silently merged into the 66 common books.\n"
+        "Included editions: WEB Classic and WEBBE each contain 81 source book/text units (66 common books plus 15 additional texts); ERV 1885 contains 80 (66 plus 14); DRA contains 73 (66 plus seven). ASV 1901, YLT 1898, Webster 1833, Darby 1884, Geneva 1599, BSB, and MSB contain 66 source books. DRA also includes the longer Esther and Daniel chapter divisions.\n"
+        "The VPL format contains Bible text only. The importer preserves source verse wording, empty verse markers, and verse-number gaps; it never fills missing text from another edition. Esther (Greek) in ERV 1885 is supplied as source chapters 10–16 and retains those chapter numbers.\n"
         "The World English Bible name is retained only for the unchanged source text. The Majority Standard Bible is identified as Public Domain by its official eBible.org source.\n",
         encoding="utf-8",
     )
