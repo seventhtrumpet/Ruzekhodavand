@@ -27,6 +27,9 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Audit all WEB Classic VPL book codes before import
+        run: python scripts/inspect-web-classic-vpl.py
+
       - name: Download and validate official public-domain VPL archives
         run: python scripts/import-english-local.py
 
