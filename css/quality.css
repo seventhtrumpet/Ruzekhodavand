@@ -175,37 +175,55 @@ body.dark .media-card {
   transform: translateY(-3px);
 }
 
-/* ===== Footer social icons: smaller + side by side ===== */
+/* ===== Footer social icons: SMALLER + side by side (very bottom) ===== */
 #footer-social,
 .footer #footer-social,
+.footer .footer-social,
 .footer-social {
   display: flex !important;
+  flex-direction: row !important;
   flex-wrap: nowrap !important;
   justify-content: center !important;
   align-items: center !important;
-  gap: 0.45rem !important;
-  margin-top: 1rem !important;
+  gap: 0.35rem !important;
+  margin: 0.85rem auto 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+  max-width: 100% !important;
 }
 #footer-social a,
 .footer #footer-social a,
-.footer-social a {
-  width: 1.85rem !important;
-  height: 1.85rem !important;
-  min-width: 1.85rem !important;
-  min-height: 1.85rem !important;
+.footer .footer-social a,
+.footer-social a,
+#footer-social a.social-yt,
+#footer-social a.social-ig,
+#footer-social a.social-tt,
+#footer-social a.social-fb,
+#footer-social a.social-wa {
+  width: 1.45rem !important;
+  height: 1.45rem !important;
+  min-width: 1.45rem !important;
+  min-height: 1.45rem !important;
+  max-width: 1.45rem !important;
+  max-height: 1.45rem !important;
   border-radius: 50% !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  flex: 0 0 auto !important;
   flex-shrink: 0 !important;
   padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
 }
 #footer-social a svg,
 .footer #footer-social a svg,
 .footer-social a svg {
-  width: 0.95rem !important;
-  height: 0.95rem !important;
+  width: 0.75rem !important;
+  height: 0.75rem !important;
+  max-width: 0.75rem !important;
+  max-height: 0.75rem !important;
 }
 
 /* ===== Language buttons: small flags ===== */
@@ -287,14 +305,21 @@ main.container {
   .media-card:hover {
     transform: none;
   }
+  #footer-social,
+  .footer #footer-social {
+    gap: 0.3rem !important;
+  }
   #footer-social a,
   .footer #footer-social a {
-    width: 1.7rem !important;
-    height: 1.7rem !important;
-    min-width: 1.7rem !important;
+    width: 1.35rem !important;
+    height: 1.35rem !important;
+    min-width: 1.35rem !important;
+    min-height: 1.35rem !important;
+    max-width: 1.35rem !important;
+    max-height: 1.35rem !important;
   }
   #footer-social a svg {
-    width: 0.85rem !important;
-    height: 0.85rem !important;
+    width: 0.7rem !important;
+    height: 0.7rem !important;
   }
 }
