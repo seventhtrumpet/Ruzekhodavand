@@ -1,34 +1,42 @@
-/* Social links — visible in header, not covered by Login/flags */
+/* Header + footer social icons */
 (function () {
+  if (window.__stSocialInit) return;
+  window.__stSocialInit = true;
+
   var LINKS = [
     {
-      href: 'https://www.youtube.com/@SeventhTrumpet-n6k',
-      cls: 'social-yt',
+      id: 'yt',
+      href: 'https://www.youtube.com/@SeventhTrumpet',
       label: 'YouTube',
+      className: 'social-yt',
       svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.8 15.5v-7l6.2 3.5-6.2 3.5z"/></svg>'
     },
     {
-      href: 'https://www.instagram.com/seventh.trumpet/',
-      cls: 'social-ig',
+      id: 'ig',
+      href: 'https://www.instagram.com/seventhtrumpet.media/',
       label: 'Instagram',
-      svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-3.2-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-3.2 1.7-4.8 4.9-4.9C8.4 2.2 8.8 2.2 12 2.2m0 1.8c-3.1 0-3.5 0-4.7.1-2.2.1-3.3 1.2-3.4 3.4-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c.1 2.2 1.2 3.3 3.4 3.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c2.2-.1 3.3-1.2 3.4-3.4.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-2.2-1.2-3.3-3.4-3.4-1.2-.1-1.6-.1-4.7-.1zm0 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 1.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zm5.3-.9a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"/></svg>'
+      className: 'social-ig',
+      svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-3.2-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-3.2 1.7-4.8 4.9-4.9C8.4 2.2 8.8 2.2 12 2.2m0 1.8c-3.1 0-3.5 0-4.7.1-2.2.1-3.3 1.2-3.4 3.4-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c.1 2.2 1.2 3.3 3.4 3.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c2.2-.1 3.3-1.2 3.4-3.4.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-2.2-1.2-3.3-3.4-3.4-1.2-.1-1.6-.1-4.7-.1zm0 3.2a5.1 5.1 0 1 1 0 10.2 5.1 5.1 0 0 1 0-10.2zm0 1.8a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6zm5.3-2.1a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"/></svg>'
     },
     {
-      href: 'https://www.tiktok.com/@seventh.trumpet',
-      cls: 'social-tt',
+      id: 'tt',
+      href: 'https://www.tiktok.com/@seventhtrumpet.media',
       label: 'TikTok',
-      svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.6 7.2a5.6 5.6 0 0 1-3.3-1.1v6.6a5.7 5.7 0 1 1-4.9-5.6v2.9a2.8 2.8 0 1 0 2 2.7V2.5h2.8a5.6 5.6 0 0 0 3.4 4.7z"/></svg>'
+      className: 'social-tt',
+      svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8.2a7.3 7.3 0 0 1-4.2-1.3v7.2a6.1 6.1 0 1 1-5.3-6v3.1a3 3 0 1 0 2.1 2.9V2.5h3a4.3 4.3 0 0 0 4.4 4.3v1.4z"/></svg>'
     },
     {
-      href: 'https://www.facebook.com/share/1Ev7nyyXVu/',
-      cls: 'social-fb',
+      id: 'fb',
+      href: 'https://www.facebook.com/SeventhTrumpet',
       label: 'Facebook',
-      svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H7v3h3v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1z"/></svg>'
+      className: 'social-fb',
+      svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8.2h2.7V5h-2.7C11.8 5 10 6.8 10 9.1V11H8v3.2h2V22h3.3v-7.8h2.5L16.5 11H13.3V9.1c0-.5.4-.9 1-.9z"/></svg>'
     },
     {
-      href: 'https://wa.me/',
-      cls: 'social-wa',
+      id: 'wa',
+      href: 'https://wa.me/442081333076',
       label: 'WhatsApp',
+      className: 'social-wa',
       svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 14.9L2 22l5.2-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 0 1 6.9 12.5l-.3.5.5 1.9-2-.5-.5.3A8.2 8.2 0 1 1 12 3.8zm4.6 9.7c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.7.9-.1.2-.3.2-.5.1-.2-.1-.9-.3-1.7-1.1-.6-.6-1.1-1.3-1.2-1.5-.1-.2 0-.3.1-.4.1-.1.2-.3.3-.4.1-.1.1-.2.2-.4 0-.1 0-.3-.1-.4-.1-.1-.5-1.3-.7-1.7-.2-.5-.4-.4-.5-.4h-.4c-.1 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.3c.1.2 1.6 2.5 3.9 3.4 2.3.9 2.3.6 2.7.6.4 0 1.3-.5 1.5-1 .2-.5.2-.9.1-1z"/></svg>'
     }
   ];
@@ -36,9 +44,9 @@
   function makeLink(item) {
     var a = document.createElement('a');
     a.href = item.href;
-    a.className = item.cls;
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
+    a.className = item.className;
     a.setAttribute('aria-label', item.label);
     a.title = item.label;
     a.innerHTML = item.svg;
@@ -46,23 +54,18 @@
   }
 
   function ensureCss() {
-    var st = document.getElementById('social-brand-colors');
-    if (st) return;
-    st = document.createElement('style');
-    st.id = 'social-brand-colors';
+    if (document.getElementById('st-social-css')) return;
+    var st = document.createElement('style');
+    st.id = 'st-social-css';
     st.textContent =
-      '#header-social.header-social{order:2!important;flex-shrink:0!important;z-index:6!important;display:inline-flex!important;align-items:center;gap:0.2rem!important}' +
       '.header-social a, .footer-social a{' +
-      'display:inline-flex!important;align-items:center;justify-content:center;' +
-      'width:1.55rem;height:1.55rem;border-radius:50%;' +
-      'background:#fff!important;border:none!important;' +
-      'box-shadow:0 1px 5px rgba(0,0,0,0.18);' +
-      'text-decoration:none;flex-shrink:0;' +
-      '}' +
-      '.footer-social{display:flex;flex-wrap:wrap;justify-content:center;gap:0.6rem;padding:0.85rem 0;}' +
-      '.footer-social a{width:2.35rem;height:2.35rem;}' +
-      '.header-social a svg, .footer-social a svg{width:0.95rem;height:0.95rem;display:block;}' +
-      '.footer-social a svg{width:1.25rem;height:1.25rem;}' +
+      'display:inline-flex;align-items:center;justify-content:center;' +
+      'width:1.5rem!important;height:1.5rem!important;max-width:1.75rem!important;max-height:1.75rem!important;border-radius:50%;' +
+      'text-decoration:none;background:rgba(255,255,255,0.12);overflow:hidden;flex-shrink:0;}' +
+      '.footer-social{display:flex;flex-wrap:wrap;justify-content:center;gap:0.55rem;padding:0.75rem 0;}' +
+      '.footer-social a{width:1.75rem!important;height:1.75rem!important;max-width:1.75rem!important;max-height:1.75rem!important;}' +
+      '.header-social a svg, .footer-social a svg{width:0.9rem!important;height:0.9rem!important;display:block;max-width:1rem!important;max-height:1rem!important;}' +
+      '.footer-social a svg{width:1rem!important;height:1rem!important;}' +
       '.header-social a.social-yt, .footer-social a.social-yt{color:#FF0000!important;}' +
       '.header-social a.social-yt svg, .footer-social a.social-yt svg{fill:#FF0000!important;}' +
       '.header-social a.social-ig, .footer-social a.social-ig{' +
@@ -122,6 +125,7 @@
     injectHeader();
     injectFooter();
   }
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
   setTimeout(boot, 400);
