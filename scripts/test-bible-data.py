@@ -416,7 +416,7 @@ def check_reader_safeguards() -> None:
     for book_id, chapters in WEB_EXTRA_CHAPTERS.items():
         if f"{book_id}:{chapters}" not in reader:
             fail(f"WEB Classic reader chapter map is missing {book_id} ({chapters} chapters)")
-    if "['web','webbe'].includes(selectedEnglishVersion)) Object.assign(CHAPTER_COUNTS" not in reader:
+    if "['web','webbe'].includes(selectedEnglishVersion)) { CHAPTER_STARTS[810] = 1; Object.assign(CHAPTER_COUNTS" not in reader:
         fail("WEB Classic and WEBBE additional chapters must be registered in the reader")
     if "selectedEnglishVersion === 'rv1885' ? ervBooks" not in reader or "CHAPTER_STARTS[810] = 10" not in reader:
         fail("ERV 1885 must expose its separate Greek Esther additions with source chapters 10–16")
