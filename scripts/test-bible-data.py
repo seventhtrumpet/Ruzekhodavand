@@ -454,8 +454,8 @@ def check_reader_safeguards() -> None:
         fail("Bible reader JavaScript must not contain a literal escaped newline in executable route parsing")
     if "=== 'opv' ? '/data/bible-fa/opv/' : '/data/bible-fa/opcb/'" not in reader:
         fail("Persian Bible reader must load OPV and OPCB from their actual separate local directories")
-    if "const fileList = Array.isArray(files) ? files : [files]" not in reader or "Promise.all(fileList.map" not in reader:
-        fail("Persian reader must accept both string and array entries in its local book manifest")
+    if "manifest[String(id)] = ['b' + id + '.json']" not in persian_fill:
+        fail("Persian manifest adapter must return file lists in the reader's expected array format")
     persian_fill = (ROOT / "js/bible_fa_fill.js").read_text(encoding="utf-8")
     if "function fullManifest()" not in persian_fill or "function bookIdFromUrl(url)" not in persian_fill:
         fail("Persian Bible fetch adapter must define its manifest and per-book URL helpers")
