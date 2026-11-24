@@ -70,10 +70,10 @@
     }
 
     var brand = english ? 'Seventh Trumpet' : 'شیپور هفتم';
-    var caption = verse + (reference ? '\\n\\n' + reference : '') + '\\n\\n' + brand;
+    var caption = verse + (reference ? '\n\n' + reference : '') + '\n\n' + brand;
 
     if (!navigator.share) {
-      var fallback = caption + '\\n\\n' + SITE;
+      var fallback = caption + '\n\n' + SITE;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(fallback).then(function () {
           alert(msg('The English verse and website link have been copied.',
@@ -91,7 +91,7 @@
       url: SITE
     }).catch(function (err) {
       if (err && err.name === 'AbortError') return;
-      navigator.share({ title: brand, text: caption + '\\n\\n' + SITE })
+      navigator.share({ title: brand, text: caption + '\n\n' + SITE })
         .catch(function () {});
     });
   }
