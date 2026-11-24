@@ -215,16 +215,17 @@ def main() -> None:
             raise RuntimeError(f"{translation}: Genesis 1:1 sample does not match the reviewed source")
         target = OUT / translation
         target.mkdir(parents=True, exist_ok=True)
+        book_file_sha256 = {}
         for book_id, payload in books.items():
-            (target / f"b{book_id}.json").write_text(
-                json.dumps({book_id: payload}, ensure_ascii=False, separators=(",", ":")) + "\n",
-                encoding="utf-8",
-            )
+            serialized = json.dumps({book_id: payload}, ensure_ascii=False, separators=(",", ":")) + "\n"
+            (target / f"b{book_id}.json").write_text(serialized, encoding="utf-8")
+            book_file_sha256[str(book_id)] = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
         metadata[translation] = {
             "title": title,
             "source_archive": f"{archive_id}_vpl.zip",
             "source_url": url,
             "source_archive_sha256": archive_sha,
+            "book_file_sha256": book_file_sha256,
             "license": license_name,
             "counts": counts,
             "empty_verses": empty_verses,
