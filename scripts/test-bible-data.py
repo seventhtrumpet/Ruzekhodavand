@@ -521,6 +521,14 @@ def check_reader_safeguards() -> None:
     if "js/bible-share.js?v=deep-link-share-20261124-native-share-cancel" not in html:
         fail("Bible share script URL is missing the edition-aware deep-link cache key")
 
+    save_start = photo.find("document.getElementById('st-photo-save').onclick")
+    save_end = photo.find("document.getElementById('st-photo-open').onclick", save_start)
+    save_handler = photo[save_start:save_end] if save_start >= 0 and save_end > save_start else ""
+    if "a.download = 'seventh-trumpet-share.jpg'" not in save_handler or "doFileShare()" in save_handler:
+        fail("Save picture must only download the generated image and must not trigger a second share action")
+    if 'js/bible-share-photo.js?v=photo-save-action-20261124' not in html:
+        fail("Bible photo-share script URL is missing the save-action cache key")
+
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
         fail("Bible share scripts must use the canonical site origin")
     if "SITE + '/bible.html?'" not in share or "return SITE + '/'" not in share:
