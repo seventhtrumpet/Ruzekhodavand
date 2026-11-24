@@ -8,26 +8,41 @@ function isAudioFile(post) {
 }
 
 function getYouTubeEmbedUrl(url) {
-  if (!url) return null;
+  if (typeof url !== 'string' || !url.trim()) return null;
   try {
     const u = new URL(url.trim());
-    if (u.hostname.includes('youtu.be')) {
-      const id = u.pathname.slice(1).split('/')[0].split('?')[0];
-      if (id) return 'https://www.youtube.com/embed/' + id;
+    if ((u.protocol !== 'https:' && u.protocol !== 'http:') || u.username || u.password) return null;
+
+    const host = u.hostname.toLowerCase();
+    const shortHosts = ['youtu.be', 'www.youtu.be'];
+    const youtubeHosts = [
+      'youtube.com', 'www.youtube.com', 'm.youtube.com',
+      'youtube-nocookie.com', 'www.youtube-nocookie.com'
+    ];
+    let id = '';
+
+    if (shortHosts.includes(host)) {
+      id = u.pathname.split('/').filter(Boolean)[0] || '';
+    } else if (youtubeHosts.includes(host)) {
+      const videoParam = u.searchParams.get('v');
+      if (videoParam) {
+        id = videoParam;
+      } else {
+        const parts = u.pathname.split('/').filter(Boolean);
+        const marker = parts.findIndex(part => ['embed', 'shorts', 'live'].includes(part));
+        if (marker >= 0) id = parts[marker + 1] || '';
+      }
+    } else {
+      return null;
     }
-    if (u.hostname.includes('youtube.com') || u.hostname.includes('youtube-nocookie.com')) {
-      const v = u.searchParams.get('v');
-      if (v) return 'https://www.youtube.com/embed/' + v;
-      const parts = u.pathname.split('/').filter(Boolean);
-      const idx = parts.indexOf('embed');
-      if (idx >= 0 && parts[idx + 1]) return 'https://www.youtube.com/embed/' + parts[idx + 1];
-      const sidx = parts.indexOf('shorts');
-      if (sidx >= 0 && parts[sidx + 1]) return 'https://www.youtube.com/embed/' + parts[sidx + 1];
-      const lidx = parts.indexOf('live');
-      if (lidx >= 0 && parts[lidx + 1]) return 'https://www.youtube.com/embed/' + parts[lidx + 1];
-    }
-  } catch (e) {}
-  return null;
+
+    // YouTube video IDs are exactly 11 URL-safe characters. Reject anything
+    // that could break the generated iframe markup or point to a malformed ID.
+    if (!/^[A-Za-z0-9_-]{11}$/.test(id)) return null;
+    return 'https://www.youtube.com/embed/' + id;
+  } catch (e) {
+    return null;
+  }
 }
 
 function postTitle(p) {
