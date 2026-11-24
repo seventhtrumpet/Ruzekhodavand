@@ -504,7 +504,7 @@ def check_reader_safeguards() -> None:
         fail("Bible reader must resolve shared book slugs against the selected edition before rendering")
     if "route.set('lang', lang)" not in share or "route.set('version', version)" not in share or "route.set('slug', slug)" not in share:
         fail("Bible share links must preserve language, translation edition, and canonical book slug")
-    if "js/bible-share.js?v=persian-edition-path-fix-20261123" not in html:
+    if "js/bible-share.js?v=verse-reference-20261124" not in html:
         fail("Bible share script URL is missing the edition-aware deep-link cache key")
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
