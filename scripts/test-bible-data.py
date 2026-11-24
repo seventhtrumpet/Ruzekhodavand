@@ -405,8 +405,8 @@ def check_reader_safeguards() -> None:
             chapters = daniel.get("340", {}).get("chapters", {})
             if len(chapters) != expected:
                 fail(f"{version}: Daniel should have {expected} chapters, found {len(chapters)}")
-    if "expandedDaniel = bookId === 340 && ['dra','odr','odr-original']" not in reader:
-        fail("DRA and Original Douay-Rheims must expose Daniel chapters 13-14 without changing WEBBE")
+    if "if (selectedEnglishVersion === 'dra') { CHAPTER_COUNTS[190] = 16; CHAPTER_COUNTS[340] = 14; }" not in reader:
+        fail("DRA must expose its longer Esther and Daniel chapter divisions without changing other editions")
     if "const availableIds = availableBooks().map(b => b.id)" not in reader:
         fail("Switching to Persian must move away from books absent from Persian editions")
     if "meta = meta.filter(b => b.id < 740 || b.id > 910)" not in reader or "meta.splice(39, 0, ...expandedBooks)" not in reader:
