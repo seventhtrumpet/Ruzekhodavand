@@ -67,6 +67,49 @@
     setTimeout(tryScroll, 700);
   }
 
+  function selectedVerseReference(selected, bookName) {
+    var coordinates = [];
+    selected.forEach(function (el) {
+      var chapter = Number(el.getAttribute('data-chapter'));
+      var verse = Number(el.getAttribute('data-verse'));
+      if (Number.isSafeInteger(chapter) && chapter > 0 &&
+          Number.isSafeInteger(verse) && verse > 0) {
+        coordinates.push({ chapter: chapter, verse: verse });
+      }
+    });
+    coordinates.sort(function (a, b) {
+      return a.chapter - b.chapter || a.verse - b.verse;
+    });
+
+    var references = [];
+    var i = 0;
+    while (i < coordinates.length) {
+      var chapter = coordinates[i].chapter;
+      var start = coordinates[i].verse;
+      var end = start;
+      i++;
+      while (i < coordinates.length && coordinates[i].chapter === chapter) {
+        var next = coordinates[i].verse;
+        if (next <= end) {
+          i++;
+          continue;
+        }
+        if (next === end + 1) {
+          end = next;
+          i++;
+          continue;
+        }
+        references.push(chapter + ':' + start + (end > start ? '-' + end : ''));
+        start = end = next;
+        i++;
+      }
+      references.push(chapter + ':' + start + (end > start ? '-' + end : ''));
+    }
+    return references.length
+      ? (bookName ? bookName + ' ' : '') + references.join(', ')
+      : '';
+  }
+
   function versePayload() {
     var text = '', ref = '';
     try {
@@ -80,12 +123,9 @@
       var lines = [];
       selected.forEach(function (el) { lines.push((el.textContent || '').trim()); });
       text = lines.join('\n');
-      var first = selected[0];
-      var ch = first.getAttribute('data-chapter') || '';
-      var vs = first.getAttribute('data-verse') || '';
       var heading = document.getElementById('bible-heading');
       var bookName = heading ? (heading.textContent || '').trim() : '';
-      if (ch || vs) ref = (bookName ? bookName + ' ' : '') + ch + ':' + vs;
+      ref = selectedVerseReference(selected, bookName);
     }
     if (!text || !ref) {
       var route = getShareRoute();
