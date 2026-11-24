@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/import-english-local.yml
       - scripts/import-english-local.py
+      - scripts/audit-local-english-exact.py
       - scripts/build-odr-search-index.py
       - scripts/inspect-web-classic-vpl.py
       - scripts/audit-all-english-vpl-coverage.py
