@@ -41,6 +41,9 @@ jobs:
       - name: Build compact Original Douay-Rheims search indexes
         run: python scripts/build-odr-search-index.py
 
+      - name: Validate all generated Bible datasets and reader safeguards
+        run: python scripts/test-bible-data.py
+
       - name: Commit generated local English books
         run: |
           git config user.name "github-actions[bot]"
