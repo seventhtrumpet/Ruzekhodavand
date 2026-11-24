@@ -318,12 +318,17 @@ def check_reader_safeguards() -> None:
     core = (ROOT / "js/bible-core-pinned.js").read_text(encoding="utf-8")
     html = (ROOT / "bible.html").read_text(encoding="utf-8")
     share = (ROOT / "js/bible-share.js").read_text(encoding="utf-8")
+    license_page = (ROOT / "bible-licenses.html").read_text(encoding="utf-8")
     welcome_tip = (ROOT / "js/welcome_tip.js").read_text(encoding="utf-8")
     photo = (ROOT / "js/bible-share-photo.js").read_text(encoding="utf-8")
     search = (ROOT / "js/bible_search.js").read_text(encoding="utf-8")
     admin = (ROOT / "admin.html").read_text(encoding="utf-8")
     admin_js = (ROOT / "js/admin.js").read_text(encoding="utf-8")
 
+    if "هیچ متنی برای افزودن ادعای مقدس بودن یکشنبه یا سبت بودن آن بازنویسی نشده است." not in license_page:
+        fail("Persian source/licence page must preserve the statement that no translation was rewritten to sanctify Sunday")
+    if "No text has been rewritten to add a Sunday Sabbath or holy-day claim." not in license_page:
+        fail("English source/licence page must preserve the statement that no translation was rewritten to sanctify Sunday")
     if "code.replace(/  async function loadEnChapter" not in reader or "const requestUrl = isOdr" not in reader:
         fail("Runtime patch must replace the complete English chapter loader and define edition-specific request URLs")
     if "const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885','msb']" not in reader:
