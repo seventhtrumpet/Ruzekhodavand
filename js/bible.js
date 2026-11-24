@@ -33,11 +33,15 @@
     var verseMatch = String(verseText).match(/^(\d+)/);
     var verse = verseMatch ? Number(verseMatch[1]) : 1;
     if (Number.isSafeInteger(bookId) && bookId > 0 && Number.isSafeInteger(chapter) && chapter > 0) {
-      localStorage.setItem('cog_bible_state', JSON.stringify({
+      var sharedRoute = {
         bookId: bookId,
         chapter: chapter,
         verse: Number.isSafeInteger(verse) && verse > 0 ? verse : 1
-      }));
+      };
+      localStorage.setItem('cog_bible_state', JSON.stringify(sharedRoute));
+      // Preserve the exact incoming verse before the reader core normalizes its
+      // navigation state; share links must keep the verse the visitor opened.
+      localStorage.setItem('cog_bible_share_route', JSON.stringify(sharedRoute));
     }
     if (route.has('lang') || route.has('version') || route.has('slug') || route.has('b') || route.has('book')) {
       window.history.replaceState(window.history.state, document.title, window.location.pathname + window.location.hash);
