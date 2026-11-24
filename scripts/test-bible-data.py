@@ -456,6 +456,14 @@ def check_reader_safeguards() -> None:
         fail("Persian Bible reader must load OPV and OPCB from their actual separate local directories")
     if "new URLSearchParams(window.location.search)" not in reader or "cog_bible_book_slug" not in reader:
         fail("Bible reader must restore shared book, language, and edition before loading the reader core")
+    if "window.__stBibleRoute = { lang: routeLanguage, version: version || null }" not in reader:
+        fail("Bible deep links must expose explicit route language before first-visit scripts initialize")
+    welcome = (ROOT / "js/welcome_tip.js").read_text(encoding="utf-8")
+    first_visit = (ROOT / "js/first_visit_bilingual.js").read_text(encoding="utf-8")
+    if "var bibleRoute = window.__stBibleRoute" not in welcome or "setLang(bibleRoute.lang, false)" not in welcome:
+        fail("Welcome language prompt must respect an explicit Bible share route and not override its language")
+    if "var route = window.__stBibleRoute" not in first_visit:
+        fail("First-visit language fallback must respect an explicit Bible share route")
     if "const selectedChapter = Math.min(Math.max(Number(chapter) || chapterStart, chapterStart), max);" not in reader or "requestAnimationFrame(() => scrollToRef(selectedChapter, verse, false))" not in reader:
         fail("English shared links must load the selected chapter and scroll to the requested verse")
     if r'code.replace("await loadMeta();\n    await loadManifest();"' not in reader:
