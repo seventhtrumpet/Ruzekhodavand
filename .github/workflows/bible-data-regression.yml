@@ -43,6 +43,8 @@ jobs:
           node --check js/bible-share.js
           node --check js/bible-share-photo.js
           node --check js/app_media.js
+          node --check js/media_rotator.js
+          node scripts/test-media-rotator-youtube.js
           node scripts/test-youtube-embed-url.js
           node --check js/bugfixes.js
           node scripts/test-html-escaping.js
