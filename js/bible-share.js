@@ -1,4 +1,5 @@
-/* Share panel: verse first + tappable link + OG profile; WA / TG / Signal / Photo / More */
+/* Share panel: verse first + tappable link + OG profile; WA / TG / Signal / Photo / More
+   Daily verse on home page is handled only by daily-bread-status.js */
 (function () {
   var SITE = 'https://seventhtrumpet.org';
   var SOCIAL = {
@@ -75,13 +76,12 @@
     textLines.push(brand);
     textLines.push(pageUrl);
     var text = textLines.join('\n\n');
-    var full = text;
 
     return {
       title: title,
       text: text,
       url: pageUrl,
-      full: full,
+      full: text,
       payload: p
     };
   }
@@ -135,22 +135,14 @@
 
     if (app === 'signal') {
       if (navigator.share) {
-        navigator.share({
-          title: parts.title,
-          text: parts.text,
-          url: parts.url
-        }).catch(function (err) {
+        navigator.share({ title: parts.title, text: parts.text, url: parts.url }).catch(function (err) {
           if (err && err.name === 'AbortError') return;
           copyText(parts.full).then(function (ok) {
-            if (ok) toast(en ? 'Copied \u2014 paste in Signal' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0633\u06cc\u06af\u0646\u0627\u0644 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
-            try { window.location.href = 'sgnl://send?text=' + encodeURIComponent(parts.full); } catch (e) {}
+            if (ok) toast(en ? 'Copied' : '\u06a9\u067e\u06cc \u0634\u062f');
           });
         });
       } else {
-        copyText(parts.full).then(function (ok) {
-          if (ok) toast(en ? 'Copied \u2014 paste in Signal' : '\u06a9\u067e\u06cc \u0634\u062f \u2014 \u062f\u0631 \u0633\u06cc\u06af\u0646\u0627\u0644 \u062c\u0627\u06cc\u200c\u06af\u0630\u0627\u0631\u06cc');
-        });
-        try { window.location.href = 'sgnl://send?text=' + encodeURIComponent(parts.full); } catch (e2) {}
+        copyText(parts.full);
       }
       return;
     }
@@ -171,22 +163,12 @@
 
     if (app === 'more' || app === 'system') {
       if (navigator.share) {
-        navigator.share({
-          title: parts.title,
-          text: parts.text,
-          url: parts.url
-        }).catch(function (err) {
+        navigator.share({ title: parts.title, text: parts.text, url: parts.url }).catch(function (err) {
           if (err && err.name === 'AbortError') return;
-          copyText(parts.full).then(function (ok) {
-            if (ok) toast(en ? 'Copied verse + link' : '\u06a9\u067e\u06cc \u0634\u062f: \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9');
-          });
+          copyText(parts.full);
         });
       } else {
-        copyText(parts.full).then(function (ok) {
-          toast(ok
-            ? (en ? 'Copied verse + link' : '\u06a9\u067e\u06cc \u0634\u062f: \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9')
-            : (en ? 'Share not supported' : '\u067e\u0634\u062a\u06cc\u0628\u0627\u0646\u06cc \u0646\u0645\u06cc\u200c\u0634\u0648\u062f'));
-        });
+        copyText(parts.full);
       }
       return;
     }
@@ -226,21 +208,16 @@
       '<div class="vshare-panel" role="dialog" aria-modal="true">' +
       '<p class="vshare-title">' + (en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9') + '</p>' +
       '<p class="vshare-hint">' +
-      (en
-        ? 'Verse + profile preview + tappable website link'
-        : '\u0622\u06cc\u0647 + \u067e\u06cc\u0634\u200c\u0646\u0645\u0627\u06cc\u0634 \u067e\u0631\u0648\u0641\u0627\u06cc\u0644 + \u0644\u06cc\u0646\u06a9 \u0642\u0627\u0628\u0644 \u0644\u0645\u0633') +
+      (en ? 'Verse + tappable website link' : '\u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9 \u0642\u0627\u0628\u0644 \u0644\u0645\u0633') +
       '</p>' +
       '<div class="vshare-grid">' +
       '<button type="button" class="vshare-btn wa" data-go="wa">WhatsApp</button>' +
       '<button type="button" class="vshare-btn tg" data-go="tg">Telegram</button>' +
       '<button type="button" class="vshare-btn signal" data-go="signal">Signal</button>' +
-      '<button type="button" class="vshare-btn photo" data-go="photo">' +
-      (en ? 'Photo' : '\u0639\u06a9\u0633') + '</button>' +
-      '<button type="button" class="vshare-btn more" data-go="more">' +
-      (en ? 'More apps' : '\u0628\u0631\u0646\u0627\u0645\u0647\u200c\u0647\u0627\u06cc \u0628\u06cc\u0634\u062a\u0631') + '</button>' +
+      '<button type="button" class="vshare-btn photo" data-go="photo">' + (en ? 'Photo' : '\u0639\u06a9\u0633') + '</button>' +
+      '<button type="button" class="vshare-btn more" data-go="more">' + (en ? 'More apps' : '\u0628\u0631\u0646\u0627\u0645\u0647\u200c\u0647\u0627\u06cc \u0628\u06cc\u0634\u062a\u0631') + '</button>' +
       '</div>' +
-      '<button type="button" class="vshare-cancel" data-go="cancel">' +
-      (en ? 'Cancel' : '\u0644\u063a\u0648') + '</button>' +
+      '<button type="button" class="vshare-cancel" data-go="cancel">' + (en ? 'Cancel' : '\u0644\u063a\u0648') + '</button>' +
       '</div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', function (e) {
@@ -259,29 +236,13 @@
   function setLabels() {
     var en = isEn();
     var label = en ? 'Share' : '\u0627\u0634\u062a\u0631\u0627\u06a9';
-    var daily = document.getElementById('daily-share');
     var mb = document.getElementById('mb-share');
-    if (daily) daily.textContent = label;
     if (mb) mb.textContent = label;
   }
 
   function bindDaily() {
-    var section = document.getElementById('daily-verse');
-    if (!section) return;
-    var btn = document.getElementById('daily-share');
-    if (!btn) {
-      btn = document.createElement('button');
-      btn.type = 'button';
-      btn.id = 'daily-share';
-      btn.className = 'verse-refresh';
-      btn.style.marginInlineStart = '0.45rem';
-      var inner = section.querySelector('.daily-verse-inner');
-      var refresh = document.getElementById('verse-refresh');
-      if (refresh && refresh.parentNode) refresh.parentNode.insertBefore(btn, refresh.nextSibling);
-      else if (inner) inner.appendChild(btn);
-    }
-    btn.onclick = function (e) { e.preventDefault(); openSharePanel(); };
-    setLabels();
+    var old = document.getElementById('daily-share');
+    if (old) try { old.remove(); } catch (e) {}
   }
 
   function bindBible() {
@@ -297,9 +258,8 @@
   function boot() {
     bindDaily();
     bindBible();
+    setTimeout(bindDaily, 500);
     setTimeout(setLabels, 400);
-    var lt = document.getElementById('lang-toggle');
-    if (lt) lt.addEventListener('click', function () { setTimeout(setLabels, 150); });
     window.addEventListener('cog-lang-changed', setLabels);
   }
 
