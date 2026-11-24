@@ -21,5 +21,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Check Bible reader JavaScript syntax
+        run: |
+          node --check js/bible.js
+          node --check js/bible-core-pinned.js
+          node --check js/bible_search.js
+          node --check js/bible-share.js
+          node --check js/bible-share-photo.js
       - name: Validate Bible datasets and reader safeguards
         run: python scripts/test-bible-data.py
