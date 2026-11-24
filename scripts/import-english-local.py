@@ -32,7 +32,7 @@ SOURCES = {
     "msb": ("engmsb", "Majority Standard Bible", "Public Domain"),
 }
 EXPECTED_ARCHIVE_SHA256 = {
-    "web": "93e867cdb2bfc84d1e997172e7773e166e718d9265985a054f8fca565f5cd21e",
+    "web": "88308b1c50ec3a536175b29ca96e82602a1f2d7c8ce6aadeb9824a4464f4565c",
     "asv": "6c41b8020cba9cf7041689f2356c55859e28023405537388be08bad93df2b050",
     "ylt": "653e9f1d8487de46e11574165a6355d3135ae378fb2198ee4128dedc06c8ca56",
     "webster": "402240da209b017c67a31b63773b42471ef7e2513aa76ef067f34af907537270",
@@ -41,7 +41,7 @@ EXPECTED_ARCHIVE_SHA256 = {
     "bsb": "72ecd9e0131e82737b76e1f2d706c85771d6054b6350673f80f49c839133f45e",
     "rv1885": "3f26f6bb6fd48d9ee18ae11fff0670054e84ed35d3ae8c984cd95e9af0ed5791",
     "dra": "4b7ddcaec6bcf1d973d483a14e6495657daba94056b3a9678d0002315e7e57dd",
-    "webbe": "055c1a5c21aa18c62117747ce7dd602346d587547399c89673fa7d0a511b8f14",
+    "webbe": "18e107b14ac22eebd450dd07d77155cb62209eba9f7ca2b6b4c8c6d3c8c08241",
 }
 EXPECTED_GENESIS_1_1 = {
     "web": "In the beginning, God created the heavens and the earth.",
