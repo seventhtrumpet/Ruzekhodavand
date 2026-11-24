@@ -518,7 +518,11 @@ def check_reader_safeguards() -> None:
         fail("Share links must recover the exact incoming verse after the reader removes URL parameters")
     if "linkedVerse" not in share or "route.chapter + ':' + route.verse" not in share:
         fail("Share payload must include the linked verse text and reference when no verse is reselected")
-    if "js/bible-share.js?v=deep-link-share-20261124-native-share-cancel" not in html:
+    if "function selectedVerseReference(selected, bookName)" not in share or "ref = selectedVerseReference(selected, bookName)" not in share:
+        fail("Selected Bible verses must build a complete reference, not only cite the first selected verse")
+    if "references.join(', ')" not in share or "end > start ? '-' + end : ''" not in share:
+        fail("Selected Bible verse references must preserve ranges and non-contiguous selections")
+    if "js/bible-share.js?v=selected-reference-ranges-20261124" not in html:
         fail("Bible share script URL is missing the edition-aware deep-link cache key")
 
     save_start = photo.find("document.getElementById('st-photo-save').onclick")
