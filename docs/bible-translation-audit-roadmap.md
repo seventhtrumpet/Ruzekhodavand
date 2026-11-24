@@ -33,7 +33,7 @@ Keep Bible reading inside SeventhTrumpet.org, preserve useful complete translati
 The selector currently exposes these 15 choices (11 locally hosted editions, two Original Douay-Rheims spelling forms, and KJV/BBE):
 
 1. KJV — King James Version
-2. WEB — World English Bible
+2. WEB — World English Bible Classic (81 source book/text units: 66 common books plus 15 additional texts)
 3. ASV — American Standard Version (1901)
 4. ERV 1885 — English Revised Version
 5. YLT — Young's Literal Translation (1898)
@@ -80,7 +80,7 @@ The reader wrapper loads the pinned JavaScript core from the same-origin path `/
 - A diagnostic downloaded the exact pinned official eBible.org archive `eng-web_vpl.zip` (SHA-256 `93e867cdb2bfc84d1e997172e7773e166e718d9265985a054f8fca565f5cd21e`) and enumerated all 81 distinct VPL book codes. The previous importer intentionally selected only the 66 common-book definitions, omitting 15 source text units.
 - PR #80 expanded the importer to preserve all 81 source units. The generated local WEB Classic dataset now contains 81 books/text units, 1,402 chapters, 38,058 verse entries, 29 empty markers, and seven chapters with source verse-number gaps. All source wording, empty markers, and gaps are retained; no text is filled from another edition.
 - The 15 additional texts are Tobit, Judith, Greek Esther, Greek Daniel, Wisdom, Sirach, Baruch, 1 Maccabees, 2 Maccabees, 1 Esdras, Prayer of Manasses, Psalm 151, 3 Maccabees, 2 Esdras, and 4 Maccabees. The eight text units not already represented by the seven shared deuterocanonical IDs use distinct IDs 810–880.
-- The reader selector, search scope, and sharing/deep-link behavior must be updated to expose these texts only when WEB Classic is selected. The existing 66-book translations and the 73-book DRA/WEBBE editions must retain their own source catalogues.
+- PR #81 adds the 81-text WEB Classic catalogue to the reader and search scope only when WEB Classic is selected. The 66-book translations and the 73-book DRA/WEBBE editions retain their own source catalogues; deep links continue to use the local numeric book IDs and the canonical SeventhTrumpet.org URL.
 - This is a structural/source-coverage correction, not a full verse-by-verse accuracy collation.
 
 ## Additional translation-candidate review (2026-11-23)
