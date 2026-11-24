@@ -930,7 +930,7 @@
     "title": "World English Bible British Edition",
     "source_archive": "eng-webbe_vpl.zip",
     "source_url": "https://ebible.org/Scriptures/eng-webbe_vpl.zip",
-    "source_archive_sha256": "18e107b14ac22eebd450dd07d77155cb62209eba9f7ca2b6b4c8c6d3c8c08241",
+    "source_archive_sha256": "130b9faf2221315caf74b4bd4541de45d745c6409ad70179b9ac0908198ccc97",
     "book_file_sha256": {
       "10": "db22836375fc5dfe2fb87274117fe2645bf1e59791b798225085a7cbf4b382a3",
       "20": "93e613ab551aab0a0f457a3f542fe78d4a25d137b383292797d7d256ba6bab53",
