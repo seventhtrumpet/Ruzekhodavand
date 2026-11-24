@@ -190,6 +190,12 @@
       "$1\n          if (ch === chapter) requestAnimationFrame(() => scrollToRef(chapter, verse, false));"
     );
     if (code.indexOf("if (ch === chapter) requestAnimationFrame(() => scrollToRef(chapter, verse, false))") < 0) {
+      const chapterAppend = "box.insertAdjacentHTML('beforeend', buildChapterHtml(ch, chData));";
+      if (code.indexOf(chapterAppend) >= 0) {
+        code = code.replace(chapterAppend, chapterAppend + "\\n          if (ch === chapter) requestAnimationFrame(() => scrollToRef(chapter, verse, false));");
+      }
+    }
+    if (code.indexOf("if (ch === chapter) requestAnimationFrame(() => scrollToRef(chapter, verse, false))") < 0) {
       throw new Error('Shared English chapter deep-link scroll patch did not apply');
     }
 
