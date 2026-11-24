@@ -60,6 +60,24 @@ function postMediaUrl(p) {
   return (p.externalUrl || p.dataUrl || p.fileUrl || p.url || '').trim();
 }
 
+function safeMediaUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+
+  // Preserve supported uploaded media data URLs, but never allow active HTML/SVG.
+  const safeDataUrl = /^data:(?:image\/(?:png|jpeg|gif|webp)|video\/(?:mp4|webm|ogg)|audio\/(?:mpeg|mp3|ogg|wav|webm|mp4|aac|flac)|application\/pdf);base64,[A-Za-z0-9+/]+={0,2}$/i;
+  if (/^data:/i.test(raw)) return safeDataUrl.test(raw) ? raw : '';
+
+  try {
+    const parsed = new URL(raw, window.location.href);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return '';
+    if (parsed.username || parsed.password) return '';
+    return parsed.href;
+  } catch (e) {
+    return '';
+  }
+}
+
 function postSortTime(p) {
   return new Date(p.date || p.createdAt || 0).getTime();
 }
@@ -175,7 +193,7 @@ function openPost(id) {
   const content = document.getElementById('modal-content');
   if (!modal || !content) return;
   const t = (T && T[currentLang]) || (T && T.en) || {};
-  const mediaUrl = postMediaUrl(post);
+  const mediaUrl = safeMediaUrl(postMediaUrl(post));
   let body = '<button class="modal-close" type="button" onclick="closeModal()">&times;</button>';
   body += '<h2 style="margin-top:0.5rem;padding-right:2rem;padding-left:2rem;">' + escapeHtml(postTitle(post)) + '</h2>';
   const d = postDesc(post);
