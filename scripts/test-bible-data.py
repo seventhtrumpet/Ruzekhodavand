@@ -474,8 +474,8 @@ def check_reader_safeguards() -> None:
     if "window.__stBibleRoute = { lang: routeLanguage, version: version || null }" not in reader:
         fail("Bible deep links must expose explicit route language before first-visit scripts initialize")
     lang_flags = (ROOT / "js/lang_flags.js").read_text(encoding="utf-8")
-    if "IRAN_SVG" in lang_flags or "US_SVG" in lang_flags or "btnFa.innerHTML = '<span>" not in lang_flags:
-        fail("Language choices must use neutral Persian and English labels, not national flags")
+    if "IRAN_SVG" in lang_flags or "Historical Persian Lion and Sun flag" not in lang_flags or "United States flag" not in lang_flags:
+        fail("Language flags must use the historical Persian Lion and Sun and United States designs, never the Islamic Republic flag")
     welcome = (ROOT / "js/welcome_tip.js").read_text(encoding="utf-8")
     first_visit = (ROOT / "js/first_visit_bilingual.js").read_text(encoding="utf-8")
     if "var bibleRoute = window.__stBibleRoute" not in welcome or "setLang(bibleRoute.lang, true)" not in welcome:
@@ -483,7 +483,7 @@ def check_reader_safeguards() -> None:
     if "var route = window.__stBibleRoute" not in first_visit or "if (route && (route.lang === 'fa' || route.lang === 'en')) return;" not in first_visit:
         fail("First-visit language fallback must respect a Bible share route without overriding a later user choice")
     menu = (ROOT / "js/menu.js").read_text(encoding="utf-8")
-    if "first_visit_bilingual.js?v=bible-route-language-20261124" not in menu or "lang_flags.js?v=neutral-language-labels-20261124" not in menu or "welcome_tip.js?v=language-choice-persist-20261124" not in menu:
+    if "first_visit_bilingual.js?v=bible-route-language-20261125" not in menu or "lang_flags.js?v=neutral-language-labels-20261125" not in menu or "welcome_tip.js?v=language-choice-persist-20261125" not in menu:
         fail("Menu must request cache-busted language and first-visit scripts")
     bible_html = (ROOT / "bible.html").read_text(encoding="utf-8")
     if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=bible-reader-runtime-fix-20261124" not in bible_html:
