@@ -151,7 +151,7 @@
   loadScript('js/player_expand.js', 'data-player-expand');
   loadScript('js/app_media.js', 'data-app-media');
   loadCss('css/about_fix.css', 'data-about-fix');
-  loadCss('css/mobile_header.css', 'data-mobile-header');
+  loadCss('css/mobile_header.css?v=one-selector-20261124', 'data-mobile-header');
   loadCss('css/social.css', 'data-social-css');
   loadCss('css/quality.css', 'data-quality-css');
   loadCss('css/player_expand.css', 'data-player-expand-css');
