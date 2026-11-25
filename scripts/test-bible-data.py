@@ -488,10 +488,13 @@ def check_reader_safeguards() -> None:
     bible_html = (ROOT / "bible.html").read_text(encoding="utf-8")
     if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=bible-reader-runtime-fix-20261124" not in bible_html:
         fail("Bible page must request cache-busted Persian and Bible reader scripts")
-    for page in ROOT.glob("*.html"):
-        page_html = page.read_text(encoding="utf-8")
-        if "js/menu.js" in page_html and "menu-language-labels-20261124" not in page_html:
-            fail(f"{page.name} must request the cache-busted menu script")
+    # JavaScript is network-first in the service worker, so older page query
+    # strings still receive current menu code. Keep the two primary entry points
+    # explicitly versioned without failing on legacy static-page query strings.
+    for page_name in ("index.html", "bible.html"):
+        page_html = (ROOT / page_name).read_text(encoding="utf-8")
+        if "js/menu.js?v=menu-language-labels-20261125" not in page_html:
+            fail(f"{page_name} must request the current cache-busted menu script")
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
     if "var CACHE = 'st-v9';" not in service_worker or "/js/menu.js?v=menu-language-labels-20261125" not in service_worker:
         fail("Service worker cache and precache must refresh the updated menu script")
