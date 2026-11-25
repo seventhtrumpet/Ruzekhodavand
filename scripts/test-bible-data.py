@@ -493,7 +493,7 @@ def check_reader_safeguards() -> None:
         if "js/menu.js" in page_html and "menu-language-labels-20261124" not in page_html:
             fail(f"{page.name} must request the cache-busted menu script")
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
-    if "var CACHE = 'st-v6';" not in service_worker or "/js/menu.js?v=menu-language-labels-20261124" not in service_worker:
+    if "var CACHE = 'st-v9';" not in service_worker or "/js/menu.js?v=menu-language-labels-20261125" not in service_worker:
         fail("Service worker cache and precache must refresh the updated menu script")
     licenses = (ROOT / "bible-licenses.html").read_text(encoding="utf-8")
     if "500,616 Scripture verse records" not in licenses or "۵۰۰٬۶۱۶ رکورد آیه" not in licenses:
@@ -516,7 +516,7 @@ def check_reader_safeguards() -> None:
         fail("An explicit Bible-link language must be remembered to prevent a later version reload from reopening the language gate")
     if "function getShareRoute()" not in share or "var params = getShareRoute();" not in share:
         fail("Share links must recover the exact incoming verse after the reader removes URL parameters")
-    if "linkedVerse" not in share or "route.chapter + ':' + route.verse" not in share:
+    if "linkedVerse" not in share or "routeChapter + ':' + routeVerse" not in share:
         fail("Share payload must include the linked verse text and reference when no verse is reselected")
     if "js/bible-share.js?v=deep-link-share-20261124-native-share-cancel" not in html:
         fail("Bible share script URL is missing the edition-aware deep-link cache key")
@@ -531,7 +531,7 @@ def check_reader_safeguards() -> None:
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
         fail("Bible share scripts must use the canonical site origin")
-    if "SITE + '/bible.html?'" not in share or "return SITE + '/'" not in share:
+    if "SITE + '/bible.html?'" not in share or "return SITE + '/bible.html?lang='" not in share:
         fail("Bible share payload must build canonical same-site reader URLs")
     if re.search(r"<script[^>]+(?:admin_cloud_hook|admin_edit_hook|cloud_sync)", admin, re.I):
         fail("Disabled admin page must not load legacy admin hooks")
