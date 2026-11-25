@@ -173,3 +173,18 @@ html, body {
     word-break: break-word;
   }
 }
+
+
+/* One language selector only: hide legacy and cloned header controls. */
+.header-actions #lang-toggle,
+.header-actions button.lang-toggle,
+.header-actions [data-lang-toggle],
+.st-lang-flags:not(#st-lang-flags),
+.st-lang-flag:not(#st-lang-flags .st-lang-flag) {
+  display: none !important;
+}
+#st-lang-flags {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
