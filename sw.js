@@ -1,5 +1,5 @@
 /* Seventh Trumpet — offline + cache (st-v5: network-first for JS) */
-var CACHE = 'st-v6';
+var CACHE = 'st-v7';
 var PRECACHE = [
   '/',
   '/index.html',
