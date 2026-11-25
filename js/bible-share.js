@@ -16,6 +16,26 @@
     return isEn() ? 'Seventh Trumpet' : '\u0634\u06cc\u067e\u0648\u0631 \u0647\u0641\u062a\u0645';
   }
 
+  function getShareRoute() {
+    var route = {};
+    try {
+      var incoming = JSON.parse(localStorage.getItem('cog_bible_share_route') || 'null');
+      if (incoming && Number(incoming.bookId) > 0 && Number(incoming.chapter) > 0) route = incoming;
+    } catch (e) {}
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var b = Number(params.get('b') || params.get('book'));
+      var c = Number(params.get('c') || params.get('chapter'));
+      var v = Number((params.get('v') || params.get('verse') || '1').match(/^\\d+/)?.[0] || 1);
+      if (b > 0 && c > 0) route = { bookId: b, chapter: c, verse: v > 0 ? v : 1 };
+    } catch (e2) {}
+    try {
+      var state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}');
+      if (!route.bookId && state.bookId) route = state;
+    } catch (e3) {}
+    return route;
+  }
+
   function versePayload() {
     var text = '', ref = '';
     try {
@@ -23,9 +43,9 @@
       if (selected.length) {
         var lines = [];
         selected.forEach(function (el) {
-          lines.push((el.textContent || '').replace(/^\d+\s*/, '').trim());
+          lines.push((el.textContent || '').replace(/^\\d+\\s*/, '').trim());
         });
-        text = lines.join('\n');
+        text = lines.join('\\n');
         var first = selected[0];
         var last = selected[selected.length - 1];
         var ch = first.getAttribute('data-chapter') || '';
@@ -35,11 +55,17 @@
       }
     } catch (e) {}
     if (!text) {
+      var route = getShareRoute();
+      if (route.chapter && route.verse) {
+        var linked = document.getElementById('v-' + route.chapter + '-' + route.verse);
+        if (linked) text = (linked.textContent || '').replace(/^\\d+\\s*/, '').trim();
+        ref = route.chapter + ':' + route.verse;
+      }
+    }
+    if (!text) {
       try {
         var vt = document.getElementById('verse-text');
         if (vt) text = (vt.textContent || '').trim();
-        var vr = document.getElementById('verse-ref');
-        if (vr) ref = (vr.textContent || '').trim();
       } catch (e2) {}
     }
     return { text: (text || '').trim(), ref: (ref || '').trim() };
@@ -47,20 +73,26 @@
 
   function sharePageUrl() {
     try {
-      var p = versePayload();
-      var state = {};
-      try { state = JSON.parse(localStorage.getItem('cog_bible_state') || '{}'); } catch (e) {}
-      var b = state.bookId || '';
-      var route = new URLSearchParams();
-      if (b) route.set('b', b);
-      if (p.ref && p.ref.indexOf(':') > 0) {
-        var parts = p.ref.split(':');
-        route.set('c', parts[0]);
-        route.set('v', parts[1].split('-')[0]);
-      }
-      if (route.toString()) return SITE + '/bible.html?' + route.toString();
-    } catch (e) {}
-    return SITE + '/';
+      var route = getShareRoute();
+      var lang = isEn() ? 'en' : 'fa';
+      var version = '';
+      try {
+        version = localStorage.getItem(lang === 'en' ? 'cog_bible_en_version' : 'cog_bible_fa_version') || (lang === 'en' ? 'kjv' : 'opcb');
+      } catch (e) { version = lang === 'en' ? 'kjv' : 'opcb'; }
+      var params = new URLSearchParams();
+      if (route.bookId) params.set('b', String(route.bookId));
+      if (route.chapter) params.set('c', String(route.chapter));
+      if (route.verse) params.set('v', String(route.verse));
+      params.set('lang', lang);
+      params.set('version', version);
+      var slug = '';
+      try {
+        slug = (window.__stBibleSlugByCanonicalId || {})[String(route.bookId)] || '';
+      } catch (e2) {}
+      if (slug) params.set('slug', slug);
+      return SITE + '/bible.html?' + params.toString();
+    } catch (e3) {}
+    return SITE + '/bible.html?lang=' + (isEn() ? 'en' : 'fa');
   }
 
   function buildParts() {
