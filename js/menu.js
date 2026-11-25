@@ -122,8 +122,8 @@
     } catch (e) {}
   }
 
-  loadScript('js/first_visit_bilingual.js', 'data-first-bilingual');
-  loadScript('js/lang_flags.js?v=top-single-20261124', 'data-lang-flags');
+  loadScript('js/first_visit_bilingual.js?v=bible-route-language-20261125', 'data-first-bilingual');
+  loadScript('js/lang_flags.js?v=neutral-language-labels-20261125', 'data-lang-flags');
   loadScript('js/css_restore.js', 'data-css-restore');
   loadScript('js/ads.js', 'data-ads-js');
   loadScript('js/menu_overlay_fix.js', 'data-menu-overlay-fix');
@@ -143,7 +143,7 @@
   loadScript('js/bible_bar_fix.js', 'data-bible-bar-fix');
   loadScript('js/bible_search.js?v=fix8', 'data-bible-search');
   loadScript('js/home_polish.js', 'data-home-polish');
-  loadScript('js/welcome_tip.js', 'data-welcome-tip');
+  loadScript('js/welcome_tip.js?v=language-choice-persist-20261125', 'data-welcome-tip');
   loadScript('js/loading.js', 'data-loading');
   loadScript('js/cloud_sync.js', 'data-cloud-sync');
   loadScript('js/media_public_fix.js', 'data-media-public-fix');
