@@ -71,6 +71,12 @@
     return persianVersion === 'opv' ? 'منبع جست‌وجو: OPV' : 'منبع جست‌وجو: OPCB';
   }
 
+  function isEnglishSearchSupported() {
+    var version = 'kjv';
+    try { version = localStorage.getItem('cog_bible_en_version') || 'kjv'; } catch (e) {}
+    return ['kjv','web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885','msb','odr','odr-original'].indexOf(version) >= 0;
+  }
+
   function scopeLabel() {
     var s = getScope();
     if (isEn()) return { all: 'All Bible', ot: 'Old Testament', nt: 'New Testament', book: 'This book' }[s] || 'All Bible';
@@ -549,6 +555,10 @@
           EN_VERSES = flattenLocalEnglish(packs, searchIds);
           return EN_VERSES;
         }
+        if (version !== 'kjv') {
+          EN_VERSES = [];
+          return EN_VERSES;
+        }
         var urls = [
           'https://cdn.jsdelivr.net/gh/thiagobodruk/bible/json/en_kjv.json',
           'https://fastly.jsdelivr.net/gh/thiagobodruk/bible@master/json/en_kjv.json',
@@ -612,7 +622,14 @@
     if (btn) { btn.disabled = true; btn.textContent = '\u2026'; }
 
     var en = isEn();
-    renderItems([], (en ? 'Loading Bible\u2026 ' : '\u0628\u0627\u0631\u06af\u0630\u0627\u0631\u06cc \u06a9\u062a\u0627\u0628\u2026 ') + scopeLabel() + ' · ' + searchSourceLabel());
+    if (en && !isEnglishSearchSupported()) {
+      var selectedVersion = 'the selected translation';
+      try { selectedVersion = (localStorage.getItem('cog_bible_en_version') || 'unknown').toUpperCase(); } catch (e) {}
+      renderItems([], 'Search is not available for ' + selectedVersion + ' yet. The reader still shows the selected translation.');
+      if (btn) { btn.disabled = false; btn.textContent = 'Search'; }
+      return;
+    }
+    renderItems([], (en ? 'Loading Bible\\u2026 ' : '\\u0628\\u0627\\u0631\\u06af\\u0630\\u0627\\u0631\\u06cc \\u06a9\\u062a\\u0627\\u0628\\u2026 ') + scopeLabel() + ' · ' + searchSourceLabel());
 
     try {
       var verses = en ? await loadEn() : await loadFa();
