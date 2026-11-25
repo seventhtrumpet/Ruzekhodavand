@@ -123,7 +123,7 @@
   }
 
   loadScript('js/first_visit_bilingual.js', 'data-first-bilingual');
-  loadScript('js/lang_flags.js?v=flags-fix-20261124', 'data-lang-flags');
+  loadScript('js/lang_flags.js?v=lion-sun-us-flags-20261124', 'data-lang-flags');
   loadScript('js/css_restore.js', 'data-css-restore');
   loadScript('js/ads.js', 'data-ads-js');
   loadScript('js/menu_overlay_fix.js', 'data-menu-overlay-fix');
@@ -155,7 +155,7 @@
   loadCss('css/social.css', 'data-social-css');
   loadCss('css/quality.css', 'data-quality-css');
   loadCss('css/player_expand.css', 'data-player-expand-css');
-  loadScript('js/social.js?v=icons-size-20261124', 'data-social-js');
+  loadScript('js/social.js?v=footer-icons-aligned-20261124', 'data-social-js');
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
