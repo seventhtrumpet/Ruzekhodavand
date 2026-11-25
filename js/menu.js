@@ -105,6 +105,14 @@
   function loadScript(src, attr) {
     try {
       if (document.querySelector('script[' + attr + ']')) return;
+      var wantedPath = String(src).split('?')[0];
+      var existing = Array.prototype.find.call(document.scripts, function (script) {
+        return String(script.getAttribute('src') || '').split('?')[0] === wantedPath;
+      });
+      if (existing) {
+        existing.setAttribute(attr, '1');
+        return;
+      }
       var s = document.createElement('script');
       s.src = src;
       s.setAttribute(attr, '1');
@@ -123,7 +131,7 @@
   }
 
   loadScript('js/first_visit_bilingual.js?v=bible-route-language-20261125', 'data-first-bilingual');
-  loadScript('js/lang_flags.js?v=neutral-language-labels-20261125', 'data-lang-flags');
+  loadScript('js/lang_flags.js?v=single-selector-dedupe-20261125', 'data-lang-flags');
   loadScript('js/css_restore.js', 'data-css-restore');
   loadScript('js/ads.js', 'data-ads-js');
   loadScript('js/menu_overlay_fix.js', 'data-menu-overlay-fix');
@@ -135,7 +143,7 @@
   loadScript('js/text_size.js', 'data-text-size');
   loadScript('js/profile_bg.js', 'data-profile-bg');
   loadScript('js/share.js', 'data-share');
-  loadScript('js/bible-share.js?v=one-share-20261124', 'data-bible-share');
+  loadScript('js/bible-share.js?v=canonical-share-route-20261125', 'data-bible-share');
   loadScript('js/bible-share-photo.js?v=fix8', 'data-bible-share-photo');
   loadScript('js/page-share.js?v=fix8', 'data-page-share');
   loadScript('js/page_back.js', 'data-page-back');
@@ -151,11 +159,11 @@
   loadScript('js/player_expand.js', 'data-player-expand');
   loadScript('js/app_media.js', 'data-app-media');
   loadCss('css/about_fix.css', 'data-about-fix');
-  loadCss('css/mobile_header.css?v=one-selector-20261124', 'data-mobile-header');
+  loadCss('css/mobile_header.css?v=single-selector-dedupe-20261125', 'data-mobile-header');
   loadCss('css/social.css', 'data-social-css');
   loadCss('css/quality.css', 'data-quality-css');
   loadCss('css/player_expand.css', 'data-player-expand-css');
-  loadScript('js/social.js?v=footer-icons-aligned-20261124', 'data-social-js');
+  loadScript('js/social.js?v=single-load-footer-icons-20261125', 'data-social-js');
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
