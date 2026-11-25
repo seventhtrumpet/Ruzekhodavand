@@ -629,7 +629,7 @@
       if (btn) { btn.disabled = false; btn.textContent = 'Search'; }
       return;
     }
-    renderItems([], (en ? 'Loading Bible\\u2026 ' : '\\u0628\\u0627\\u0631\\u06af\\u0630\\u0627\\u0631\\u06cc \\u06a9\\u062a\\u0627\\u0628\\u2026 ') + scopeLabel() + ' · ' + searchSourceLabel());
+    renderItems([], (en ? 'Loading Bible\u2026 ' : '\u0628\u0627\u0631\u06af\u0630\u0627\u0631\u06cc \u06a9\u062a\u0627\u0628\u2026 ') + scopeLabel() + ' · ' + searchSourceLabel());
 
     try {
       var verses = en ? await loadEn() : await loadFa();
