@@ -57,8 +57,8 @@
     if (!text) {
       var route = getShareRoute();
       if (route.chapter && route.verse) {
-        var linked = document.getElementById('v-' + route.chapter + '-' + route.verse);
-        if (linked) text = (linked.textContent || '').replace(/^\\d+\\s*/, '').trim();
+        var linkedVerse = document.getElementById('v-' + route.chapter + '-' + route.verse);
+        if (linkedVerse) text = (linkedVerse.textContent || '').replace(/^\\d+\\s*/, '').trim();
         ref = route.chapter + ':' + route.verse;
       }
     }
@@ -79,18 +79,18 @@
       try {
         version = localStorage.getItem(lang === 'en' ? 'cog_bible_en_version' : 'cog_bible_fa_version') || (lang === 'en' ? 'kjv' : 'opcb');
       } catch (e) { version = lang === 'en' ? 'kjv' : 'opcb'; }
-      var params = new URLSearchParams();
-      if (route.bookId) params.set('b', String(route.bookId));
-      if (route.chapter) params.set('c', String(route.chapter));
-      if (route.verse) params.set('v', String(route.verse));
-      params.set('lang', lang);
-      params.set('version', version);
+      var routeParams = new URLSearchParams();
+      if (route.bookId) routeParams.set('b', String(route.bookId));
+      if (route.chapter) routeParams.set('c', String(route.chapter));
+      if (route.verse) routeParams.set('v', String(route.verse));
+      routeParams.set('lang', lang);
+      routeParams.set('version', version);
       var slug = '';
       try {
         slug = (window.__stBibleSlugByCanonicalId || {})[String(route.bookId)] || '';
       } catch (e2) {}
-      if (slug) params.set('slug', slug);
-      return SITE + '/bible.html?' + params.toString();
+      if (slug) routeParams.set('slug', slug);
+      return SITE + '/bible.html?' + routeParams.toString();
     } catch (e3) {}
     return SITE + '/bible.html?lang=' + (isEn() ? 'en' : 'fa');
   }
