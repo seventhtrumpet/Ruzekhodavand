@@ -101,11 +101,10 @@
       if (readLang() !== 'en') setLang('en');
     });
 
-    var oldToggle = document.getElementById('lang-toggle');
-    if (oldToggle) {
-      oldToggle.classList.add('st-lang-hidden');
-      oldToggle.style.display = 'none';
-    }
+    // Remove the legacy text toggle; the two flag buttons are the only language control.
+    document.querySelectorAll('#lang-toggle, button.lang-toggle, [data-lang-toggle]').forEach(function (oldToggle) {
+      if (oldToggle && oldToggle.parentNode) oldToggle.parentNode.removeChild(oldToggle);
+    });
 
     syncActive();
   }
@@ -115,9 +114,16 @@
     if (!document.body || window.__stFlagDeduper) return;
     window.__stFlagDeduper = new MutationObserver(function () {
       var nodes = document.querySelectorAll('.st-lang-flags');
-      for (var i = 1; i < nodes.length; i++) {
-        if (nodes[i].parentNode) nodes[i].parentNode.removeChild(nodes[i]);
-      }
+      var keep = document.getElementById('st-lang-flags');
+      nodes.forEach(function (node) {
+        if (node !== keep && node.parentNode) node.parentNode.removeChild(node);
+      });
+      document.querySelectorAll('.st-lang-flag').forEach(function (btn) {
+        if (!keep || !keep.contains(btn)) btn.remove();
+      });
+      document.querySelectorAll('#lang-toggle, button.lang-toggle, [data-lang-toggle]').forEach(function (oldToggle) {
+        if (oldToggle.parentNode) oldToggle.parentNode.removeChild(oldToggle);
+      });
     });
     window.__stFlagDeduper.observe(document.body, { childList: true, subtree: true });
   }
