@@ -63,6 +63,10 @@
     if (!actions) return;
 
     var wrap = document.getElementById('st-lang-flags');
+    // Sticky/mobile header copies can duplicate the selector; keep one selector on the page.
+    document.querySelectorAll('.st-lang-flags').forEach(function (node) {
+      if (node !== wrap && node.parentNode) node.parentNode.removeChild(node);
+    });
     if (!wrap) {
       wrap = document.createElement('div');
       wrap.id = 'st-lang-flags';
@@ -106,8 +110,22 @@
     syncActive();
   }
 
+
+  function watchForClonedHeaders() {
+    if (!document.body || window.__stFlagDeduper) return;
+    window.__stFlagDeduper = new MutationObserver(function () {
+      var nodes = document.querySelectorAll('.st-lang-flags');
+      for (var i = 1; i < nodes.length; i++) {
+        if (nodes[i].parentNode) nodes[i].parentNode.removeChild(nodes[i]);
+      }
+    });
+    window.__stFlagDeduper.observe(document.body, { childList: true, subtree: true });
+  }
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paint);
   else paint();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchForClonedHeaders);
+  else watchForClonedHeaders();
   setTimeout(paint, 400);
   setTimeout(paint, 1000);
 })();
