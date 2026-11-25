@@ -75,19 +75,20 @@
   function sharePageUrl() {
     try {
       var params = getShareRoute();
+      var route = params;
       var lang = isEn() ? 'en' : 'fa';
       var version = '';
       try {
         version = localStorage.getItem(lang === 'en' ? 'cog_bible_en_version' : 'cog_bible_fa_version') || (lang === 'en' ? 'kjv' : 'opcb');
       } catch (e) { version = lang === 'en' ? 'kjv' : 'opcb'; }
-      params.set('lang', lang);
-      params.set('version', version);
+      route.set('lang', lang);
+      route.set('version', version);
       var slug = '';
       try {
         slug = (window.__stBibleSlugByCanonicalId || {})[String(params.get('b') || params.get('book') || '')] || '';
       } catch (e2) {}
-      if (slug) params.set('slug', slug);
-      return SITE + '/bible.html?' + params.toString();
+      if (slug) route.set('slug', slug);
+      return SITE + '/bible.html?' + route.toString();
     } catch (e3) {}
     return SITE + '/bible.html?lang=' + (isEn() ? 'en' : 'fa');
   }
