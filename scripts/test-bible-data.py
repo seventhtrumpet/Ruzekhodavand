@@ -483,7 +483,7 @@ def check_reader_safeguards() -> None:
     if "var route = window.__stBibleRoute" not in first_visit or "if (route && (route.lang === 'fa' || route.lang === 'en')) return;" not in first_visit:
         fail("First-visit language fallback must respect a Bible share route without overriding a later user choice")
     menu = (ROOT / "js/menu.js").read_text(encoding="utf-8")
-    if "first_visit_bilingual.js?v=bible-route-language-20261125" not in menu or "lang_flags.js?v=neutral-language-labels-20261125" not in menu or "welcome_tip.js?v=language-choice-persist-20261125" not in menu:
+    if "first_visit_bilingual.js?v=bible-route-language-20261125" not in menu or "lang_flags.js?v=single-selector-dedupe-20261125" not in menu or "welcome_tip.js?v=language-choice-persist-20261125" not in menu:
         fail("Menu must request cache-busted language and first-visit scripts")
     bible_html = (ROOT / "bible.html").read_text(encoding="utf-8")
     if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=bible-reader-runtime-fix-20261124" not in bible_html:
@@ -493,7 +493,7 @@ def check_reader_safeguards() -> None:
     # explicitly versioned without failing on legacy static-page query strings.
     for page_name in ("index.html", "bible.html"):
         page_html = (ROOT / page_name).read_text(encoding="utf-8")
-        if "js/menu.js?v=menu-language-labels-20261125" not in page_html:
+        if "js/menu.js?v=menu-single-load-20261125" not in page_html:
             fail(f"{page_name} must request the current cache-busted menu script")
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
     if "var CACHE = 'st-v9';" not in service_worker or "/js/menu.js?v=menu-language-labels-20261125" not in service_worker:
