@@ -107,23 +107,35 @@
     });
 
     syncActive();
+    dedupeLanguageControls();
   }
 
+
+  function dedupeLanguageControls() {
+    var keep = document.getElementById('st-lang-flags');
+    document.querySelectorAll('.st-lang-flags').forEach(function (node) {
+      if (node !== keep && node.parentNode) node.parentNode.removeChild(node);
+    });
+    if (keep) {
+      var seen = {};
+      Array.prototype.forEach.call(keep.querySelectorAll('.st-lang-flag'), function (btn) {
+        var lang = btn.getAttribute('data-lang');
+        if ((lang !== 'fa' && lang !== 'en') || seen[lang]) btn.remove();
+        else seen[lang] = true;
+      });
+    }
+    document.querySelectorAll('.st-lang-flag').forEach(function (btn) {
+      if (!keep || !keep.contains(btn)) btn.remove();
+    });
+    document.querySelectorAll('#lang-toggle, button.lang-toggle, [data-lang-toggle]').forEach(function (oldToggle) {
+      if (oldToggle.parentNode) oldToggle.parentNode.removeChild(oldToggle);
+    });
+  }
 
   function watchForClonedHeaders() {
     if (!document.body || window.__stFlagDeduper) return;
     window.__stFlagDeduper = new MutationObserver(function () {
-      var nodes = document.querySelectorAll('.st-lang-flags');
-      var keep = document.getElementById('st-lang-flags');
-      nodes.forEach(function (node) {
-        if (node !== keep && node.parentNode) node.parentNode.removeChild(node);
-      });
-      document.querySelectorAll('.st-lang-flag').forEach(function (btn) {
-        if (!keep || !keep.contains(btn)) btn.remove();
-      });
-      document.querySelectorAll('#lang-toggle, button.lang-toggle, [data-lang-toggle]').forEach(function (oldToggle) {
-        if (oldToggle.parentNode) oldToggle.parentNode.removeChild(oldToggle);
-      });
+      dedupeLanguageControls();
     });
     window.__stFlagDeduper.observe(document.body, { childList: true, subtree: true });
   }
