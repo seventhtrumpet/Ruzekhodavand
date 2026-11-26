@@ -1,9 +1,10 @@
-/* Cross-device media sync via Firestore — pull aggressively so all phones see posts */
+/* Cross-device media sync via Firestore — public read required on site/media */
 (function () {
   var POSTS_KEY = 'cog_posts_v1';
   var PL_KEY = 'cog_playlists_v1';
   var LIVE_KEY = 'cog_live_v1';
   var SYNC_META = 'cog_cloud_sync_at';
+  var STATIC_URLS = ['/data/media-posts.json', 'data/media-posts.json'];
   var pushTimer = null;
   var pulling = false;
 
@@ -44,6 +45,9 @@
       window.posts = merged;
     } catch (e) {}
     try {
+      localStorage.setItem(POSTS_KEY, JSON.stringify(merged));
+    } catch (e) {}
+    try {
       if (typeof window.renderMedia === 'function') window.renderMedia();
     } catch (e) {}
     try {
@@ -58,6 +62,29 @@
     try {
       window.dispatchEvent(new CustomEvent('cog-posts-updated', { detail: { posts: merged } }));
     } catch (e) {}
+  }
+
+  function loadStaticPosts() {
+    var chain = Promise.resolve(null);
+    STATIC_URLS.forEach(function (url) {
+      chain = chain.then(function (prev) {
+        if (prev && prev.length) return prev;
+        return fetch(url + (url.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now())
+          .then(function (r) {
+            if (!r.ok) return null;
+            return r.json();
+          })
+          .then(function (data) {
+            if (Array.isArray(data)) return data;
+            if (data && Array.isArray(data.posts)) return data.posts;
+            return null;
+          })
+          .catch(function () {
+            return null;
+          });
+      });
+    });
+    return chain;
   }
 
   window.pushMediaToCloud = function pushToCloud() {
@@ -86,85 +113,124 @@
       .doc('media')
       .set(payload)
       .then(function () {
-        localStorage.setItem(SYNC_META, String(payload.updatedAt));
         console.log('[cloud] pushed', payload.posts.length, 'posts');
+        try {
+          localStorage.setItem(SYNC_META, String(Date.now()));
+        } catch (e) {}
         return true;
       })
       .catch(function (err) {
-        console.warn('[cloud] push failed', err && err.message);
+        console.warn('[cloud] push failed', err && (err.code || err.message));
         return false;
       });
   };
 
   window.pullMediaFromCloud = function pullFromCloud() {
-    if (!hasFirestore() || pulling) return Promise.resolve(null);
+    if (pulling) return Promise.resolve(null);
     pulling = true;
+
+    var localPosts = [];
+    try {
+      localPosts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
+    } catch (e) {}
+    var localAt = 0;
+    try {
+      localAt = Number(localStorage.getItem(SYNC_META) || 0) || 0;
+    } catch (e) {}
+
+    function finish(merged) {
+      pulling = false;
+      return merged;
+    }
+
+    function mergeRemote(remotePosts, remoteAt) {
+      remotePosts = remotePosts || [];
+      remoteAt = remoteAt || 0;
+      var useCloud =
+        remotePosts.length > 0 &&
+        (localPosts.length === 0 ||
+          remoteAt >= localAt ||
+          remotePosts.length >= localPosts.length);
+      if (!useCloud) return null;
+
+      var byId = {};
+      remotePosts.forEach(function (p) {
+        if (p && p.id) byId[p.id] = p;
+      });
+      localPosts.forEach(function (p) {
+        if (!p || !p.id) return;
+        if (!byId[p.id]) {
+          byId[p.id] = p;
+        } else if (p.dataUrl && !byId[p.id].dataUrl) {
+          byId[p.id].dataUrl = p.dataUrl;
+        }
+      });
+      var merged = Object.keys(byId).map(function (k) {
+        return byId[k];
+      });
+      merged.sort(function (a, b) {
+        return (
+          new Date(b.date || b.createdAt || b.created || 0) -
+          new Date(a.date || a.createdAt || a.created || 0)
+        );
+      });
+      try {
+        localStorage.setItem(POSTS_KEY, JSON.stringify(merged));
+        localStorage.setItem(SYNC_META, String(Math.max(remoteAt, Date.now())));
+      } catch (e) {}
+      console.log('[cloud] pulled', merged.length, 'posts');
+      return merged;
+    }
+
+    if (!hasFirestore()) {
+      return loadStaticPosts()
+        .then(function (staticPosts) {
+          if (staticPosts && staticPosts.length) {
+            return finish(mergeRemote(staticPosts, Date.now()));
+          }
+          return finish(null);
+        })
+        .catch(function () {
+          return finish(null);
+        });
+    }
+
     return firebase
       .firestore()
       .collection('site')
       .doc('media')
       .get()
       .then(function (snap) {
-        pulling = false;
-        if (!snap.exists) return null;
+        if (!snap.exists) {
+          console.warn('[cloud] site/media missing — try static fallback');
+          return loadStaticPosts().then(function (staticPosts) {
+            return finish(staticPosts && staticPosts.length ? mergeRemote(staticPosts, Date.now()) : null);
+          });
+        }
         var data = snap.data() || {};
-        var remoteAt = data.updatedAt || 0;
-        var localAt = parseInt(localStorage.getItem(SYNC_META) || '0', 10) || 0;
-        var localPosts = [];
-        try {
-          localPosts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
-        } catch (e) {}
         var remotePosts = Array.isArray(data.posts) ? data.posts : [];
-
-        // Always take cloud if it has posts and local is empty OR cloud is newer OR cloud has more
-        var useCloud =
-          remotePosts.length > 0 &&
-          (localPosts.length === 0 ||
-            remoteAt >= localAt ||
-            remotePosts.length >= localPosts.length);
-
-        if (!useCloud) return null;
-
-        var byId = {};
-        // Start from remote (source of truth for other phones)
-        remotePosts.forEach(function (p) {
-          if (p && p.id) byId[p.id] = p;
-        });
-        // Keep local-only posts (not yet pushed) and local dataUrls
-        localPosts.forEach(function (p) {
-          if (!p || !p.id) return;
-          if (!byId[p.id]) {
-            byId[p.id] = p;
-          } else if (p.dataUrl && !byId[p.id].dataUrl) {
-            byId[p.id].dataUrl = p.dataUrl;
-          }
-        });
-
-        var merged = Object.keys(byId).map(function (k) {
-          return byId[k];
-        });
-        merged.sort(function (a, b) {
-          return (
-            new Date(b.date || b.createdAt || b.created || 0) -
-            new Date(a.date || a.createdAt || a.created || 0)
-          );
-        });
-
-        localStorage.setItem(POSTS_KEY, JSON.stringify(merged));
+        var remoteAt = Number(data.updatedAt || 0) || 0;
         if (Array.isArray(data.playlists)) {
-          localStorage.setItem(PL_KEY, JSON.stringify(data.playlists));
+          try {
+            localStorage.setItem(PL_KEY, JSON.stringify(data.playlists));
+          } catch (e) {}
         }
         if (data.live && typeof data.live === 'object') {
-          localStorage.setItem(LIVE_KEY, JSON.stringify(data.live));
+          try {
+            localStorage.setItem(LIVE_KEY, JSON.stringify(data.live));
+          } catch (e) {}
         }
-        localStorage.setItem(SYNC_META, String(Math.max(remoteAt, Date.now())));
-        console.log('[cloud] pulled', merged.length, 'posts');
-        return merged;
+        return finish(mergeRemote(remotePosts, remoteAt));
       })
       .catch(function (err) {
-        pulling = false;
-        console.warn('[cloud] pull failed', err && err.message);
-        return null;
+        console.warn('[cloud] pull failed', err && (err.code || err.message));
+        window.__stCloudMediaError = (err && (err.code || err.message)) || 'permission-denied';
+        return loadStaticPosts().then(function (staticPosts) {
+          if (staticPosts && staticPosts.length) {
+            return finish(mergeRemote(staticPosts, Date.now()));
+          }
+          return finish(null);
+        });
       });
   };
 
@@ -180,12 +246,10 @@
 
   function tryPull(attempt) {
     attempt = attempt || 0;
-    if (!hasFirestore()) {
-      if (attempt < 15) {
-        setTimeout(function () {
-          tryPull(attempt + 1);
-        }, 400);
-      }
+    if (!hasFirestore() && attempt < 8) {
+      setTimeout(function () {
+        tryPull(attempt + 1);
+      }, 400);
       return;
     }
     window.pullMediaFromCloud().then(function (merged) {
@@ -195,7 +259,6 @@
 
   function boot() {
     tryPull(0);
-    // Extra pulls for slow networks / late Firebase init
     setTimeout(function () {
       tryPull(0);
     }, 2500);
