@@ -495,10 +495,10 @@ def check_reader_safeguards() -> None:
     # explicitly versioned without failing on legacy static-page query strings.
     for page_name in ("index.html", "bible.html"):
         page_html = (ROOT / page_name).read_text(encoding="utf-8")
-        if "js/menu.js?v=menu-single-load-20261125" not in page_html:
+        if "js/menu.js?v=mobile-header-click-layer-20261126" not in page_html:
             fail(f"{page_name} must request the current cache-busted menu script")
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
-    if "var CACHE = 'st-v10';" not in service_worker or "/js/menu.js?v=menu-single-load-20261125" not in service_worker:
+    if "var CACHE = 'st-v10';" not in service_worker or "/js/menu.js?v=mobile-header-click-layer-20261126" not in service_worker:
         fail("Service worker cache and precache must refresh the updated menu script")
     licenses = (ROOT / "bible-licenses.html").read_text(encoding="utf-8")
     if "500,616 Scripture verse records" not in licenses or "۵۰۰٬۶۱۶ رکورد آیه" not in licenses:
