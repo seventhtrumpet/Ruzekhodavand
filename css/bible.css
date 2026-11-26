@@ -274,6 +274,8 @@ body.lang-en .mb-verse { text-align: left; }
   box-shadow: 0 -4px 16px rgba(0,0,0,0.2);
 }
 .mb-actions.hidden { display: none !important; }
+.mb-selection-tools { display: inline-flex; align-items: center; gap: 0.4rem; }
+.mb-selection-tools.hidden { display: none !important; }
 .mb-sel-label {
   flex: 1 1 auto;
   min-width: 0;
