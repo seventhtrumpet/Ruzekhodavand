@@ -150,7 +150,19 @@
     var en = isEn();
 
     if (app === 'wa') {
-      window.location.href = 'https://wa.me/?text=' + encodeURIComponent(parts.full);
+      // Prefer the native Android share sheet with the generated profile-branded
+      // image attached and the verse + canonical passage URL as its caption.
+      // The visitor can then choose WhatsApp and "My Status".
+      if (typeof window.ST_sharePhoto === 'function') {
+        window.ST_sharePhoto(false, 'wa', {
+          text: parts.payload.text,
+          ref: parts.payload.ref,
+          url: parts.url,
+          title: parts.title
+        });
+      } else {
+        window.location.href = 'https://wa.me/?text=' + encodeURIComponent(parts.full);
+      }
       return;
     }
 
