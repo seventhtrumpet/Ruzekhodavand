@@ -131,7 +131,7 @@
   }
 
   loadScript('js/first_visit_bilingual.js?v=bible-route-language-20261125', 'data-first-bilingual');
-  loadScript('js/lang_flags.js?v=single-selector-dedupe-20261125', 'data-lang-flags');
+  loadScript('js/lang_flags.js?v=single-language-controls-20261126b', 'data-lang-flags');
   loadScript('js/css_restore.js', 'data-css-restore');
   loadScript('js/ads.js', 'data-ads-js');
   loadScript('js/menu_overlay_fix.js', 'data-menu-overlay-fix');
