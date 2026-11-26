@@ -157,7 +157,7 @@
     code = code.replace("      applyChrome();\n      await renderBook(true);", "      applyChrome();\n      const availableIds = availableBooks().map(b => b.id);\n      if (!availableIds.includes(Number(bookId))) { bookId = availableIds.includes(480) ? 480 : (availableIds[0] || 480); chapter = 1; verse = 1; saveState(); }\n      await renderBook(true);");
     if (code.indexOf("const availableIds = availableBooks().map(b => b.id)") < 0) throw new Error('Language-toggle canon fallback patch did not apply');
 
-    code = code.replace(/mb-sel-actions/g, 'mb-actions');
+    code = code.replace(/mb-sel-actions/g, 'mb-selection-tools');
     code = code.replace(/mb-book-btn/g, 'mb-cell');
     code = code.replace(/mb-num-btn/g, 'mb-cell');
 
