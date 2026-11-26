@@ -138,7 +138,7 @@
   loadScript('js/bugfixes.js', 'data-bugfixes');
   loadScript('js/footer_legal.js', 'data-footer-legal');
   loadScript('js/privacy_banner.js', 'data-privacy-banner');
-  loadScript('js/logo_data.js', 'data-logo-data');
+  loadScript('js/logo_data.js?v=profile-logo-20261126', 'data-logo-data');
   loadScript('js/visits.js', 'data-visits');
   loadScript('js/text_size.js', 'data-text-size');
   loadScript('js/profile_bg.js', 'data-profile-bg');
