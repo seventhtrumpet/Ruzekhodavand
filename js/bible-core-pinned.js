@@ -309,9 +309,9 @@
     }).forEach(key => {
       const [c, v] = key.split(':');
       const el = document.getElementById('v-' + c + '-' + v);
-      if (el) lines.push(c + ':' + v + ' — ' + el.textContent.replace(/^\\d+/, '').trim());
+      if (el) lines.push(c + ':' + v + ' — ' + el.textContent.replace(/^\d+/, '').trim());
     });
-    const text = bookLabel() + '\\n' + lines.join('\\n');
+    const text = bookLabel() + '\n' + lines.join('\n');
     const copied = () => {
       const btn = document.getElementById('mb-copy');
       if (btn) { const o = btn.textContent; btn.textContent = t('copied'); setTimeout(() => { btn.textContent = o; }, 1200); }
