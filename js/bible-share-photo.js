@@ -375,7 +375,8 @@
       } else {
         showError();
       }
-    }).catch(function () {
+    }).catch(function (error) {
+      try { console.error('Bible share image generation failed', error); } catch (logError) {}
       showError();
     });
   };
