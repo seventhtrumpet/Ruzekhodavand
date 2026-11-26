@@ -275,7 +275,7 @@
       '</p>' +
       '<div class="st-photo-actions">' +
       '<button type="button" class="st-photo-save" id="st-photo-share">' +
-      (en ? 'Share photo + link' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0639\u06a9\u0633 + \u0644\u06cc\u0646\u06a9') + '</button>' +
+      (isWhatsApp ? (en ? 'Share to WhatsApp' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u062f\u0631 WhatsApp') : (en ? 'Share photo + link' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0639\u06a9\u0633 + \u0644\u06cc\u0646\u06a9')) + '</button>' +
       '<button type="button" class="st-photo-save" id="st-photo-save">' +
       (en ? 'Save picture' : '\u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633') + '</button>' +
       (isWhatsApp ? '' : '<button type="button" class="st-photo-open" id="st-photo-open">' +
