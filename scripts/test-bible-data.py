@@ -536,7 +536,7 @@ def check_reader_safeguards() -> None:
         fail("Bible share script URL is missing the canonical edition-aware deep-link cache key")
 
     save_start = photo.find("document.getElementById('st-photo-save').onclick")
-    save_end = photo.find("document.getElementById('st-photo-open').onclick", save_start)
+    save_end = photo.find("var openSocialBtn = document.getElementById('st-photo-open')", save_start)
     save_handler = photo[save_start:save_end] if save_start >= 0 and save_end > save_start else ""
     if "window.ST_sharePhoto(false, 'wa'" not in share:
         fail("WhatsApp Bible sharing must offer the profile-branded photo with the verse and passage URL")
