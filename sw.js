@@ -1,5 +1,5 @@
 /* Seventh Trumpet — offline + cache (st-v5: network-first for JS) */
-var CACHE = 'st-v11';
+var CACHE = 'st-v12';
 var PRECACHE = [
   '/',
   '/index.html',
@@ -8,7 +8,7 @@ var PRECACHE = [
   '/css/style.css',
   '/css/menu.css',
   '/css/quality.css',
-  '/js/menu.js?v=mobile-header-click-layer-20261126',
+  '/js/menu.js?v=single-language-controls-20261126b',
   '/js/app.js',
   '/js/app_core.js'
 ];
