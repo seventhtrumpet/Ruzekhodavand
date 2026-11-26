@@ -5,6 +5,7 @@
   Object.keys(slugById).forEach(function (id) { idBySlug[slugById[id]] = Number(id); });
   window.__stBibleSlugByCanonicalId = slugById;
   window.__stBibleCanonicalIdBySlug = idBySlug;
+  try { window.history.scrollRestoration = 'manual'; } catch (e0) {}
   try {
     var route = new URLSearchParams(window.location.search);
     var lang = route.get('lang');
