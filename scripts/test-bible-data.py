@@ -492,7 +492,7 @@ def check_reader_safeguards() -> None:
     if "first_visit_bilingual.js?v=bible-route-language-20261125" not in menu or "lang_flags.js?v=single-selector-dedupe-20261125" not in menu or "welcome_tip.js?v=language-choice-persist-20261125" not in menu:
         fail("Menu must request cache-busted language and first-visit scripts")
     bible_html = (ROOT / "bible.html").read_text(encoding="utf-8")
-    if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=bible-reader-runtime-fix-20261124" not in bible_html:
+    if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=bible-reader-route-cache-20261126" not in bible_html:
         fail("Bible page must request cache-busted Persian and Bible reader scripts")
     # JavaScript is network-first in the service worker, so older page query
     # strings still receive current menu code. Keep the two primary entry points
