@@ -159,11 +159,11 @@
   loadScript('js/player_expand.js', 'data-player-expand');
   loadScript('js/app_media.js', 'data-app-media');
   loadCss('css/about_fix.css', 'data-about-fix');
-  loadCss('css/mobile_header.css?v=mobile-header-click-layer-20261126', 'data-mobile-header');
+  loadCss('css/mobile_header.css?v=profile-social-lang-20261126', 'data-mobile-header');
   loadCss('css/social.css', 'data-social-css');
   loadCss('css/quality.css', 'data-quality-css');
   loadCss('css/player_expand.css', 'data-player-expand-css');
-  loadScript('js/social.js?v=single-load-footer-icons-20261125', 'data-social-js');
+  loadScript('js/social.js?v=brand-icons-20261126', 'data-social-js');
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
