@@ -329,7 +329,8 @@
       a.click();
       setTimeout(function () { try { a.remove(); } catch (e) {} }, 400);
     };
-    document.getElementById('st-photo-open').onclick = function () {
+    var openSocialBtn = document.getElementById('st-photo-open');
+    if (openSocialBtn) openSocialBtn.onclick = function () {
       if (isFb) window.open('https://www.facebook.com/', '_blank', 'noopener');
       else window.open('https://www.instagram.com/seventhtrumpet.media', '_blank', 'noopener');
     };
