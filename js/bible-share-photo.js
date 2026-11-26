@@ -269,20 +269,19 @@
       '<p class="st-photo-title">' + (en ? 'Ready' : '\u0622\u0645\u0627\u062f\u0647') + '</p>' +
       '<img class="st-photo-preview" alt="share" src="' + dataUrl + '" />' +
       '<p class="st-photo-hint">' +
-      (en
-        ? 'Share sends the photo + verse + a real tappable website link.'
-        : '\u0627\u0634\u062a\u0631\u0627\u06a9: \u0639\u06a9\u0633 + \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9 \u0642\u0627\u0628\u0644\u0650 \u0644\u0645\u0633.') +
+      (isWhatsApp
+        ? (en ? 'Share the profile-branded picture with the verse and passage link. Choose WhatsApp, then My Status.' : '\u0639\u06a9\u0633 \u0647\u0645\u0631\u0627\u0647 \u0622\u06cc\u0647 \u0648 \u067e\u06cc\u0648\u0646\u062f \u0631\u0627 \u0627\u0634\u062a\u0631\u0627\u06a9 \u06a9\u0646\u06cc\u062f\u061b WhatsApp \u0648 \u0633\u067e\u0633 My Status \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f.')
+        : (en ? 'Share sends the photo + verse + a real tappable website link.' : '\u0627\u0634\u062a\u0631\u0627\u06a9: \u0639\u06a9\u0633 + \u0622\u06cc\u0647 + \u0644\u06cc\u0646\u06a9 \u0642\u0627\u0628\u0644\u0650 \u0644\u0645\u0633.')) +
       '</p>' +
       '<div class="st-photo-actions">' +
       '<button type="button" class="st-photo-save" id="st-photo-share">' +
       (en ? 'Share photo + link' : '\u0627\u0634\u062a\u0631\u0627\u06a9 \u0639\u06a9\u0633 + \u0644\u06cc\u0646\u06a9') + '</button>' +
       '<button type="button" class="st-photo-save" id="st-photo-save">' +
       (en ? 'Save picture' : '\u0630\u062e\u06cc\u0631\u0647 \u0639\u06a9\u0633') + '</button>' +
-      '<button type="button" class="st-photo-open" id="st-photo-open">' +
+      (isWhatsApp ? '' : '<button type="button" class="st-photo-open" id="st-photo-open">' +
       (isFb
         ? (en ? 'Open Facebook' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0641\u06cc\u0633\u0628\u0648\u06a9')
-        : (en ? 'Open Instagram' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645')) +
-      '</button>' +
+        : (en ? 'Open Instagram' : '\u0628\u0627\u0632 \u06a9\u0631\u062f\u0646 \u0627\u06cc\u0646\u0633\u062a\u0627\u06af\u0631\u0627\u0645')) + '</button>') +
       '<button type="button" class="st-photo-close" id="st-photo-close">' +
       (en ? 'Done' : '\u062a\u0645\u0627\u0645') + '</button>' +
       '</div></div>';
