@@ -188,3 +188,13 @@ html, body {
   visibility: visible !important;
   opacity: 1 !important;
 }
+
+
+/* Keep language controls clickable above the social links on narrow headers. */
+@media (max-width: 900px) {
+  .header-brand { position: relative !important; z-index: 1 !important; }
+  #header-social { position: relative !important; z-index: 1 !important; }
+  .header-actions { position: relative !important; z-index: 20 !important; }
+  #st-lang-flags { position: relative !important; z-index: 21 !important; }
+  #st-lang-flags .st-lang-flag { position: relative !important; z-index: 22 !important; }
+}
