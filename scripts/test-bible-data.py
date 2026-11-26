@@ -333,6 +333,8 @@ def check_reader_safeguards() -> None:
         fail("Runtime patch must replace the complete English chapter loader and define edition-specific request URLs")
     if "const localEnglishBookCache = {};" not in reader or "if (isOdr || isLocalEnglish) localEnglishBookCache[cacheKey] = data;" not in reader:
         fail("Local English and Original Douay-Rheims book JSON must be cached once per book and edition")
+    if "const oldScrollBehavior = root.style.scrollBehavior" not in reader:
+        fail("Shared Bible route restoration must bypass global smooth scrolling for immediate verse positioning")
     if "const chapterData = bookData && bookData.chapters[String(chapter)];" not in reader or "requestAnimationFrame(() => scrollToRef(chapter, verse, false));" not in reader:
         fail("English Bible deep links must render and scroll to the requested chapter and verse")
     if "const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885','msb']" not in reader:
@@ -453,7 +455,7 @@ def check_reader_safeguards() -> None:
         fail("Reader must load the selected source chapter instead of assuming chapter 1")
     if "chapter = CHAPTER_STARTS[bookId] || 1" not in reader:
         fail("Selecting a book with a non-1 source chapter start must open its first available source chapter")
-    if "js/bible.js?v=bible-reader-scroll-restore-20261126" not in html or "js/bible_search.js?v=english-edition-canon-20261124" not in html:
+    if "js/bible.js?v=bible-reader-fast-route-20261126" not in html or "js/bible_search.js?v=english-edition-canon-20261124" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
     for label in ("ERV — English Revised Version (1885, 80 texts)", "WEBBE — World English Bible British Edition (81 texts)"):
@@ -492,7 +494,7 @@ def check_reader_safeguards() -> None:
     if "first_visit_bilingual.js?v=bible-route-language-20261125" not in menu or "lang_flags.js?v=single-selector-dedupe-20261125" not in menu or "welcome_tip.js?v=language-choice-persist-20261125" not in menu:
         fail("Menu must request cache-busted language and first-visit scripts")
     bible_html = (ROOT / "bible.html").read_text(encoding="utf-8")
-    if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=bible-reader-scroll-restore-20261126" not in bible_html:
+    if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=bible-reader-fast-route-20261126" not in bible_html:
         fail("Bible page must request cache-busted Persian and Bible reader scripts")
     # JavaScript is network-first in the service worker, so older page query
     # strings still receive current menu code. Keep the two primary entry points
