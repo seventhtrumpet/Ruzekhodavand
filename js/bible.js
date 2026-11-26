@@ -64,7 +64,7 @@
     // Replace the pinned core's chapter loader as one complete unit. The pinned
     // core's historical requestUrl reference is undefined; patching a smaller
     // fragment is fragile and can silently leave every English chapter blank.
-    code = code.replace(/  async function loadEnChapter\(id, ch\) \{[\s\S]*?\n  \}\n\n  function escapeHtml/, `  async function loadEnChapter(id, ch) {
+    code = code.replace(/  async function loadEnChapter\(id, ch\) \{[\s\S]*?\n  \}\n\n  function escapeHtml/, `  const localEnglishBookCache = {};\n  async function loadEnChapter(id, ch) {
     const b = meta.find(x => x.id === id);
     if (!b) return null;
     if (!enCache[id]) enCache[id] = { id, name: b.en, chapters: {} };
@@ -87,9 +87,16 @@
             ? 'https://free.bible/bible/' + selectedTranslation + '/' + bookSlug + '/' + ch + '.json'
             : '';
       if (!requestUrl) throw new Error('Unsupported Bible edition: ' + selectedTranslation);
-      const res = await fetch(requestUrl);
-      if (!res.ok) throw new Error('Chapter request failed: ' + res.status);
-      const data = await res.json();
+      const cacheKey = selectedTranslation + ':' + id;
+      let data;
+      if ((isOdr || isLocalEnglish) && localEnglishBookCache[cacheKey]) {
+        data = localEnglishBookCache[cacheKey];
+      } else {
+        const res = await fetch(requestUrl);
+        if (!res.ok) throw new Error('Chapter request failed: ' + res.status);
+        data = await res.json();
+        if (isOdr || isLocalEnglish) localEnglishBookCache[cacheKey] = data;
+      }
       let rows = [];
       if (isOdr) {
         const entry = (data.chapters || []).find(item => Number(item.chapter) === Number(ch));
@@ -117,6 +124,11 @@
   function escapeHtml`);
     if (code.indexOf('async function loadEnChapter(id, ch)') < 0 || code.indexOf('const requestUrl = isOdr') < 0) {
       throw new Error('Reader core chapter-loader patch did not apply');
+    }
+
+    code = code.replace(/  async function renderBook\(forceReload\) \{[\s\S]*?\n  \}\n\n  function clearSelection/, "  async function renderBook(forceReload) {\n    const box = document.getElementById('bible-verses');\n    const heading = document.getElementById('bible-heading');\n    const b = meta.find(x => x.id === bookId);\n    if (!b || !box) return;\n    loadingBook = true;\n    heading.textContent = bookLabel();\n    updateRef();\n    saveState();\n    clearSelection();\n    if (forceReload || !box.querySelector('.mb-chapter')) {\n      box.innerHTML = '<p class=\"bible-loading\">' + t('bibleLoading') + '</p>';\n    }\n    try {\n      if (currentLang === 'fa') {\n        const data = await loadFaBook(bookId);\n        if (!data || !data.chapters) {\n          box.innerHTML = '<p class=\"bible-loading\">' + t('errLoad') + '</p>';\n          loadingBook = false;\n          return;\n        }\n        const chNums = Object.keys(data.chapters).map(Number).sort((a,c)=>a-c);\n        box.innerHTML = chNums.map(ch => buildChapterHtml(ch, data.chapters[String(ch)])).join('');\n        if (!chNums.includes(chapter)) chapter = chNums[0] || 1;\n        loadingBook = false;\n        updateRef();\n        requestAnimationFrame(() => scrollToRef(chapter, verse, false));\n      } else {\n        const chapterStart = CHAPTER_STARTS[bookId] || 1;\n        const chapterMax = CHAPTER_COUNTS[bookId] || chapterStart;\n        if (!Number.isInteger(chapter) || chapter < chapterStart || chapter > chapterMax) chapter = chapterStart;\n        await loadEnChapter(bookId, chapter);\n        const bookData = enCache[bookId];\n        const chapterData = bookData && bookData.chapters[String(chapter)];\n        if (!chapterData) {\n          box.innerHTML = '<p class=\"bible-loading\">' + t('errLoad') + '</p>';\n          loadingBook = false;\n          return;\n        }\n        box.innerHTML = buildChapterHtml(chapter, chapterData);\n        loadingBook = false;\n        updateRef();\n        requestAnimationFrame(() => scrollToRef(chapter, verse, false));\n      }\n    } catch (e) {\n      box.innerHTML = '<p class=\"bible-loading\">' + t('errNet') + '</p>';\n      loadingBook = false;\n    }\n  }\n\n  function clearSelection");
+    if (code.indexOf("const chapterData = bookData && bookData.chapters[String(chapter)];") < 0) {
+      throw new Error('Requested-chapter-first reader patch did not apply');
     }
 
     // Expose each edition's complete source canon without duplicating shared metadata.
