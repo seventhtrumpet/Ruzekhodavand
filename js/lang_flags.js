@@ -112,11 +112,15 @@
 
 
   function dedupeLanguageControls() {
-    var keep = document.getElementById('st-lang-flags');
+    var keep = document.querySelector('.header .header-actions #st-lang-flags') || document.getElementById('st-lang-flags');
     document.querySelectorAll('.st-lang-flags').forEach(function (node) {
       if (node !== keep && node.parentNode) node.parentNode.removeChild(node);
     });
     if (keep) {
+      if (keep.parentElement && !keep.parentElement.matches('.header .header-actions')) {
+        var headerActions = document.querySelector('.header .header-actions');
+        if (headerActions) headerActions.insertBefore(keep, headerActions.firstChild);
+      }
       var seen = {};
       Array.prototype.forEach.call(keep.querySelectorAll('.st-lang-flag'), function (btn) {
         var lang = btn.getAttribute('data-lang');
