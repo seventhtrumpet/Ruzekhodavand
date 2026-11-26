@@ -4,7 +4,6 @@
   var INTERVAL_MS = 4000;
   var MAX_ITEMS = 5;
   var card = null;
-  var container = null;
   var titleEl = null;
   var textEl = null;
   var typeEl = null;
@@ -243,14 +242,6 @@
 
   function applyPosts(list) {
     items = pickSubset(list);
-    if (container) container.hidden = !items.length;
-    if (!items.length) {
-      stop();
-      if (card) { card.classList.remove('is-visible'); card.classList.add('is-empty'); }
-      if (dotsEl) dotsEl.innerHTML = '';
-      currentPost = null;
-      return;
-    }
     if (card) card.classList.remove('is-empty');
     start();
   }
@@ -291,7 +282,6 @@
   }
 
   function boot() {
-    container = document.getElementById('media-rotator');
     card = document.getElementById('media-rotator-card');
     titleEl = document.getElementById('media-rotator-title');
     textEl = document.getElementById('media-rotator-text');
