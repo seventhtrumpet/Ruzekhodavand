@@ -352,8 +352,11 @@
       btn.addEventListener('click', async () => {
         bookId = Number(btn.getAttribute('data-book'));
         chapter = 1; verse = 1;
-        closeSel();
+        updateRef();
+        saveState();
         await renderBook(true);
+        await renderChapterGrid();
+        showTab('chapters');
       });
     });
   }
