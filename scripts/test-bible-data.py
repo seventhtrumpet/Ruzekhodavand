@@ -476,6 +476,8 @@ def check_reader_safeguards() -> None:
     lang_flags = (ROOT / "js/lang_flags.js").read_text(encoding="utf-8")
     if "IRAN_SVG" in lang_flags or "Historical Persian Lion and Sun flag" not in lang_flags or "United States flag" not in lang_flags:
         fail("Language flags must use the historical Persian Lion and Sun and United States designs, never the Islamic Republic flag")
+    if "function dedupeLanguageControls()" not in lang_flags or "new MutationObserver" not in lang_flags or "dedupeLanguageControls();" not in lang_flags:
+        fail("Language selector must continuously remove cloned wrappers, orphan flags, and duplicate controls")
     welcome = (ROOT / "js/welcome_tip.js").read_text(encoding="utf-8")
     first_visit = (ROOT / "js/first_visit_bilingual.js").read_text(encoding="utf-8")
     if "var bibleRoute = window.__stBibleRoute" not in welcome or "setLang(bibleRoute.lang, true)" not in welcome:
