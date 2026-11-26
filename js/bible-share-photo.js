@@ -260,6 +260,7 @@
     closePreview();
     var en = isEn();
     var isFb = app === 'fb';
+    var isWhatsApp = app === 'wa';
     var ov = document.createElement('div');
     ov.id = 'st-photo-overlay';
     ov.className = 'st-photo-overlay';
@@ -311,7 +312,14 @@
 
     var shareBtn = document.getElementById('st-photo-share');
     if (shareBtn) shareBtn.onclick = function () {
-      if (!doFileShare()) document.getElementById('st-photo-save').click();
+      if (!doFileShare()) {
+        if (isWhatsApp && payload) {
+          var fallbackText = (payload.text ? payload.text + '\\n\\n' : '') + (payload.ref ? payload.ref + '\\n' : '') + (payload.url || siteUrl());
+          window.location.href = 'https://wa.me/?text=' + encodeURIComponent(fallbackText);
+        } else {
+          document.getElementById('st-photo-save').click();
+        }
+      }
     };
 
     document.getElementById('st-photo-save').onclick = function () {
