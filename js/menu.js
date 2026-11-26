@@ -159,7 +159,7 @@
   loadScript('js/player_expand.js', 'data-player-expand');
   loadScript('js/app_media.js', 'data-app-media');
   loadCss('css/about_fix.css', 'data-about-fix');
-  loadCss('css/mobile_header.css?v=single-selector-dedupe-20261125', 'data-mobile-header');
+  loadCss('css/mobile_header.css?v=mobile-header-click-layer-20261126', 'data-mobile-header');
   loadCss('css/social.css', 'data-social-css');
   loadCss('css/quality.css', 'data-quality-css');
   loadCss('css/player_expand.css', 'data-player-expand-css');
