@@ -455,7 +455,7 @@ def check_reader_safeguards() -> None:
         fail("Reader must load the selected source chapter instead of assuming chapter 1")
     if "chapter = CHAPTER_STARTS[bookId] || 1" not in reader:
         fail("Selecting a book with a non-1 source chapter start must open its first available source chapter")
-    if "js/bible.js?v=bible-reader-fast-route-20261126" not in html or "js/bible_search.js?v=english-edition-canon-20261124" not in html:
+    if "js/bible.js?v=selection-copy-clear-20261126" not in html or "js/bible_search.js?v=english-edition-canon-20261124" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
     for label in ("ERV — English Revised Version (1885, 80 texts)", "WEBBE — World English Bible British Edition (81 texts)"):
@@ -494,20 +494,20 @@ def check_reader_safeguards() -> None:
     if "var route = window.__stBibleRoute" not in first_visit or "if (route && (route.lang === 'fa' || route.lang === 'en')) return;" not in first_visit:
         fail("First-visit language fallback must respect a Bible share route without overriding a later user choice")
     menu = (ROOT / "js/menu.js").read_text(encoding="utf-8")
-    if "first_visit_bilingual.js?v=bible-route-language-20261125" not in menu or "lang_flags.js?v=single-selector-dedupe-20261125" not in menu or "welcome_tip.js?v=language-choice-persist-20261125" not in menu:
+    if "first_visit_bilingual.js?v=bible-route-language-20261125" not in menu or "lang_flags.js?v=single-language-controls-20261126b" not in menu or "welcome_tip.js?v=language-choice-persist-20261125" not in menu:
         fail("Menu must request cache-busted language and first-visit scripts")
     bible_html = (ROOT / "bible.html").read_text(encoding="utf-8")
-    if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=bible-reader-fast-route-20261126" not in bible_html:
+    if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=selection-copy-clear-20261126" not in bible_html:
         fail("Bible page must request cache-busted Persian and Bible reader scripts")
     # JavaScript is network-first in the service worker, so older page query
     # strings still receive current menu code. Keep the two primary entry points
     # explicitly versioned without failing on legacy static-page query strings.
     for page_name in ("index.html", "bible.html"):
         page_html = (ROOT / page_name).read_text(encoding="utf-8")
-        if "js/menu.js?v=mobile-header-click-layer-20261126" not in page_html:
+        if "js/menu.js?v=single-language-controls-20261126b" not in page_html:
             fail(f"{page_name} must request the current cache-busted menu script")
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
-    if "var CACHE = 'st-v11';" not in service_worker or "/js/menu.js?v=mobile-header-click-layer-20261126" not in service_worker:
+    if "var CACHE = 'st-v12';" not in service_worker or "/js/menu.js?v=single-language-controls-20261126b" not in service_worker:
         fail("Service worker cache and precache must refresh the updated menu script")
     licenses = (ROOT / "bible-licenses.html").read_text(encoding="utf-8")
     if "500,616 Scripture verse records" not in licenses or "۵۰۰٬۶۱۶ رکورد آیه" not in licenses:
