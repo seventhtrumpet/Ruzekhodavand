@@ -50,6 +50,16 @@
     a.setAttribute('aria-label', item.label);
     a.title = item.label;
     a.innerHTML = item.svg;
+    var brand = {
+      yt: '#ff0033',
+      ig: 'linear-gradient(45deg,#f9ce34 0%,#ee2a7b 50%,#6228d7 100%)',
+      tt: '#111111',
+      fb: '#1877f2',
+      wa: '#25d366'
+    };
+    if (brand[item.id]) a.style.setProperty('background', brand[item.id], 'important');
+    var icon = a.querySelector('svg');
+    if (icon) icon.style.setProperty('fill', '#ffffff', 'important');
     return a;
   }
 
