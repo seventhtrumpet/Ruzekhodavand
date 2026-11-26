@@ -1,0 +1,5 @@
+{
+  "updatedAt": 0,
+  "posts": [],
+  "note": "After fixing Firestore rules, open Admin while logged in and publish/save posts so they sync to the cloud. Optionally paste an exported posts array here as backup."
+}
