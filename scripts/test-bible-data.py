@@ -484,6 +484,9 @@ def check_reader_safeguards() -> None:
         fail("Language flags must use the historical Persian Lion and Sun and United States designs, never the Islamic Republic flag")
     if "function dedupeLanguageControls()" not in lang_flags or "new MutationObserver" not in lang_flags or "dedupeLanguageControls();" not in lang_flags:
         fail("Language selector must continuously remove cloned wrappers, orphan flags, and duplicate controls")
+    footer_legal = (ROOT / "js/footer_legal.js").read_text(encoding="utf-8")
+    if "var missing = items.filter(function (item) { return existing.indexOf(item.href) < 0; });" not in footer_legal:
+        fail("Footer legal links must not duplicate links already present in the page footer")
     welcome = (ROOT / "js/welcome_tip.js").read_text(encoding="utf-8")
     first_visit = (ROOT / "js/first_visit_bilingual.js").read_text(encoding="utf-8")
     if "var bibleRoute = window.__stBibleRoute" not in welcome or "setLang(bibleRoute.lang, true)" not in welcome:
