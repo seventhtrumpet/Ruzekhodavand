@@ -544,7 +544,7 @@ def check_reader_safeguards() -> None:
         fail("WhatsApp Status photo sharing must attach the generated image and guide users to My Status")
     if "a.download = 'seventh-trumpet-share.jpg'" not in save_handler or "doFileShare()" in save_handler:
         fail("Save picture must only download the generated image and must not trigger a second share action")
-    if 'js/bible-share-photo.js?v=whatsapp-photo-status-debug-20261126' not in html:
+    if 'js/bible-share-photo.js?v=whatsapp-photo-status-final-20261126' not in html:
         fail("Bible photo-share script URL is missing the save-action cache key")
 
     if "var SITE = 'https://seventhtrumpet.org'" not in share or "var SITE = 'https://seventhtrumpet.org'" not in photo:
