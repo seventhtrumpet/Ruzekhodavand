@@ -75,12 +75,27 @@
     if (!src || src.length < 50) return;
     ensureCss();
     document.querySelectorAll('a.logo').forEach(function (a) {
+      if (a.closest('#header-brand')) {
+        a.style.setProperty('display', 'inline-flex', 'important');
+        a.style.setProperty('flex', '0 0 2.2rem', 'important');
+        a.style.setProperty('width', '2.2rem', 'important');
+        a.style.setProperty('min-width', '2.2rem', 'important');
+        a.style.setProperty('max-width', '2.2rem', 'important');
+        a.style.setProperty('overflow', 'visible', 'important');
+      }
       if (!a.querySelector('img.logo-img')) {
         var img = document.createElement('img');
         img.className = 'logo-img';
         img.alt = 'Seventh Trumpet';
         img.width = 58;
         img.height = 58;
+        img.style.setProperty('width', '2.1rem', 'important');
+        img.style.setProperty('min-width', '2.1rem', 'important');
+        img.style.setProperty('max-width', '2.1rem', 'important');
+        img.style.setProperty('height', '2.1rem', 'important');
+        img.style.setProperty('min-height', '2.1rem', 'important');
+        img.style.setProperty('max-height', '2.1rem', 'important');
+        img.style.setProperty('flex', '0 0 2.1rem', 'important');
         img.src = src;
         img.addEventListener('click', function (e) {
           e.preventDefault();
