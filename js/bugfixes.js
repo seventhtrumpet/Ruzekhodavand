@@ -83,7 +83,7 @@
   }
 
   /* Force small footer social icons even if old social.js is cached */
-  function forceSmallFooterIcons() {
+  function forceReadableFooterIcons() {
     var id = 'st-footer-icons-force';
     var old = document.getElementById(id);
     if (old) old.remove();
@@ -96,19 +96,19 @@
       'gap:6px!important;padding:8px 0!important;margin:8px auto 0!important;}' +
       '#footer-social a, .footer-social a, #footer-social a.social-yt, #footer-social a.social-ig,' +
       '#footer-social a.social-tt, #footer-social a.social-fb, #footer-social a.social-wa {' +
-      'width:22px!important;height:22px!important;min-width:22px!important;min-height:22px!important;' +
-      'max-width:22px!important;max-height:22px!important;border-radius:50%!important;' +
+      'width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;' +
+      'max-width:32px!important;max-height:32px!important;border-radius:50%!important;' +
       'display:inline-flex!important;align-items:center!important;justify-content:center!important;' +
-      'padding:0!important;margin:0!important;flex:0 0 22px!important;box-sizing:border-box!important;}' +
+      'padding:0!important;margin:0!important;flex:0 0 32px!important;box-sizing:border-box!important;}' +
       '#footer-social a svg, .footer-social a svg {' +
-      'width:12px!important;height:12px!important;max-width:12px!important;max-height:12px!important;display:block!important;}' +
-      '#footer-social a.social-yt svg, .footer-social a.social-yt svg { fill:#FF0000!important; }' +
+      'width:19px!important;height:19px!important;max-width:19px!important;max-height:19px!important;display:block!important;}' +
+      '#footer-social a.social-yt svg, .footer-social a.social-yt svg { fill:#fff!important; }' +
       '#footer-social a.social-ig { background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7)!important; }' +
       '#footer-social a.social-ig svg, .footer-social a.social-ig svg { fill:#fff!important; }' +
-      '#footer-social a.social-fb svg, .footer-social a.social-fb svg { fill:#1877F2!important; }' +
+      '#footer-social a.social-fb svg, .footer-social a.social-fb svg { fill:#fff!important; }' +
       '#footer-social a.social-wa { background:#25D366!important; }' +
       '#footer-social a.social-wa svg, .footer-social a.social-wa svg { fill:#fff!important; }' +
-      '#footer-social a.social-tt svg, .footer-social a.social-tt svg { fill:#111!important; }';
+      '#footer-social a.social-tt svg, .footer-social a.social-tt svg { fill:#fff!important; }';
     document.head.appendChild(st);
 
     // Also set inline styles as last resort
@@ -116,12 +116,12 @@
     if (host) {
       host.style.cssText = 'display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;justify-content:center!important;align-items:center!important;gap:6px!important;';
       Array.prototype.forEach.call(host.querySelectorAll('a'), function (a) {
-        a.style.width = '22px';
-        a.style.height = '22px';
-        a.style.minWidth = '22px';
-        a.style.minHeight = '22px';
-        a.style.maxWidth = '22px';
-        a.style.maxHeight = '22px';
+        a.style.setProperty('width', '32px', 'important');
+        a.style.setProperty('height', '32px', 'important');
+        a.style.setProperty('min-width', '32px', 'important');
+        a.style.setProperty('min-height', '32px', 'important');
+        a.style.setProperty('max-width', '32px', 'important');
+        a.style.setProperty('max-height', '32px', 'important');
         a.style.borderRadius = '50%';
         a.style.padding = '0';
         a.style.margin = '0';
@@ -130,8 +130,8 @@
         a.style.justifyContent = 'center';
         var svg = a.querySelector('svg');
         if (svg) {
-          svg.style.width = '12px';
-          svg.style.height = '12px';
+          svg.style.setProperty('width', '19px', 'important');
+          svg.style.setProperty('height', '19px', 'important');
         }
       });
     }
@@ -156,9 +156,9 @@
     setTimeout(refreshMediaFromCloud, 5000);
 
     // Run after social.js has injected its (possibly cached) styles
-    setTimeout(forceSmallFooterIcons, 100);
-    setTimeout(forceSmallFooterIcons, 500);
-    setTimeout(forceSmallFooterIcons, 1200);
+    setTimeout(forceReadableFooterIcons, 100);
+    setTimeout(forceReadableFooterIcons, 500);
+    setTimeout(forceReadableFooterIcons, 1200);
   }
 
   if (document.readyState === 'loading') {
