@@ -149,7 +149,7 @@
   loadScript('js/page_back.js', 'data-page-back');
   loadScript('js/fixed_header.js', 'data-fixed-header');
   loadScript('js/bible_bar_fix.js', 'data-bible-bar-fix');
-  loadScript('js/bible_search.js?v=fix8', 'data-bible-search');
+  loadScript('js/bible_search.js?v=search-version-rows-20261127b', 'data-bible-search');
   loadScript('js/home_polish.js', 'data-home-polish');
   loadScript('js/welcome_tip.js?v=language-choice-persist-20261125', 'data-welcome-tip');
   loadScript('js/loading.js', 'data-loading');
