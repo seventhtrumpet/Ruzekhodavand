@@ -163,7 +163,7 @@
   loadCss('css/social.css', 'data-social-css');
   loadCss('css/quality.css', 'data-quality-css');
   loadCss('css/player_expand.css', 'data-player-expand-css');
-  loadScript('js/social.js?v=brand-icons-20261126', 'data-social-js');
+  loadScript('js/social.js?v=brand-icons-clear-20261127', 'data-social-js');
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
