@@ -62,6 +62,10 @@
     var actions = document.querySelector('.header-actions');
     if (!actions) return;
 
+    // The header's language area is reserved for one compact two-language selector only.
+    Array.prototype.forEach.call(actions.children, function (child) {
+      if (child.id !== 'st-lang-flags') child.remove();
+    });
     var wrap = document.getElementById('st-lang-flags');
     // Sticky/mobile header copies can duplicate the selector; keep one selector on the page.
     document.querySelectorAll('.st-lang-flags').forEach(function (node) {
