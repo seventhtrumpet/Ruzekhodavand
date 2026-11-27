@@ -132,6 +132,8 @@
         if (svg) {
           svg.style.setProperty('width', '19px', 'important');
           svg.style.setProperty('height', '19px', 'important');
+          svg.style.setProperty('max-width', '19px', 'important');
+          svg.style.setProperty('max-height', '19px', 'important');
         }
       });
     }
