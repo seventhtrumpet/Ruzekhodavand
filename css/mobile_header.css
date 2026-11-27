@@ -210,3 +210,8 @@ html, body {
  #st-lang-flags .st-flag-svg { width: 1.35rem !important; height: .81rem !important; }
  #st-lang-flags .st-lang-label { font-size: .54rem !important; line-height: 1.05 !important; }
 }
+
+
+/* Header language area contains exactly one compact selector; remove legacy large toggle. */
+.header .header-actions > *:not(#st-lang-flags) { display: none !important; }
+.header .header-actions #st-lang-flags { display: inline-flex !important; }
