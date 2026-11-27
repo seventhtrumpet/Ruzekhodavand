@@ -389,19 +389,28 @@ body.dark #persian-version-wrap label { color: #f1f5f9; }
 body.dark #persian-version-select { background: #1b2b3c; color: #f8fafc; border-color: #9aafc4; }
 
 
-/* Keep translation selection accessible while reading, beneath the fixed site and Bible bars. */
-#bible-version-wrap {
-  position: sticky;
+
+
+/* Pin the active Bible translation selector below the two fixed navigation bars. */
+#bible-version-wrap, #persian-version-wrap {
+  position: fixed !important;
   top: 8rem;
-  z-index: 880;
+  left: 0;
+  right: 0;
+  width: calc(100% - 1rem);
+  max-width: 720px;
+  margin: 0 auto !important;
   padding: .55rem .65rem;
-  margin-inline: -.65rem;
+  z-index: 1100;
   background: var(--bg-card, #fff);
-  border-bottom: 1px solid var(--border, #d8dee6);
-  box-shadow: 0 3px 10px rgba(10,37,64,.08);
+  border: 1px solid var(--border, #d8dee6);
+  border-radius: .65rem;
+  box-shadow: 0 3px 12px rgba(10,37,64,.12);
 }
-body.dark #bible-version-wrap { background: #152536; }
+#bible-version-spacer { height: 7rem; flex: 0 0 7rem; }
+body.dark #bible-version-wrap, body.dark #persian-version-wrap { background: #152536; }
 @media (max-width: 480px) {
-  #bible-version-wrap { top: 8rem; gap: .35rem; }
-  #bible-version-select { width: 100%; min-width: 0; }
+  #bible-version-wrap, #persian-version-wrap { top: 8rem; gap: .35rem; }
+  #bible-version-wrap { flex-wrap: wrap; }
+  #bible-version-select, #persian-version-select { width: 100%; min-width: 0; }
 }
