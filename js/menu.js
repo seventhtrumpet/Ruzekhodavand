@@ -131,7 +131,7 @@
   }
 
   loadScript('js/first_visit_bilingual.js?v=bible-route-language-20261125', 'data-first-bilingual');
-  loadScript('js/lang_flags.js?v=one-pair-only-20261126c', 'data-lang-flags');
+  loadScript('js/lang_flags.js?v=single-header-selector-20261127', 'data-lang-flags');
   loadScript('js/css_restore.js', 'data-css-restore');
   loadScript('js/ads.js', 'data-ads-js');
   loadScript('js/menu_overlay_fix.js', 'data-menu-overlay-fix');
@@ -159,7 +159,7 @@
   loadScript('js/player_expand.js', 'data-player-expand');
   loadScript('js/app_media.js', 'data-app-media');
   loadCss('css/about_fix.css', 'data-about-fix');
-  loadCss('css/mobile_header.css?v=profile-social-lang-20261126', 'data-mobile-header');
+  loadCss('css/mobile_header.css?v=single-header-selector-20261127', 'data-mobile-header');
   loadCss('css/social.css', 'data-social-css');
   loadCss('css/quality.css', 'data-quality-css');
   loadCss('css/player_expand.css', 'data-player-expand-css');
