@@ -212,7 +212,7 @@
     const versionBar = document.querySelector('#bible-version-wrap:not([style*="display: none"]), #persian-version-wrap:not([style*="display: none"])');
     const fixedOffset = (header ? header.getBoundingClientRect().height : 0) +
       (navBar ? navBar.getBoundingClientRect().height : 0) +
-      (versionBar ? versionBar.getBoundingClientRect().height : 0) + 14;
+      (versionBar ? versionBar.getBoundingClientRect().height : 0) + 30;
     const targetTop = Math.max(0, el.getBoundingClientRect().top + window.scrollY - fixedOffset);
     window.scrollTo({ top: targetTop, behavior: smooth ? 'smooth' : 'auto' });
     document.querySelectorAll('.mb-verse.highlight').forEach(n => n.classList.remove('highlight'));
