@@ -209,8 +209,10 @@
     // Position the chosen verse below BOTH fixed bars (site header + Bible navigation bar).
     const header = document.querySelector('.header');
     const navBar = document.querySelector('.mb-bar');
+    const versionBar = document.querySelector('#bible-version-wrap:not([style*="display: none"]), #persian-version-wrap:not([style*="display: none"])');
     const fixedOffset = (header ? header.getBoundingClientRect().height : 0) +
-      (navBar ? navBar.getBoundingClientRect().height : 0) + 14;
+      (navBar ? navBar.getBoundingClientRect().height : 0) +
+      (versionBar ? versionBar.getBoundingClientRect().height : 0) + 14;
     const targetTop = Math.max(0, el.getBoundingClientRect().top + window.scrollY - fixedOffset);
     window.scrollTo({ top: targetTop, behavior: smooth ? 'smooth' : 'auto' });
     document.querySelectorAll('.mb-verse.highlight').forEach(n => n.classList.remove('highlight'));
