@@ -236,15 +236,39 @@
     var bar = document.querySelector('.mb-bar');
     var top = bar ? Math.max(bar.getBoundingClientRect().bottom, 48) : 56;
     wrap.style.top = top + 'px';
-    var sp = document.getElementById('mb-search-spacer');
-    if (!sp) {
-      sp = document.createElement('div');
-      sp.id = 'mb-search-spacer';
+
+    // Keep the translation selector in its own fixed row BELOW the search UI.
+    // It must never cover the search input or its scope buttons.
+    var version = document.getElementById('bible-version-wrap') ||
+      document.getElementById('persian-version-wrap');
+    var spacer = document.getElementById('mb-search-spacer');
+    if (!spacer) {
+      spacer = document.createElement('div');
+      spacer.id = 'mb-search-spacer';
       var reader = document.getElementById('mb-reader') || document.querySelector('main');
-      if (reader && reader.parentNode) reader.parentNode.insertBefore(sp, reader);
-      else document.body.appendChild(sp);
+      if (reader && reader.parentNode) reader.parentNode.insertBefore(spacer, reader);
+      else document.body.appendChild(spacer);
     }
-    sp.style.height = (wrap.offsetHeight || 88) + 'px';
+    var searchHeight = wrap.offsetHeight || 88;
+    if (version) {
+      version.style.position = 'fixed';
+      version.style.left = '0';
+      version.style.right = '0';
+      version.style.top = (top + searchHeight) + 'px';
+      version.style.zIndex = '1130';
+      version.style.display = version.id === 'bible-version-wrap'
+        ? (document.body.classList.contains('lang-en') || document.documentElement.lang === 'en' ? 'flex' : 'none')
+        : (document.body.classList.contains('lang-en') || document.documentElement.lang === 'en' ? 'none' : 'flex');
+      version.style.boxSizing = 'border-box';
+      version.style.padding = '0.35rem 0.65rem';
+      version.style.margin = '0';
+      version.style.background = 'var(--bg-card,#fff)';
+      version.style.borderBottom = '1px solid var(--border,#d8dee6)';
+      version.style.boxShadow = '0 2px 10px rgba(10,37,64,.06)';
+      version.style.width = '100%';
+    }
+    var versionHeight = version && version.style.display !== 'none' ? (version.offsetHeight || 58) : 0;
+    spacer.style.height = (searchHeight + versionHeight) + 'px';
   }
 
   function goTo(bookId, chapter, verse) {
