@@ -203,12 +203,12 @@ html, body {
   #st-lang-flags .st-lang-flag { position: relative !important; z-index: 22 !important; }
 }
 
-/* Compact language controls: one small flag with its label underneath. */
+/* Keep one clearly visible flag per language, above its language label. */
 @media (max-width: 900px) {
- #st-lang-flags { gap: .12rem !important; }
- #st-lang-flags .st-lang-flag { width: 3.35rem !important; min-width: 3.35rem !important; padding: .08rem .1rem !important; gap: .04rem !important; }
- #st-lang-flags .st-flag-svg { width: 1.35rem !important; height: .81rem !important; }
- #st-lang-flags .st-lang-label { font-size: .54rem !important; line-height: 1.05 !important; }
+ #st-lang-flags { gap: .18rem !important; align-items: flex-end !important; }
+ #st-lang-flags .st-lang-flag { width: 4.15rem !important; min-width: 4.15rem !important; padding: .12rem .16rem !important; gap: .12rem !important; }
+ #st-lang-flags .st-flag-svg { width: 2.05rem !important; height: 1.23rem !important; }
+ #st-lang-flags .st-lang-label { font-size: .68rem !important; line-height: 1.1 !important; }
 }
 
 
