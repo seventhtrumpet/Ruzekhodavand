@@ -23,7 +23,7 @@
       href: 'https://www.tiktok.com/@seventhtrumpet.media',
       label: 'TikTok',
       className: 'social-tt',
-      svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8.2a7.3 7.3 0 0 1-4.2-1.3v7.2a6.1 6.1 0 1 1-5.3-6v3.1a3 3 0 1 0 2.1 2.9V2.5h3a4.3 4.3 0 0 0 4.4 4.3v1.4z"/></svg>'
+      svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#25F4EE" transform="translate(-1 0)" d="M21 8.2a7.3 7.3 0 0 1-4.2-1.3v7.2a6.1 6.1 0 1 1-5.3-6v3.1a3 3 0 1 0 2.1 2.9V2.5h3a4.3 4.3 0 0 0 4.4 4.3v1.4z"/><path fill="#FE2C55" transform="translate(1 0)" d="M21 8.2a7.3 7.3 0 0 1-4.2-1.3v7.2a6.1 6.1 0 1 1-5.3-6v3.1a3 3 0 1 0 2.1 2.9V2.5h3a4.3 4.3 0 0 0 4.4 4.3v1.4z"/><path fill="#fff" d="M21 8.2a7.3 7.3 0 0 1-4.2-1.3v7.2a6.1 6.1 0 1 1-5.3-6v3.1a3 3 0 1 0 2.1 2.9V2.5h3a4.3 4.3 0 0 0 4.4 4.3v1.4z"/></svg>'
     },
     {
       id: 'fb',
@@ -82,8 +82,8 @@
       'gap:0.45rem!important;padding:0.65rem 0!important;margin:0.6rem auto 0!important;width:max-content;max-width:100%;}' +
       '#footer-social a, .footer-social a{' +
       'display:inline-flex!important;align-items:center!important;justify-content:center!important;' +
-      'width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;' +
-      'max-width:28px!important;max-height:28px!important;border-radius:50%!important;' +
+      'width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;' +
+      'max-width:32px!important;max-height:32px!important;border-radius:50%!important;' +
       'text-decoration:none;background:rgba(255,255,255,0.14)!important;overflow:hidden;flex:0 0 28px!important;padding:0!important;margin:0!important;}' +
       '#footer-social a svg, .footer-social a svg{' +
       'width:15px!important;height:15px!important;max-width:15px!important;max-height:15px!important;display:block;}' +
