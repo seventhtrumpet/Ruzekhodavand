@@ -1,183 +1,20 @@
-/* Mobile header — stable, no overlap */
-html, body {
-  max-width: 100%;
-  overflow-x: hidden !important;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-.hero,
-.hero-inner,
-.media-rotator,
-.media-rotator-card,
-.angels-row,
-.home-cta,
-.daily-verse,
-.mission-section,
-.container {
-  max-width: 100% !important;
-  box-sizing: border-box;
-}
-
-.header-brand {
-  display: inline-flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 0.3rem !important;
-  flex: 0 1 auto;
-  min-width: 0;
-  position: relative;
-  z-index: 2;
-}
-.header-brand .logo {
-  display: inline-flex !important;
-  align-items: center;
-  gap: 0.25rem;
-  flex-shrink: 0;
-}
-.header-brand .header-social {
-  display: inline-flex !important;
-  align-items: center;
-  gap: 0.12rem !important;
-  flex-shrink: 0;
-  margin: 0 !important;
-}
-.header-social {
-  margin-inline-end: 0 !important;
-  margin-inline-start: 0 !important;
-}
-
-@media (max-width: 900px) {
-  .header {
-    padding: 0.35rem 0.4rem !important;
-  }
+/* Mobile header helpers */
+@media (max-width: 860px) {
   .header-inner {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    flex-wrap: nowrap !important;
-    gap: 0.25rem !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow: hidden;
+    gap: 0.35rem !important;
   }
-
-  .menu-btn {
-    display: flex !important;
-    width: 2.1rem !important;
-    height: 2.1rem !important;
-    flex-shrink: 0 !important;
-    order: 0;
-  }
-
-  .header-brand {
-    order: 1; flex: 1 1 auto; min-width: 0;
-    overflow: visible !important; gap: 0.22rem !important;
-  }
-  /* Keep the profile mark at a real size; flex must never squash it. */
-  .header-brand > a.logo {
-    display: inline-flex !important; flex: 0 0 2.15rem !important;
-    width: 2.15rem !important; min-width: 2.15rem !important; max-width: 2.15rem !important;
-    height: 2.15rem !important; overflow: visible !important; padding: 0 !important;
-  }
-  .header-brand > a.logo .logo-img, .header-brand .logo-img {
-    display: block !important; flex: 0 0 2.05rem !important;
-    width: 2.05rem !important; min-width: 2.05rem !important; max-width: 2.05rem !important;
-    height: 2.05rem !important; min-height: 2.05rem !important; max-height: 2.05rem !important;
-    object-fit: cover !important;
-  }
-  .logo .logo-name,
-  .logo [data-i18n="siteName"] {
+  .nav-main {
     display: none !important;
   }
-
-  .header-social a {
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-    min-width: 1.5rem !important;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.14);
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .header-social a svg {
-    width: 0.75rem !important;
-    height: 0.75rem !important;
-  }
-  /* Show ALL social icons including WhatsApp */
-  .header-social a:nth-child(n) {
-    display: inline-flex !important;
-  }
-
-  .nav.nav-main {
-    display: none !important;
-  }
-
-  .header-actions {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.2rem !important;
-    margin-inline-start: 0.2rem !important;
-    flex-shrink: 0 !important;
-    order: 2;
-    position: relative;
-    z-index: 3;
-  }
-
   #lang-toggle,
   button.lang-toggle {
-    display: inline-flex !important;
-    font-size: 0.7rem !important;
-    padding: 0.25rem 0.4rem !important;
-    flex-shrink: 0;
-  }
-
-  .text-size-controls {
     display: none !important;
   }
-
-  .header-actions .btn,
   .header-actions button:not(.lang-toggle),
-  #auth-btn,
-  #sign-in-btn,
-  .auth-btn {
-    position: relative;
-    z-index: 4;
-    flex-shrink: 0;
-    font-size: 0.72rem !important;
-    padding: 0.28rem 0.55rem !important;
-    white-space: nowrap;
-  }
-
-  .media-rotator {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
-  }
-  .media-rotator-card {
-    width: 100% !important;
-  }
-
-  .hero .hero-inner {
-    padding-left: 0.85rem !important;
-    padding-right: 0.85rem !important;
-    width: 100% !important;
-  }
-  .hero h1 {
-    font-size: clamp(1.55rem, 7vw, 2.1rem) !important;
-    word-break: break-word;
+  .header-actions a {
+    font-size: 0.78rem;
   }
 }
-
 
 /* One language selector only: hide legacy and cloned header controls. */
 .header-actions #lang-toggle,
@@ -193,25 +30,29 @@ html, body {
   opacity: 1 !important;
 }
 
-
 /* Keep language controls clickable above the social links on narrow headers. */
-@media (max-width: 900px) {
-  .header-brand { position: relative !important; z-index: 1 !important; }
-  #header-social { position: relative !important; z-index: 1 !important; }
-  .header-actions { position: relative !important; z-index: 20 !important; }
+@media (max-width: 860px) {
   #st-lang-flags { position: relative !important; z-index: 21 !important; }
   #st-lang-flags .st-lang-flag { position: relative !important; z-index: 22 !important; }
 }
 
-/* Keep one clearly visible flag per language, above its language label. */
-@media (max-width: 900px) {
- #st-lang-flags { gap: .18rem !important; align-items: flex-end !important; }
- #st-lang-flags .st-lang-flag { width: 4.15rem !important; min-width: 4.15rem !important; padding: .12rem .16rem !important; gap: .12rem !important; }
- #st-lang-flags .st-flag-svg { width: 2.05rem !important; height: 1.23rem !important; }
- #st-lang-flags .st-lang-label { font-size: .68rem !important; line-height: 1.1 !important; }
-}
+/* One clearly visible flag per language, above its language label. */
+#st-lang-flags { gap: .18rem !important; align-items: center !important; }
+#st-lang-flags .st-lang-flag { width: auto !important; min-width: 3.2rem !important; padding: .12rem .16rem !important; gap: .1rem !important; }
+#st-lang-flags .st-flag-svg { width: 1.55rem !important; height: 0.95rem !important; display: block !important; }
+#st-lang-flags .st-lang-label { font-size: .62rem !important; line-height: 1.1 !important; }
 
-
-/* Header language area contains exactly one compact selector; remove legacy large toggle. */
+/* Header language area contains exactly one compact selector */
 .header .header-actions > *:not(#st-lang-flags) { display: none !important; }
 .header .header-actions #st-lang-flags { display: inline-flex !important; }
+
+/* KILL-SECOND-FLAG: only one SVG flag per language button */
+#st-lang-flags .st-lang-flag .st-lang-label::before,
+#st-lang-flags .st-lang-flag .st-lang-label::after,
+#st-lang-flags .st-lang-emoji {
+  content: none !important;
+  display: none !important;
+}
+#st-lang-flags .st-lang-flag {
+  background-image: none !important;
+}

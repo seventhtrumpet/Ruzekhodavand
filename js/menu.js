@@ -95,8 +95,6 @@
     } catch (e) {}
     refreshThemeBtn();
     refreshMenuLabels();
-    var lt = document.getElementById('lang-toggle');
-    if (lt) lt.addEventListener('click', function () { setTimeout(refreshMenuLabels, 80); });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
@@ -105,14 +103,6 @@
   function loadScript(src, attr) {
     try {
       if (document.querySelector('script[' + attr + ']')) return;
-      var wantedPath = String(src).split('?')[0];
-      var existing = Array.prototype.find.call(document.scripts, function (script) {
-        return String(script.getAttribute('src') || '').split('?')[0] === wantedPath;
-      });
-      if (existing) {
-        existing.setAttribute(attr, '1');
-        return;
-      }
       var s = document.createElement('script');
       s.src = src;
       s.setAttribute(attr, '1');
@@ -130,28 +120,28 @@
     } catch (e) {}
   }
 
-  loadScript('js/first_visit_bilingual.js?v=bible-route-language-20261125', 'data-first-bilingual');
-  loadScript('js/lang_flags.js?v=single-header-selector-one-flag-20261127b', 'data-lang-flags');
+  loadScript('js/first_visit_bilingual.js', 'data-first-bilingual');
+  loadScript('js/lang_flags.js?v=one-flag-only-20261128', 'data-lang-flags');
   loadScript('js/css_restore.js', 'data-css-restore');
   loadScript('js/ads.js', 'data-ads-js');
   loadScript('js/menu_overlay_fix.js', 'data-menu-overlay-fix');
-  loadScript('js/bugfixes.js?v=footer-icons-full-color2-20261127', 'data-bugfixes');
+  loadScript('js/bugfixes.js', 'data-bugfixes');
   loadScript('js/footer_legal.js', 'data-footer-legal');
   loadScript('js/privacy_banner.js', 'data-privacy-banner');
-  loadScript('js/logo_data.js?v=profile-logo-20261126', 'data-logo-data');
+  loadScript('js/logo_data.js', 'data-logo-data');
   loadScript('js/visits.js', 'data-visits');
   loadScript('js/text_size.js', 'data-text-size');
   loadScript('js/profile_bg.js', 'data-profile-bg');
   loadScript('js/share.js', 'data-share');
-  loadScript('js/bible-share.js?v=canonical-share-route-20261125', 'data-bible-share');
+  loadScript('js/bible-share.js?v=one-share-20261124', 'data-bible-share');
   loadScript('js/bible-share-photo.js?v=fix8', 'data-bible-share-photo');
   loadScript('js/page-share.js?v=fix8', 'data-page-share');
   loadScript('js/page_back.js', 'data-page-back');
   loadScript('js/fixed_header.js', 'data-fixed-header');
   loadScript('js/bible_bar_fix.js', 'data-bible-bar-fix');
-  loadScript('js/bible_search.js?v=search-version-rows-20261127b', 'data-bible-search');
+  loadScript('js/bible_search.js?v=search-version-stack-20261128', 'data-bible-search');
   loadScript('js/home_polish.js', 'data-home-polish');
-  loadScript('js/welcome_tip.js?v=language-choice-persist-20261125', 'data-welcome-tip');
+  loadScript('js/welcome_tip.js', 'data-welcome-tip');
   loadScript('js/loading.js', 'data-loading');
   loadScript('js/cloud_sync.js', 'data-cloud-sync');
   loadScript('js/media_public_fix.js', 'data-media-public-fix');
@@ -159,11 +149,11 @@
   loadScript('js/player_expand.js', 'data-player-expand');
   loadScript('js/app_media.js', 'data-app-media');
   loadCss('css/about_fix.css', 'data-about-fix');
-  loadCss('css/mobile_header.css?v=one-large-flag-per-language-20261127', 'data-mobile-header');
+  loadCss('css/mobile_header.css?v=one-flag-only-20261128', 'data-mobile-header');
   loadCss('css/social.css', 'data-social-css');
   loadCss('css/quality.css', 'data-quality-css');
   loadCss('css/player_expand.css', 'data-player-expand-css');
-  loadScript('js/social.js?v=footer-icons-32px-20261127', 'data-social-js');
+  loadScript('js/social.js?v=icons-size-20261124', 'data-social-js');
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
