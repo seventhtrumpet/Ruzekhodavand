@@ -135,7 +135,7 @@
   loadScript('js/css_restore.js', 'data-css-restore');
   loadScript('js/ads.js', 'data-ads-js');
   loadScript('js/menu_overlay_fix.js', 'data-menu-overlay-fix');
-  loadScript('js/bugfixes.js', 'data-bugfixes');
+  loadScript('js/bugfixes.js?v=footer-icons-full-color-20261127', 'data-bugfixes');
   loadScript('js/footer_legal.js', 'data-footer-legal');
   loadScript('js/privacy_banner.js', 'data-privacy-banner');
   loadScript('js/logo_data.js?v=profile-logo-20261126', 'data-logo-data');
