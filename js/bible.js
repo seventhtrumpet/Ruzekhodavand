@@ -132,10 +132,7 @@
       throw new Error('Requested-chapter-first reader patch did not apply');
     }
 
-    code = code.replace("    el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });", "    const root = document.documentElement; const oldScrollBehavior = root.style.scrollBehavior; if (!smooth) root.style.scrollBehavior = 'auto'; el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' }); if (!smooth) root.style.scrollBehavior = oldScrollBehavior;");
-    if (code.indexOf("const oldScrollBehavior = root.style.scrollBehavior") < 0) {
-      throw new Error('Instant deep-link scrolling patch did not apply');
-    }
+    // scrollToRef in the pinned reader now computes the exact offset below both fixed bars.
 
     // Expose each edition's complete source canon without duplicating shared metadata.
     code = code.replace(/  function availableBooks\(\) \{[\s\S]*?\n  \}/, `  function availableBooks() {
