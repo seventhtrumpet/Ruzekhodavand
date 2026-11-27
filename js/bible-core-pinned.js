@@ -206,7 +206,13 @@
     const el = document.getElementById('v-' + ch + '-' + vs) || document.getElementById('ch-' + ch);
     if (!el) return;
     scrollSync = false;
-    el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+    // Position the chosen verse below BOTH fixed bars (site header + Bible navigation bar).
+    const header = document.querySelector('.header');
+    const navBar = document.querySelector('.mb-bar');
+    const fixedOffset = (header ? header.getBoundingClientRect().height : 0) +
+      (navBar ? navBar.getBoundingClientRect().height : 0) + 14;
+    const targetTop = Math.max(0, el.getBoundingClientRect().top + window.scrollY - fixedOffset);
+    window.scrollTo({ top: targetTop, behavior: smooth ? 'smooth' : 'auto' });
     document.querySelectorAll('.mb-verse.highlight').forEach(n => n.classList.remove('highlight'));
     const verseEl = document.getElementById('v-' + ch + '-' + vs);
     if (verseEl) {
