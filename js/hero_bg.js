@@ -1,6 +1,6 @@
 /* Hero background — Option A: soft photo, FULL image visible (all angels) */
 (function () {
-  var LOCAL = 'media/hero-bg.jpg';
+  var LOCAL = 'https://i.imgur.com/Nmz3YPt.jpeg';
   var HOSTED = 'https://i.imgur.com/Nmz3YPt.jpeg';
 
   function injectOptionAStyles() {
