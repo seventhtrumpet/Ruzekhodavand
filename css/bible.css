@@ -394,14 +394,14 @@ body.dark #persian-version-select { background: #1b2b3c; color: #f8fafc; border-
 /* Pin the active Bible translation selector below the two fixed navigation bars. */
 #bible-version-wrap, #persian-version-wrap {
   position: fixed !important;
-  top: 8rem;
+  top: 12.3rem;
   left: 0;
   right: 0;
   width: calc(100% - 1rem);
   max-width: 720px;
   margin: 0 auto !important;
   padding: .55rem .65rem;
-  z-index: 1100;
+  z-index: 1160;
   background: var(--bg-card, #fff);
   border: 1px solid var(--border, #d8dee6);
   border-radius: .65rem;
