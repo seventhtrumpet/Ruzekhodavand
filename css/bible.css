@@ -392,7 +392,7 @@ body.dark #persian-version-select { background: #1b2b3c; color: #f8fafc; border-
 /* Keep translation selection accessible while reading, beneath the fixed site and Bible bars. */
 #bible-version-wrap {
   position: sticky;
-  top: 7rem;
+  top: 8rem;
   z-index: 880;
   padding: .55rem .65rem;
   margin-inline: -.65rem;
@@ -402,6 +402,6 @@ body.dark #persian-version-select { background: #1b2b3c; color: #f8fafc; border-
 }
 body.dark #bible-version-wrap { background: #152536; }
 @media (max-width: 480px) {
-  #bible-version-wrap { top: 7rem; gap: .35rem; }
+  #bible-version-wrap { top: 8rem; gap: .35rem; }
   #bible-version-select { width: 100%; min-width: 0; }
 }
