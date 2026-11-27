@@ -177,6 +177,10 @@
           img.src = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
           img.alt = title;
           img.loading = 'lazy';
+          img.onerror = function () {
+            img.remove();
+            card.classList.add('no-media');
+          };
           mediaEl.appendChild(img);
           hasVisual = true;
         }
