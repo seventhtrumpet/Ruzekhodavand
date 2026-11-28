@@ -310,3 +310,51 @@ body.dark #persian-version-select {
   .mb-text { font-size: 1rem; }
   .mb-reader { padding-inline: .45rem !important; }
 }
+
+
+/* Larger, easier-to-read book and chapter/verse choices */
+.mb-sel-panel {
+  max-height: min(84vh, 760px);
+}
+.mb-sel-tabs {
+  gap: 0.35rem;
+  padding: 0.8rem 0.5rem;
+}
+.mb-tab {
+  padding: 0.7rem 0.55rem;
+  font-size: 1rem;
+}
+.mb-sel-body {
+  padding: 0.75rem;
+}
+.mb-grid {
+  gap: 0.5rem;
+}
+.mb-books {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.mb-nums {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+.mb-book, .mb-num {
+  min-height: 2.9rem;
+  padding: 0.62rem 0.35rem;
+  font-size: 0.94rem;
+  line-height: 1.5;
+  font-weight: 600;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.mb-num {
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 480px) {
+  .mb-nums { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .mb-book, .mb-num {
+    min-height: 3rem;
+    padding: 0.65rem 0.3rem;
+    font-size: 0.96rem;
+  }
+  .mb-num { font-size: 1.02rem; }
+}
