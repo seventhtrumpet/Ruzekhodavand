@@ -162,10 +162,10 @@ def compare_official_opcb() -> tuple[int, int, int]:
     total_ranges = 0
     for book_id, code in OFFICIAL.BOOKS.items():
         filename, source = sources[code]
-        expected = OFFICIAL.parse_usfm(source, book_id)
-        book = expected[str(book_id)]
+        book = OFFICIAL.parse_usfm(source, book_id)
         heading = re.search(r"^\\h\s+(.+)$", source, re.M)
         book["name"] = OFFICIAL.clean_text(heading.group(1)) if heading else code
+        expected = {str(book_id): book}
         local_path = PERSIAN_ROOT / "opcb-official" / f"b{book_id}.json"
         local = json.loads(local_path.read_text(encoding="utf-8"))
         if local != expected:
