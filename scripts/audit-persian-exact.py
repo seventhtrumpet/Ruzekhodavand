@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare every locally hosted Persian verse with its pinned upstream source."""
+"""Compare local Persian editions with their pinned official source archives."""
 from __future__ import annotations
 
 import hashlib
@@ -24,7 +24,7 @@ def load_importer(module_name: str, path: str):
 
 
 OPV = load_importer("opv_importer", "import-opv.py")
-OPCB = load_importer("opcb_importer", "import-opcb.py")
+OFFICIAL = load_importer("opcb_official_importer", "import-opcb-official.py")
 PERSIAN_ROOT = ROOT / "data" / "bible-fa"
 
 
@@ -74,8 +74,6 @@ def compare_opv() -> tuple[int, int]:
             if sorted(map(int, chapters)) != list(range(1, expected_count + 1)):
                 raise ValueError(f"OPV book {book_id}: non-contiguous chapter numbering")
 
-            # The source appends Ezekiel 25:5 to the end of 25:4. Restore only
-            # the verse boundary; the original words remain unchanged.
             if book_id == 330:
                 verse_four = chapters["25"]["4"]
                 if OPV.EZEKIEL_25_5 not in verse_four:
@@ -92,9 +90,7 @@ def compare_opv() -> tuple[int, int]:
                     )
                 for verse_number, verse_text in verses.items():
                     if not verse_text:
-                        empty_verses.append(
-                            f"{filename} {chapter_number}:{verse_number}"
-                        )
+                        empty_verses.append(f"{filename} {chapter_number}:{verse_number}")
 
             heading = re.search(r"^\\h\s+(.+?)\s*$", source, re.M)
             payload = {
@@ -126,86 +122,89 @@ def compare_opv() -> tuple[int, int]:
 
     index = json.loads((PERSIAN_ROOT / "opv" / "index.json").read_text(encoding="utf-8"))
     if index.get("version") != "OPV" or index.get("books") != expected_books:
-        raise ValueError("OPV full-text search index differs from the source books")
-
+        raise ValueError("OPV full-text search index differs from the source")
     return len(expected_books), total_verses
 
 
-def compare_opcb() -> tuple[int, int]:
+def compare_official_opcb() -> tuple[int, int, int]:
     request = urllib.request.Request(
-        OPCB.SOURCE_URL,
-        headers={"User-Agent": "SeventhTrumpet-OPCB-ExactCollation/1.0"},
+        OFFICIAL.SOURCE_URL,
+        headers={"User-Agent": "SeventhTrumpet-OPCB-Official-ExactCollation/1.0"},
     )
     with urllib.request.urlopen(request, timeout=120) as response:
-        raw = response.read()
-
-    metadata_path = PERSIAN_ROOT / "opcb" / "metadata.json"
-    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    source_sha = hashlib.sha256(raw).hexdigest()
-    if source_sha != metadata.get("source_sha256"):
-        raise ValueError("OPCB source SHA-256 differs from pinned metadata")
-    if metadata.get("source_commit") != OPCB.SOURCE_COMMIT:
-        raise ValueError("OPCB source commit differs from importer pin")
-
-    source_books = json.loads(
-        raw.decode("utf-8"),
-        object_pairs_hook=OPCB.reject_duplicate_keys,
-    )
-    if not isinstance(source_books, list) or len(source_books) != 66:
-        raise ValueError("OPCB source must contain exactly 66 books")
-
-    expected_manifest = {}
-    total_chapters = 0
-    total_verses = 0
-
-    for index, book_id in enumerate(OPCB.BOOK_IDS):
-        source_book = source_books[index]
-        chapters = source_book.get("chapters")
-        expected_chapters = OPCB.CHAPTER_COUNTS[book_id]
-        if not isinstance(chapters, list) or len(chapters) != expected_chapters:
-            raise ValueError(
-                f"OPCB book {book_id}: expected {expected_chapters} chapters"
-            )
-
-        numbered_chapters = {}
-        for chapter_number, verses in enumerate(chapters, start=1):
-            if not isinstance(verses, list) or not verses:
-                raise ValueError(f"OPCB book {book_id}, chapter {chapter_number}: invalid")
-            verse_map = {}
-            for verse_number, verse_text in enumerate(verses, start=1):
-                if not isinstance(verse_text, str) or not verse_text.strip():
-                    raise ValueError(
-                        f"OPCB book {book_id}, {chapter_number}:{verse_number}: invalid"
-                    )
-                verse_map[str(verse_number)] = verse_text
-                total_verses += 1
-            numbered_chapters[str(chapter_number)] = verse_map
-            total_chapters += 1
-
-        expected_payload = {
-            str(book_id): {
-                "id": book_id,
-                "name": str(source_book.get("name") or ""),
-                "chapters": numbered_chapters,
-            }
-        }
-        local_path = PERSIAN_ROOT / "opcb" / f"b{book_id}.json"
-        local = json.loads(local_path.read_text(encoding="utf-8"))
-        if local != expected_payload:
-            raise ValueError(f"OPCB book {book_id}: local verse text differs from source")
-        expected_manifest[str(book_id)] = f"b{book_id}.json"
-
-    if total_chapters != 1189 or total_verses != OPCB.EXPECTED_VERSES:
+        archive = response.read()
+    source_sha = hashlib.sha256(archive).hexdigest()
+    if source_sha != OFFICIAL.EXPECTED_SHA256:
         raise ValueError(
-            f"OPCB totals mismatch: chapters={total_chapters}, verses={total_verses}"
+            f"Official OPCB USFM archive SHA-256 changed: expected "
+            f"{OFFICIAL.EXPECTED_SHA256}, received {source_sha}"
         )
-    manifest = json.loads(
-        (PERSIAN_ROOT / "opcb" / "manifest.json").read_text(encoding="utf-8")
-    )
-    if manifest != expected_manifest:
-        raise ValueError("OPCB local manifest differs from the source book list")
 
-    return len(OPCB.BOOK_IDS), total_verses
+    with zipfile.ZipFile(BytesIO(archive)) as source_zip:
+        corrupt_member = source_zip.testzip()
+        if corrupt_member:
+            raise ValueError(f"Official OPCB corrupt archive member: {corrupt_member}")
+        sources = {}
+        for filename in source_zip.namelist():
+            if not filename.lower().endswith(".usfm"):
+                continue
+            source = source_zip.read(filename).decode("utf-8-sig")
+            code_match = re.search(r"^\\id\s+(\S+)", source, re.M)
+            if code_match:
+                sources[code_match.group(1)] = (filename, source)
+
+    if set(sources) != set(OFFICIAL.BOOKS.values()) or len(sources) != 66:
+        raise ValueError(f"Official OPCB expected 66 source books, found {len(sources)}")
+
+    manifest = {}
+    total_chapters = 0
+    total_markers = 0
+    total_ranges = 0
+    for book_id, code in OFFICIAL.BOOKS.items():
+        filename, source = sources[code]
+        expected = OFFICIAL.parse_usfm(source, book_id)
+        book = expected[str(book_id)]
+        heading = re.search(r"^\\h\s+(.+)$", source, re.M)
+        book["name"] = OFFICIAL.clean_text(heading.group(1)) if heading else code
+        local_path = PERSIAN_ROOT / "opcb-official" / f"b{book_id}.json"
+        local = json.loads(local_path.read_text(encoding="utf-8"))
+        if local != expected:
+            raise ValueError(
+                f"Official OPCB book {book_id} ({filename}): local data differs from USFM source"
+            )
+        manifest[str(book_id)] = [f"b{book_id}.json"]
+        total_chapters += len(book["chapters"])
+        for verses in book["chapters"].values():
+            total_markers += len(verses)
+            total_ranges += sum(1 for key in verses if "-" in key)
+
+    local_manifest = json.loads(
+        (PERSIAN_ROOT / "opcb-official" / "manifest.json").read_text(encoding="utf-8")
+    )
+    if local_manifest != manifest:
+        raise ValueError("Official OPCB manifest differs from the 66-book source list")
+    metadata = json.loads(
+        (PERSIAN_ROOT / "opcb-official" / "metadata.json").read_text(encoding="utf-8")
+    )
+    expected_metadata = {
+        "source_sha256": source_sha,
+        "books": 66,
+        "chapters": 1189,
+        "verse_markers": 29469,
+        "verse_range_markers": 913,
+        "text_license": "CC BY-SA 4.0",
+    }
+    for key, value in expected_metadata.items():
+        if metadata.get(key) != value:
+            raise ValueError(
+                f"Official OPCB metadata {key}={metadata.get(key)!r}; expected {value!r}"
+            )
+    if total_chapters != 1189 or total_markers != 29469 or total_ranges != 913:
+        raise ValueError(
+            f"Official OPCB totals mismatch: chapters={total_chapters}, "
+            f"markers={total_markers}, ranges={total_ranges}"
+        )
+    return len(OFFICIAL.BOOKS), total_markers, total_ranges
 
 
 def main() -> int:
@@ -215,9 +214,10 @@ def main() -> int:
             f"OPV: PASS; books={opv_books}; exact_verse_records={opv_verses}; "
             "source_SHA256=verified"
         )
-        opcb_books, opcb_verses = compare_opcb()
+        official_books, official_markers, official_ranges = compare_official_opcb()
         print(
-            f"OPCB: PASS; books={opcb_books}; exact_verse_texts={opcb_verses}; "
+            f"OPCB official USFM: PASS; books={official_books}; "
+            f"exact_verse_markers={official_markers}; preserved_ranges={official_ranges}; "
             "source_SHA256=verified"
         )
     except Exception as error:
@@ -225,10 +225,11 @@ def main() -> int:
         return 1
 
     print(
-        f"PASS: both local Persian editions; "
-        f"{opv_books + opcb_books} books and {opv_verses + opcb_verses} "
-        "verse records match pinned sources exactly"
+        f"PASS: OPV and official OPCB; {opv_books + official_books} books, "
+        f"{opv_verses} OPV records, {official_markers} OPCB markers, "
+        f"and {official_ranges} source verse ranges verified."
     )
+    print("NOTE: The earlier OPCB JSON edition remains available for user comparison; it is not certified by this exact-source audit.")
     return 0
 
 
