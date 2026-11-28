@@ -504,7 +504,7 @@ def check_reader_safeguards() -> None:
         fail("Reader must load the selected source chapter instead of assuming chapter 1")
     if "chapter = CHAPTER_STARTS[bookId] || 1" not in reader:
         fail("Selecting a book with a non-1 source chapter start must open its first available source chapter")
-    if "js/bible.js?v=official-opcb-parallel-20261128" not in html or "js/bible_search.js?v=official-opcb-parallel-20261128" not in html:
+    if "js/bible.js?v=chapter-selection-offset-fix-20261128" not in html or "js/bible_search.js?v=official-opcb-parallel-20261128" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
     for label in ("ERV — English Revised Version (1885, 80 texts)", "WEBBE — World English Bible British Edition (81 texts)"):
@@ -546,7 +546,7 @@ def check_reader_safeguards() -> None:
     if "first_visit_bilingual.js?v=bible-route-language-20261125" not in menu or "lang_flags.js?v=single-language-controls-20261126b" not in menu or "welcome_tip.js?v=language-choice-persist-20261125" not in menu:
         fail("Menu must request cache-busted language and first-visit scripts")
     bible_html = (ROOT / "bible.html").read_text(encoding="utf-8")
-    if "bible_fa_fill.js?v=official-opcb-parallel-20261128" not in bible_html or "bible.js?v=official-opcb-parallel-20261128" not in bible_html:
+    if "bible_fa_fill.js?v=official-opcb-parallel-20261128" not in bible_html or "bible.js?v=chapter-selection-offset-fix-20261128" not in bible_html:
         fail("Bible page must request cache-busted Persian and Bible reader scripts")
     # JavaScript is network-first in the service worker, so older page query
     # strings still receive current menu code. Keep the two primary entry points
