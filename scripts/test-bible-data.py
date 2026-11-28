@@ -120,8 +120,52 @@ def check_pack(pack: str, book_ids: list[int]) -> None:
                     fail(f"{path.relative_to(ROOT)} chapter {chapter} verse {verse}: verse text must be a string")
 
 
+def check_official_opcb_pack() -> None:
+    base = ROOT / "data/bible-fa/opcb-official"
+    manifest = load_json(base / "manifest.json")
+    if not isinstance(manifest, dict) or len(manifest) != 66:
+        fail("Official OPCB manifest must list all 66 books")
+        return
+    total_chapters = total_markers = total_ranges = 0
+    for book_id in BOOK_IDS:
+        expected_file = f"b{book_id}.json"
+        if manifest.get(str(book_id)) != [expected_file]:
+            fail(f"Official OPCB manifest entry for {book_id} must reference {expected_file}")
+            continue
+        path = base / expected_file
+        if not path.is_file():
+            fail(f"Official OPCB book file is missing: {expected_file}")
+            continue
+        payload = load_json(path)
+        book = payload.get(str(book_id), {}) if isinstance(payload, dict) else {}
+        chapters = book.get("chapters", {}) if isinstance(book, dict) else {}
+        if not isinstance(chapters, dict):
+            fail(f"Official OPCB book {book_id} has no chapter map")
+            continue
+        total_chapters += len(chapters)
+        for chapter, verses in chapters.items():
+            if not isinstance(verses, dict):
+                fail(f"Official OPCB book {book_id}, chapter {chapter}: invalid verse map")
+                continue
+            for verse, text in verses.items():
+                match = re.fullmatch(r"(\d+)(?:-(\d+))?", str(verse))
+                if not match or int(match.group(1)) < 1 or (match.group(2) and int(match.group(2)) < int(match.group(1))):
+                    fail(f"Official OPCB book {book_id}, chapter {chapter}: invalid USFM verse/range {verse!r}")
+                if not isinstance(text, str) or not text.strip():
+                    fail(f"Official OPCB book {book_id}, chapter {chapter}, verse {verse}: empty/non-text verse body")
+                total_markers += 1
+                total_ranges += int("-" in str(verse))
+    metadata = load_json(base / "metadata.json")
+    if total_chapters != 1189 or total_markers != 29469 or total_ranges != 913:
+        fail(f"Official OPCB totals mismatch: chapters={total_chapters}, markers={total_markers}, ranges={total_ranges}")
+    if metadata.get("books") != 66 or metadata.get("chapters") != 1189 or metadata.get("verse_markers") != 29469 or metadata.get("verse_range_markers") != 913:
+        fail("Official OPCB metadata does not match the imported USFM structure")
+    if metadata.get("text_license") != "CC BY-SA 4.0":
+        fail("Official OPCB metadata must retain the CC BY-SA 4.0 licence")
+
+
 def check_persian_verse_totals() -> None:
-    expected_totals = {"opv": 31091, "opcb": 28731}
+    expected_totals = {"opv": 31091, "opcb": 28735, "opcb-official": 29469}
     for edition, expected in expected_totals.items():
         base = ROOT / f"data/bible-fa/{edition}"
         actual = 0
@@ -225,7 +269,7 @@ def check_runtime_chapter_catalogue() -> None:
         return
     catalogue = {int(book): int(chapters) for book, chapters in re.findall(r"(\d+)\s*:\s*(\d+)", match.group(1))}
     editions = [(f"data/bible-en/local/{edition}", edition) for edition in ENGLISH]
-    editions += [(f"data/bible-fa/{edition}", edition) for edition in ("opv", "opcb")]
+    editions += [(f"data/bible-fa/{edition}", edition) for edition in ("opv", "opcb", "opcb-official")]
     for relative, edition in editions:
         base = ROOT / relative
         for path in sorted(base.glob("b*.json")):
@@ -321,7 +365,10 @@ def check_reader_safeguards() -> None:
     license_page = (ROOT / "bible-licenses.html").read_text(encoding="utf-8")
     welcome_tip = (ROOT / "js/welcome_tip.js").read_text(encoding="utf-8")
     photo = (ROOT / "js/bible-share-photo.js").read_text(encoding="utf-8")
-    search = (ROOT / "js/bible_search.js").read_text(encoding="utf-8")
+    search = (ROOT / "js/bible_search_engine.js").read_text(encoding="utf-8")
+    search_loader = (ROOT / "js/bible_search.js").read_text(encoding="utf-8")
+    if "'/js/bible_search_engine.js'" not in search_loader:
+        fail("Bible search must load its engine from the same website")
     admin = (ROOT / "admin.html").read_text(encoding="utf-8")
     admin_js = (ROOT / "js/admin.js").read_text(encoding="utf-8")
 
@@ -358,7 +405,7 @@ def check_reader_safeguards() -> None:
             fail(f"Local English runtime allowlist mismatch; missing={sorted(expected_local-listed)}, extra={sorted(listed-expected_local)}")
     persian_select = re.search(r'<select id="persian-version-select"(.*?)</select>', html, re.S)
     persian_ids = set(re.findall(r'<option value="([^"]+)"', persian_select.group(0))) if persian_select else set()
-    if persian_ids != {"opv", "opcb"}:
+    if persian_ids != {"opv", "opcb", "opcb-official"}:
         fail(f"Persian selector must preserve both distinct local editions; found={sorted(persian_ids)}")
     for edition_id in supported_ids:
         has_label = re.search(r"(?<![A-Za-z0-9_-])" + re.escape(edition_id) + r"\s*:", reader) or ("'" + edition_id + "':") in reader
@@ -455,7 +502,7 @@ def check_reader_safeguards() -> None:
         fail("Reader must load the selected source chapter instead of assuming chapter 1")
     if "chapter = CHAPTER_STARTS[bookId] || 1" not in reader:
         fail("Selecting a book with a non-1 source chapter start must open its first available source chapter")
-    if "js/bible.js?v=selection-copy-clear-20261126" not in html or "js/bible_search.js?v=english-edition-canon-20261124" not in html:
+    if "js/bible.js?v=official-opcb-parallel-20261128" not in html or "js/bible_search.js?v=official-opcb-parallel-20261128" not in html:
         fail("Bible reader or search script URL is missing the latest cache-busting version")
 
     for label in ("ERV — English Revised Version (1885, 80 texts)", "WEBBE — World English Bible British Edition (81 texts)"):
@@ -464,7 +511,7 @@ def check_reader_safeguards() -> None:
 
     if r"\n    else if (route.has('b')" in reader:
         fail("Bible reader JavaScript must not contain a literal escaped newline in executable route parsing")
-    if "=== 'opv' ? '/data/bible-fa/opv/' : '/data/bible-fa/opcb/'" not in reader:
+    if "isOfficialOpcb = selectedPersianVersion === 'opcb-official'" not in (ROOT / "js/bible_fa_fill.js").read_text(encoding="utf-8"):
         fail("Persian Bible reader must load OPV and OPCB from their actual separate local directories")
     persian_fill = (ROOT / "js/bible_fa_fill.js").read_text(encoding="utf-8")
     if "manifest[String(id)] = ['b' + id + '.json']" not in persian_fill:
@@ -497,7 +544,7 @@ def check_reader_safeguards() -> None:
     if "first_visit_bilingual.js?v=bible-route-language-20261125" not in menu or "lang_flags.js?v=single-language-controls-20261126b" not in menu or "welcome_tip.js?v=language-choice-persist-20261125" not in menu:
         fail("Menu must request cache-busted language and first-visit scripts")
     bible_html = (ROOT / "bible.html").read_text(encoding="utf-8")
-    if "bible_fa_fill.js?v=persian-reader-route-fix-20261124" not in bible_html or "bible.js?v=selection-copy-clear-20261126" not in bible_html:
+    if "bible_fa_fill.js?v=official-opcb-parallel-20261128" not in bible_html or "bible.js?v=official-opcb-parallel-20261128" not in bible_html:
         fail("Bible page must request cache-busted Persian and Bible reader scripts")
     # JavaScript is network-first in the service worker, so older page query
     # strings still receive current menu code. Keep the two primary entry points
@@ -510,7 +557,7 @@ def check_reader_safeguards() -> None:
     if "var CACHE = 'st-v12';" not in service_worker or "/js/menu.js?v=single-language-controls-20261126b" not in service_worker:
         fail("Service worker cache and precache must refresh the updated menu script")
     licenses = (ROOT / "bible-licenses.html").read_text(encoding="utf-8")
-    if "500,616 Scripture verse records" not in licenses or "۵۰۰٬۶۱۶ رکورد آیه" not in licenses:
+    if "29,469 verse markers" not in licenses or "۲۹۴۶۹ نشانگر آیه" not in licenses:
         fail("Bilingual Bible source page must disclose the verified local verse-collation totals")
     if "Thirteen English editions" not in licenses or "سیزده نسخهٔ انگلیسی" not in licenses:
         fail("Bilingual Bible source page must distinguish all 13 locally hosted English editions")
@@ -627,6 +674,7 @@ def main() -> int:
         check_pack(f"data/bible-en/local/{version}", local_english_book_ids(version))
     check_pack("data/bible-fa/opcb", BOOK_IDS)
     check_pack("data/bible-fa/opv", BOOK_IDS)
+    check_official_opcb_pack()
     check_persian_verse_totals()
     check_runtime_chapter_catalogue()
     check_import_workflow_audit_triggers()
