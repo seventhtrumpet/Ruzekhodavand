@@ -11,7 +11,7 @@
     var lang = route.get('lang');
     var version = route.get('version');
     var englishVersions = ['kjv','web','asv','rv1885','ylt','webster','bbe','bsb','msb','webbe','darby','dra','gnv','odr','odr-original'];
-    var persianVersions = ['opv','opcb'];
+    var persianVersions = ['opv','opcb','opcb-official'];
     var routeLanguage = (lang === 'fa' || lang === 'en') ? lang
       : englishVersions.indexOf(version) >= 0 ? 'en'
       : persianVersions.indexOf(version) >= 0 ? 'fa' : null;
@@ -132,6 +132,41 @@
       throw new Error('Requested-chapter-first reader patch did not apply');
     }
 
+    // Keep official USFM verse ranges intact in the reader (for example, 7–8).
+    code = code.replace(/  function buildChapterHtml\(ch, versesObj\) \{[\s\S]*?\n  \}\n\n  function scrollToRef/, [
+      "  function buildChapterHtml(ch, versesObj) {",
+      "    const verses = versesObj || {};",
+      "    const verseKeys = Object.keys(verses).sort((a, b) => Number(a.split('-')[0]) - Number(b.split('-')[0]));",
+      "    const maxVerse = verseKeys.reduce((max, key) => Math.max(max, Number(key.split('-').pop()) || 1), 1);",
+      "    let html = '<div class=\"mb-chapter\" id=\"ch-' + ch + '\" data-chapter=\"' + ch + '\" data-max-verse=\"' + maxVerse + '\">';",
+      "    html += '<h2 class=\"mb-ch-title\">' + t('chapterLabel') + ' ' + ch + '</h2>';",
+      "    verseKeys.forEach(rawKey => {",
+      "      const parts = rawKey.split('-').map(Number);",
+      "      const start = parts[0];",
+      "      const end = parts[1] || start;",
+      "      const key = ch + ':' + start;",
+      "      const sel = selected.has(key) ? ' selected' : '';",
+      "      const label = end > start ? start + '–' + end : String(start);",
+      "      html += '<p class=\"mb-verse' + sel + '\" id=\"v-' + ch + '-' + start + '\" data-chapter=\"' + ch + '\" data-verse=\"' + start + '\" data-verse-end=\"' + end + '\">' +",
+      "        '<span class=\"mb-vnum\">' + label + '</span>' + escapeHtml(verses[rawKey]) + '</p>';",
+      "    });",
+      "    html += '</div>';",
+      "    return html;",
+      "  }",
+      "",
+      "  function scrollToRef"
+    ].join('\n'));
+    if (code.indexOf("data-verse-end") < 0) throw new Error('USFM range renderer patch did not apply');
+    code = code.replace(
+      "    const el = document.getElementById('v-' + ch + '-' + vs) || document.getElementById('ch-' + ch);",
+      "    const exact = document.getElementById('v-' + ch + '-' + vs);\n    const range = exact || Array.from(document.querySelectorAll('.mb-verse[data-chapter=\"' + ch + '\"]')).find(node => Number(node.getAttribute('data-verse')) <= Number(vs) && Number(node.getAttribute('data-verse-end') || node.getAttribute('data-verse')) >= Number(vs));\n    const el = range || document.getElementById('ch-' + ch);"
+    );
+    code = code.replace(
+      "max = Math.max(...Object.keys(vs).map(Number), 1);",
+      "max = Math.max(...Object.keys(vs).map(key => Number(key.split('-').pop())).filter(Number.isFinite), 1);"
+    );
+
+
     // scrollToRef in the pinned reader now computes the exact offset below both fixed bars.
 
     // Expose each edition's complete source canon without duplicating shared metadata.
@@ -158,7 +193,7 @@
     code = code.replace(/mb-book-btn/g, 'mb-cell');
     code = code.replace(/mb-num-btn/g, 'mb-cell');
 
-    code = code.replace("version: 'هزارۀ نو (FANMV)',", "version: (localStorage.getItem('cog_bible_fa_version') === 'opv' ? 'ترجمه قدیم فارسی (OPV)' : 'ترجمه معاصر فارسی (OPCB)'),");
+    code = code.replace("version: 'هزارۀ نو (FANMV)',", "version: ({opv:'ترجمه قدیم فارسی (OPV)',opcb:'ترجمه معاصر فارسی (OPCB)', 'opcb-official':'ترجمه رسمی معاصر فارسی (OPCB 2022)'})[localStorage.getItem('cog_bible_fa_version') || 'opcb'] || 'ترجمه معاصر فارسی (OPCB)',");
     code = code.replace("version: 'King James Version',", "version: ({kjv:'King James Version',web:'World English Bible Classic (81 texts)',asv:'American Standard Version (1901)',rv1885:'English Revised Version (1885, 80 texts)',ylt:\"Young's Literal Translation (1898)\",webster:\"Webster's Bible (1833)\",bbe:'Bible in Basic English',bsb:'Berean Standard Bible',msb:'Majority Standard Bible',webbe:'World English Bible British Edition (81 texts)',darby:'Darby Translation (1884)',dra:'Douay-Rheims 1899',gnv:'Geneva Bible (1599)',odr:'Original Douay-Rheims (1582/1609–1610) — modern spelling','odr-original':'Original Douay-Rheims — original spelling'})[localStorage.getItem('cog_bible_en_version') || 'kjv'] || 'King James Version',");
     code = code.replace(/const ref = encodeURIComponent\(b\.en \+ ' ' \+ ch\);\s*const res = await fetch\([^;]+\);/, "const selectedTranslation = localStorage.getItem('cog_bible_en_version') || 'kjv';\n      const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885','msb'];\n      const freeBibleIds = ['kjv','bbe'];\n      const bookSlug = b.en === 'Song of Songs' ? 'song-of-solomon' : b.en.toLowerCase().replace(/\\s+/g, '-').replace(/[^a-z0-9-]/g, '');\n      \n      const isOdr = selectedTranslation === 'odr' || selectedTranslation === 'odr-original';\n      const isLocalEnglish = localEnglishIds.indexOf(selectedTranslation) >= 0;\n      const odrPath = selectedTranslation === 'odr-original' ? 'original-spelling/bible/raw/' : 'bible/raw/';\n      const requestUrl = isOdr\n        ? '/data/bible-en/odr/' + odrPath + b.slug + '.json'\n        : isLocalEnglish\n          ? '/data/bible-en/local/' + selectedTranslation + '/b' + id + '.json'\n          : freeBibleIds.indexOf(selectedTranslation) >= 0\n            ? 'https://free.bible/bible/' + selectedTranslation + '/' + bookSlug + '/' + ch + '.json'\n            : '/data/bible-en/local/' + selectedTranslation + '/b' + id + '.json';\n      const res = await fetch(requestUrl);");
     code = code.replace("(data.verses || []).forEach(v => { verses[String(v.verse)] = (v.text || '').trim(); });", "const localBook = isLocalEnglish ? (data[String(id)] || data[id] || data) : null;\n      const chapterData = isOdr ? (data.chapters || []).find(item => Number(item.chapter) === Number(ch)) : null;\n      const localChapter = isLocalEnglish ? ((localBook && localBook.chapters) || {})[String(ch)] : null;\n      const rows = isOdr ? ((chapterData && chapterData.verses) || [])\n        : isLocalEnglish ? Object.keys(localChapter || {}).map(verse => ({verse: verse, text: localChapter[verse]}))\n        : (Array.isArray(data) ? data : (data.verses || []));\n      rows.forEach(v => { const n = v.verse != null ? v.verse : v.v; const verseText = v.text != null ? v.text : v.t; if (n != null && Number(n) > 0) verses[String(n)] = String(verseText || '').replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').trim(); });");
@@ -272,13 +307,15 @@
       var savedEnglishVersion = localStorage.getItem('cog_bible_en_version') || 'kjv';
       if (['kjv','web','asv','rv1885','ylt','webster','bbe','bsb','msb','webbe','darby','dra','gnv','odr','odr-original'].indexOf(savedEnglishVersion) < 0) savedEnglishVersion = 'kjv';
       if (versionSelect) versionSelect.value = savedEnglishVersion;
-      if (persianVersionSelect) persianVersionSelect.value = localStorage.getItem('cog_bible_fa_version') || 'opcb';
+      var savedPersianVersion = localStorage.getItem('cog_bible_fa_version') || 'opcb';
+      if (['opv','opcb','opcb-official'].indexOf(savedPersianVersion) < 0) savedPersianVersion = 'opcb';
+      if (persianVersionSelect) persianVersionSelect.value = savedPersianVersion;
       var translationNote = document.getElementById('bible-translation-note');
       if (translationNote) translationNote.textContent = english
         ? (['odr','odr-original'].includes(savedEnglishVersion)
           ? "Original Douay-Rheims (1582/1609–1610), 76 listed texts: the 73-book Catholic canon plus three appendix texts. Both spelling forms are served from this website's own files. This beta dataset is marked CC0; only Scripture verses are displayed, not study notes or front matter. Both spelling forms use their own local verse search index. See Sources and Licences for details."
           : "Read and compare translations here without leaving SeventhTrumpet.org. Eleven English editions, plus both Original Douay-Rheims spelling forms, are served from this website's own files. KJV and BBE chapter text is fetched in the background from Free.Bible; these two editions are not self-hosted. Bible search follows the selected local edition, including both Original Douay-Rheims spelling forms; only KJV and BBE use the KJV fallback index. See Sources and Licences for details.")
-        : "متن دو نسخهٔ فارسی OPV و OPCB از فایل‌های خودِ SeventhTrumpet.org بارگذاری می‌شود و برای خواندن آن‌ها به وب‌سایت دیگری منتقل نمی‌شوید. نسخه‌های انگلیسیِ میزبانی‌شده روی سایت و دو نگارش Douay-Rheims نیز از فایل‌های خود سایت خوانده می‌شوند؛ فقط متن فصل‌های KJV و BBE در پس‌زمینه از Free.Bible دریافت می‌شود. جست‌وجوی فارسی از همان نسخهٔ فارسی انتخاب‌شده استفاده می‌کند و جست‌وجوی انگلیسی نیز برای نسخه‌های دارای نمایهٔ داخلی با نسخهٔ انتخاب‌شده هماهنگ است؛ فقط KJV و BBE فعلاً از نمایهٔ جایگزین KJV استفاده می‌کنند. برای جزئیات منبع و شرایط استفاده، صفحهٔ منابع و مجوزها را ببینید.";
+        : "نسخهٔ فعلی OPCB و نسخهٔ رسمی OPCB ۲۰۲۲ که از منبع USFM تبدیل شده، همراه با OPV از فایل‌های خودِ SeventhTrumpet.org خوانده می‌شوند؛ خواننده برای دیدن آیات به سایت دیگری منتقل نمی‌شود. نسخهٔ رسمی، محدوده‌های آیه را مطابق منبع حفظ می‌کند و پاورقی‌ها را وارد متن آیات نمی‌کند. نسخه‌های انگلیسیِ میزبانی‌شده نیز از فایل‌های خود سایت خوانده می‌شوند؛ فقط متن فصل‌های KJV و BBE در پس‌زمینه از Free.Bible دریافت می‌شود. برای جزئیات منبع و مجوزها، صفحهٔ منابع و مجوزها را ببینید.";
       var nmvLink = document.getElementById('nmv-external-link');
       if (nmvLink) nmvLink.textContent = english
         ? 'New Millennium Version (NMV) — read on the publisher’s website'
@@ -292,7 +329,7 @@
       location.reload();
     });
     if (persianVersionSelect) persianVersionSelect.addEventListener('change', function () {
-      var value = persianVersionSelect.value === 'opv' ? 'opv' : 'opcb';
+      var value = ['opv','opcb-official'].indexOf(persianVersionSelect.value) >= 0 ? persianVersionSelect.value : 'opcb';
       localStorage.setItem('cog_bible_fa_version', value);
       location.reload();
     });
