@@ -123,7 +123,7 @@ body.dark .mb-tab.active { background: #2a6dad; }
 .mb-nums {
   grid-template-columns: repeat(6, 1fr);
 }
-.mb-book, .mb-num {
+.mb-book-btn, .mb-num-btn {
   border: 1px solid var(--border, #d8dee6);
   background: var(--bg, #f5f7fa);
   border-radius: 10px;
@@ -133,13 +133,13 @@ body.dark .mb-tab.active { background: #2a6dad; }
   cursor: pointer;
   color: var(--text, #1a1a1a);
 }
-.mb-book.active, .mb-num.active {
+.mb-book-btn.active, .mb-num-btn.active {
   background: var(--primary, #0a2540);
   color: #fff;
   border-color: var(--primary, #0a2540);
 }
-body.dark .mb-book, body.dark .mb-num { background: #1a2b3c; border-color: #2a3a4c; color: #e8eef5; }
-body.dark .mb-book.active, body.dark .mb-num.active { background: #2a6dad; border-color: #2a6dad; }
+body.dark .mb-book-btn, body.dark .mb-num-btn { background: #1a2b3c; border-color: #2a3a4c; color: #e8eef5; }
+body.dark .mb-book-btn.active, body.dark .mb-num-btn.active { background: #2a6dad; border-color: #2a6dad; }
 .mb-sel-foot {
   display: flex;
   align-items: center;
@@ -336,7 +336,7 @@ body.dark #persian-version-select {
 .mb-nums {
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
-.mb-book, .mb-num {
+.mb-book-btn, .mb-num-btn {
   min-height: 2.9rem;
   padding: 0.62rem 0.35rem;
   font-size: 0.94rem;
@@ -345,16 +345,16 @@ body.dark #persian-version-select {
   white-space: normal;
   overflow-wrap: anywhere;
 }
-.mb-num {
+.mb-num-btn {
   font-size: 1rem;
   font-variant-numeric: tabular-nums;
 }
 @media (max-width: 480px) {
   .mb-nums { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  .mb-book, .mb-num {
+  .mb-book-btn, .mb-num-btn {
     min-height: 3rem;
     padding: 0.65rem 0.3rem;
     font-size: 0.96rem;
   }
-  .mb-num { font-size: 1.02rem; }
+  .mb-num-btn { font-size: 1.02rem; }
 }
