@@ -70,7 +70,7 @@
     try { persianVersion = localStorage.getItem('cog_bible_fa_version') || 'opcb'; } catch (e2) {}
     if (persianVersion === 'opv') return 'منبع جست‌وجو: OPV';
     if (persianVersion === 'opcb-official') return 'منبع جست‌وجو: OPCB رسمی ۲۰۲۲';
-    return 'منبع جست‌وجو: OPCB';
+    return 'منبع جست‌وجو: OPCB (نسخهٔ فعلی)';
   }
 
   function isEnglishSearchSupported() {
