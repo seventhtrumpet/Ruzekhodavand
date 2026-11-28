@@ -1,0 +1,20 @@
+{
+  "translation": "Biblica Open Persian Contemporary Bible (2022) — official USFM source",
+  "copyright": "© 1995, 2005, 2018, 2022 Biblica, Inc.",
+  "text_license": "CC BY-SA 4.0",
+  "source": "https://ebible.org/Scriptures/pesopcb_usfm.zip",
+  "source_sha256": "86ec74a1de07f769bf53f0f282c9f2886f845aca7dcbf8412543f0feb2a42a7d",
+  "source_archive": "pesopcb_usfm.zip",
+  "source_format": "USFM",
+  "site_format": "Per-book JSON for the on-site reader",
+  "format_changes": [
+    "Converted USFM to per-book JSON.",
+    "USFM verse ranges remain range keys (for example, 7-8); they are not silently split or renumbered.",
+    "Footnotes and cross-references are kept out of verse-body text.",
+    "Paragraph/list/table markers are represented as readable spacing and separators."
+  ],
+  "books": 66,
+  "chapters": 1189,
+  "verse_markers": 29469,
+  "verse_range_markers": 913
+}
