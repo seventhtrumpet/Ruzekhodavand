@@ -21,6 +21,8 @@
 
   var opcbPromise = null;
   var converted = {};
+  var officialOpcbPromise = null;
+  var officialConverted = {};
   var origFetch = window.fetch.bind(window);
 
   function loadOpcb() {
@@ -67,6 +69,53 @@
       });
     }
     return converted[id];
+  }
+
+  function loadOfficialOpcb() {
+    if (!officialOpcbPromise) {
+      officialOpcbPromise = origFetch('/data/bible-fa/opcb-official/manifest.json').then(function (response) {
+        if (!response.ok) throw new Error('Official OPCB manifest unavailable: ' + response.status);
+        return response.json();
+      }).then(function (manifest) {
+        var valid = manifest && IDS.every(function (id) {
+          var files = manifest[String(id)];
+          return Array.isArray(files) && files.indexOf('b' + id + '.json') >= 0;
+        });
+        if (!valid) throw new Error('Official OPCB manifest is incomplete');
+        return manifest;
+      }).catch(function (error) {
+        officialOpcbPromise = null;
+        console.error('[bible] Official OPCB manifest failed', error);
+        return null;
+      });
+    }
+    return officialOpcbPromise;
+  }
+
+  function officialOpcbBookPayload(id) {
+    id = Number(id);
+    if (!officialConverted[id]) {
+      officialConverted[id] = loadOfficialOpcb().then(function (manifest) {
+        if (!manifest || IDS.indexOf(id) < 0 || !manifest[String(id)]) return null;
+        return origFetch('/data/bible-fa/opcb-official/b' + id + '.json').then(function (response) {
+          if (!response.ok) throw new Error('Official OPCB book unavailable: ' + response.status);
+          return response.json();
+        }).then(function (parsed) {
+          var data = parsed && (parsed[String(id)] || parsed[id] || parsed);
+          var chapters = data && data.chapters;
+          var expected = CH_COUNT[id] || 0;
+          if (!chapters || Object.keys(chapters).length !== expected) {
+            throw new Error('Official OPCB chapter count mismatch for book ' + id);
+          }
+          return parsed;
+        }).catch(function (error) {
+          delete officialConverted[id];
+          console.error('[bible] Official OPCB book failed', id, error);
+          return null;
+        });
+      });
+    }
+    return officialConverted[id];
   }
 
   function jsonResponse(obj) {
@@ -146,7 +195,30 @@
   window.fetch = function (input, init) {
     var url = typeof input === 'string' ? input : (input && input.url) || '';
     var isOpv = false;
-    try { isOpv = localStorage.getItem('cog_bible_fa_version') === 'opv'; } catch (e) {}
+    var isOfficialOpcb = false;
+    try {
+      var selectedPersianVersion = localStorage.getItem('cog_bible_fa_version') || 'opcb';
+      isOpv = selectedPersianVersion === 'opv';
+      isOfficialOpcb = selectedPersianVersion === 'opcb-official';
+    } catch (e) {}
+
+    if (isOfficialOpcb && url.indexOf('/data/bible-fa/manifest.json') >= 0) {
+      return loadOfficialOpcb().then(function (manifest) {
+        var selectedManifest = manifest || {};
+        window.__bibleManifest = selectedManifest;
+        return jsonResponse(selectedManifest);
+      });
+    }
+    if (isOfficialOpcb && url.indexOf('/data/bible-fa/') >= 0 &&
+        url.indexOf('manifest') < 0 && url.indexOf('meta.json') < 0 &&
+        url.indexOf('pack.json') < 0) {
+      var officialId = bookIdFromUrl(url);
+      if (officialId && IDS.indexOf(officialId) >= 0) {
+        return officialOpcbBookPayload(officialId).then(function (data) {
+          return data ? jsonResponse(data) : jsonResponse({});
+        });
+      }
+    }
 
     if (isOpv && url.indexOf('/data/bible-fa/manifest.json') >= 0) {
       return Promise.resolve(jsonResponse(fullManifest()));
@@ -189,9 +261,10 @@
   };
 
   function preloadSelectedPersianVersion() {
-    try {
-      if (localStorage.getItem('cog_bible_fa_version') === 'opv') return;
-    } catch (e) {}
+    var selected = 'opcb';
+    try { selected = localStorage.getItem('cog_bible_fa_version') || 'opcb'; } catch (e) {}
+    if (selected === 'opv') return;
+    if (selected === 'opcb-official') { loadOfficialOpcb(); return; }
     loadOpcb();
   }
 
@@ -200,10 +273,11 @@
   setTimeout(preloadSelectedPersianVersion, 2000);
 
   window.__stPersianBibleReady = function () {
-    var isOpv = false;
-    try { isOpv = localStorage.getItem('cog_bible_fa_version') === 'opv'; } catch (e) {}
-    if (isOpv) return Promise.resolve(true);
-    return loadOpcb().then(function (manifest) {
+    var selected = 'opcb';
+    try { selected = localStorage.getItem('cog_bible_fa_version') || 'opcb'; } catch (e) {}
+    if (selected === 'opv') return Promise.resolve(true);
+    var loader = selected === 'opcb-official' ? loadOfficialOpcb : loadOpcb;
+    return loader().then(function (manifest) {
       return !!(manifest && Object.keys(manifest).length >= 66);
     });
   };
