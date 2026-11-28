@@ -26,6 +26,7 @@ jobs:
           python -m py_compile scripts/import-english-local.py
           python -m py_compile scripts/import-opv.py
           python -m py_compile scripts/import-opcb.py
+          python -m py_compile scripts/import-opcb-official.py
           python -m py_compile scripts/import-odr.py
           python -m py_compile scripts/build-odr-search-index.py
           python -m py_compile scripts/audit-odr-exact.py
@@ -40,6 +41,7 @@ jobs:
           node --check js/bible.js
           node --check js/bible-core-pinned.js
           node --check js/bible_search.js
+          node --check js/bible_search_engine.js
           node --check js/bible-share.js
           node --check js/bible-share-photo.js
           node --check js/lang_fix.js
