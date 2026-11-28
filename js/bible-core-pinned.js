@@ -228,7 +228,32 @@
     if (!scrollSync || loadingBook) return;
     const nodes = document.querySelectorAll('.mb-chapter');
     let current = null;
-    const mid = window.scrollY + 130;
+    // Use the same live fixed-bar stack as the scroll helper. A hard-coded
+    // 130px line can sit above the selected chapter when the version/search
+    // bars are visible, causing the reader to save the previous chapter.
+    const fixedNodes = [
+      document.querySelector('.header'),
+      document.querySelector('.mb-bar'),
+      document.getElementById('mb-search-wrap'),
+      document.getElementById('bible-version-wrap'),
+      document.getElementById('persian-version-wrap')
+    ];
+    let fixedBottom = 0;
+    let totalFixedHeight = 0;
+    fixedNodes.forEach(node => {
+      if (!node) return;
+      const style = window.getComputedStyle(node);
+      if (style.display === 'none' || style.visibility === 'hidden') return;
+      const rect = node.getBoundingClientRect();
+      if (rect.height > 0) {
+        totalFixedHeight += rect.height;
+        if (rect.bottom > fixedBottom) fixedBottom = rect.bottom;
+      }
+    });
+    const selectorOffset = fixedBottom > 80 ? fixedBottom + 14 : totalFixedHeight + 16;
+    // scrollToRef places the selected verse at selectorOffset. Read selection
+    // just below that same line so a chapter jump cannot resolve to chapter N-1.
+    const mid = window.scrollY + selectorOffset + 8;
     nodes.forEach(n => { if (n.offsetTop <= mid) current = n; });
     if (!current) return;
     const ch = Number(current.getAttribute('data-chapter'));
