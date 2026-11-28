@@ -3,10 +3,7 @@
   if (window.__mbSearchLoader) return;
   window.__mbSearchLoader = true;
 
-  var URLS = [
-    'https://cdn.jsdelivr.net/gh/seventhtrumpet/Ruzekhodavand@9c8acefa30/js/bible_search.js',
-    'https://raw.githubusercontent.com/seventhtrumpet/Ruzekhodavand/9c8acefa30/js/bible_search.js'
-  ];
+  var URLS = ['/js/bible_search_engine.js'];
 
   var PATCH_TO = [
     'function placeSearch() {',
