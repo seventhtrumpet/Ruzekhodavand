@@ -1,4 +1,4 @@
-/* Bible search loader — restore full engine + fix version/search stack */
+/* Bible search loader — restore full engine + fix version/search stack + verse offset */
 (function () {
   if (window.__mbSearchLoader) return;
   window.__mbSearchLoader = true;
@@ -13,6 +13,7 @@
     '    var wrap = document.getElementById("mb-search-wrap");',
     '    if (!wrap) return;',
     '    var bar = document.querySelector(".mb-bar");',
+    '    var header = document.querySelector(".header");',
     '    var top = bar ? Math.max(bar.getBoundingClientRect().bottom, 48) : 56;',
     '    wrap.style.position = "fixed";',
     '    wrap.style.left = "0";',
@@ -47,6 +48,9 @@
     '      version.style.width = "100%";',
     '    });',
     '    var versionHeight = activeVersion ? Math.max(activeVersion.offsetHeight || 0, 48) : 0;',
+    '    var headerH = header ? (header.offsetHeight || 56) : 56;',
+    '    var barH = bar ? (bar.offsetHeight || 48) : 48;',
+    '    var stackH = headerH + barH + searchHeight + versionHeight + 20;',
     '    var spacer = document.getElementById("bible-version-spacer");',
     '    if (!spacer) {',
     '      spacer = document.createElement("div");',
@@ -58,8 +62,13 @@
     '    }',
     '    spacer.style.display = "block";',
     '    spacer.style.width = "100%";',
-    '    spacer.style.height = (searchHeight + versionHeight + 8) + "px";',
+    '    spacer.style.height = stackH + "px";',
+    '    spacer.style.flex = "0 0 auto";',
     '    spacer.style.pointerEvents = "none";',
+    '    try {',
+    '      document.documentElement.style.scrollPaddingTop = stackH + "px";',
+    '      document.documentElement.style.setProperty("--st-bible-offset", stackH + "px");',
+    '    } catch (e2) {}',
     '  }'
   ].join('\n');
 
@@ -76,6 +85,20 @@
     code = applyPatch(code);
     try {
       (0, eval)(code);
+      setTimeout(function () {
+        try { if (typeof placeSearch === 'function') placeSearch(); } catch (e) {}
+      }, 200);
+      setTimeout(function () {
+        try { if (typeof placeSearch === 'function') placeSearch(); } catch (e) {}
+      }, 800);
+      window.addEventListener('resize', function () {
+        try { if (typeof placeSearch === 'function') placeSearch(); } catch (e) {}
+      });
+      window.addEventListener('cog-lang-changed', function () {
+        setTimeout(function () {
+          try { if (typeof placeSearch === 'function') placeSearch(); } catch (e) {}
+        }, 100);
+      });
     } catch (e) {
       console.error('[bible_search] eval failed', e);
     }
