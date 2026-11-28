@@ -382,6 +382,8 @@ def check_reader_safeguards() -> None:
         fail("Local English and Original Douay-Rheims book JSON must be cached once per book and edition")
     if "const oldScrollBehavior = root.style.scrollBehavior" not in reader:
         fail("Shared Bible route restoration must bypass global smooth scrolling for immediate verse positioning")
+    if "const selectorOffset = fixedBottom > 80 ? fixedBottom + 14 : totalFixedHeight + 16;" not in core or "const mid = window.scrollY + selectorOffset + 8;" not in core:
+        fail("Scroll-based chapter tracking must use the live fixed header/navigation/search/version stack, not a hard-coded offset")
     if "const chapterData = bookData && bookData.chapters[String(chapter)];" not in reader or "requestAnimationFrame(() => scrollToRef(chapter, verse, false));" not in reader:
         fail("English Bible deep links must render and scroll to the requested chapter and verse")
     if "const localEnglishIds = ['web','asv','ylt','webster','darby','gnv','bsb','dra','webbe','rv1885','msb']" not in reader:
